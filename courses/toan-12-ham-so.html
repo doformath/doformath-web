@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chuyên đề Hàm số & Tích phân - DoforMath</title>
+    <!-- Nhúng icon -->
+    <link rel="icon" type="image/jpeg" href="../assets/images/Doformath.png">
+
+    <!-- Nhúng CSS & Fonts giống y chang Trang chủ -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: { extend: { colors: { primary: '#1d4ed8', secondary: '#facc15'} } }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 text-gray-800 antialiased font-sans">
+
+    <!-- Header Menu -->
+    <header class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+            <!-- Lưu ý: Dùng "../index.html" để quay về trang chủ -->
+            <a href="../index.html" class="flex items-center text-gray-600 hover:text-primary font-medium gap-2 transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Trở về Trang chủ
+            </a>
+        </div>
+    </header>
+
+    <!-- Nội dung Chi tiết Khóa học -->
+    <main class="max-w-5xl mx-auto px-4 py-12">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            
+            <!-- Cột trái: Thông tin & Video mô tả (Chiếm 2/3) -->
+            <div class="md:col-span-2">
+                <span class="bg-blue-100 text-primary text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">Toán 12</span>
+                <h1 class="text-3xl font-bold mt-4 mb-6">Luyện thi THPT Quốc Gia - Chuyên đề Hàm số & Tích phân</h1>
+                
+                <!-- Video giới thiệu -->
+                <div class="aspect-video bg-gray-900 rounded-xl overflow-hidden mb-8">
+                    <!-- Dán iframe video giới thiệu (không bảo mật cũng được) vào đây -->
+                    <p class="text-white text-center mt-20">Video giới thiệu khóa học</p>
+                </div>
+                
+                <!-- Nội dung mô tả khóa học -->
+                <div class="prose max-w-none">
+                    <h3 class="text-xl font-bold mb-4">Bạn sẽ học được gì?</h3>
+                    <ul class="space-y-2 mb-8 list-disc pl-5">
+                        <li>Làm chủ bài toán cực trị, tính đơn điệu của hàm số.</li>
+                        <li>Kỹ năng giải nhanh tích phân hàm ẩn, tích phân từng phần.</li>
+                        <li>Tuyệt chiêu bấm máy tính Casio tối ưu thời gian.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Cột phải: Cột Đăng ký (Chiếm 1/3) -->
+            <div class="md:col-span-1">
+                <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 sticky top-6">
+                    <div class="text-3xl font-bold text-primary mb-2">899,000đ</div>
+                    <div class="text-sm text-gray-500 line-through mb-6">1,200,000đ</div>
+                    
+                    <button class="w-full bg-primary hover:bg-blue-800 text-white py-4 rounded-xl font-bold text-lg mb-4 shadow-md transition-all">
+                        Đăng ký học ngay
+                    </button>
+                    
+                    <ul class="text-sm text-gray-600 space-y-3">
+                        <li class="flex items-center gap-2"><svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg> Sở hữu bài giảng trọn đời</li>
+                        <li class="flex items-center gap-2"><svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg> Tặng kèm File LaTeX chuyên đề</li>
+                        <li class="flex items-center gap-2"><svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg> Hỗ trợ giải đáp 24/7</li>
+                    </ul>
+                </div>
+            </div>
+            
+        </div>
+    </main>
+</body>
+</html>

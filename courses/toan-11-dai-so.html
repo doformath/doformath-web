@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đại số & Giải tích 11 - DoforMath</title>
+    
+    <!-- Cấu hình Favicon (Logo trên tab) nhớ có ../ vì đang ở thư mục con -->
+    <link rel="icon" type="image/png" href="../assets/images/Doformath.png">
+
+    <!-- Font chữ Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS và cấu hình màu Teal -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] }, colors: { primary: '#0d9488', secondary: '#facc15'} } }
+        }
+    </script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- KaTeX cho Toán học -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 antialiased font-sans">
+
+    <!-- Header Navigation -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+            <!-- Nút quay lại trang chủ -->
+            <a href="../index.html" class="flex items-center text-gray-500 hover:text-primary font-medium gap-2 transition">
+                <i class="fa-solid fa-arrow-left"></i> Trở về Trang chủ
+            </a>
+            
+            <!-- Logo Toán học -->
+            <div class="hidden sm:block hover:opacity-80 transition-opacity cursor-pointer">
+                <span class="text-2xl tracking-tight text-gray-900 pb-1">
+                    $\textcolor{#0d9488}{\textsf{\textbf{Dofor}}{\sum}\textsf{\textbf{ath}}}$
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Nội dung Chi tiết Khóa học -->
+    <main class="max-w-5xl mx-auto px-4 py-12">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            
+            <!-- Cột trái: Thông tin & Video mô tả (Chiếm 2/3) -->
+            <div class="md:col-span-2">
+                <span class="bg-teal-50 text-primary border border-teal-100 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">Toán 11</span>
+                <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mt-4 mb-6 leading-tight">Đại số & Giải tích 11 - Trọng tâm Học kỳ I</h1>
+                
+                <!-- Khung nhúng Video giới thiệu -->
+                <div class="aspect-video bg-gray-900 rounded-xl overflow-hidden mb-10 shadow-lg flex items-center justify-center">
+                    <p class="text-white opacity-70"><i class="fa-regular fa-circle-play mr-2"></i> [Nhúng video giới thiệu khóa học vào đây]</p>
+                </div>
+                
+                <!-- BẮT ĐẦU: KHU VỰC 3 CHƯƠNG HỌC MÀ BẠN YÊU CẦU -->
+                <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-200">
+                    <h3 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                        <i class="fa-solid fa-list-check text-primary"></i> Lộ trình & Nội dung khóa học
+                    </h3>
+                    
+                    <div class="space-y-4">
+                        <!-- Chương 1 -->
+                        <div class="border border-gray-100 rounded-xl p-5 bg-gray-50 hover:bg-teal-50/50 transition-colors group">
+                            <div class="flex items-start gap-4">
+                                <div class="bg-white w-10 h-10 rounded-full shadow-sm flex items-center justify-center text-primary font-bold border border-teal-100 shrink-0">1</div>
+                                <div>
+                                    <h4 class="text-lg font-bold text-gray-800 group-hover:text-primary transition-colors">Hàm số lượng giác và phương trình lượng giác</h4>
+                                    <p class="text-gray-500 text-sm mt-1">Nắm vững các tính chất hàm số và kỹ năng giải phương trình lượng giác từ cơ bản đến nâng cao.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Chương 2 -->
+                        <div class="border border-gray-100 rounded-xl p-5 bg-gray-50 hover:bg-teal-50/50 transition-colors group">
+                            <div class="flex items-start gap-4">
+                                <div class="bg-white w-10 h-10 rounded-full shadow-sm flex items-center justify-center text-primary font-bold border border-teal-100 shrink-0">2</div>
+                                <div>
+                                    <h4 class="text-lg font-bold text-gray-800 group-hover:text-primary transition-colors">Dãy số. Cấp số cộng. Cấp số nhân.</h4>
+                                    <p class="text-gray-500 text-sm mt-1">Phương pháp truy hồi, chứng minh quy nạp và các bài toán thực tế về cấp số.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Chương 3 -->
+                        <div class="border border-gray-100 rounded-xl p-5 bg-gray-50 hover:bg-teal-50/50 transition-colors group">
+                            <div class="flex items-start gap-4">
+                                <div class="bg-white w-10 h-10 rounded-full shadow-sm flex items-center justify-center text-primary font-bold border border-teal-100 shrink-0">3</div>
+                                <div>
+                                    <h4 class="text-lg font-bold text-gray-800 group-hover:text-primary transition-colors">Giới hạn. Hàm số liên tục</h4>
+                                    <p class="text-gray-500 text-sm mt-1">Tính giới hạn dãy số, hàm số và điều kiện để hàm số liên tục trên một khoảng.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- KẾT THÚC: KHU VỰC 3 CHƯƠNG HỌC -->
+                
+            </div>
+
+            <!-- Cột phải: Cột Đăng ký (Chiếm 1/3) -->
+            <div class="md:col-span-1">
+                <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 sticky top-24">
+                    <div class="text-3xl font-bold text-primary mb-2">699,000đ</div>
+                    <div class="text-sm text-gray-500 line-through mb-6">900,000đ</div>
+                    
+                    <button class="w-full bg-primary hover:bg-teal-700 text-white py-4 rounded-xl font-bold text-lg mb-4 shadow-md transition-all flex items-center justify-center gap-2">
+                        Đăng ký học ngay <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                    
+                    <ul class="text-sm text-gray-600 space-y-3 mt-6">
+                        <li class="flex items-center gap-3">
+                            <i class="fa-solid fa-check text-green-500"></i> Sở hữu video bài giảng trọn đời
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i class="fa-solid fa-check text-green-500"></i> Bài tập trắc nghiệm & tự luận kèm lời giải
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i class="fa-solid fa-check text-green-500"></i> Hỗ trợ giải đáp thắc mắc 24/7
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+        </div>
+    </main>
+
+    <!-- Script Kích hoạt KaTeX cho Logo -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false}
+                ],
+                throwOnError : false
+            });
+        });
+    </script>
+</body>
+</html>

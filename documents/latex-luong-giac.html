@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tài liệu LaTeX - Lượng giác | DoforMath</title>
+    
+    <!-- Font Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] }, colors: { primary: '#1d4ed8', secondary: '#facc15' } } }
+        }
+    </script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 antialiased font-sans">
+
+    <!-- Header Navigation -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <!-- Link quay lại trang chủ -->
+            <a href="../index.html" class="flex items-center text-gray-500 hover:text-primary font-medium transition-colors">
+                <i class="fa-solid fa-arrow-left mr-2"></i> Trở về Trang chủ
+            </a>
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-primary text-white rounded-lg flex items-center justify-center font-bold text-sm shadow">
+                    <i class="fa-solid fa-infinity"></i>
+                </div>
+                <span class="font-bold text-xl text-gray-900">DoforMath.</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <!-- Tiêu đề trang -->
+        <div class="mb-10 border-b border-gray-200 pb-6">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-primary font-semibold text-xs mb-4 uppercase tracking-wide">
+                <i class="fa-solid fa-code"></i> Thư viện Code
+            </div>
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3">Hướng dẫn gõ LaTeX: Chuyên đề Lượng Giác</h1>
+            <p class="text-gray-500 text-lg">Tổng hợp các mã lệnh LaTeX để gõ công thức lượng giác lớp 11, từ cơ bản đến phương trình.</p>
+        </div>
+
+        <!-- Bảng đối chiếu Code vs Render -->
+        <div class="space-y-12">
+            
+            <!-- Phần 1: Hệ thức cơ bản -->
+            <section>
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+                    <span class="bg-primary text-white w-8 h-8 rounded-full flex items-center justify-center text-lg">1</span> 
+                    Hệ thức lượng giác cơ bản
+                </h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Cột Code -->
+                    <div class="bg-gray-900 rounded-xl p-5 shadow-inner">
+                        <div class="flex justify-between items-center mb-3 border-b border-gray-700 pb-2">
+                            <span class="text-gray-400 text-sm font-mono">Mã LaTeX</span>
+                            <button class="text-gray-400 hover:text-white transition-colors" title="Copy"><i class="fa-regular fa-copy"></i></button>
+                        </div>
+                        <pre class="text-green-400 font-mono text-sm overflow-x-auto whitespace-pre-wrap">
+$$ \sin^2 x + \cos^2 x = 1 $$
+
+$$ 1 + \tan^2 x = \frac{1}{\cos^2 x} $$
+
+$$ \tan x \cdot \cot x = 1 $$</pre>
+                    </div>
+                    
+                    <!-- Cột Hiển thị -->
+                    <div class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm flex flex-col justify-center items-center">
+                        <div class="w-full text-left mb-3 border-b border-gray-100 pb-2">
+                            <span class="text-gray-500 text-sm font-medium">Kết quả hiển thị</span>
+                        </div>
+                        <div class="space-y-4 text-xl text-primary w-full text-center">
+                            $$ \sin^2 x + \cos^2 x = 1 $$
+                            $$ 1 + \tan^2 x = \frac{1}{\cos^2 x} $$
+                            $$ \tan x \cdot \cot x = 1 $$
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Phần 2: Công thức cộng & Nhân đôi -->
+            <section>
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+                    <span class="bg-primary text-white w-8 h-8 rounded-full flex items-center justify-center text-lg">2</span> 
+                    Công thức Cộng & Nhân đôi
+                </h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-gray-900 rounded-xl p-5 shadow-inner">
+                        <div class="flex justify-between items-center mb-3 border-b border-gray-700 pb-2">
+                            <span class="text-gray-400 text-sm font-mono">Mã LaTeX</span>
+                        </div>
+                        <pre class="text-green-400 font-mono text-sm overflow-x-auto whitespace-pre-wrap">
+$$ \sin(a \pm b) = \sin a \cos b \pm \cos a \sin b $$
+
+$$ \cos 2x = \cos^2 x - \sin^2 x = 2\cos^2 x - 1 $$
+
+$$ \sin 2x = 2\sin x \cos x $$</pre>
+                    </div>
+                    
+                    <div class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm flex flex-col justify-center items-center">
+                        <div class="w-full text-left mb-3 border-b border-gray-100 pb-2">
+                            <span class="text-gray-500 text-sm font-medium">Kết quả hiển thị</span>
+                        </div>
+                        <div class="space-y-4 text-xl text-primary w-full text-center">
+                            $$ \sin(a \pm b) = \sin a \cos b \pm \cos a \sin b $$
+                            $$ \cos 2x = \cos^2 x - \sin^2 x = 2\cos^2 x - 1 $$
+                            $$ \sin 2x = 2\sin x \cos x $$
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Phần 3: Phương trình Lượng giác cơ bản (Dùng mảng/hệ) -->
+            <section>
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+                    <span class="bg-primary text-white w-8 h-8 rounded-full flex items-center justify-center text-lg">3</span> 
+                    Phương trình lượng giác (Hệ ngoặc vuông)
+                </h2>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-gray-900 rounded-xl p-5 shadow-inner">
+                        <div class="flex justify-between items-center mb-3 border-b border-gray-700 pb-2">
+                            <span class="text-gray-400 text-sm font-mono">Mã LaTeX</span>
+                        </div>
+                        <!-- Thẻ pre chứa mã code, bắt buộc dùng \ để hiển thị đúng -->
+                        <pre class="text-green-400 font-mono text-sm overflow-x-auto whitespace-pre-wrap">
+$$ 
+\sin x = \sin \alpha \Leftrightarrow 
+\left[ 
+\begin{array}{l} 
+x = \alpha + k2\pi \\ 
+x = \pi - \alpha + k2\pi 
+\end{array} 
+\right. \quad (k \in \mathbb{Z}) 
+$$</pre>
+                    </div>
+                    
+                    <div class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm flex flex-col justify-center items-center">
+                        <div class="w-full text-left mb-3 border-b border-gray-100 pb-2">
+                            <span class="text-gray-500 text-sm font-medium">Kết quả hiển thị</span>
+                        </div>
+                        <div class="text-xl text-primary w-full text-center overflow-x-auto">
+                            $$ 
+                            \sin x = \sin \alpha \Leftrightarrow 
+                            \left[ 
+                            \begin{array}{l} 
+                            x = \alpha + k2\pi \\ 
+                            x = \pi - \alpha + k2\pi 
+                            \end{array} 
+                            \right. \quad (k \in \mathbb{Z}) 
+                            $$
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- Script Kích hoạt KaTeX -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Chỉ render KaTeX trong các khu vực hiển thị kết quả, KHÔNG render trong thẻ <pre> chứa mã code
+            const renderZones = document.querySelectorAll('.bg-white.border');
+            
+            renderZones.forEach(zone => {
+                renderMathInElement(zone, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false}
+                    ],
+                    throwOnError : false
+                });
+            });
+        });
+    </script>
+</body>
+</html>

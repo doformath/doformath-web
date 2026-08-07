@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chinh phục Toán 12 Nâng cao - DoforMath</title>
+    
+    <!-- Cấu hình Favicon -->
+    <link rel="icon" type="image/png" href="../assets/images/Doformath.png">
+
+    <!-- Font chữ Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS và cấu hình màu Teal chủ đạo -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] }, colors: { primary: '#0d9488', secondary: '#facc15'} } }
+        }
+    </script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- KaTeX cho Toán học -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 antialiased font-sans">
+
+    <!-- Header Navigation -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+            <!-- Nút quay lại trang chủ -->
+            <a href="../index.html" class="flex items-center text-gray-500 hover:text-primary font-medium gap-2 transition">
+                <i class="fa-solid fa-arrow-left"></i> Trở về Trang chủ
+            </a>
+            
+            <!-- Logo Toán học -->
+            <div class="hidden sm:block hover:opacity-80 transition-opacity cursor-pointer">
+                <span class="text-2xl tracking-tight text-gray-900 pb-1">
+                    $\textcolor{#0d9488}{\textsf{\textbf{Dofor}}{\sum}\textsf{\textbf{ath}}}$
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Khu vực Tiêu đề động được thiết kế lại thành khối Banner -->
+    <div class="max-w-4xl mx-auto px-4 w-full mt-8 mb-6">
+        <div class="bg-gradient-to-r from-blue-50 to-teal-50 border border-blue-100 rounded-2xl p-6 shadow-sm flex flex-col items-center text-center">
+            
+            <!-- Badge (Nhãn) có thêm icon -->
+            <span class="bg-blue-100 text-blue-700 border border-blue-200 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide mb-3 shadow-sm inline-flex items-center gap-1.5">
+                <i class="fa-regular fa-folder-open"></i> Tài liệu học tập
+            </span>
+            
+            <!-- Tên bài học (Javascript sẽ tự động điền vào đây) -->
+            <h1 id="doc-title" class="text-2xl md:text-3xl font-bold text-gray-900 leading-snug">Đang tải tên bài học...</h1>
+            
+            <!-- Dòng kẻ gạch chân trang trí -->
+            <div class="w-16 h-1 bg-gradient-to-r from-blue-400 to-teal-400 rounded-full mt-4"></div>
+            
+        </div>
+
+    <!-- Khung chứa ảnh tự động -->
+    <main class="flex-1 w-full max-w-4xl mx-auto px-4 pb-12 select-none" oncontextmenu="return false;">
+        <div id="image-container" class="w-full bg-white rounded-xl shadow-sm border border-gray-200 flex flex-col items-center p-2 md:p-8 relative min-h-[500px]">
+            <!-- Vòng xoay tải trang -->
+            <div id="loader" class="absolute top-20 text-gray-400 flex flex-col items-center gap-2">
+                <i class="fa-solid fa-circle-notch fa-spin text-3xl"></i>
+                <span class="text-sm">Đang tải dữ liệu...</span>
+            </div>
+        </div>
+    </main>
+
+    <!-- Script Tự động hóa tải ảnh -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Lấy thông tin từ thanh địa chỉ URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const folderName = urlParams.get('folder'); // Ví dụ: bai-1
+            const title = urlParams.get('title'); // Ví dụ: Lời giải Bài 1
+
+            // Cập nhật tiêu đề trang
+            if (title) {
+                document.getElementById('doc-title').innerText = title;
+                document.title = title + " - DoforMath";
+            }
+
+            const container = document.getElementById('image-container');
+            const loader = document.getElementById('loader');
+            let pageNum = 1;
+
+            // Hàm đệ quy: Tải từng ảnh một
+            function loadNextImage() {
+                if (!folderName) {
+                    loader.innerHTML = "Lỗi: Không tìm thấy thư mục tài liệu!";
+                    return;
+                }
+
+                let img = new Image();
+                // Đường dẫn tạo tự động: ../assets/images/bai-1/1.png
+                img.src = `../assets/images/${folderName}/${pageNum}.png`;
+                img.className = "w-full h-auto block mb-6 shadow-sm border border-gray-100 pointer-events-none";
+                img.alt = `Trang ${pageNum}`;
+
+                // Nếu ảnh tồn tại -> Nhét vào khung và thử tải ảnh tiếp theo (trang 2, 3...)
+                img.onload = function() {
+                    loader.style.display = 'none'; // Ẩn vòng xoay
+                    container.appendChild(img);
+                    pageNum++;
+                    loadNextImage();
+                };
+
+                // Nếu ảnh không tồn tại (hết trang) -> Dừng lại
+                img.onerror = function() {
+                    if (pageNum === 1) {
+                        loader.innerHTML = "Không tìm thấy ảnh tài liệu. Vui lòng kiểm tra lại tên thư mục và tên ảnh (1.png, 2.png...).";
+                    }
+                };
+            }
+
+            // Bắt đầu chạy
+            loadNextImage();
+        });
+    </script>
+    <!-- Script Kích hoạt KaTeX cho Logo -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false}
+                ],
+                throwOnError : false
+            });
+        });
+    </script>
+
+</body>
+</html>
