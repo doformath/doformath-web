@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập - DoforMath</title>
+    
+    <!-- Nhúng font chữ Montserrat từ Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Nhúng thư viện KaTeX (CSS và JS) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" 
+        onload="renderMathInElement(document.body, {
+            delimiters: [
+                {left: '$$', right: '$$', display: true},
+                {left: '$', right: '$', display: false}
+            ],
+            throwOnError: false
+        });">
+    </script>
+
+    <!-- Nhúng thư viện Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #f4f7f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            position: relative; /* Thêm để căn chỉnh nút Trở về */
+        }
+        
+        /* CSS cho nút Trở về trang chủ */
+        .back-home-btn {
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            color: #64748b;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        .back-home-btn:hover {
+            color: #0d9488;
+            transform: translateX(-3px); /* Hiệu ứng lùi nhẹ sang trái khi rê chuột */
+        }
+
+        .login-container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(13, 148, 136, 0.15);
+            width: 100%;
+            max-width: 350px;
+            text-align: center;
+        }
+        
+        .logo-container {
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .logo-text {
+            font-size: 30px; 
+            padding-bottom: 4px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #444;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-sizing: border-box;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 15px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .input-group input:focus {
+            outline: none;
+            border-color: #0d9488;
+            box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15);
+        }
+        
+        /* CSS mô phỏng hiệu ứng Tailwind cho nút Đăng nhập */
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background-color: #0d9488; /* bg-primary */
+            color: white;
+            border: none;
+            border-radius: 100px; /* rounded-full */
+            cursor: pointer;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            margin-top: 10px;
+            /* Hiệu ứng bóng đổ màu xanh ngọc nhạt (shadow-xl shadow-teal-200) */
+            box-shadow: 0 20px 25px -5px rgba(153, 246, 228, 0.6), 0 8px 10px -6px rgba(153, 246, 228, 0.6);
+            transition: all 0.3s ease; /* transition-all */
+        }
+        .login-btn:hover {
+            background-color: #115e59; /* hover:bg-teal-800 */
+            transform: translateY(-4px); /* hover:-translate-y-1 (Nảy lên trên) */
+            /* Ánh sáng đậm hơn một chút khi hover */
+            box-shadow: 0 20px 25px -5px rgba(13, 148, 136, 0.4), 0 8px 10px -6px rgba(13, 148, 136, 0.4);
+        }
+        .login-btn:active {
+            transform: translateY(0); /* Lún xuống khi click */
+        }
+
+        #error-message {
+            color: #e53935;
+            background-color: #ffebee;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Nút trở về trang chủ -->
+    <a href="index.html" class="back-home-btn">
+        &#8592; Trở về trang chủ
+    </a>
+
+    <div class="login-container">
+        <!-- Mã LaTeX logo -->
+        <div class="logo-container">
+            <span class="logo-text">
+                $\textcolor{#0d9488}{\textsf{\textbf{Dofor}}{\sum}\textsf{\textbf{ath}}}$
+            </span>
+        </div>
+        
+        <div class="input-group">
+            <label>Tài khoản Email</label>
+            <input type="email" id="email" placeholder="Nhập email...">
+        </div>
+        <div class="input-group">
+            <label>Mật khẩu</label>
+            <input type="password" id="password" placeholder="Nhập mật khẩu...">
+        </div>
+        <button class="login-btn" onclick="xuLyDangNhap()">Đăng nhập</button>
+        
+        <div id="error-message">Sai tài khoản hoặc mật khẩu!</div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyD-NDo43O3Q_9GVii6pDOM7D6SQ5pxmo5g",
+            authDomain: "doformath-bac70.firebaseapp.com",
+            projectId: "doformath-bac70",
+            storageBucket: "doformath-bac70.firebasestorage.app",
+            messagingSenderId: "329095418163",
+            appId: "1:329095418163:web:226636d40b5c2960cdee46",
+            measurementId: "G-RHVBMMGQGZ"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+
+        function xuLyDangNhap() {
+            const emailNhapVao = document.getElementById('email').value;
+            const matKhauNhapVao = document.getElementById('password').value;
+            const thongBaoLoi = document.getElementById('error-message');
+            const nutDangNhap = document.querySelector('.login-btn');
+
+            nutDangNhap.innerText = "Đang xử lý...";
+            nutDangNhap.style.opacity = "0.7";
+
+            firebase.auth().signInWithEmailAndPassword(emailNhapVao, matKhauNhapVao)
+            .then((userCredential) => {
+                thongBaoLoi.style.display = "none";
+                window.location.href = "/courses"; 
+            })
+            .catch((error) => {
+                thongBaoLoi.style.display = "block";
+                nutDangNhap.innerText = "Đăng nhập";
+                nutDangNhap.style.opacity = "1";
+
+                if(error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+                    thongBaoLoi.innerText = "Sai email hoặc mật khẩu. Vui lòng thử lại!";
+                } else if(error.code === 'auth/invalid-email') {
+                    thongBaoLoi.innerText = "Định dạng email không hợp lệ!";
+                } else {
+                    thongBaoLoi.innerText = "Lỗi kết nối. Vui lòng kiểm tra mạng!";
+                }
+            });
+        }
+    </script>
+</body>
+</html>
