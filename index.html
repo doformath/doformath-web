@@ -57,8 +57,23 @@
                 </nav>
 
                 <!-- Nút Hành động -->
-                <div class="hidden md:flex items-center space-x-4">
+               <!-- 1. Khu vực hiển thị khi CHƯA đăng nhập -->
+                <div id="khu-vuc-dang-nhap">
                     <a href="login.html" class="text-gray-600 font-medium hover:text-primary transition">Đăng nhập</a>
+                </div>
+
+                <!-- 2. Khu vực hiển thị khi ĐÃ đăng nhập (Mặc định ẩn) -->
+                <div id="khu-vuc-user" style="display: none;" class="flex items-center gap-4">
+                    <!-- Nơi chứa tên học sinh -->
+                    <span id="ten-user" class="text-sm font-semibold text-teal-700 bg-teal-50 px-3 py-1 rounded-full border border-teal-100"></span>
+                    
+                    <!-- Nút đăng xuất -->
+                    <button onclick="dangXuat()" class="text-sm text-gray-500 hover:text-red-500 font-medium transition-colors">
+                        Đăng xuất
+                    </button>
+                </div>
+
+
                     <a href="#" class="bg-primary hover:bg-teal-800 text-white px-6 py-2.5 rounded-full font-medium transition-all shadow-md hover:shadow-lg">
                         Đăng ký ngay
                     </a>
@@ -102,15 +117,15 @@
     <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-12 relative z-10 mb-20">
         <div class="bg-white rounded-2xl shadow-xl shadow-gray-200/50 border border-gray-100 p-8 grid grid-cols-2 md:grid-cols-4 gap-8 text-center divide-x divide-gray-100">
             <div>
-                <p class="text-4xl font-bold text-gray-900 mb-1">500+</p>
+                <p class="text-4xl font-bold text-gray-900 mb-1">50+</p>
                 <p class="text-sm font-medium text-gray-500">Học viên tham gia</p>
             </div>
             <div>
-                <p class="text-4xl font-bold text-gray-900 mb-1">50+</p>
+                <p class="text-4xl font-bold text-gray-900 mb-1">100+</p>
                 <p class="text-sm font-medium text-gray-500">Chuyên đề Toán</p>
             </div>
             <div>
-                <p class="text-4xl font-bold text-gray-900 mb-1">9.2</p>
+                <p class="text-4xl font-bold text-gray-900 mb-1">8+</p>
                 <p class="text-sm font-medium text-gray-500">Điểm thi trung bình</p>
             </div>
             <div>
@@ -125,7 +140,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-end mb-10">
                 <div>
-                    <h2 class="text-3xl font-bold text-gray-900 mb-2">Khóa học Nổi bật</h2>
+                    <h2 class="text-3xl font-bold text-gray-900 mb-2">Khóa học dành riêng cho Học viên</h2>
                     <p class="text-gray-500">Các lộ trình được học sinh đăng ký nhiều nhất</p>
                 </div>
                 <a href="#" class="hidden md:block text-primary font-medium hover:underline">Xem tất cả <i class="fa-solid fa-arrow-right ml-1"></i></a>
@@ -134,7 +149,7 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <!-- Card Khóa học 1 -->
                 <!-- ĐỔI THẺ <div> NGOÀI CÙNG THÀNH THẺ <a> VÀ THÊM THUỘC TÍNH href -->
-                <a href="courses/toan-12-ham-so.html" class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 border border-gray-100 group flex flex-col cursor-pointer block">
+                <a href="courses/toan-10.html" class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 border border-gray-100 group flex flex-col cursor-pointer block">
                     
                     <div class="relative h-48 bg-teal-100 overflow-hidden">
                         <!-- Ảnh minh họa -->
@@ -211,13 +226,13 @@
             <i class="fa-solid fa-calculator text-white/30 text-7xl"></i>
         </div>
         <span class="absolute top-4 left-4 bg-white/90 backdrop-blur-sm text-purple-600 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
-            Nâng cao
+            Toán 12
         </span>
     </div>
     <div class="p-6 flex-1 flex flex-col">
         <div class="flex items-center text-sm text-gray-500 mb-3 gap-4">
-            <span><i class="fa-solid fa-book text-gray-400 mr-1"></i> 15 Bài giảng</span>
-            <span><i class="fa-regular fa-clock text-gray-400 mr-1"></i> 6 Tuần</span>
+            <span><i class="fa-solid fa-book text-gray-400 mr-1"></i> 100 Bài giảng</span>
+            <span><i class="fa-regular fa-clock text-gray-400 mr-1"></i> 4 Buổi/Tuần</span>
         </div>
         <h3 class="text-xl font-bold text-gray-900 mb-3 group-hover:text-primary transition-colors">
             Chinh phục Toán 12
@@ -335,5 +350,59 @@
             });
         });
     </script>
+    <!-- Nhúng thư viện Firebase Auth (Nếu trang này chưa có) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+
+<script>
+    // 1. Khai báo chìa khóa Firebase
+    const firebaseConfig = {
+        apiKey: "AIzaSyD-NDo43O3Q_9GVii6pDOM7D6SQ5pxmo5g",
+        authDomain: "doformath-bac70.firebaseapp.com",
+        projectId: "doformath-bac70",
+        storageBucket: "doformath-bac70.firebasestorage.app",
+        messagingSenderId: "329095418163",
+        appId: "1:329095418163:web:226636d40b5c2960cdee46"
+    };
+    
+    // 2. Khởi động Firebase (kiểm tra để tránh khởi động trùng lặp)
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
+
+    // 3. Hàm theo dõi trạng thái đăng nhập
+    firebase.auth().onAuthStateChanged((user) => {
+        const khuVucDangNhap = document.getElementById('khu-vuc-dang-nhap');
+        const khuVucUser = document.getElementById('khu-vuc-user');
+        const tenUser = document.getElementById('ten-user');
+
+        if (user) {
+            // TRƯỜNG HỢP A: CÓ USER (ĐÃ ĐĂNG NHẬP)
+            khuVucDangNhap.style.display = 'none';   // Giấu nút Đăng nhập
+            khuVucUser.style.display = 'flex';       // Hiện khu vực chứa tên & Đăng xuất
+            
+            // Xử lý chuỗi để lấy phần tên trước đuôi @gmail.com
+            const tenHienThi = user.email.split('@')[0];
+            
+            // In tên ra màn hình
+            tenUser.innerText = "Xin chào, " + tenHienThi;
+        } else {
+            // TRƯỜNG HỢP B: KHÔNG CÓ USER (CHƯA ĐĂNG NHẬP)
+            khuVucDangNhap.style.display = 'block';  // Hiện nút Đăng nhập
+            khuVucUser.style.display = 'none';       // Giấu khu vực chứa tên
+        }
+    });
+
+    // 4. Hàm thực thi khi bấm nút Đăng xuất
+    function dangXuat() {
+        firebase.auth().signOut().then(() => {
+            // Đăng xuất thành công thì tải lại trang web
+            window.location.reload(); 
+        }).catch((error) => {
+            console.error("Lỗi đăng xuất:", error);
+        });
+    }
+</script>
+
 </body>
 </html>
