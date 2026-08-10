@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lý thuyết: Tính đơn điệu và Cực trị - DoforMath</title>
+    
+    <!-- Cấu hình Favicon -->
+    <link rel="icon" type="image/png" href="../assets/images/Doformath.png">
+
+    <!-- Font chữ Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] }, colors: { primary: '#0d9488', secondary: '#facc15'} } }
+        }
+    </script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- KaTeX cho Toán học -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+    <!-- Thư viện TikZJax để vẽ hình trực tiếp từ code TikZ -->
+    <link rel="stylesheet" type="text/css" href="https://tikzjax.com/v1/fonts.css">
+    <script src="https://tikzjax.com/v1/tikzjax.js"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 antialiased font-sans pb-16">
+
+    <!-- Header Navigation -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="javascript:history.back()" class="flex items-center text-gray-500 hover:text-primary font-medium gap-2 transition">
+                <i class="fa-solid fa-arrow-left"></i> Quay lại
+            </a>
+            
+            <div class="hidden sm:block hover:opacity-80 transition-opacity cursor-pointer">
+                <span class="text-2xl tracking-tight text-gray-900 pb-1">
+                    $\textcolor{#0d9488}{\textsf{\textbf{Dofor}}{\sum}\textsf{\textbf{ath}}}$
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Banner Tiêu đề -->
+    <div class="max-w-4xl mx-auto px-4 w-full mt-8 mb-8">
+        <div class="bg-gradient-to-r from-teal-50 to-emerald-50 border border-teal-100 rounded-2xl p-6 md:p-10 shadow-sm flex flex-col items-center text-center">
+            <span class="bg-teal-100 text-teal-700 border border-teal-200 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide mb-4 shadow-sm inline-flex items-center gap-1.5">
+                <i class="fa-solid fa-book-open"></i> Bài giảng Lý thuyết
+            </span>
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900 leading-snug">Tính đơn điệu và Cực trị của hàm số</h1>
+            <div class="w-20 h-1.5 bg-gradient-to-r from-teal-400 to-emerald-400 rounded-full mt-6"></div>
+        </div>
+    </div>
+
+    <!-- Nội dung Lý thuyết -->
+    <main class="max-w-4xl mx-auto px-4 w-full text-base md:text-lg leading-relaxed text-gray-700 space-y-10">
+        
+        <!-- ================= PHẦN 1 ================= -->
+        <section class="bg-white p-6 md:p-10 rounded-2xl shadow-sm border border-gray-100">
+            <h2 class="text-2xl font-bold text-teal-700 mb-6 flex items-center gap-2 border-b-2 border-teal-50 pb-3">
+                <span class="bg-teal-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-lg">1</span> 
+                Tính đơn điệu của hàm số
+            </h2>
+            
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-5 rounded-r-lg mb-6 text-gray-800">
+                <p><strong>Định nghĩa:</strong> Cho hàm số $y=f(x)$ xác định trên $K$ với $K$ là một khoảng, một đoạn hoặc một nửa khoảng.</p>
+                <ul class="list-disc pl-6 mt-3 space-y-2 marker:text-blue-500">
+                    <li>Hàm số $y=f(x)$ được gọi là đồng biến trên $K$ nếu $\forall x_{1}, x_{2} \in K$, $x_{1} < x_{2} \Rightarrow f(x_{1}) < f(x_{2})$.</li>
+                    <li>Nếu hàm số đồng biến trên $K$ thì đồ thị của hàm số đi lên từ trái sang phải.</li>
+                    <li>Hàm số $y=f(x)$ được gọi là nghịch biến trên $K$ nếu $\forall x_{1}, x_{2} \in K$, $x_{1} < x_{2} \Rightarrow f(x_{1}) > f(x_{2})$.</li>
+                    <li>Nếu hàm số nghịch biến trên $K$ thì đồ thị của hàm số đi xuống từ trái sang phải.</li>
+                </ul>
+            </div>
+
+            <!-- TikZ - Đồ thị Đồng biến / Nghịch biến -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 flex flex-col items-center justify-between">
+                    <div class="overflow-x-auto w-full flex justify-center">
+                        <script type="text/tikz">
+                            \begin{tikzpicture}[>=stealth, scale=0.7, line join=round, line cap=round]
+                                \draw[->, thick] (-1,0) -- (6,0) node[above] {$x$};
+                                \draw[->, thick] (0,-1) -- (0,4.5) node[right] {$y$};
+                                \fill (0,0) circle (1.5pt) node[above left] {$O$};
+                                \draw[thick, smooth, domain=1.5:4.5] plot (\x, {0.22*(\x-1.5)^2 + 1.5});
+                                \draw[dashed, thick] (1.5,0) node[below=2pt] {$a$} -- (1.5,1.5);
+                                \draw[dashed, thick] (4.5,0) node[below=2pt] {$b$} -- (4.5,3.5);
+                                \fill (1.5,0) circle (2pt);
+                                \fill (4.5,0) circle (2pt);
+                                \fill (1.5,1.5) circle (2pt);
+                                \fill (4.5,3.5) circle (2pt);
+                            \end{tikzpicture}
+                        </script>
+                    </div>
+                    <div class="mt-4 text-sm font-semibold text-gray-800 text-center">
+                        Hình 1. Hàm số đồng biến trên $(a;b)$
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 flex flex-col items-center justify-between">
+                    <div class="overflow-x-auto w-full flex justify-center">
+                        <script type="text/tikz">
+                            \begin{tikzpicture}[>=stealth, scale=0.7, line join=round, line cap=round]
+                                \draw[->, thick] (-1,0) -- (6,0) node[above] {$x$};
+                                \draw[->, thick] (0,-1) -- (0,4.5) node[right] {$y$};
+                                \fill (0,0) circle (1.5pt) node[above left] {$O$};
+                                \draw[thick, smooth, domain=1.5:4.5] plot (\x, {0.22*(\x-4.5)^2 + 1.5});
+                                \draw[dashed, thick] (1.5,0) node[below=2pt] {$a$} -- (1.5,3.5);
+                                \draw[dashed, thick] (4.5,0) node[below=2pt] {$b$} -- (4.5,1.5);
+                                \fill (1.5,0) circle (2pt);
+                                \fill (4.5,0) circle (2pt);
+                                \fill (1.5,3.5) circle (2pt);
+                                \fill (4.5,1.5) circle (2pt);
+                            \end{tikzpicture}
+                        </script>
+                    </div>
+                    <div class="mt-4 text-sm font-semibold text-gray-800 text-center">
+                        Hình 2. Hàm số nghịch biến trên $(a;b)$
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <h3 class="font-bold text-gray-800 mb-3"><i class="fa-solid fa-pen-to-square text-teal-600 mr-2"></i>Định lí 1 (Liên hệ giữa đạo hàm và tính đơn điệu):</h3>
+                <p class="mb-2">Cho hàm số $y=f(x)$ có đạo hàm trên khoảng $K$.</p>
+                <ul class="list-disc pl-6 space-y-2 text-gray-700 marker:text-teal-500">
+                    <li>Nếu $f'(x) \ge 0$, $\forall x \in K$ và $f'(x) = 0$ xảy ra tại một số hữu hạn điểm trên $K$ thì hàm số $y=f(x)$ đồng biến trên khoảng $K$.</li>
+                    <li>Nếu $f'(x) \le 0$, $\forall x \in K$ và $f'(x) = 0$ xảy ra tại một số hữu hạn điểm trên $K$ thì hàm số $y=f(x)$ nghịch biến trên khoảng $K$.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- ================= PHẦN 2 ================= -->
+        <section class="bg-white p-6 md:p-10 rounded-2xl shadow-sm border border-gray-100">
+            <h2 class="text-2xl font-bold text-teal-700 mb-6 flex items-center gap-2 border-b-2 border-teal-50 pb-3">
+                <span class="bg-teal-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-lg">2</span> 
+                Cực trị của hàm số
+            </h2>
+            
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-5 rounded-r-lg mb-6 text-gray-800">
+                <p><strong>Định nghĩa:</strong> Cho hàm số $y=f(x)$ liên tục trên khoảng $(a;b)$ và điểm $x_{0} \in (a;b)$.</p>
+                <ul class="list-disc pl-6 mt-3 space-y-2 marker:text-blue-500">
+                    <li>Nếu tồn tại số $h > 0$ sao cho $f(x) < f(x_{0})$ với mọi $x \in (x_{0}-h ; x_{0}+h) \subset (a;b)$ và $x \ne x_{0}$ thì ta nói hàm số $f(x)$ đạt <strong>cực đại</strong> tại $x_{0}$.</li>
+                    <li>Nếu tồn tại số $h > 0$ sao cho $f(x) > f(x_{0})$ với mọi $x \in (x_{0}-h ; x_{0}+h) \subset (a;b)$ và $x \ne x_{0}$ thì ta nói hàm số $f(x)$ đạt <strong>cực tiểu</strong> tại $x_{0}$.</li>
+                </ul>
+            </div>
+
+            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-5 rounded-r-lg text-gray-800 mb-8">
+                <strong><i class="fa-solid fa-lightbulb text-yellow-500 mr-1"></i> Ghi chú:</strong>
+                <ul class="list-disc pl-6 mt-2 space-y-2">
+                    <li>Nếu hàm số $y=f(x)$ đạt cực đại tại $x_{0}$ thì: $x_{0}$ là điểm cực đại của hàm số, $f(x_{0})$ là giá trị cực đại ($y_{\text{CĐ}}$), và $M(x_{0};f(x_{0}))$ là điểm cực đại của đồ thị hàm số.</li>
+                    <li>Nếu hàm số $y=f(x)$ đạt cực tiểu tại $x_{0}$ thì: $x_{0}$ là điểm cực tiểu của hàm số, $f(x_{0})$ là giá trị cực tiểu ($y_{\text{CT}}$), và $M(x_{0};f(x_{0}))$ là điểm cực tiểu của đồ thị hàm số.</li>
+                    <li>Nếu hàm số $y=f(x)$ có đạo hàm trên khoảng $(a;b)$ và có điểm cực trị là $x_{0} \in (a;b)$ thì $f'(x_{0}) = 0$.</li>
+                </ul>
+            </div>
+
+            <div class="mb-8">
+                <h3 class="font-bold text-gray-800 mb-3"><i class="fa-solid fa-pen-to-square text-teal-600 mr-2"></i>Định lí Cực trị:</h3>
+                <p class="mb-2 text-gray-700">Giả sử hàm số $y=f(x)$ liên tục trên khoảng $K=(x_{0}-h ; x_{0}+h)$ và có đạo hàm trên $K$ hoặc trên $K \setminus \{x_{0}\}$, với $h > 0$.</p>
+                <ul class="list-disc pl-6 space-y-2 text-gray-700 marker:text-teal-500">
+                    <li>Nếu $f'(x)$ đổi dấu từ $+$ sang $-$ khi qua $x_0$ thì $x_{0}$ là một điểm cực đại của hàm số $f(x)$.</li>
+                    <li>Nếu $f'(x)$ đổi dấu từ $-$ sang $+$ khi qua $x_0$ thì $x_{0}$ là một điểm cực tiểu của hàm số $f(x)$.</li>
+                </ul>
+            </div>
+
+            <!-- Bảng biến thiên thuần TikZ (Đã sửa ký hiệu CĐ, CT) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 flex justify-center overflow-x-auto">
+                    <script type="text/tikz">
+                        \begin{tikzpicture}[scale=0.8]
+                            \draw (0,0) rectangle (8,3);
+                            \draw (0,2) -- (8,2);
+                            \draw (0,1) -- (8,1);
+                            \draw (1.5,0) -- (1.5,3);
+                            \node at (0.75, 2.5) {$x$};
+                            \node at (0.75, 1.5) {$f\prime(x)$};
+                            \node at (0.75, 0.5) {$f(x)$};
+                            \node at (2, 2.5) {$a$};
+                            \node at (4.75, 2.5) {$x_0$};
+                            \node at (7.5, 2.5) {$b$};
+                            \node at (3.375, 1.5) {$+$};
+                            \node at (4.75, 1.5) {$0$};
+                            \node at (6.125, 1.5) {$-$};
+                            \node at (2, 0.2) (A) {};
+                            \node at (4.75, 0.8) (B) {$f_{CD}$};
+                            \node at (7.5, 0.2) (C) {};
+                            \draw[->] (A) -- (B);
+                            \draw[->] (B) -- (C);
+                        \end{tikzpicture}
+                    </script>
+                </div>
+                
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 flex justify-center overflow-x-auto">
+                    <script type="text/tikz">
+                        \begin{tikzpicture}[scale=0.8]
+                            \draw (0,0) rectangle (8,3);
+                            \draw (0,2) -- (8,2);
+                            \draw (0,1) -- (8,1);
+                            \draw (1.5,0) -- (1.5,3);
+                            \node at (0.75, 2.5) {$x$};
+                            \node at (0.75, 1.5) {$f\prime(x)$};
+                            \node at (0.75, 0.5) {$f(x)$};
+                            \node at (2, 2.5) {$a$};
+                            \node at (4.75, 2.5) {$x_0$};
+                            \node at (7.5, 2.5) {$b$};
+                            \node at (3.375, 1.5) {$-$};
+                            \node at (4.75, 1.5) {$0$};
+                            \node at (6.125, 1.5) {$+$};
+                            \node at (2, 0.8) (A) {};
+                            \node at (4.75, 0.2) (B) {$f_{CT}$};
+                            \node at (7.5, 0.8) (C) {};
+                            \draw[->] (A) -- (B);
+                            \draw[->] (B) -- (C);
+                        \end{tikzpicture}
+                    </script>
+                </div>
+            </div>
+
+            <!-- Các dạng đồ thị cực trị (Đã sửa hàm số trong plot) -->
+            <div class="space-y-6">
+                <div class="bg-gray-50 p-5 rounded-xl border border-gray-200 flex flex-col md:flex-row items-center gap-6">
+                    <div class="flex-1 text-gray-800">
+                        <h3 class="font-bold text-teal-700 mb-2">Nhận diện trên Đồ thị hàm số:</h3>
+                        <ul class="list-disc pl-6 mt-1 marker:text-teal-500">
+                            <li>$(x_{1};y_{1})$ là điểm cực đại của đồ thị hàm số.</li>
+                            <li>$(x_{2};y_{2})$ là điểm cực tiểu của đồ thị hàm số.</li>
+                        </ul>
+                    </div>
+                    <div class="w-full md:w-1/2 flex justify-center overflow-x-auto">
+                        <script type="text/tikz">
+                            \begin{tikzpicture}[>=stealth, scale=0.8, line join=round, line cap=round]
+                                \draw[->] (-3,0) -- (4,0) node[above] {$x$};
+                                \draw[->] (0,-3) -- (0,3.5) node[right] {$y$};
+                                \fill (0,0) circle (1.2pt) node[above left] {$O$};
+                                
+                                \begin{scope}
+                                    \clip (-2.8,-3) rectangle (3.5,3.5);
+                                    \draw[thick, smooth, samples=50, domain=-2.5:3.2] plot (\x, {\x*\x*\x/3 - \x*\x/2 - 2*\x + 1});
+                                \end{scope}
+                                
+                                \draw[dashed, thin] (-1,0) -- (-1,2.16) -- (0,2.16);
+                                \fill (-1,0) circle (1.2pt) node[below] {$x_1$};
+                                \fill (0,2.16) circle (1.2pt) node[right] {$y_1$};
+                                \fill (-1,2.16) circle (1.2pt);
+                                
+                                \draw[dashed, thin] (2,0) -- (2,-2.33) -- (0,-2.33);
+                                \fill (2,0) circle (1.2pt) node[above] {$x_2$};
+                                \fill (0,-2.33) circle (1.2pt) node[left] {$y_2$};
+                                \fill (2,-2.33) circle (1.2pt);
+                            \end{tikzpicture}
+                        </script>
+                    </div>
+                </div>
+            </div>
+            
+        </section>
+    </main>
+
+    <!-- Script Kích hoạt KaTeX -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false}
+                ],
+                throwOnError : false
+            });
+        });
+    </script>
+
+</body>
+</html>

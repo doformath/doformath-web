@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lý thuyết: Đường tiệm cận - DoforMath</title>
+    
+    <!-- Cấu hình Favicon -->
+    <link rel="icon" type="image/png" href="../assets/images/Doformath.png">
+
+    <!-- Font chữ Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] }, colors: { primary: '#0d9488', secondary: '#facc15'} } }
+        }
+    </script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- KaTeX cho Toán học -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+    <!-- Thư viện TikZJax để vẽ hình trực tiếp từ code TikZ -->
+    <link rel="stylesheet" type="text/css" href="https://tikzjax.com/v1/fonts.css">
+    <script src="https://tikzjax.com/v1/tikzjax.js"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 antialiased font-sans pb-16">
+
+    <!-- Header Navigation -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+            <!-- Nút quay lại trang trước -->
+            <a href="javascript:history.back()" class="flex items-center text-gray-500 hover:text-primary font-medium gap-2 transition">
+                <i class="fa-solid fa-arrow-left"></i> Quay lại
+            </a>
+            
+            <!-- Logo DoforMath -->
+            <div class="hidden sm:block hover:opacity-80 transition-opacity cursor-pointer">
+                <span class="text-2xl tracking-tight text-gray-900 pb-1">
+                    $\textcolor{#0d9488}{\textsf{\textbf{Dofor}}{\sum}\textsf{\textbf{ath}}}$
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Banner Tiêu đề -->
+    <div class="max-w-4xl mx-auto px-4 w-full mt-8 mb-8">
+        <div class="bg-gradient-to-r from-teal-50 to-emerald-50 border border-teal-100 rounded-2xl p-6 md:p-10 shadow-sm flex flex-col items-center text-center">
+            <span class="bg-teal-100 text-teal-700 border border-teal-200 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide mb-4 shadow-sm inline-flex items-center gap-1.5">
+                <i class="fa-solid fa-book-open"></i> Bài giảng Lý thuyết
+            </span>
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900 leading-snug">Đường tiệm cận của đồ thị hàm số</h1>
+            <div class="w-20 h-1.5 bg-gradient-to-r from-teal-400 to-emerald-400 rounded-full mt-6"></div>
+        </div>
+    </div>
+
+    <!-- Nội dung Lý thuyết -->
+    <main class="max-w-4xl mx-auto px-4 w-full text-base md:text-lg leading-relaxed text-gray-700 space-y-10">
+        
+        <!-- ================= PHẦN 1 ================= -->
+        <section class="bg-white p-6 md:p-10 rounded-2xl shadow-sm border border-gray-100">
+            <h2 class="text-2xl font-bold text-teal-700 mb-6 flex items-center gap-2 border-b-2 border-teal-50 pb-3">
+                <span class="bg-teal-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-lg">1</span> 
+                Đường tiệm cận đứng
+            </h2>
+            
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-5 rounded-r-lg mb-6 text-gray-800">
+                <p><strong>Định nghĩa:</strong> Đường thẳng $x=a$ được gọi là một đường tiệm cận đứng (hay tiệm cận đứng) của đồ thị hàm số $y=f(x)$ nếu ít nhất một trong các điều kiện sau thỏa mãn:</p>
+                <div class="overflow-x-auto mt-2 text-center">
+                    $$ \lim\limits_{x\to a^+}f(x)=+\infty \quad \text{hoặc} \quad \lim\limits_{x\to a^-}f(x)=+\infty $$
+                    $$ \lim\limits_{x\to a^+}f(x)=-\infty \quad \text{hoặc} \quad \lim\limits_{x\to a^-}f(x)=-\infty $$
+                </div>
+            </div>
+
+            <!-- TikZ - Tiệm cận đứng (Đã tách KaTeX) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                
+                <!-- Hình 1 -->
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 flex flex-col items-center justify-between">
+                    <div class="overflow-x-auto w-full flex justify-center">
+                        <script type="text/tikz">
+                            \begin{tikzpicture}[scale=0.7,>=stealth]
+                                \draw[->] (-1.5,0)--(3,0) node[below]{$x$};
+                                \draw[->] (0,-1)--(0,4) node[left]{$y$};
+                                \node at (0,0) [below left]{$O$};
+                                \draw[thick] (1.5,-1)--(1.5,3.8) node[right]{$x=a$};
+                                \node at (1.5,0) [below left]{$a$};
+                                \draw[thick, smooth, domain=1.7:2.8] plot (\x, {1/(\x-1.5)-1.5});
+                                \node at (2.5,2.5) {$f(x)$};
+                            \end{tikzpicture}
+                        </script>
+                    </div>
+                    <div class="mt-4 text-sm font-semibold text-gray-800">
+                        $\lim\limits_{x\to a^+}f(x)=+\infty$
+                    </div>
+                </div>
+
+                <!-- Hình 2 -->
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 flex flex-col items-center justify-between">
+                    <div class="overflow-x-auto w-full flex justify-center">
+                        <script type="text/tikz">
+                            \begin{tikzpicture}[scale=0.7,>=stealth]
+                                \draw[->] (-1.5,0)--(3,0) node[below]{$x$};
+                                \draw[->] (0,-1)--(0,3.8) node[left]{$y$};
+                                \node at (0,0) [below left]{$O$};
+                                \draw[thick] (1.5,-1)--(1.5,3.8) node[right]{$x=a$};
+                                \node at (1.5,0) [below right]{$a$};
+                                \draw[thick, smooth, domain=0.2:1.3] plot (\x, {-1/(\x-1.5)-1.5});
+                                \node at (0.6,2.5) {$f(x)$};
+                            \end{tikzpicture}
+                        </script>
+                    </div>
+                    <div class="mt-4 text-sm font-semibold text-gray-800">
+                        $\lim\limits_{x\to a^-}f(x)=+\infty$
+                    </div>
+                </div>
+
+                <!-- Hình 3 -->
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 flex flex-col items-center justify-between">
+                    <div class="overflow-x-auto w-full flex justify-center">
+                        <script type="text/tikz">
+                            \begin{tikzpicture}[scale=0.7,>=stealth]
+                                \draw[->] (-1.5,0)--(3,0) node[below]{$x$};
+                                \draw[->] (0,-4)--(0,1) node[left]{$y$};
+                                \node at (0,0) [above left]{$O$};
+                                \draw[thick] (1.5,-4)--(1.5,1) node[right]{$x=a$};
+                                \node at (1.5,0) [below left]{$a$};
+                                \draw[thick, smooth, domain=1.68:2.83] plot (\x, {-1/(\x-1.5)+1.5});
+                                \node at (2.5,-2.5) {$f(x)$};
+                            \end{tikzpicture}
+                        </script>
+                    </div>
+                    <div class="mt-4 text-sm font-semibold text-gray-800">
+                        $\lim\limits_{x\to a^+}f(x)=-\infty$
+                    </div>
+                </div>
+
+                <!-- Hình 4 -->
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 flex flex-col items-center justify-between">
+                    <div class="overflow-x-auto w-full flex justify-center">
+                        <script type="text/tikz">
+                            \begin{tikzpicture}[scale=0.7,>=stealth]
+                                \draw[->] (-1.5,0)--(3,0) node[below]{$x$};
+                                \draw[->] (0,-1)--(0,4.5) node[left]{$y$};
+                                \node at (0,0) [above left]{$O$};
+                                \draw[thick] (1.5,-1)--(1.5,4.) node[right]{$x=a$};
+                                \node at (1.5,0) [below right]{$a$};
+                                \draw[thick, smooth, domain=0:1.3] plot (\x, {1/(\x-1.5)+4});
+                                \node at (0.5,1.5) {$f(x)$};
+                            \end{tikzpicture}
+                        </script>
+                    </div>
+                    <div class="mt-4 text-sm font-semibold text-gray-800">
+                        $\lim\limits_{x\to a^-}f(x)=-\infty$
+                    </div>
+                </div>
+                
+            </div>
+
+            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-r-lg text-gray-800">
+                <strong><i class="fa-solid fa-lightbulb text-yellow-500 mr-1"></i> Chú ý:</strong> Đồ thị hàm số có thể không có tiệm cận đứng, có thể có một tiệm cận đứng, có thể có nhiều tiệm cận đứng hoặc có thể có vô số tiệm cận đứng.
+            </div>
+        </section>
+
+        <!-- ================= PHẦN 2 ================= -->
+        <section class="bg-white p-6 md:p-10 rounded-2xl shadow-sm border border-gray-100">
+            <h2 class="text-2xl font-bold text-teal-700 mb-6 flex items-center gap-2 border-b-2 border-teal-50 pb-3">
+                <span class="bg-teal-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-lg">2</span> 
+                Đường tiệm cận ngang
+            </h2>
+            
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-5 rounded-r-lg mb-6 text-gray-800">
+                <p><strong>Định nghĩa:</strong> Đường thẳng $y=m$ được gọi là một đường tiệm cận ngang (hay tiệm cận ngang) của đồ thị hàm số $y=f(x)$ nếu:</p>
+                <div class="overflow-x-auto mt-2 text-center">
+                    $$ \lim\limits_{x\to +\infty}f(x)=m \quad \text{hoặc} \quad \lim\limits_{x\to -\infty}f(x)=m $$
+                </div>
+            </div>
+
+            <!-- TikZ - Tiệm cận ngang -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 flex justify-center overflow-x-auto">
+                    <script type="text/tikz">
+                        \begin{tikzpicture}[scale=0.7,>=stealth]
+                            \draw[->] (-1.5,0)--(4,0) node[below]{$x$};
+                            \draw[->] (0,-1)--(0,3) node[left]{$y$};
+                            \node at (0,0) [below left]{$O$};
+                            \draw[thick] (-1.5,1.5)--(4,1.5) node[below left]{$y=m$};
+                            \node at (0,1.5) [below left]{$m$};
+                            \draw[thick, smooth, domain=0.5:3.9] plot (\x, {1.5 + 0.8/\x});
+                            \node at (2.5,2.5) {$y=f(x)$};
+                        \end{tikzpicture}
+                    </script>
+                </div>
+                
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 flex justify-center overflow-x-auto">
+                    <script type="text/tikz">
+                        \begin{tikzpicture}[scale=0.7,>=stealth]
+                            \draw[->] (-4,0)--(1.5,0) node[below]{$x$};
+                            \draw[->] (0,-1)--(0,3) node[right]{$y$};
+                            \node at (0,0) [below left]{$O$};
+                            \draw[thick] (1.5,1.5)--(-4,1.5) node[below right]{$y=m$};
+                            \node at (0,1.5) [below right]{$m$};
+                            \draw[thick, smooth, domain=-3.9:-0.5] plot (\x, {1.5 - 0.8/\x});
+                            \node at (-2.5,2.5) {$y=f(x)$};
+                        \end{tikzpicture}
+                    </script>
+                </div>
+
+            </div>
+
+            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-r-lg text-gray-800">
+                <strong><i class="fa-solid fa-lightbulb text-yellow-500 mr-1"></i> Chú ý:</strong> Đồ thị hàm số hoặc không có tiệm cận ngang, hoặc có một tiệm cận ngang hoặc có tối đa hai tiệm cận ngang.
+            </div>
+        </section>
+
+        <!-- ================= PHẦN 3 ================= -->
+        <section class="bg-white p-6 md:p-10 rounded-2xl shadow-sm border border-gray-100">
+            <h2 class="text-2xl font-bold text-teal-700 mb-6 flex items-center gap-2 border-b-2 border-teal-50 pb-3">
+                <span class="bg-teal-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-lg">3</span> 
+                Đường tiệm cận xiên
+            </h2>
+            
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-5 rounded-r-lg mb-6 text-gray-800">
+                <p><strong>Định nghĩa:</strong> Đường thẳng $y=ax+b$ ($a \neq 0$) được gọi là đường tiệm cận xiên (hay tiệm cận xiên) của đồ thị hàm số $y=f(x)$ nếu:</p>
+                <div class="overflow-x-auto mt-2 text-center">
+                    $$ \lim\limits_{x\to -\infty}[f(x)-(ax+b)]=0 \quad \text{hoặc} \quad \lim\limits_{x\to +\infty}[f(x)-(ax+b)]=0 $$
+                </div>
+            </div>
+
+            <!-- TikZ - Tiệm cận xiên -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 flex justify-center overflow-x-auto">
+                    <script type="text/tikz">
+                        \begin{tikzpicture}[scale=0.7,>=stealth]
+                            \draw[->] (-4.5,0)--(1.5,0) node[below]{$x$};
+                            \draw[->] (0,-1)--(0,4.5) node[left]{$y$};
+                            \node at (0,0) [below right]{$O$};
+                            \draw[thick] (1, -0.5)--(-4, 4) node[midway, xshift=-35pt]{$y=ax+b$};
+                            \draw[thick, smooth, domain=-4:-0.35] plot (\x, {-0.9*\x + 0.4 - 1.2/\x});
+                            \node at (-1.5,3.5) {$f(x)$};
+                        \end{tikzpicture}
+                    </script>
+                </div>
+                
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 flex justify-center overflow-x-auto">
+                    <script type="text/tikz">
+                        \begin{tikzpicture}[scale=0.7,>=stealth]
+                            \draw[->] (-1.5,0)--(4,0) node[below]{$x$};
+                            \draw[->] (0,-1)--(0,4.5) node[left]{$y$};
+                            \node at (0,0) [below left]{$O$};
+                            \draw[thick] (-1, -0.5)--(3.5, 3.55) node[midway, xshift=35pt]{$y=ax+b$};
+                            \draw[thick, smooth, domain=0.35:3.5] plot (\x, {0.9*\x + 0.4 + 1.2/\x});
+                            \node at (1.5,3.5) {$f(x)$};
+                        \end{tikzpicture}
+                    </script>
+                </div>
+
+            </div>
+
+            <!-- Nhận xét -->
+            <div class="mb-8">
+                <h3 class="font-bold text-gray-800 mb-3"><i class="fa-solid fa-pen-to-square text-teal-600 mr-2"></i>Nhận xét 1:</h3>
+                <ul class="list-none space-y-4 text-gray-700">
+                    <li class="flex items-start gap-3">
+                        <span class="bg-teal-100 text-teal-700 w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold shrink-0 mt-0.5">1</span>
+                        <div>
+                            Trong trường hợp tổng quát, có thể tìm các hệ số $a$, $b$ trong phương trình của đường tiệm cận xiên $y=ax+b$ theo công thức như sau:
+                            <div class="overflow-x-auto mt-2">
+                                $$ a=\lim\limits_{x\to +\infty}\dfrac{f(x)}{x}, \quad b=\lim\limits_{x\to +\infty}[f(x)-ax] $$
+                                <p class="text-center my-2 text-sm text-gray-500">hoặc</p>
+                                $$ a=\lim\limits_{x\to -\infty}\dfrac{f(x)}{x}, \quad b=\lim\limits_{x\to -\infty}[f(x)-ax] $$
+                            </div>
+                        </div>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="bg-teal-100 text-teal-700 w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold shrink-0 mt-0.5">2</span>
+                        <p>Khi $a=0$ thì đồ thị của hàm số có tiệm cận ngang là đường thẳng $y=b$.</p>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="mb-8">
+                <h3 class="font-bold text-gray-800 mb-3"><i class="fa-solid fa-pen-to-square text-teal-600 mr-2"></i>Nhận xét 2:</h3>
+                <ul class="list-disc pl-6 space-y-2 text-gray-700 marker:text-teal-500">
+                    <li>Đồ thị hàm số $y=f(x)$ có tiệm cận xiên thì tập xác định của hàm số phải chứa khoảng vô cực.</li>
+                    <li>Tiệm cận xiên của đồ thị hàm số có thể không có, có một hoặc nhiều điểm chung với đồ thị hàm số.</li>
+                    <li>Một đồ thị chỉ có tối đa hai đường tiệm cận xiên (tức là có thể không có, có một hoặc hai TCX).</li>
+                </ul>
+            </div>
+
+            <!-- Các dạng hàm số đặc biệt -->
+            <div class="space-y-6">
+                <div class="bg-gray-50 p-5 rounded-xl border border-gray-200 text-gray-800">
+                    <h3 class="font-bold text-teal-700 mb-2">Tiệm cận của đồ thị hàm số phân thức bậc nhất / bậc nhất</h3>
+                    <p class="mb-2">Cho hàm số $y=\dfrac{ax+b}{cx+d}$ có $c \neq 0$ và $ad - bc \neq 0$ có đồ thị là $(C)$.</p>
+                    <p>Khi đó, đồ thị hàm số $(C)$ có:</p>
+                    <ul class="list-disc pl-6 mt-1 marker:text-teal-500">
+                        <li>Tiệm cận đứng: $x=-\dfrac{d}{c}$</li>
+                        <li>Tiệm cận ngang: $y=\dfrac{a}{c}$</li>
+                        <li>Không có tiệm cận xiên.</li>
+                    </ul>
+                </div>
+
+                <div class="bg-gray-50 p-5 rounded-xl border border-gray-200 text-gray-800">
+                    <h3 class="font-bold text-teal-700 mb-2">Tiệm cận của đồ thị hàm số bậc hai / bậc nhất</h3>
+                    <p class="mb-2">Cho hàm số $y=\dfrac{ax^2+bx+c}{mx+n}$ ($a \neq 0$; $m \neq 0$, đa thức tử không chia hết cho đa thức mẫu).</p>
+                    <p>Đồ thị hàm số có:</p>
+                    <ul class="list-disc pl-6 mt-1 marker:text-teal-500">
+                        <li>Tiệm cận đứng: $x=-\dfrac{n}{m}$</li>
+                        <li>Tiệm cận xiên: $y=\dfrac{a}{m}x-\dfrac{an-bm}{m^2}$</li>
+                        <li>Không có tiệm cận ngang.</li>
+                    </ul>
+                </div>
+            </div>
+            
+        </section>
+    </main>
+
+    <!-- Script Kích hoạt KaTeX -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false}
+                ],
+                throwOnError : false
+            });
+        });
+    </script>
+
+</body>
+</html>
