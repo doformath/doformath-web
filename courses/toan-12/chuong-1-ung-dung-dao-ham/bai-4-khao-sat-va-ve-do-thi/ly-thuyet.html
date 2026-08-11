@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lý thuyết: Khảo sát và Vẽ đồ thị hàm số - DoforMath</title>
+    
+    <!-- Cấu hình Favicon -->
+    <link rel="icon" type="image/png" href="../../../../assets/images/Doformath.png">
+
+    <!-- Font chữ Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] }, colors: { primary: '#0d9488', secondary: '#facc15'} } }
+        }
+    </script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- KaTeX cho Toán học -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 antialiased font-sans pb-16">
+
+    <!-- Header Navigation -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+            <!-- Nút quay lại trang trước -->
+            <a href="javascript:history.back()" class="flex items-center text-gray-500 hover:text-primary font-medium gap-2 transition">
+                <i class="fa-solid fa-arrow-left"></i> Quay lại
+            </a>
+            
+            <!-- Logo DoforMath -->
+            <div class="hidden sm:block hover:opacity-80 transition-opacity cursor-pointer">
+                <span class="text-2xl tracking-tight text-gray-900 pb-1">
+                    $\textcolor{#0d9488}{\textsf{\textbf{Dofor}}{\sum}\textsf{\textbf{ath}}}$
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Banner Tiêu đề -->
+    <div class="max-w-5xl mx-auto px-4 w-full mt-8 mb-8">
+        <div class="bg-gradient-to-r from-teal-50 to-emerald-50 border border-teal-100 rounded-2xl p-6 md:p-10 shadow-sm flex flex-col items-center text-center">
+            <span class="bg-teal-100 text-teal-700 border border-teal-200 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide mb-4 shadow-sm inline-flex items-center gap-1.5">
+                <i class="fa-solid fa-book-open"></i> Lý thuyết
+            </span>
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900 leading-snug">Bài 4. Khảo sát & Vẽ đồ thị hàm số</h1>
+            <div class="w-20 h-1.5 bg-gradient-to-r from-teal-400 to-emerald-400 rounded-full mt-6"></div>
+        </div>
+    </div>
+
+    <!-- Nội dung Lý thuyết -->
+    <main class="max-w-5xl mx-auto px-4 w-full text-base md:text-lg leading-relaxed text-gray-700 space-y-10">
+        
+        <!-- ================= PHẦN 1 ================= -->
+        <section class="bg-white p-6 md:p-10 rounded-xl shadow-sm border border-gray-100">
+            <h2 class="text-xl font-bold text-teal-700 mb-6 flex items-center gap-2 border-b-2 border-teal-50 pb-3">
+                <span class="bg-teal-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-lg">1</span> 
+                Khảo sát và lập bảng biến thiên của hàm số
+            </h2>
+            
+            <p class="mb-4 text-gray-800">Để khảo sát và vẽ đồ thị hàm số $y=f(x)$ thì ta thực hiện theo các bước sau đây:</p>
+            
+            <div class="space-y-4 mb-8">
+                <!-- Bước 1 -->
+                <div class="bg-gray-50 border border-gray-200 rounded-xl p-5 flex items-start gap-4">
+                    <div class="bg-teal-600 text-white font-bold text-sm px-3 py-1 rounded-md shrink-0 mt-0.5">Bước 1</div>
+                    <div class="text-gray-700"><strong>Tìm tập xác định</strong> $D$ của hàm số.</div>
+                </div>
+                
+                <!-- Bước 2 -->
+                <div class="bg-gray-50 border border-gray-200 rounded-xl p-5 flex items-start gap-4">
+                    <div class="bg-teal-600 text-white font-bold text-sm px-3 py-1 rounded-md shrink-0 mt-0.5">Bước 2</div>
+                    <div class="text-gray-700">
+                        <strong>Xét sự biến thiên của hàm số:</strong>
+                        <ul class="list-disc pl-5 mt-2 space-y-2 marker:text-teal-500">
+                            <li>Tìm đạo hàm $f'(x)$ rồi xét dấu đạo hàm, xác định các khoảng đơn điệu, cực trị (nếu có) của hàm số.</li>
+                            <li>Tìm giới hạn tại vô cực và giới hạn vô cực của hàm số cũng như là các đường tiệm cận của đồ thị hàm số (nếu có).</li>
+                            <li>Lập bảng biến thiên của hàm số.</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Bước 3 -->
+                <div class="bg-gray-50 border border-gray-200 rounded-xl p-5 flex items-start gap-4">
+                    <div class="bg-teal-600 text-white font-bold text-sm px-3 py-1 rounded-md shrink-0 mt-0.5">Bước 3</div>
+                    <div class="text-gray-700">
+                        <strong>Vẽ đồ thị hàm số:</strong>
+                        <ul class="list-disc pl-5 mt-2 space-y-2 marker:text-teal-500">
+                            <li>Xác định các điểm cực trị (nếu có), giao điểm của đồ thị với các trục tọa độ (nếu có và dễ tìm)...</li>
+                            <li>Vẽ các đường tiệm cận của đồ thị hàm số (nếu có).</li>
+                            <li>Vẽ đồ thị hàm số.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-5 rounded-r-lg text-gray-800">
+                <strong><i class="fa-solid fa-lightbulb text-yellow-500 mr-2"></i>Chú ý:</strong> Khi vẽ đồ thị, nên xác định thêm một số điểm đặc biệt của đồ thị, chẳng hạn tìm giao điểm của đồ thị với các trục tọa độ (khi có và việc tìm không quá phức tạp). Ngoài ra cần lưu ý đến tính đối xứng của đồ thị (đối xứng tâm, đối xứng trục).
+            </div>
+        </section>
+
+        <!-- ================= PHẦN 2 ================= -->
+        <section class="bg-white p-6 md:p-10 rounded-xl shadow-sm border border-gray-100">
+            <h2 class="text-xl font-bold text-teal-700 mb-6 flex items-center gap-2 border-b-2 border-teal-50 pb-3">
+                <span class="bg-teal-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-lg">2</span> 
+                Khảo sát hàm số bậc ba $y=ax^3+bx^2+cx+d \, (a \neq 0)$
+            </h2>
+
+            <div class="overflow-x-auto mb-8">
+                <table class="w-full border-collapse border border-gray-200 text-center min-w-[700px]">
+                    <thead>
+                        <tr class="bg-teal-600 text-white font-bold">
+                            <th class="border border-gray-200 p-4 w-1/3">Trường hợp</th>
+                            <th class="border border-gray-200 p-4 w-1/3">$a > 0$</th>
+                            <th class="border border-gray-200 p-4 w-1/3">$a < 0$</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Nhóm Đồ thị -->
+                        <tr class="bg-teal-50 text-teal-800 font-bold uppercase text-sm tracking-wider">
+                            <td colspan="3" class="border border-gray-200 p-3">Đồ thị hàm số</td>
+                        </tr>
+                        <tr>
+                            <td class="border border-gray-200 p-4 text-left align-middle text-gray-800">
+                                Phương trình $y'=0$ có $2$ nghiệm phân biệt<br>
+                                $\Delta_{y'} > 0 \Leftrightarrow b^2 - 3ac > 0$
+                            </td>
+                            <td class="border border-gray-200 p-4">
+                                <div class="bg-gray-50 border border-dashed border-gray-300 rounded-lg h-40 flex items-center justify-center">
+                                    <span class="text-gray-400 text-sm italic">Chèn thẻ &lt;img src="...svg"&gt; Đồ thị</span>
+                                </div>
+                            </td>
+                            <td class="border border-gray-200 p-4">
+                                <div class="bg-gray-50 border border-dashed border-gray-300 rounded-lg h-40 flex items-center justify-center">
+                                    <span class="text-gray-400 text-sm italic">Chèn thẻ &lt;img src="...svg"&gt; Đồ thị</span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="border border-gray-200 p-4 text-left align-middle text-gray-800">
+                                Phương trình $y'=0$ có nghiệm kép<br>
+                                $\Delta_{y'} = 0 \Leftrightarrow b^2 - 3ac = 0$
+                            </td>
+                            <td class="border border-gray-200 p-4">
+                                <div class="bg-gray-50 border border-dashed border-gray-300 rounded-lg h-40 flex items-center justify-center">
+                                    <span class="text-gray-400 text-sm italic">Chèn thẻ &lt;img src="...svg"&gt; Đồ thị</span>
+                                </div>
+                            </td>
+                            <td class="border border-gray-200 p-4">
+                                <div class="bg-gray-50 border border-dashed border-gray-300 rounded-lg h-40 flex items-center justify-center">
+                                    <span class="text-gray-400 text-sm italic">Chèn thẻ &lt;img src="...svg"&gt; Đồ thị</span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="border border-gray-200 p-4 text-left align-middle text-gray-800">
+                                Phương trình $y'=0$ vô nghiệm<br>
+                                $\Delta_{y'} < 0 \Leftrightarrow b^2 - 3ac < 0$
+                            </td>
+                            <td class="border border-gray-200 p-4">
+                                <div class="bg-gray-50 border border-dashed border-gray-300 rounded-lg h-40 flex items-center justify-center">
+                                    <span class="text-gray-400 text-sm italic">Chèn thẻ &lt;img src="...svg"&gt; Đồ thị</span>
+                                </div>
+                            </td>
+                            <td class="border border-gray-200 p-4">
+                                <div class="bg-gray-50 border border-dashed border-gray-300 rounded-lg h-40 flex items-center justify-center">
+                                    <span class="text-gray-400 text-sm italic">Chèn thẻ &lt;img src="...svg"&gt; Đồ thị</span>
+                                </div>
+                            </td>
+                        </tr>
+                        
+                        <!-- Nhóm Bảng biến thiên -->
+                        <tr class="bg-teal-50 text-teal-800 font-bold uppercase text-sm tracking-wider">
+                            <td colspan="3" class="border border-gray-200 p-3">Bảng biến thiên</td>
+                        </tr>
+                        <tr>
+                            <td class="border border-gray-200 p-4 text-left align-middle text-gray-800">$y'=0$ có $2$ nghiệm phân biệt</td>
+                            <td class="border border-gray-200 p-4">
+                                <div class="bg-gray-50 border border-dashed border-gray-300 rounded-lg h-32 flex items-center justify-center">
+                                    <span class="text-gray-400 text-sm italic">Chèn thẻ &lt;img src="...svg"&gt; BBT</span>
+                                </div>
+                            </td>
+                            <td class="border border-gray-200 p-4">
+                                <div class="bg-gray-50 border border-dashed border-gray-300 rounded-lg h-32 flex items-center justify-center">
+                                    <span class="text-gray-400 text-sm italic">Chèn thẻ &lt;img src="...svg"&gt; BBT</span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="border border-gray-200 p-4 text-left align-middle text-gray-800">$y'=0$ có nghiệm kép</td>
+                            <td class="border border-gray-200 p-4">
+                                <div class="bg-gray-50 border border-dashed border-gray-300 rounded-lg h-24 flex items-center justify-center">
+                                    <span class="text-gray-400 text-sm italic">Chèn thẻ &lt;img src="...svg"&gt; BBT</span>
+                                </div>
+                            </td>
+                            <td class="border border-gray-200 p-4">
+                                <div class="bg-gray-50 border border-dashed border-gray-300 rounded-lg h-24 flex items-center justify-center">
+                                    <span class="text-gray-400 text-sm italic">Chèn thẻ &lt;img src="...svg"&gt; BBT</span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="border border-gray-200 p-4 text-left align-middle text-gray-800">$y'=0$ vô nghiệm</td>
+                            <td class="border border-gray-200 p-4">
+                                <div class="bg-gray-50 border border-dashed border-gray-300 rounded-lg h-24 flex items-center justify-center">
+                                    <span class="text-gray-400 text-sm italic">Chèn thẻ &lt;img src="...svg"&gt; BBT</span>
+                                </div>
+                            </td>
+                            <td class="border border-gray-200 p-4">
+                                <div class="bg-gray-50 border border-dashed border-gray-300 rounded-lg h-24 flex items-center justify-center">
+                                    <span class="text-gray-400 text-sm italic">Chèn thẻ &lt;img src="...svg"&gt; BBT</span>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-5 rounded-r-lg text-gray-800">
+                <h3 class="font-bold text-blue-700 mb-2"><i class="fa-solid fa-pen-to-square mr-2"></i>Chú ý:</h3>
+                <p class="mb-2">Ta có $y'=3ax^2+2bx+c$ và $y''=6ax+2b$.</p>
+                <p class="mb-2">Khi đó: $y''=6ax+2b=0 \Leftrightarrow x=-\dfrac{b}{3a}$.</p>
+                <p>Đồ thị của hàm số bậc ba luôn nhận điểm $I(x_0;y_0)$ làm <strong>tâm đối xứng</strong>, trong đó $x_0=-\dfrac{b}{3a}$ là nghiệm của phương trình $y''=0$ và $y_0=y(x_0)$. Điểm $I(x_0;y_0)$ được gọi là <strong>điểm uốn</strong> của đồ thị này, nó cũng là trung điểm của đoạn thẳng nối $2$ điểm cực trị (nếu có).</p>
+            </div>
+        </section>
+
+        <!-- ================= PHẦN 3 ================= -->
+        <section class="bg-white p-6 md:p-10 rounded-xl shadow-sm border border-gray-100">
+            <h2 class="text-xl font-bold text-teal-700 mb-6 flex items-center gap-2 border-b-2 border-teal-50 pb-3">
+                <span class="bg-teal-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-lg">3</span> 
+                Khảo sát hàm phân thức hữu tỉ $y=\dfrac{ax+b}{cx+d} \, (c \neq 0; ad-bc \neq 0)$
+            </h2>
+
+            <div class="overflow-x-auto mb-8">
+                <table class="w-full border-collapse border border-gray-200 text-center min-w-[700px]">
+                    <thead>
+                        <tr class="bg-teal-600 text-white font-bold">
+                            <th class="border border-gray-200 p-4 w-1/3">Đặc điểm</th>
+                            <th class="border border-gray-200 p-4 w-1/3">$ad-bc > 0$</th>
+                            <th class="border border-gray-200 p-4 w-1/3">$ad-bc < 0$</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="border border-gray-200 p-4 font-bold text-teal-800 bg-teal-50">Đồ thị hàm số</td>
+                            <td class="border border-gray-200 p-4">
+                                <div class="bg-gray-50 border border-dashed border-gray-300 rounded-lg h-48 flex items-center justify-center">
+                                    <span class="text-gray-400 text-sm italic">Chèn thẻ &lt;img src="...svg"&gt; Đồ thị</span>
+                                </div>
+                            </td>
+                            <td class="border border-gray-200 p-4">
+                                <div class="bg-gray-50 border border-dashed border-gray-300 rounded-lg h-48 flex items-center justify-center">
+                                    <span class="text-gray-400 text-sm italic">Chèn thẻ &lt;img src="...svg"&gt; Đồ thị</span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="border border-gray-200 p-4 font-bold text-teal-800 bg-teal-50">Bảng biến thiên</td>
+                            <td class="border border-gray-200 p-4">
+                                <div class="bg-gray-50 border border-dashed border-gray-300 rounded-lg h-32 flex items-center justify-center">
+                                    <span class="text-gray-400 text-sm italic">Chèn thẻ &lt;img src="...svg"&gt; BBT</span>
+                                </div>
+                            </td>
+                            <td class="border border-gray-200 p-4">
+                                <div class="bg-gray-50 border border-dashed border-gray-300 rounded-lg h-32 flex items-center justify-center">
+                                    <span class="text-gray-400 text-sm italic">Chèn thẻ &lt;img src="...svg"&gt; BBT</span>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-5 rounded-r-lg text-gray-800">
+                <h3 class="font-bold text-yellow-700 mb-2"><i class="fa-solid fa-lightbulb mr-2"></i>Chú ý:</h3>
+                <p class="mb-2">Đồ thị của hàm số $y=\dfrac{ax+b}{cx+d} \, \left(c \neq 0, ad-bc \neq 0\right)$:</p>
+                <ul class="list-disc pl-5 space-y-2 marker:text-yellow-500">
+                    <li>Có tiệm cận đứng là đường thẳng $x=-\dfrac{d}{c}$, tiệm cận ngang là đường thẳng $y=\dfrac{a}{c}$.</li>
+                    <li>Nhận giao điểm của $2$ đường tiệm cận $I\left(-\dfrac{d}{c};\dfrac{a}{c}\right)$ làm <strong>tâm đối xứng</strong>.</li>
+                    <li>Nhận $2$ đường phân giác của các góc tạo bởi tiệm cận đứng và tiệm cận ngang làm <strong>trục đối xứng</strong>.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- ================= PHẦN 4 ================= -->
+        <section class="bg-white p-6 md:p-10 rounded-xl shadow-sm border border-gray-100">
+            <h2 class="text-l font-bold text-teal-700 mb-6 flex items-center gap-2 border-b-2 border-teal-50 pb-3">
+                <span class="bg-teal-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-lg">4</span> 
+                Khảo sát hàm phân thức bậc hai trên bậc nhất $y=\frac{ax^2+bx+c}{mx+n} \, (a \neq 0; m \neq 0)$
+            </h2>
+            
+            <!-- Lý thuyết mở đầu -->
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-5 rounded-r-lg mb-8 text-gray-800 space-y-2">
+                <p><strong>Tập xác định:</strong> $D=\mathbb{R} \setminus \left\{-\dfrac{n}{m}\right\}$.</p>
+                <p><strong>Đạo hàm:</strong> $y'=\dfrac{am \cdot x^2+2an \cdot x+bn-mc}{(mx+n)^2}$.</p>
+                <p>Đặt $g(x)=am \cdot x^2+2an \cdot x+bn-mc$.</p>
+                <p>Dấu của $y'$ là dấu của $g(x)=am \cdot x^2+2an \cdot x+bn-mc$.</p>
+            </div>
+
+            <!-- Bảng -->
+            <div class="overflow-x-auto mb-8">
+                <table class="w-full border-collapse border border-gray-200 text-center min-w-[750px]">
+                    <thead>
+                        <tr class="bg-teal-600 text-white font-bold">
+                            <th class="border border-gray-200 p-4 w-1/3">Trường hợp</th>
+                            <th class="border border-gray-200 p-4 w-1/3">$am > 0$</th>
+                            <th class="border border-gray-200 p-4 w-1/3">$am < 0$</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Nhóm Đồ thị -->
+                        <tr class="bg-teal-50 text-teal-800 font-bold uppercase text-sm tracking-wider">
+                            <td colspan="3" class="border border-gray-200 p-3">Đồ thị hàm số</td>
+                        </tr>
+                        <tr>
+                            <td class="border border-gray-200 p-4 text-left align-middle text-gray-800">
+                                Phương trình $y'=0$ có $2$ nghiệm phân biệt<br>
+                                $\Delta_{g(x)} > 0$
+                            </td>
+                            <td class="border border-gray-200 p-4">
+                                <div class="bg-gray-50 border border-dashed border-gray-300 rounded-lg h-48 flex items-center justify-center">
+                                    <span class="text-gray-400 text-sm italic">Chèn thẻ &lt;img src="...svg"&gt; Đồ thị</span>
+                                </div>
+                            </td>
+                            <td class="border border-gray-200 p-4">
+                                <div class="bg-gray-50 border border-dashed border-gray-300 rounded-lg h-48 flex items-center justify-center">
+                                    <span class="text-gray-400 text-sm italic">Chèn thẻ &lt;img src="...svg"&gt; Đồ thị</span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="border border-gray-200 p-4 text-left align-middle text-gray-800">
+                                Phương trình $y'=0$ có nghiệm kép hoặc vô nghiệm<br>
+                                $\Delta_{g(x)} \le 0$
+                            </td>
+                            <td class="border border-gray-200 p-4">
+                                <div class="bg-gray-50 border border-dashed border-gray-300 rounded-lg h-48 flex items-center justify-center">
+                                    <span class="text-gray-400 text-sm italic">Chèn thẻ &lt;img src="...svg"&gt; Đồ thị</span>
+                                </div>
+                            </td>
+                            <td class="border border-gray-200 p-4">
+                                <div class="bg-gray-50 border border-dashed border-gray-300 rounded-lg h-48 flex items-center justify-center">
+                                    <span class="text-gray-400 text-sm italic">Chèn thẻ &lt;img src="...svg"&gt; Đồ thị</span>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- Nhóm Bảng biến thiên -->
+                        <tr class="bg-teal-50 text-teal-800 font-bold uppercase text-sm tracking-wider">
+                            <td colspan="3" class="border border-gray-200 p-3">Bảng biến thiên</td>
+                        </tr>
+                        <tr>
+                            <td class="border border-gray-200 p-4 text-left align-middle text-gray-800">Hàm số có $2$ cực trị</td>
+                            <td class="border border-gray-200 p-4">
+                                <div class="bg-gray-50 border border-dashed border-gray-300 rounded-lg h-32 flex items-center justify-center">
+                                    <span class="text-gray-400 text-sm italic">Chèn thẻ &lt;img src="...svg"&gt; BBT</span>
+                                </div>
+                            </td>
+                            <td class="border border-gray-200 p-4">
+                                <div class="bg-gray-50 border border-dashed border-gray-300 rounded-lg h-32 flex items-center justify-center">
+                                    <span class="text-gray-400 text-sm italic">Chèn thẻ &lt;img src="...svg"&gt; BBT</span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="border border-gray-200 p-4 text-left align-middle text-gray-800">Hàm số không có cực trị</td>
+                            <td class="border border-gray-200 p-4">
+                                <div class="bg-gray-50 border border-dashed border-gray-300 rounded-lg h-32 flex items-center justify-center">
+                                    <span class="text-gray-400 text-sm italic">Chèn thẻ &lt;img src="...svg"&gt; BBT</span>
+                                </div>
+                            </td>
+                            <td class="border border-gray-200 p-4">
+                                <div class="bg-gray-50 border border-dashed border-gray-300 rounded-lg h-32 flex items-center justify-center">
+                                    <span class="text-gray-400 text-sm italic">Chèn thẻ &lt;img src="...svg"&gt; BBT</span>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-5 rounded-r-lg text-gray-800">
+                <h3 class="font-bold text-yellow-700 mb-2"><i class="fa-solid fa-lightbulb mr-2"></i>Chú ý:</h3>
+                <p class="mb-2">Đồ thị hàm số $y=\dfrac{ax^2+bx+c}{mx+n} \, (a \neq 0, m \neq 0$, đa thức tử không chia hết cho đa thức mẫu):</p>
+                <ul class="list-disc pl-5 space-y-2 marker:text-yellow-500">
+                    <li>Có tiệm cận đứng là đường thẳng $x=-\dfrac{n}{m}$, tiệm cận xiên là đường thẳng $y=\dfrac{a}{m}x-\dfrac{an-bm}{m^2}$</li>
+                    <li>Nhận giao điểm của tiệm cận đứng là tiệm cận xiên làm <strong>tâm đối xứng</strong>, tâm đối xứng này cũng là trung điểm của đoạn thẳng nối $2$ điểm cực trị (nếu có).</li>
+                    <li>Nhận hai đường phân giác của các góc tạo bởi tiệm cận đứng và tiệm cận xiên làm <strong>trục đối xứng</strong>.</li>
+                </ul>
+            </div>
+        </section>
+    </main>
+    <footer class="bg-gray-900 text-gray-300 py-12 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div class="col-span-1 md:col-span-2">
+                <div class="mb-4 inline-block hover:opacity-80 transition-opacity cursor-pointer">
+    <span class="text-2xl tracking-tight text-white pb-1">
+        $\textcolor{#0d9488}{\textsf{\textbf{Dofor}}{\sum}\textsf{\textbf{ath}}}$
+    </span>
+</div>
+                <p class="text-sm text-gray-400 max-w-sm mb-6 leading-relaxed">
+                    Nền tảng học Toán trực tuyến tối ưu, giúp học sinh xây dựng tư duy logic và đạt điểm số cao trong các kỳ thi.
+                </p>
+                <div class="flex space-x-4 mt-6">
+                <!-- Facebook -->
+                <a href="https://www.facebook.com/d.circle7" target="_blank" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
+                    <i class="fa-brands fa-facebook-f"></i>
+                </a>
+                
+                <!-- TikTok -->
+                <a href="https://tiktok.com/@anhthaymathmath" target="_blank" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
+                    <i class="fa-brands fa-tiktok"></i>
+                </a>
+                
+                <!-- YouTube -->
+                <a href="https://youtube.com/@doformath" target="_blank" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
+                    <i class="fa-brands fa-youtube"></i>
+                </a>
+
+            </div>
+            </div>
+            <div>
+                <h4 class="text-white font-semibold mb-4">Liên kết nhanh</h4>
+                <ul class="space-y-2 text-sm">
+                    <li><a href="#" class="hover:text-primary transition-colors">Tất cả khóa học</a></li>
+                    <li><a href="#" class="hover:text-primary transition-colors">Tài liệu miễn phí</a></li>
+                    <li><a href="#" class="hover:text-primary transition-colors">Tin tức & Sự kiện</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-white font-semibold mb-4">Hỗ trợ</h4>
+                <ul class="space-y-2 text-sm">
+                    <li><a href="#" class="hover:text-primary transition-colors">Hướng dẫn đăng ký</a></li>
+                    <li><a href="#" class="hover:text-primary transition-colors">Chính sách hoàn học phí</a></li>
+                    <li><a href="#" class="hover:text-primary transition-colors">Liên hệ giáo viên</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 pt-8 border-t border-gray-800 text-sm text-gray-500 text-center">
+            &copy; 2026 DoforMath Education. All rights reserved. Code by HTML/Tailwind.
+        </div>
+    </footer>
+    <!-- Script Kích hoạt KaTeX -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false}
+                ],
+                throwOnError : false
+            });
+        });
+    </script>
+
+</body>
+</html>
