@@ -5,12 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Đăng nhập - DoforMath</title>
     
-    <!-- Nhúng font chữ Montserrat từ Google Fonts -->
+    <!-- Cấu hình Favicon -->
+    <link rel="icon" type="image/png" href="../assets/images/Doformath.png">
+
+    <!-- Nhúng font chữ Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Nhúng FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
-    <!-- Nhúng thư viện KaTeX (CSS và JS) -->
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] }, colors: { primary: '#0d9488'} } }
+        }
+    </script>
+
+    <!-- Thêm Alpine.js để xử lý Ẩn/Hiện mật khẩu -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <!-- Nhúng thư viện KaTeX -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" 
@@ -28,200 +45,163 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
     
     <style>
-        body {
-            font-family: 'Montserrat', sans-serif;
-            background-color: #f4f7f6;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            position: relative; /* Thêm để căn chỉnh nút Trở về */
-        }
-        
-        /* CSS cho nút Trở về trang chủ */
-        .back-home-btn {
-            position: absolute;
-            top: 30px;
-            left: 30px;
-            color: #64748b;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 15px;
-            display: flex;
-            align-items: center;
-            transition: all 0.3s ease;
-        }
-        .back-home-btn:hover {
-            color: #0d9488;
-            transform: translateX(-3px); /* Hiệu ứng lùi nhẹ sang trái khi rê chuột */
-        }
+        body { font-family: 'Inter', system-ui, sans-serif; }
+        [x-cloak] { display: none !important; }
 
-        .login-container {
-            background-color: white;
-            padding: 40px;
-            border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(13, 148, 136, 0.15);
-            width: 100%;
-            max-width: 350px;
-            text-align: center;
-        }
+        /* Hiệu ứng hoạt hình mượt mà khi load trang */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fadeIn 0.6s ease-out forwards; }
         
-        .logo-container {
-            margin-bottom: 30px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .logo-text {
-            font-size: 30px; 
-            padding-bottom: 4px;
-        }
-
-        .input-group {
-            margin-bottom: 20px;
-            text-align: left;
-        }
-        .input-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: #444;
-            font-weight: 600;
-            font-size: 14px;
-        }
-        .input-group input {
-            width: 100%;
-            padding: 14px;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            box-sizing: border-box;
-            font-family: 'Montserrat', sans-serif;
-            font-size: 15px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-        .input-group input:focus {
-            outline: none;
-            border-color: #0d9488;
-            box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15);
-        }
-        
-        /* CSS mô phỏng hiệu ứng Tailwind cho nút Đăng nhập */
-        .login-btn {
-            width: 100%;
-            padding: 14px;
-            background-color: #0d9488; /* bg-primary */
-            color: white;
-            border: none;
-            border-radius: 100px; /* rounded-full */
-            cursor: pointer;
-            font-family: 'Montserrat', sans-serif;
-            font-size: 16px;
-            font-weight: 700;
-            margin-top: 10px;
-            /* Hiệu ứng bóng đổ màu xanh ngọc nhạt (shadow-xl shadow-teal-200) */
-            box-shadow: 0 20px 25px -5px rgba(153, 246, 228, 0.6), 0 8px 10px -6px rgba(153, 246, 228, 0.6);
-            transition: all 0.3s ease; /* transition-all */
-        }
-        .login-btn:hover {
-            background-color: #115e59; /* hover:bg-teal-800 */
-            transform: translateY(-4px); /* hover:-translate-y-1 (Nảy lên trên) */
-            /* Ánh sáng đậm hơn một chút khi hover */
-            box-shadow: 0 20px 25px -5px rgba(13, 148, 136, 0.4), 0 8px 10px -6px rgba(13, 148, 136, 0.4);
-        }
-        .login-btn:active {
-            transform: translateY(0); /* Lún xuống khi click */
-        }
-
-        #error-message {
-            color: #e53935;
-            background-color: #ffebee;
-            padding: 10px;
-            border-radius: 8px;
-            margin-top: 20px;
-            font-size: 14px;
-            font-weight: 500;
-            display: none;
-        }
+        /* Chỉnh lại style thanh cuộn cho Light Mode */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
-<body>
+<body class="bg-slate-50 min-h-screen overflow-hidden selection:bg-teal-500/20 selection:text-teal-900">
 
-    <!-- Nút trở về trang chủ -->
-    <a href="index.html" class="back-home-btn">
-        &#8592; Trở về trang chủ
-    </a>
+    <div class="w-full min-h-screen grid grid-cols-1 lg:grid-cols-[1fr_480px]">
 
-    <div class="login-container">
-        <!-- Mã LaTeX logo -->
-        <div class="logo-container">
-            <span class="logo-text">
-                $\textcolor{#0d9488}{\textsf{\textbf{Dofor}}{\sum}\textsf{\textbf{ath}}}$
-            </span>
-        </div>
-        
-        <div class="input-group">
-            <label>Tài khoản Email</label>
-            <input type="email" id="email" placeholder="Nhập email...">
-        </div>
-        <div class="input-group">
-            <label>Mật khẩu</label>
-            <input type="password" id="password" placeholder="Nhập mật khẩu...">
-        </div>
-        <button class="login-btn" onclick="xuLyDangNhap()">Đăng nhập</button>
-        
-        <div id="error-message">Sai tài khoản hoặc mật khẩu!</div>
-    </div>
-<footer class="bg-gray-900 text-gray-300 py-12 border-t border-gray-800">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div class="col-span-1 md:col-span-2">
-                <div class="mb-4 inline-block hover:opacity-80 transition-opacity cursor-pointer">
-    <span class="text-2xl tracking-tight text-white pb-1">
-        $\textcolor{#0d9488}{\textsf{\textbf{Dofor}}{\sum}\textsf{\textbf{ath}}}$
-    </span>
-</div>
-                <p class="text-sm text-gray-400 max-w-sm mb-6 leading-relaxed">
-                    Nền tảng học Toán trực tuyến tối ưu, giúp học sinh xây dựng tư duy logic và đạt điểm số cao trong các kỳ thi.
+        <!-- ================= CỘT TRÁI: THƯƠNG HIỆU & GIỚI THIỆU ================= -->
+        <div class="relative flex flex-col justify-center p-10 lg:p-14 bg-gradient-to-br from-teal-50 via-sky-50 to-emerald-50 overflow-hidden min-h-screen border-r border-slate-200/60">
+            
+            <!-- Nút Trở về trang chủ -->
+            <a href="index.html" class="absolute top-8 left-8 lg:left-14 flex items-center gap-2 text-slate-500 hover:text-teal-600 transition-all hover:-translate-x-1 font-medium z-20">
+                <i class="fa-solid fa-arrow-left"></i> Trở về trang chủ
+            </a>
+
+            <!-- Các mảng màu mờ trang trí (Abstract shapes) -->
+            <div class="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-teal-300/40 blur-[100px] pointer-events-none"></div>
+            <div class="absolute -bottom-24 -right-12 w-80 h-80 rounded-full bg-blue-300/30 blur-[100px] pointer-events-none"></div>
+
+            <div class="flex flex-col justify-center z-10 animate-fade-in">
+                
+                <!-- Logo -->
+                <div class="mb-10 inline-block">
+                    <!-- Trả lại màu gốc #0d9488 cho nền sáng -->
+                    <span class="text-4xl tracking-tight text-slate-900 pb-1">
+                        $\textcolor{#0d9488}{\textsf{\textbf{Dofor}}{\sum}\textsf{\textbf{ath}}}$
+                    </span>
+                </div>
+
+                <!-- Tiêu đề lớn -->
+                <h1 class="text-4xl lg:text-6xl font-black text-slate-900 leading-tight mb-6 tracking-tight">
+                    Nền tảng học Toán<br>
+                    <span class="bg-gradient-to-r from-teal-600 to-emerald-500 bg-clip-text text-transparent">toàn diện & chuyên sâu</span>
+                </h1>
+
+                <p class="text-base lg:text-lg leading-relaxed text-slate-600 mb-10 max-w-md font-medium">
+                    Phá bỏ giới hạn tư duy, chinh phục điểm số mục tiêu với phương pháp học tập trực quan và hệ thống bài giảng đẳng cấp.
                 </p>
-                <div class="flex space-x-4 mt-6">
-                <!-- Facebook -->
-                <a href="https://www.facebook.com/d.circle7" target="_blank" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
-                    <i class="fa-brands fa-facebook-f"></i>
-                </a>
-                
-                <!-- TikTok -->
-                <a href="https://tiktok.com/@anhthaymathmath" target="_blank" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
-                    <i class="fa-brands fa-tiktok"></i>
-                </a>
-                
-                <!-- YouTube -->
-                <a href="https://youtube.com/@doformath" target="_blank" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
-                    <i class="fa-brands fa-youtube"></i>
-                </a>
 
-            </div>
-            </div>
-            <div>
-                <h4 class="text-white font-semibold mb-4">Liên kết nhanh</h4>
-                <ul class="space-y-2 text-sm">
-                    <li><a href="#" class="hover:text-primary transition-colors">Tất cả khóa học</a></li>
-                    <li><a href="#" class="hover:text-primary transition-colors">Tài liệu miễn phí</a></li>
-                    <li><a href="#" class="hover:text-primary transition-colors">Tin tức & Sự kiện</a></li>
-                </ul>
-            </div>
-            <div>
-                <h4 class="text-white font-semibold mb-4">Hỗ trợ</h4>
-                <ul class="space-y-2 text-sm">
-                    <li><a href="#" class="hover:text-primary transition-colors">Hướng dẫn đăng ký</a></li>
-                    <li><a href="#" class="hover:text-primary transition-colors">Chính sách hoàn học phí</a></li>
-                    <li><a href="#" class="hover:text-primary transition-colors">Liên hệ giáo viên</a></li>
-                </ul>
+                <!-- Thông số / Social Proof -->
+                <div class="flex items-center gap-4 p-4 rounded-2xl bg-white/70 border border-slate-200/60 w-fit backdrop-blur-md shadow-sm">
+                    <div class="flex -space-x-3">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-orange-400 to-rose-500 border-2 border-white flex items-center justify-center text-white text-xs font-bold shadow-md">12</div>
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 border-2 border-white flex items-center justify-center text-white text-xs font-bold shadow-md">11</div>
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-teal-400 to-emerald-500 border-2 border-white flex items-center justify-center text-white text-xs font-bold shadow-md">10</div>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-sm font-bold text-teal-600">Hơn 7.500</span>
+                        <span class="text-[13px] font-medium text-slate-500">Học sinh đang chạy nước rút</span>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 pt-8 border-t border-gray-800 text-sm text-gray-500 text-center">
-            &copy; 2026 DoforMath Education. All rights reserved. Code by HTML/Tailwind.
+
+        <!-- ================= CỘT PHẢI: FORM ĐĂNG NHẬP ================= -->
+        <div class="bg-white p-10 lg:p-14 flex flex-col justify-center min-h-screen overflow-y-auto z-10 relative shadow-[-10px_0_30px_rgba(0,0,0,0.03)]">
+
+            <div class="animate-fade-in" style="animation-delay: 0.1s;">
+                <div class="mb-8">
+                    <h2 class="text-3xl font-extrabold text-slate-900 mb-2 tracking-tight">Đăng nhập</h2>
+                    <p class="text-sm text-slate-500 font-medium">Vui lòng đăng nhập để tiếp tục hành trình học tập.</p>
+                </div>
+                
+                <!-- Khu vực hiển thị lỗi -->
+                <div id="error-message" class="hidden mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm font-medium flex items-center gap-2 shadow-sm">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    <span id="error-text">Sai tài khoản hoặc mật khẩu!</span>
+                </div>
+
+                <div class="space-y-5" x-data="{ showPassword: false }">
+                    
+                    <!-- Nhập Email -->
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">Tài khoản Email</label>
+                        <div class="relative group">
+                            <i class="fa-regular fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm transition-colors group-focus-within:text-teal-500 pointer-events-none"></i>
+                            <input type="email" id="email" placeholder="hocsinh@dfm.com"
+                                class="w-full pl-11 pr-4 py-3.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 text-base font-medium placeholder:text-slate-400 focus:ring-4 focus:ring-teal-500/10 focus:border-teal-500 outline-none transition-all focus:bg-white">
+                        </div>
+                    </div>
+
+                    <!-- Nhập Mật khẩu -->
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">Mật khẩu</label>
+                        <div class="relative group">
+                            <i class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm transition-colors group-focus-within:text-teal-500 pointer-events-none"></i>
+                            
+                            <input id="password" :type="showPassword ? 'text' : 'password'" placeholder="••••••••"
+                                class="w-full pl-11 pr-12 py-3.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 text-base font-medium placeholder:text-slate-400 focus:ring-4 focus:ring-teal-500/10 focus:border-teal-500 outline-none transition-all focus:bg-white">
+                            
+                            <!-- Nút ẩn/hiện mật khẩu (Alpine.js) -->
+                            <button type="button" @click="showPassword = !showPassword" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition">
+                                <i class="text-sm" :class="showPassword ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye'"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Ghi nhớ & Quên mật khẩu -->
+                    <div class="flex items-center justify-between mt-2">
+                        <label class="flex items-center gap-2 cursor-pointer group">
+                            <!-- Custom checkbox -->
+                            <div class="relative flex items-center justify-center w-5 h-5 rounded border border-slate-300 bg-white group-hover:border-teal-500 transition-colors">
+                                <input type="checkbox" class="peer opacity-0 absolute inset-0 cursor-pointer">
+                                <i class="fa-solid fa-check text-[10px] text-teal-600 opacity-0 peer-checked:opacity-100 transition-opacity"></i>
+                            </div>
+                            <span class="text-sm font-semibold text-slate-600 group-hover:text-slate-900 transition">Ghi nhớ đăng nhập</span>
+                        </label>
+                        <a href="#" class="text-sm font-bold text-teal-600 hover:text-teal-700 transition">Quên mật khẩu?</a>
+                    </div>
+
+                    <!-- Nút Đăng nhập -->
+                    <button class="login-btn w-full py-4 mt-2 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-600 text-white text-base font-bold shadow-lg shadow-teal-500/30 hover:shadow-teal-500/50 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2" onclick="xuLyDangNhap()">
+                        <span id="btn-text">Đăng nhập</span>
+                        <i id="btn-icon" class="fa-solid fa-arrow-right-to-bracket"></i>
+                        <svg id="btn-spinner" class="hidden w-5 h-5 animate-spin text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+                    </button>
+
+                    <!-- Hoặc đăng nhập với -->
+                    <div class="flex items-center gap-3 my-6">
+                        <div class="flex-1 h-px bg-slate-200"></div>
+                        <span class="text-xs uppercase tracking-wider font-bold text-slate-400">Hoặc tiếp tục với</span>
+                        <div class="flex-1 h-px bg-slate-200"></div>
+                    </div>
+
+                    <!-- Nút Google -->
+                    <button class="flex items-center justify-center gap-3 w-full py-3.5 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 hover:border-slate-300 text-sm font-bold text-slate-700 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-sm">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24">
+                            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
+                            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                        </svg>
+                        Đăng nhập bằng Google
+                    </button>
+                </div>
+
+                <p class="text-center mt-8 text-sm text-slate-500 font-medium">
+                    Chưa có tài khoản?
+                    <a href="#" class="text-teal-600 hover:text-teal-700 font-bold transition">Đăng ký ngay</a>
+                </p>
+            </div>
         </div>
-    </footer>
+
+    </div>
+
+    <!-- KHỐI JAVASCRIPT XỬ LÝ ĐĂNG NHẬP FIREBASE (GIỮ NGUYÊN) -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyD-NDo43O3Q_9GVii6pDOM7D6SQ5pxmo5g",
@@ -238,28 +218,46 @@
         function xuLyDangNhap() {
             const emailNhapVao = document.getElementById('email').value;
             const matKhauNhapVao = document.getElementById('password').value;
-            const thongBaoLoi = document.getElementById('error-message');
+            const thongBaoLoiBox = document.getElementById('error-message');
+            const thongBaoLoiText = document.getElementById('error-text');
+            
             const nutDangNhap = document.querySelector('.login-btn');
+            const btnText = document.getElementById('btn-text');
+            const btnIcon = document.getElementById('btn-icon');
+            const btnSpinner = document.getElementById('btn-spinner');
 
-            nutDangNhap.innerText = "Đang xử lý...";
-            nutDangNhap.style.opacity = "0.7";
+            // Hiển thị trạng thái đang xử lý (Spinner)
+            nutDangNhap.disabled = true;
+            nutDangNhap.classList.add('opacity-70', 'cursor-not-allowed');
+            btnText.innerText = "Đang xử lý...";
+            btnIcon.classList.add('hidden');
+            btnSpinner.classList.remove('hidden');
+            thongBaoLoiBox.classList.add('hidden'); // Ẩn lỗi cũ nếu có
 
             firebase.auth().signInWithEmailAndPassword(emailNhapVao, matKhauNhapVao)
             .then((userCredential) => {
-                thongBaoLoi.style.display = "none";
-                window.location.href = "/courses"; 
+                thongBaoLoiBox.classList.add('hidden');
+                
+                // Đổi thành tên file HTML bạn muốn học sinh nhìn thấy sau khi đăng nhập
+                window.location.href = "index.html"; 
             })
             .catch((error) => {
-                thongBaoLoi.style.display = "block";
-                nutDangNhap.innerText = "Đăng nhập";
-                nutDangNhap.style.opacity = "1";
+                // Khôi phục nút bấm khi lỗi
+                nutDangNhap.disabled = false;
+                nutDangNhap.classList.remove('opacity-70', 'cursor-not-allowed');
+                btnText.innerText = "Đăng nhập";
+                btnIcon.classList.remove('hidden');
+                btnSpinner.classList.add('hidden');
+                
+                // Hiển thị thông báo lỗi
+                thongBaoLoiBox.classList.remove('hidden');
 
                 if(error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
-                    thongBaoLoi.innerText = "Sai email hoặc mật khẩu. Vui lòng thử lại!";
+                    thongBaoLoiText.innerText = "Sai email hoặc mật khẩu. Vui lòng thử lại!";
                 } else if(error.code === 'auth/invalid-email') {
-                    thongBaoLoi.innerText = "Định dạng email không hợp lệ!";
+                    thongBaoLoiText.innerText = "Định dạng email không hợp lệ!";
                 } else {
-                    thongBaoLoi.innerText = "Lỗi kết nối. Vui lòng kiểm tra mạng!";
+                    thongBaoLoiText.innerText = "Lỗi kết nối. Vui lòng kiểm tra mạng!";
                 }
             });
         }

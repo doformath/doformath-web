@@ -31,7 +31,26 @@
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased font-sans">
-
+<!-- Cửa sổ thông báo Không có quyền truy cập (Được ẩn mặc định) -->
+    <div id="access-denied-modal" class="fixed inset-0 z-[9999] hidden flex items-center justify-center bg-slate-900/70 backdrop-blur-md px-4 transition-opacity">
+        <div class="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl animate-fade-in">
+            <!-- Biểu tượng ổ khóa -->
+            <div class="w-20 h-20 bg-teal-50 text-teal-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner border border-teal-100">
+                <i class="fa-solid fa-lock text-3xl"></i>
+            </div>
+            
+            <h3 class="text-2xl font-extrabold text-slate-800 mb-3 tracking-tight">Truy cập bị từ chối</h3>
+            <p class="text-slate-600 mb-8 leading-relaxed text-sm font-medium">
+                Tài khoản của bạn chưa được cấp quyền truy cập khóa học này. Vui lòng liên hệ thầy Đô để được hỗ trợ mở khóa nhé!
+            </p>
+            
+            <!-- Nút Quay lại Trang chủ -->
+            <a href="../index.html" class="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-600 text-white text-base font-bold shadow-lg shadow-teal-500/30 hover:shadow-teal-500/50 hover:scale-[1.02] active:scale-[0.98] transition-all">
+                <i class="fa-solid fa-house text-sm"></i>
+                Quay lại Trang chủ
+            </a>
+        </div>
+    </div>
     <!-- Header Navigation -->
     <header class="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-50 border-b border-slate-200">
         <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
@@ -578,5 +597,69 @@
             });
         });
     </script>
+    <!-- Nhúng thư viện Firebase Auth -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    
+    <!-- BỔ SUNG: Nhúng thư viện Firestore để đọc Database phân quyền -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+    <!-- Nhúng thư viện Firebase Auth & Firestore -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+    <!-- Script kiểm tra quyền truy cập (Phiên bản UI đẹp) -->
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyD-NDo43O3Q_9GVii6pDOM7D6SQ5pxmo5g",
+            authDomain: "doformath-bac70.firebaseapp.com",
+            projectId: "doformath-bac70",
+            storageBucket: "doformath-bac70.firebasestorage.app",
+            messagingSenderId: "329095418163",
+            appId: "1:329095418163:web:226636d40b5c2960cdee46",
+            measurementId: "G-RHVBMMGQGZ"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // ĐỔI TÊN KHÓA HỌC Ở ĐÂY TƯƠNG ỨNG VỚI TỪNG FILE (toan-10, toan-11, toan-12)
+        const currentCourse = "toan-12"; 
+
+        // Hàm hiển thị Modal lỗi
+        function showAccessDenied() {
+            const modal = document.getElementById('access-denied-modal');
+            modal.classList.remove('hidden'); // Hiện cửa sổ lên
+            document.body.style.overflow = 'hidden'; // Khóa cuộn trang web (không cho cuộn xuống xem trộm)
+        }
+
+        firebase.auth().onAuthStateChanged((user) => {
+            if (!user) {
+                window.location.replace("../login.html");
+            } else {
+                db.collection("phan_quyen").doc(user.email).get()
+                .then((doc) => {
+                    if (doc.exists) {
+                        const data = doc.data();
+                        
+                        if (data[currentCourse] === true) {
+                            console.log("Xác thực quyền hợp lệ!");
+                        } else {
+                            // Bị false -> Gọi giao diện Modal đẹp
+                            showAccessDenied();
+                        }
+                    } else {
+                        // Không có email trong bảng -> Gọi giao diện Modal đẹp
+                        showAccessDenied();
+                    }
+                }).catch((error) => {
+                    console.log("Lỗi:", error);
+                    showAccessDenied();
+                });
+            }
+        });
+    </script>
 </body>
+
 </html>
