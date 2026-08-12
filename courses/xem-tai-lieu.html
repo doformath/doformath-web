@@ -63,9 +63,25 @@
             
         </div>
     </div>
+    <!-- Khu vực Tiêu đề động được thiết kế lại thành khối Banner -->
+    <div class="max-w-4xl mx-auto px-4 w-full mt-8 mb-4">
+        <!-- ... (Khối banner tiêu đề hiện tại của bạn giữ nguyên) ... -->
+    </div>
 
+    <!-- THANH CÔNG CỤ ZOOM (Cố định khi cuộn) -->
+    <div class="max-w-7xl mx-auto px-4 flex justify-end mb-4 sticky top-[90px] z-40">
+        <div class="bg-white/90 backdrop-blur-md border border-gray-200 rounded-full shadow-lg flex items-center p-1 gap-1">
+            <button onclick="zoomOut()" class="w-8 h-8 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 hover:text-primary transition-colors" title="Thu nhỏ">
+                <i class="fa-solid fa-minus"></i>
+            </button>
+            <span id="zoom-level" class="text-sm font-bold text-primary w-12 text-center select-none">100%</span>
+            <button onclick="zoomIn()" class="w-8 h-8 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 hover:text-primary transition-colors" title="Phóng to">
+                <i class="fa-solid fa-plus"></i>
+            </button>
+        </div>
+    </div>
     <!-- Khung chứa ảnh tự động -->
-    <main class="flex-1 w-full max-w-4xl mx-auto px-4 pb-12 select-none" oncontextmenu="return false;">
+    <main class="flex-1 w-full max-w-9xl mx-auto px-4 pb-12 select-none" oncontextmenu="return false;">
         <div id="image-container" class="w-full bg-white rounded-xl shadow-sm border border-gray-200 flex flex-col items-center p-2 md:p-8 relative min-h-[500px]">
             <!-- Vòng xoay tải trang -->
             <div id="loader" class="absolute top-20 text-gray-400 flex flex-col items-center gap-2">
@@ -110,7 +126,8 @@
                 
                 // Móc trực tiếp vào Cloudinary, chèn sẵn f_auto và q_auto để ảnh siêu nét mà cực nhẹ
                 img.src = `https://res.cloudinary.com/${cloudName}/image/upload/f_auto,q_auto/${folderName}-${pageNum}.png`;
-                
+                // Vẫn TUYỆT ĐỐI GIỮ LẠI dòng Lazy Loading này
+                img.setAttribute("loading", "lazy");
                 img.className = "w-full h-auto block mb-6 shadow-sm border border-gray-100 pointer-events-none";
                 img.alt = `Trang ${pageNum}`;
 
@@ -146,6 +163,39 @@
                 throwOnError : false
             });
         });
+    </script>
+    <!-- Script Xử lý chức năng Zoom -->
+    <script>
+        // Mức zoom mặc định ban đầu là 100%
+        let currentZoom = 100;
+
+        function zoomIn() {
+            // Giới hạn phóng to tối đa là 150% để ảnh không bị vỡ hoặc tràn quá mức
+            if (currentZoom < 150) { 
+                currentZoom += 10;
+                applyZoom();
+            }
+        }
+
+        function zoomOut() {
+            // Giới hạn thu nhỏ tối thiểu là 50%
+            if (currentZoom > 50) { 
+                currentZoom -= 10;
+                applyZoom();
+            }
+        }
+
+        function applyZoom() {
+            // 1. Cập nhật con số hiển thị trên thanh công cụ
+            document.getElementById('zoom-level').innerText = currentZoom + '%';
+            
+            // 2. Điều chỉnh chiều rộng của khung chứa ảnh
+            const container = document.getElementById('image-container');
+            container.style.width = currentZoom + '%';
+            
+            // 3. Đảm bảo khung chứa luôn được căn giữa màn hình dù to hay nhỏ
+            container.style.margin = '0 auto';
+        }
     </script>
 
 </body>

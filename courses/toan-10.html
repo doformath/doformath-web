@@ -37,14 +37,22 @@
             </a>
         </div>
     </div>
-    <!-- Header Menu -->
-    <header class="bg-white shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-            <!-- Lưu ý: Dùng "../index.html" để quay về trang chủ -->
-            <a href="../index.html" class="flex items-center text-gray-600 hover:text-primary font-medium gap-2 transition">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-                Trở về Trang chủ
+    <!-- Header Navigation (Đã tối ưu Mobile) -->
+    <header class="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-50 border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 py-3 md:py-4 flex justify-between items-center">
+            <!-- Nút quay lại trang chủ: Rút gọn chữ trên mobile -->
+            <a href="../index.html" class="flex items-center text-slate-500 hover:text-teal-600 font-medium gap-1.5 md:gap-2 transition-colors text-sm md:text-base">
+                <i class="fa-solid fa-arrow-left"></i> 
+                <span class="hidden sm:inline">Trở về Trang chủ</span>
+                <span class="sm:hidden">Quay lại</span>
             </a>
+            
+            <!-- Logo Toán học: Hiện trên mobile nhưng thu nhỏ lại -->
+            <div class="hover:opacity-80 transition-opacity cursor-pointer">
+                <span class="text-xl md:text-2xl tracking-tight text-slate-900 pb-1">
+                    $\textcolor{#0d9488}{\textsf{\textbf{Dofor}}{\sum}\textsf{\textbf{ath}}}$
+                </span>
+            </div>
         </div>
     </header>
 

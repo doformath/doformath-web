@@ -40,15 +40,18 @@
     <!-- HEADER / NAVBAR (Sticky) -->
     <header class="bg-white shadow-sm sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-20">
-                <!-- Logo Toán học -->
-            <div class="flex-shrink-0 flex items-center cursor-pointer hover:opacity-80 transition-opacity">
-                <span class="text-3xl tracking-tight text-gray-900 pb-1">
-                    $\textcolor{#0d9488}{\textsf{\textbf{Dofor}}{\sum}\textsf{\textbf{ath}}}$
-                </span>
-            </div>
+            <!-- Giảm chiều cao header trên mobile từ h-20 xuống h-16 -->
+            <div class="flex justify-between items-center h-16 md:h-20">
                 
-                <!-- Menu ngang -->
+                <!-- Logo Toán học -->
+                <div class="flex-shrink-0 flex items-center cursor-pointer hover:opacity-80 transition-opacity">
+                    <!-- Thu nhỏ logo trên mobile (text-2xl) và giữ nguyên trên desktop (md:text-3xl) -->
+                    <span class="text-2xl md:text-3xl tracking-tight text-gray-900 pb-1">
+                        $\textcolor{#0d9488}{\textsf{\textbf{Dofor}}{\sum}\textsf{\textbf{ath}}}$
+                    </span>
+                </div>
+                
+                <!-- Menu ngang (Ẩn trên mobile) -->
                 <nav class="hidden md:flex space-x-8">
                     <a href="#" class="text-primary font-semibold border-b-2 border-primary py-2">Trang chủ</a>
                     <a href="#" class="text-gray-500 hover:text-primary font-medium py-2 transition-colors">Khóa học của tôi</a>
@@ -57,21 +60,27 @@
                 </nav>
 
                 <!-- Nút Hành động -->
-               <!-- 1. Khu vực hiển thị khi CHƯA đăng nhập -->
+                <!-- 1. Khu vực hiển thị khi CHƯA đăng nhập -->
                 <div id="khu-vuc-dang-nhap">
-                    <a href="login.html" class="bg-primary hover:bg-teal-800 text-white px-6 py-2.5 rounded-full font-medium transition-all shadow-md hover:shadow-lg">
-                        Đăng nhập</a>
+                    <!-- Thu nhỏ nút đăng nhập trên mobile -->
+                    <a href="login.html" class="bg-primary hover:bg-teal-800 text-white px-4 py-2 md:px-6 md:py-2.5 rounded-full text-sm md:text-base font-medium transition-all shadow-md hover:shadow-lg">
+                        Đăng nhập
+                    </a>
                 </div>
 
-                <!-- 2. Khu vực hiển thị khi ĐÃ đăng nhập (Mặc định ẩn) -->
-                <div id="khu-vuc-user" style="display: none;" class="flex items-center gap-4">
-                    <!-- Nơi chứa tên học sinh -->
-                    <span id="ten-user" class="text-sm font-semibold text-teal-700 bg-teal-50 px-3 py-1 rounded-full border border-teal-100"></span>
+                <!-- 2. Khu vực hiển thị khi ĐÃ đăng nhập -->
+                <!-- Giảm khoảng cách (gap) giữa tên và nút đăng xuất trên mobile -->
+                <div id="khu-vuc-user" style="display: none;" class="flex items-center gap-2 md:gap-4">
                     
-                    <!-- Nút đăng xuất -->
-                    <button onclick="dangXuat()" class="text-sm text-gray-500 hover:text-red-500 font-medium transition-colors">
-                        Đăng xuất
+                    <!-- Nơi chứa tên học sinh: Cắt chữ nếu dài quá 100px, thu nhỏ padding -->
+                    <span id="ten-user" class="text-xs md:text-sm font-semibold text-teal-700 bg-teal-50 px-2 py-1.5 md:px-3 md:py-1 rounded-full border border-teal-100 max-w-[100px] md:max-w-[200px] truncate inline-block text-center"></span>
+                    
+                    <!-- Nút đăng xuất: Dùng icon trên mobile, hiện chữ trên desktop -->
+                    <button onclick="dangXuat()" class="flex items-center justify-center gap-1.5 text-xs md:text-sm text-gray-500 hover:text-red-500 font-medium transition-colors bg-gray-100 hover:bg-red-50 md:bg-transparent p-2 md:p-0 rounded-full md:rounded-none w-8 h-8 md:w-auto md:h-auto">
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                        <span class="hidden md:inline">Đăng xuất</span>
                     </button>
+                </div>
             </div>
         </div>
     </header>
@@ -435,18 +444,17 @@
 
         if (user) {
             // TRƯỜNG HỢP A: CÓ USER (ĐÃ ĐĂNG NHẬP)
-            khuVucDangNhap.style.display = 'none';   // Giấu nút Đăng nhập
-            khuVucUser.style.display = 'flex';       // Hiện khu vực chứa tên & Đăng xuất
+            khuVucDangNhap.style.display = 'none';   
+            khuVucUser.style.display = 'flex';       
             
-            // Xử lý chuỗi để lấy phần tên trước đuôi @gmail.com
             const tenHienThi = user.email.split('@')[0];
             
-            // In tên ra màn hình
-            tenUser.innerText = "Xin chào, " + tenHienThi;
+            // CẬP NHẬT MỚI: Dùng mã HTML để ẩn chữ "Xin chào," trên điện thoại (chỉ hiện trên màn hình sm trở lên)
+            tenUser.innerHTML = '<span class="hidden sm:inline">Xin chào, </span>' + tenHienThi;
         } else {
             // TRƯỜNG HỢP B: KHÔNG CÓ USER (CHƯA ĐĂNG NHẬP)
-            khuVucDangNhap.style.display = 'block';  // Hiện nút Đăng nhập
-            khuVucUser.style.display = 'none';       // Giấu khu vực chứa tên
+            khuVucDangNhap.style.display = 'block';  
+            khuVucUser.style.display = 'none';       
         }
     });
 
