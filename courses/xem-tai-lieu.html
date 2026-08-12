@@ -126,8 +126,6 @@
                 
                 // Móc trực tiếp vào Cloudinary, chèn sẵn f_auto và q_auto để ảnh siêu nét mà cực nhẹ
                 img.src = `https://res.cloudinary.com/${cloudName}/image/upload/f_auto,q_auto/${folderName}-${pageNum}.png`;
-                // Vẫn TUYỆT ĐỐI GIỮ LẠI dòng Lazy Loading này
-                img.setAttribute("loading", "lazy");
                 img.className = "w-full h-auto block mb-6 shadow-sm border border-gray-100 pointer-events-none";
                 img.alt = `Trang ${pageNum}`;
 
