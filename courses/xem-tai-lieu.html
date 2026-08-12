@@ -68,14 +68,14 @@
         <!-- ... (Khối banner tiêu đề hiện tại của bạn giữ nguyên) ... -->
     </div>
 
-    <!-- THANH CÔNG CỤ ZOOM (Cố định khi cuộn) -->
-    <div class="max-w-7xl mx-auto px-4 flex justify-end mb-4 sticky top-[90px] z-40">
-        <div class="bg-white/90 backdrop-blur-md border border-gray-200 rounded-full shadow-lg flex items-center p-1 gap-1">
-            <button onclick="zoomOut()" class="w-8 h-8 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 hover:text-primary transition-colors" title="Thu nhỏ">
+    <!-- THANH CÔNG CỤ ZOOM (Nổi ở góc phải dưới, Tự động ẩn trên điện thoại) -->
+    <div class="hidden md:flex fixed bottom-8 right-8 z-50">
+        <div class="bg-white/95 backdrop-blur-md border border-gray-200 rounded-full shadow-2xl flex items-center p-1.5 gap-1 hover:shadow-teal-500/20 transition-shadow">
+            <button onclick="zoomOut()" class="w-10 h-10 rounded-full flex items-center justify-center text-gray-500 hover:bg-teal-50 hover:text-primary transition-colors" title="Thu nhỏ">
                 <i class="fa-solid fa-minus"></i>
             </button>
-            <span id="zoom-level" class="text-sm font-bold text-primary w-12 text-center select-none">100%</span>
-            <button onclick="zoomIn()" class="w-8 h-8 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 hover:text-primary transition-colors" title="Phóng to">
+            <span id="zoom-level" class="text-sm font-bold text-primary w-12 text-center select-none">80%</span>
+            <button onclick="zoomIn()" class="w-10 h-10 rounded-full flex items-center justify-center text-gray-500 hover:bg-teal-50 hover:text-primary transition-colors" title="Phóng to">
                 <i class="fa-solid fa-plus"></i>
             </button>
         </div>
@@ -162,13 +162,19 @@
             });
         });
     </script>
-    <!-- Script Xử lý chức năng Zoom -->
+    <!-- Script Xử lý chức năng Zoom (Đã tối ưu Mobile) -->
     <script>
-        // Mức zoom mặc định ban đầu là 100%
-        let currentZoom = 100;
+        let currentZoom = 80; // Mặc định 80% cho máy tính
+
+        // Áp dụng zoom ngay khi trang tải xong
+        document.addEventListener("DOMContentLoaded", function() {
+            applyZoom();
+        });
+
+        // Tự động điều chỉnh lại ảnh nếu người dùng xoay ngang điện thoại hoặc đổi size cửa sổ
+        window.addEventListener('resize', applyZoom);
 
         function zoomIn() {
-            // Giới hạn phóng to tối đa là 150% để ảnh không bị vỡ hoặc tràn quá mức
             if (currentZoom < 150) { 
                 currentZoom += 10;
                 applyZoom();
@@ -176,7 +182,6 @@
         }
 
         function zoomOut() {
-            // Giới hạn thu nhỏ tối thiểu là 50%
             if (currentZoom > 50) { 
                 currentZoom -= 10;
                 applyZoom();
@@ -184,14 +189,22 @@
         }
 
         function applyZoom() {
-            // 1. Cập nhật con số hiển thị trên thanh công cụ
+            // Cập nhật số phần trăm trên thanh công cụ
             document.getElementById('zoom-level').innerText = currentZoom + '%';
             
-            // 2. Điều chỉnh chiều rộng của khung chứa ảnh
             const container = document.getElementById('image-container');
-            container.style.width = currentZoom + '%';
             
-            // 3. Đảm bảo khung chứa luôn được căn giữa màn hình dù to hay nhỏ
+            // TRÍ TUỆ NHÂN TẠO: Kiểm tra màn hình
+            // Nếu là điện thoại (chiều rộng < 768px), ép ảnh bung 100%
+            if (window.innerWidth < 768) {
+                container.style.width = '100%';
+            } 
+            // Nếu là máy tính/tablet, dùng mức zoom hiện tại
+            else {
+                container.style.width = currentZoom + '%';
+            }
+            
+            // Căn giữa khung ảnh
             container.style.margin = '0 auto';
         }
     </script>
