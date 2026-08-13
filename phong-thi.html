@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phòng Thi Ảo - DoforMath</title>
+    
+    <!-- Cấu hình Favicon -->
+    <link rel="icon" type="image/png" href="assets/images/Doformath.png">
+
+    <!-- Font chữ Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] }, colors: { primary: '#0d9488', secondary: '#facc15'} } }
+        }
+    </script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- KaTeX cho Toán học -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased font-sans">
+
+    <!-- HEADER -->
+    <header class="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-50 border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 py-3 md:py-4 flex justify-between items-center">
+            <!-- Nút quay lại -->
+            <a href="index.html" class="flex items-center text-slate-500 hover:text-teal-600 font-medium gap-1.5 md:gap-2 transition-colors text-sm md:text-base">
+                <i class="fa-solid fa-arrow-left"></i> 
+                <span class="hidden sm:inline">Trở về Trang chủ</span>
+                <span class="sm:hidden">Quay lại</span>
+            </a>
+            
+            <!-- Logo -->
+            <a href="index.html" class="hover:opacity-80 transition-opacity block">
+                <span class="text-xl md:text-2xl tracking-tight text-slate-900 pb-1">
+                    $\textcolor{#0d9488}{\textsf{\textbf{Dofor}}{\sum}\textsf{\textbf{ath}}}$
+                </span>
+            </a>
+        </div>
+    </header>
+
+    <!-- HERO BANNER: Không gian tối tạo sự tập trung -->
+    <section class="relative bg-slate-900 py-16 overflow-hidden">
+        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-30"></div>
+        <!-- Vòng sáng trang trí -->
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-teal-500/20 blur-[100px] rounded-full pointer-events-none"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+            <span class="bg-slate-800/80 text-teal-400 border border-teal-500/30 text-sm font-bold px-4 py-1.5 rounded-full uppercase tracking-widest mb-5 inline-flex items-center gap-2 backdrop-blur-sm">
+                <i class="fa-solid fa-stopwatch"></i> Đánh giá năng lực
+            </span>
+            <h1 class="text-3xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6 tracking-tight">
+                Phòng Thi Trực Tuyến
+            </h1>
+            <p class="text-base md:text-lg text-slate-400 max-w-2xl mx-auto font-medium leading-relaxed">
+                Trải nghiệm áp lực thời gian thực với hệ thống đề thi đa dạng, bám sát cấu trúc đề thi Tốt nghiệp THPT và các kỳ thi ĐGNL mới nhất.
+            </p>
+        </div>
+    </section>
+
+    <!-- DANH SÁCH ĐỀ THI -->
+    <section class="py-12 md:py-16 relative z-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <!-- Nút Lọc Danh mục -->
+            <div class="flex flex-wrap justify-center gap-3 mb-10 md:mb-14">
+                <button class="bg-teal-600 text-white px-5 py-2 rounded-full font-semibold shadow-md shadow-teal-500/20 border border-teal-600">Tất cả đề thi</button>
+                <button class="bg-white text-slate-600 hover:text-teal-600 border border-slate-200 hover:border-teal-300 px-5 py-2 rounded-full font-medium transition-colors">Thi thử THPT</button>
+                <button class="bg-white text-slate-600 hover:text-teal-600 border border-slate-200 hover:border-teal-300 px-5 py-2 rounded-full font-medium transition-colors">ĐGNL V-ACT</button>
+                <button class="bg-white text-slate-600 hover:text-teal-600 border border-slate-200 hover:border-teal-300 px-5 py-2 rounded-full font-medium transition-colors">Toán 12</button>
+                <button class="bg-white text-slate-600 hover:text-teal-600 border border-slate-200 hover:border-teal-300 px-5 py-2 rounded-full font-medium transition-colors">Toán 11</button>
+                <button class="bg-white text-slate-600 hover:text-teal-600 border border-slate-200 hover:border-teal-300 px-5 py-2 rounded-full font-medium transition-colors">Toán 10</button>
+            </div>
+
+            <!-- Lưới Đề thi (Grid 3 cột) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+                
+                <!-- Đề 1: Thi thử THPT (Nổi bật nhất) -->
+                <a href="#" class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 border border-slate-200 group flex flex-col cursor-pointer block relative">
+                    <!-- Nhãn góc -->
+                    <div class="absolute top-4 right-4 bg-red-100 text-red-600 font-bold text-xs px-2.5 py-1 rounded-md z-10 border border-red-200 flex items-center gap-1">
+                        <i class="fa-solid fa-fire"></i> Hot
+                    </div>
+                    
+                    <div class="p-6 md:p-8 flex-1 flex flex-col relative overflow-hidden">
+                        <!-- Icon chìm trang trí -->
+                        <i class="fa-solid fa-graduation-cap absolute -bottom-6 -right-6 text-9xl text-slate-50 opacity-50 transform -rotate-12 group-hover:scale-110 transition-transform duration-500"></i>
+                        
+                        <div class="flex items-center gap-2 mb-4 relative z-10">
+                            <span class="bg-slate-100 text-slate-600 font-semibold text-xs px-3 py-1 rounded-full uppercase tracking-wider">THPT Quốc gia</span>
+                        </div>
+                        
+                        <h3 class="text-xl font-bold text-slate-900 mb-4 group-hover:text-red-600 transition-colors leading-snug relative z-10">
+                            Đề thi thử Tốt nghiệp THPT 2027 - Lần 1
+                        </h3>
+                        
+                        <!-- Thông số bài thi -->
+                        <div class="grid grid-cols-2 gap-3 mb-6 relative z-10">
+                            <div class="bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col">
+                                <span class="text-xs text-slate-400 font-medium mb-1">Thời gian</span>
+                                <span class="text-sm font-bold text-slate-700"><i class="fa-regular fa-clock text-teal-500 mr-1"></i> 90 phút</span>
+                            </div>
+                            <div class="bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col">
+                                <span class="text-xs text-slate-400 font-medium mb-1">Số lượng</span>
+                                <span class="text-sm font-bold text-slate-700"><i class="fa-solid fa-list-ol text-teal-500 mr-1"></i> 50 câu</span>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-auto pt-4 border-t border-slate-100 flex items-center justify-between relative z-10">
+                            <span class="text-sm font-medium text-slate-500"><i class="fa-regular fa-user mr-1"></i> 1,250 lượt thi</span>
+                            <div class="bg-red-50 text-red-600 font-semibold px-4 py-2 rounded-full text-sm group-hover:bg-red-600 group-hover:text-white transition-colors shadow-sm">
+                                Bắt đầu <i class="fa-solid fa-play text-xs ml-1"></i>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Đề 2: ĐGNL V-ACT -->
+                <a href="#" class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 border border-slate-200 group flex flex-col cursor-pointer block relative">
+                    <div class="p-6 md:p-8 flex-1 flex flex-col relative overflow-hidden">
+                        <i class="fa-solid fa-brain absolute -bottom-6 -right-6 text-9xl text-slate-50 opacity-50 transform -rotate-12 group-hover:scale-110 transition-transform duration-500"></i>
+                        
+                        <div class="flex items-center gap-2 mb-4 relative z-10">
+                            <span class="bg-blue-50 text-blue-600 font-semibold text-xs px-3 py-1 rounded-full uppercase tracking-wider border border-blue-100">ĐGNL V-ACT</span>
+                        </div>
+                        
+                        <h3 class="text-xl font-bold text-slate-900 mb-4 group-hover:text-blue-600 transition-colors leading-snug relative z-10">
+                            Đề thi thử Đánh giá năng lực V-ACT 2027 (Phần Toán)
+                        </h3>
+                        
+                        <div class="grid grid-cols-2 gap-3 mb-6 relative z-10">
+                            <div class="bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col">
+                                <span class="text-xs text-slate-400 font-medium mb-1">Thời gian</span>
+                                <span class="text-sm font-bold text-slate-700"><i class="fa-regular fa-clock text-blue-500 mr-1"></i> 60 phút</span>
+                            </div>
+                            <div class="bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col">
+                                <span class="text-xs text-slate-400 font-medium mb-1">Số lượng</span>
+                                <span class="text-sm font-bold text-slate-700"><i class="fa-solid fa-list-ol text-blue-500 mr-1"></i> 40 câu</span>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-auto pt-4 border-t border-slate-100 flex items-center justify-between relative z-10">
+                            <span class="text-sm font-medium text-slate-500"><i class="fa-regular fa-user mr-1"></i> 890 lượt thi</span>
+                            <div class="bg-blue-50 text-blue-600 font-semibold px-4 py-2 rounded-full text-sm group-hover:bg-blue-600 group-hover:text-white transition-colors shadow-sm">
+                                Bắt đầu <i class="fa-solid fa-play text-xs ml-1"></i>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Đề 3: Toán 12 -->
+                <a href="#" class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 border border-slate-200 group flex flex-col cursor-pointer block relative">
+                    <div class="p-6 md:p-8 flex-1 flex flex-col relative overflow-hidden">
+                        <i class="fa-solid fa-file-contract absolute -bottom-6 -right-6 text-9xl text-slate-50 opacity-50 transform -rotate-12 group-hover:scale-110 transition-transform duration-500"></i>
+                        
+                        <div class="flex items-center gap-2 mb-4 relative z-10">
+                            <span class="bg-purple-50 text-purple-600 font-semibold text-xs px-3 py-1 rounded-full uppercase tracking-wider border border-purple-100">Toán 12</span>
+                        </div>
+                        
+                        <h3 class="text-xl font-bold text-slate-900 mb-4 group-hover:text-purple-600 transition-colors leading-snug relative z-10">
+                            Đề kiểm tra Giữa Học kỳ 1 - Môn Toán 12
+                        </h3>
+                        
+                        <div class="grid grid-cols-2 gap-3 mb-6 relative z-10">
+                            <div class="bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col">
+                                <span class="text-xs text-slate-400 font-medium mb-1">Thời gian</span>
+                                <span class="text-sm font-bold text-slate-700"><i class="fa-regular fa-clock text-purple-500 mr-1"></i> 90 phút</span>
+                            </div>
+                            <div class="bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col">
+                                <span class="text-xs text-slate-400 font-medium mb-1">Số lượng</span>
+                                <span class="text-sm font-bold text-slate-700"><i class="fa-solid fa-list-ol text-purple-500 mr-1"></i> 50 câu</span>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-auto pt-4 border-t border-slate-100 flex items-center justify-between relative z-10">
+                            <span class="text-sm font-medium text-slate-500"><i class="fa-regular fa-user mr-1"></i> 450 lượt thi</span>
+                            <div class="bg-purple-50 text-purple-600 font-semibold px-4 py-2 rounded-full text-sm group-hover:bg-purple-600 group-hover:text-white transition-colors shadow-sm">
+                                Bắt đầu <i class="fa-solid fa-play text-xs ml-1"></i>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Đề 4: Toán 11 -->
+                <a href="#" class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 border border-slate-200 group flex flex-col cursor-pointer block relative">
+                    <div class="p-6 md:p-8 flex-1 flex flex-col relative overflow-hidden">
+                        <i class="fa-solid fa-shapes absolute -bottom-6 -right-6 text-9xl text-slate-50 opacity-50 transform -rotate-12 group-hover:scale-110 transition-transform duration-500"></i>
+                        
+                        <div class="flex items-center gap-2 mb-4 relative z-10">
+                            <span class="bg-emerald-50 text-emerald-600 font-semibold text-xs px-3 py-1 rounded-full uppercase tracking-wider border border-emerald-100">Toán 11</span>
+                        </div>
+                        
+                        <h3 class="text-xl font-bold text-slate-900 mb-4 group-hover:text-emerald-600 transition-colors leading-snug relative z-10">
+                            Đề kiểm tra 1 tiết: Lượng giác & Tổ hợp xác suất
+                        </h3>
+                        
+                        <div class="grid grid-cols-2 gap-3 mb-6 relative z-10">
+                            <div class="bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col">
+                                <span class="text-xs text-slate-400 font-medium mb-1">Thời gian</span>
+                                <span class="text-sm font-bold text-slate-700"><i class="fa-regular fa-clock text-emerald-500 mr-1"></i> 45 phút</span>
+                            </div>
+                            <div class="bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col">
+                                <span class="text-xs text-slate-400 font-medium mb-1">Số lượng</span>
+                                <span class="text-sm font-bold text-slate-700"><i class="fa-solid fa-list-ol text-emerald-500 mr-1"></i> 25 câu</span>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-auto pt-4 border-t border-slate-100 flex items-center justify-between relative z-10">
+                            <span class="text-sm font-medium text-slate-500"><i class="fa-regular fa-user mr-1"></i> 320 lượt thi</span>
+                            <div class="bg-emerald-50 text-emerald-600 font-semibold px-4 py-2 rounded-full text-sm group-hover:bg-emerald-600 group-hover:text-white transition-colors shadow-sm">
+                                Bắt đầu <i class="fa-solid fa-play text-xs ml-1"></i>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Đề 5: Toán 10 -->
+                <a href="#" class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 border border-slate-200 group flex flex-col cursor-pointer block relative">
+                    <div class="p-6 md:p-8 flex-1 flex flex-col relative overflow-hidden">
+                        <i class="fa-solid fa-square-root-variable absolute -bottom-6 -right-6 text-9xl text-slate-50 opacity-50 transform -rotate-12 group-hover:scale-110 transition-transform duration-500"></i>
+                        
+                        <div class="flex items-center gap-2 mb-4 relative z-10">
+                            <span class="bg-teal-50 text-teal-600 font-semibold text-xs px-3 py-1 rounded-full uppercase tracking-wider border border-teal-100">Toán 10</span>
+                        </div>
+                        
+                        <h3 class="text-xl font-bold text-slate-900 mb-4 group-hover:text-teal-600 transition-colors leading-snug relative z-10">
+                            Đề kiểm tra Giữa Học kỳ 1 - Môn Toán 10
+                        </h3>
+                        
+                        <div class="grid grid-cols-2 gap-3 mb-6 relative z-10">
+                            <div class="bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col">
+                                <span class="text-xs text-slate-400 font-medium mb-1">Thời gian</span>
+                                <span class="text-sm font-bold text-slate-700"><i class="fa-regular fa-clock text-teal-500 mr-1"></i> 90 phút</span>
+                            </div>
+                            <div class="bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col">
+                                <span class="text-xs text-slate-400 font-medium mb-1">Số lượng</span>
+                                <span class="text-sm font-bold text-slate-700"><i class="fa-solid fa-list-ol text-teal-500 mr-1"></i> 50 câu</span>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-auto pt-4 border-t border-slate-100 flex items-center justify-between relative z-10">
+                            <span class="text-sm font-medium text-slate-500"><i class="fa-regular fa-user mr-1"></i> 510 lượt thi</span>
+                            <div class="bg-teal-50 text-teal-600 font-semibold px-4 py-2 rounded-full text-sm group-hover:bg-teal-600 group-hover:text-white transition-colors shadow-sm">
+                                Bắt đầu <i class="fa-solid fa-play text-xs ml-1"></i>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Script Kích hoạt KaTeX -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false}
+                ],
+                throwOnError : false
+            });
+        });
+    </script>
+</body>
+</html>

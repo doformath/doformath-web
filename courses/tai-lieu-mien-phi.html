@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tài liệu & Mẹo giải Toán - DoforMath</title>
+    
+    <!-- Cấu hình Favicon -->
+    <link rel="icon" type="image/png" href="assets/images/Doformath.png">
+
+    <!-- Font chữ Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] }, colors: { primary: '#0d9488', secondary: '#facc15'} } }
+        }
+    </script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- KaTeX cho Toán học -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased font-sans">
+
+    <!-- HEADER -->
+    <header class="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-50 border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 py-3 md:py-4 flex justify-between items-center">
+            <!-- Nút quay lại -->
+            <a href="..\index.html" class="flex items-center text-slate-500 hover:text-teal-600 font-medium gap-1.5 md:gap-2 transition-colors text-sm md:text-base">
+                <i class="fa-solid fa-arrow-left"></i> 
+                <span class="hidden sm:inline">Trở về Trang chủ</span>
+                <span class="sm:hidden">Quay lại</span>
+            </a>
+            
+            <!-- Logo -->
+            <a href="..\index.html" class="hover:opacity-80 transition-opacity block">
+                <span class="text-xl md:text-2xl tracking-tight text-slate-900 pb-1">
+                    $\textcolor{#0d9488}{\textsf{\textbf{Dofor}}{\sum}\textsf{\textbf{ath}}}$
+                </span>
+            </a>
+        </div>
+    </header>
+
+    <!-- HERO BANNER -->
+    <section class="relative bg-teal-50/50 py-16 overflow-hidden border-b border-teal-100">
+        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03]"></div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+            <span class="bg-white text-teal-600 border border-teal-200 text-sm font-bold px-4 py-1.5 rounded-full uppercase tracking-widest mb-4 inline-block shadow-sm">
+                <i class="fa-solid fa-gift mr-1"></i> Góc chia sẻ
+            </span>
+            <h1 class="text-3xl md:text-5xl lg:text-6xl font-extrabold text-slate-800 mb-6 tracking-tight">
+                Tài nguyên & <span class="text-transparent bg-clip-text bg-gradient-to-br from-teal-500 to-emerald-500 pb-2">Mẹo giải siêu tốc</span>
+            </h1>
+            <p class="text-base md:text-lg text-slate-600 max-w-2xl mx-auto font-medium leading-relaxed">
+                Tổng hợp các công thức giải nhanh, thủ thuật Casio và những bổ đề độc quyền giúp bạn bứt phá điểm số trong mọi kỳ thi Toán.
+            </p>
+            
+            <!-- Thanh tìm kiếm (Mô phỏng) -->
+            <div class="max-w-xl mx-auto mt-8 relative">
+                <input type="text" placeholder="Tìm kiếm tài liệu, công thức..." class="w-full pl-12 pr-4 py-4 rounded-full border-2 border-teal-100 focus:border-teal-400 focus:outline-none shadow-sm text-slate-700 font-medium">
+                <i class="fa-solid fa-magnifying-glass absolute left-5 top-1/2 transform -translate-y-1/2 text-teal-400 text-lg"></i>
+            </div>
+        </div>
+    </section>
+
+    <!-- DANH SÁCH BÀI VIẾT / TÀI LIỆU -->
+    <section class="py-16 relative z-20 min-h-[500px]">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <!-- Nút Lọc Danh mục -->
+            <div class="flex flex-wrap justify-center gap-3 mb-12">
+                <button class="bg-teal-600 text-white px-5 py-2 rounded-full font-semibold shadow-md shadow-teal-500/20">Tất cả</button>
+                <button class="bg-white text-slate-600 hover:text-teal-600 border border-slate-200 hover:border-teal-300 px-5 py-2 rounded-full font-medium transition-colors">Thủ thuật Casio</button>
+                <button class="bg-white text-slate-600 hover:text-teal-600 border border-slate-200 hover:border-teal-300 px-5 py-2 rounded-full font-medium transition-colors">Bổ đề Hình học</button>
+                <button class="bg-white text-slate-600 hover:text-teal-600 border border-slate-200 hover:border-teal-300 px-5 py-2 rounded-full font-medium transition-colors">Công thức Đại số</button>
+            </div>
+
+            <!-- Lưới bài viết (Grid 3 cột) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                
+                <!-- Bài 1: Mẹo Casio -->
+                <a href="documents/casio-tich-phan.html" class="bg-white rounded-3xl overflow-hidden shadow-md shadow-slate-200/50 hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 border border-slate-100 group flex flex-col cursor-pointer block">
+                    <div class="relative h-48 bg-slate-100 overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-br from-slate-700 to-slate-900 group-hover:scale-105 transition-transform duration-500 flex items-center justify-center">
+                            <i class="fa-solid fa-calculator text-white/20 text-7xl"></i>
+                        </div>
+                        <span class="absolute top-4 left-4 bg-white/95 backdrop-blur-sm text-slate-800 text-xs font-bold px-3 py-1.5 rounded-md shadow-sm flex items-center gap-1.5">
+                            <div class="w-2 h-2 rounded-full bg-red-500"></div> Thủ thuật Casio
+                        </span>
+                    </div>
+                    <div class="p-6 flex-1 flex flex-col">
+                        <span class="text-sm text-slate-400 font-medium mb-2">12/08/2026 • 5 phút đọc</span>
+                        <h3 class="text-xl font-bold text-slate-800 mb-3 group-hover:text-teal-600 transition-colors leading-snug">
+                            Kỹ thuật bấm máy tính chống sai ngu Tích phân hàm ẩn
+                        </h3>
+                        <p class="text-slate-500 text-sm mb-6 line-clamp-3">
+                            Hướng dẫn chi tiết cách sử dụng bảng Table (Mode 8) để mò nghiệm và xử lý các bài toán tích phân chống bấm máy tính siêu tốc trong phòng thi.
+                        </p>
+                        <div class="mt-auto pt-4 border-t border-slate-100 flex items-center text-teal-600 font-semibold text-sm group-hover:text-teal-700">
+                            Đọc tiếp <i class="fa-solid fa-arrow-right ml-2 transform group-hover:translate-x-1 transition-transform"></i>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Bài 2: Công thức giải nhanh -->
+                <a href="#" class="bg-white rounded-3xl overflow-hidden shadow-md shadow-slate-200/50 hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 border border-slate-100 group flex flex-col cursor-pointer block">
+                    <div class="relative h-48 bg-slate-100 overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-br from-teal-400 to-emerald-600 group-hover:scale-105 transition-transform duration-500 flex items-center justify-center">
+                            <div class="text-white/30 text-5xl font-serif italic">$$f'(x) = 0$$</div>
+                        </div>
+                        <span class="absolute top-4 left-4 bg-white/95 backdrop-blur-sm text-teal-700 text-xs font-bold px-3 py-1.5 rounded-md shadow-sm flex items-center gap-1.5">
+                            <div class="w-2 h-2 rounded-full bg-teal-500"></div> Công thức Đại số
+                        </span>
+                    </div>
+                    <div class="p-6 flex-1 flex flex-col">
+                        <span class="text-sm text-slate-400 font-medium mb-2">05/08/2026 • Tải về PDF</span>
+                        <h3 class="text-xl font-bold text-slate-800 mb-3 group-hover:text-teal-600 transition-colors leading-snug">
+                            Trọn bộ 50 công thức Đạo hàm - Cực trị không thể bỏ qua
+                        </h3>
+                        <p class="text-slate-500 text-sm mb-6 line-clamp-3">
+                            Tổng hợp các hệ quả cực trị hàm bậc 3, hàm bậc 4 trùng phương và đồ thị. Tài liệu được gõ LaTeX 100% cực kỳ sắc nét.
+                        </p>
+                        <div class="mt-auto pt-4 border-t border-slate-100 flex items-center text-teal-600 font-semibold text-sm group-hover:text-teal-700">
+                            Xem tài liệu <i class="fa-solid fa-arrow-right ml-2 transform group-hover:translate-x-1 transition-transform"></i>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Bài 3: Bổ đề không gian -->
+                <a href="#" class="bg-white rounded-3xl overflow-hidden shadow-md shadow-slate-200/50 hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 border border-slate-100 group flex flex-col cursor-pointer block">
+                    <div class="relative h-48 bg-slate-100 overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-br from-blue-500 to-indigo-600 group-hover:scale-105 transition-transform duration-500 flex items-center justify-center">
+                            <i class="fa-solid fa-cube text-white/20 text-7xl"></i>
+                        </div>
+                        <span class="absolute top-4 left-4 bg-white/95 backdrop-blur-sm text-blue-700 text-xs font-bold px-3 py-1.5 rounded-md shadow-sm flex items-center gap-1.5">
+                            <div class="w-2 h-2 rounded-full bg-blue-500"></div> Bổ đề Hình học
+                        </span>
+                    </div>
+                    <div class="p-6 flex-1 flex flex-col">
+                        <span class="text-sm text-slate-400 font-medium mb-2">28/07/2026 • 8 phút đọc</span>
+                        <h3 class="text-xl font-bold text-slate-800 mb-3 group-hover:text-blue-600 transition-colors leading-snug">
+                            Tỉ số thể tích: Phương pháp Vách ngăn nâng cao
+                        </h3>
+                        <p class="text-slate-500 text-sm mb-6 line-clamp-3">
+                            Kỹ thuật siêu tốc giúp xử lý gọn gàng các bài toán chia khối đa diện phức tạp mà không cần vẽ thêm hình phụ. Áp dụng ngay cho thi THPT.
+                        </p>
+                        <div class="mt-auto pt-4 border-t border-slate-100 flex items-center text-blue-600 font-semibold text-sm group-hover:text-blue-700">
+                            Đọc tiếp <i class="fa-solid fa-arrow-right ml-2 transform group-hover:translate-x-1 transition-transform"></i>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Bài 4: Chuyên đề mới -->
+                <a href="#" class="bg-white rounded-3xl overflow-hidden shadow-md shadow-slate-200/50 hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 border border-slate-100 group flex flex-col cursor-pointer block">
+                    <div class="relative h-48 bg-slate-100 overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-br from-purple-500 to-fuchsia-600 group-hover:scale-105 transition-transform duration-500 flex items-center justify-center">
+                            <i class="fa-solid fa-dice text-white/20 text-7xl"></i>
+                        </div>
+                        <span class="absolute top-4 left-4 bg-white/95 backdrop-blur-sm text-purple-700 text-xs font-bold px-3 py-1.5 rounded-md shadow-sm flex items-center gap-1.5">
+                            <div class="w-2 h-2 rounded-full bg-purple-500"></div> Kỹ năng đếm
+                        </span>
+                    </div>
+                    <div class="p-6 flex-1 flex flex-col">
+                        <span class="text-sm text-slate-400 font-medium mb-2">20/07/2026 • Tải về PDF</span>
+                        <h3 class="text-xl font-bold text-slate-800 mb-3 group-hover:text-purple-600 transition-colors leading-snug">
+                            Hai bổ đề Kaplansky: Tuyệt chiêu bài toán Tổ hợp
+                        </h3>
+                        <p class="text-slate-500 text-sm mb-6 line-clamp-3">
+                            Giải quyết các bài toán xếp chỗ ngồi, chọn học sinh không ngồi cạnh nhau trong chớp mắt với bổ đề Kaplansky thứ nhất và thứ hai.
+                        </p>
+                        <div class="mt-auto pt-4 border-t border-slate-100 flex items-center text-purple-600 font-semibold text-sm group-hover:text-purple-700">
+                            Xem tài liệu <i class="fa-solid fa-arrow-right ml-2 transform group-hover:translate-x-1 transition-transform"></i>
+                        </div>
+                    </div>
+                </a>
+
+            </div>
+            
+            <!-- Phân trang -->
+            <div class="flex justify-center mt-12 gap-2">
+                <button class="w-10 h-10 rounded-full flex items-center justify-center bg-teal-50 text-teal-600 font-bold border border-teal-200">1</button>
+                <button class="w-10 h-10 rounded-full flex items-center justify-center bg-white text-slate-500 hover:bg-slate-50 hover:text-teal-600 font-medium transition-colors">2</button>
+                <button class="w-10 h-10 rounded-full flex items-center justify-center bg-white text-slate-500 hover:bg-slate-50 hover:text-teal-600 font-medium transition-colors">3</button>
+                <button class="w-10 h-10 rounded-full flex items-center justify-center bg-white text-slate-500 hover:bg-slate-50 hover:text-teal-600 font-medium transition-colors"><i class="fa-solid fa-chevron-right text-xs"></i></button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Script Kích hoạt KaTeX -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false}
+                ],
+                throwOnError : false
+            });
+        });
+    </script>
+</body>
+</html>
