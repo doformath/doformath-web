@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh sách Khóa học - DoforMath</title>
+    
+    <!-- Cấu hình Favicon -->
+    <link rel="icon" type="image/png" href="assets/images/Doformath.png">
+
+    <!-- Font chữ Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] }, colors: { primary: '#0d9488', secondary: '#facc15'} } }
+        }
+    </script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- KaTeX cho Toán học -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased font-sans">
+
+    <!-- HEADER -->
+    <header class="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-50 border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 py-3 md:py-4 flex justify-between items-center">
+            <!-- Nút quay lại trang chủ -->
+            <a href="index.html" class="flex items-center text-slate-500 hover:text-teal-600 font-medium gap-1.5 md:gap-2 transition-colors text-sm md:text-base">
+                <i class="fa-solid fa-arrow-left"></i> 
+                <span class="hidden sm:inline">Trở về Trang chủ</span>
+                <span class="sm:hidden">Quay lại</span>
+            </a>
+            
+            <!-- Logo Toán học -->
+            <a href="index.html" class="hover:opacity-80 transition-opacity block">
+                <span class="text-xl md:text-2xl tracking-tight text-slate-900 pb-1">
+                    $\textcolor{#0d9488}{\textsf{\textbf{Dofor}}{\sum}\textsf{\textbf{ath}}}$
+                </span>
+            </a>
+        </div>
+    </header>
+
+    <!-- 1. HERO BANNER: Không gian cá nhân (Tone màu sáng) -->
+    <section class="relative bg-teal-50/50 py-16 overflow-hidden border-b border-teal-100">
+        <!-- Hoa văn chìm (Đã giảm độ đậm xuống 3% để phù hợp với nền sáng) -->
+        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.8]"></div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+            
+            <!-- Nhãn (Badge): Đổi thành nền trắng, chữ xanh, viền xanh nhạt -->
+            <span class="bg-white text-teal-600 border border-teal-200 text-sm font-bold px-4 py-1.5 rounded-full uppercase tracking-widest mb-4 inline-block shadow-sm">
+                Góc học tập
+            </span>
+            
+            <!-- Tiêu đề: Đổi từ text-white sang text-slate-800 (Đen xám đậm) -->
+            <h1 id="user-greeting" class="text-8xl text-transparent bg-clip-text bg-gradient-to-r from-primary to-teal-800t pb-4">
+                Đang tải dữ liệu...
+            </h1>
+            
+            <!-- Mô tả phụ: Đổi sang text-slate-600 (Xám vừa) -->
+            <p class=" text-base md:text-lg text-slate-600 max-w-2xl mx-auto font-medium leading-relaxed">
+                Chào mừng bạn quay trở lại. Hãy chọn khóa học bên dưới để tiếp tục hành trình chinh phục môn Toán nhé!
+            </p>
+        </div>
+    </section>
+
+    <!-- 2. DANH SÁCH KHÓA HỌC ĐÃ ĐĂNG KÝ -->
+    <section class="py-16 -mt-10 relative z-20 min-h-[400px]">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <!-- TRẠNG THÁI 1: Đang tải dữ liệu (Vòng xoay) -->
+            <div id="loading-state" class="flex flex-col items-center justify-center py-12 text-teal-600">
+                <i class="fa-solid fa-circle-notch fa-spin text-4xl mb-4"></i>
+                <p class="font-medium">Hệ thống đang kiểm tra quyền truy cập...</p>
+            </div>
+
+            <!-- TRẠNG THÁI 2: Chưa đăng nhập -->
+            <div id="unauth-state" class="hidden bg-white rounded-3xl shadow-lg border border-red-100 p-10 text-center max-w-2xl mx-auto">
+                <div class="w-20 h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center text-3xl mx-auto mb-6">
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-slate-800 mb-3">Bạn chưa đăng nhập</h3>
+                <p class="text-slate-500 mb-8">Vui lòng đăng nhập bằng tài khoản học viên để xem danh sách các khóa học của bạn.</p>
+                <a href="login.html" class="bg-primary hover:bg-teal-800 text-white px-8 py-3 rounded-full font-bold transition-colors inline-block shadow-md">Đến trang Đăng nhập</a>
+            </div>
+
+            <!-- TRẠNG THÁI 3: Chưa có khóa học nào -->
+            <div id="empty-state" class="hidden bg-white rounded-3xl shadow-lg border border-gray-100 p-10 text-center max-w-2xl mx-auto">
+                <div class="w-20 h-20 bg-gray-50 text-gray-400 rounded-full flex items-center justify-center text-3xl mx-auto mb-6">
+                    <i class="fa-solid fa-folder-open"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-slate-800 mb-3">Trống trơn!</h3>
+                <p class="text-slate-500 mb-8">Tài khoản của bạn hiện chưa được cấp quyền truy cập khóa học nào. Vui lòng liên hệ Thầy Đô để đăng ký nhé.</p>
+                <a href="index.html" class="bg-gray-800 hover:bg-gray-700 text-white px-8 py-3 rounded-full font-bold transition-colors inline-block shadow-md">Xem tất cả khóa học</a>
+            </div>
+
+            <!-- TRẠNG THÁI 4: Hiển thị lưới khóa học -->
+            <div id="courses-grid" class="hidden grid-cols-1 md:grid-cols-3 gap-8">
+                
+                <!-- CARD TOÁN 10 -->
+                <a id="card-toan-10" style="display: none;" href="courses/toan-10.html" class="bg-white rounded-3xl overflow-hidden shadow-lg shadow-gray-200/50 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border border-gray-100 group flex-col cursor-pointer block">
+                    <div class="relative h-48 bg-teal-100 overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-br from-teal-500 to-indigo-600 group-hover:scale-110 transition-transform duration-700 flex items-center justify-center">
+                            <i class="fa-solid fa-square-root-variable text-white/30 text-7xl"></i>
+                        </div>
+                        <span class="absolute top-4 left-4 bg-white/90 backdrop-blur-sm text-primary text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide shadow-sm">
+                            Toán 10
+                        </span>
+                    </div>
+                    <div class="p-6 md:p-8 flex-1 flex flex-col">
+                        <div class="flex items-center justify-between text-sm text-gray-500 mb-4">
+                            <span class="flex items-center gap-1.5"><i class="fa-solid fa-book text-teal-400"></i> 100+ Bài giảng</span>
+                            <span class="flex items-center gap-1.5"><i class="fa-regular fa-clock text-teal-400"></i> 3 Buổi/Tuần</span>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-900 mb-3 group-hover:text-primary transition-colors">
+                            Chinh phục Toán 10
+                        </h3>
+                        <p class="text-gray-500 text-sm mb-6 line-clamp-2">Nắm vững nền tảng Đại số và Hình học, rèn luyện tư duy logic bước đầu cho cấp THPT.</p>
+                        
+                        <div class="mt-auto pt-5 border-t border-gray-100 flex items-center justify-between">
+                            <div class="flex flex-col">
+                                <span class="text-xs text-gray-400 line-through">1,200,000đ</span>
+                                <span class="text-lg font-extrabold text-primary">Liên hệ</span>
+                            </div>
+                            <div class="bg-teal-50 text-primary group-hover:bg-primary group-hover:text-white h-12 w-12 rounded-full flex items-center justify-center transition-colors shadow-sm">
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- CARD TOÁN 11 -->
+                <a id="card-toan-11" style="display: none;" href="courses/toan-11.html" class="bg-white rounded-3xl overflow-hidden shadow-lg shadow-gray-200/50 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border border-gray-100 group flex-col cursor-pointer block">
+                    <div class="relative h-48 overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-br from-emerald-400 to-teal-600 group-hover:scale-110 transition-transform duration-700 flex items-center justify-center">
+                            <i class="fa-solid fa-shapes text-white/30 text-7xl"></i>
+                        </div>
+                        <span class="absolute top-4 left-4 bg-white/90 backdrop-blur-sm text-emerald-600 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide shadow-sm">
+                            Toán 11
+                        </span>
+                    </div>
+                    <div class="p-6 md:p-8 flex-1 flex flex-col">
+                        <div class="flex items-center justify-between text-sm text-gray-500 mb-4">
+                            <span class="flex items-center gap-1.5"><i class="fa-solid fa-book text-emerald-400"></i> 100+ Bài giảng</span>
+                            <span class="flex items-center gap-1.5"><i class="fa-regular fa-clock text-emerald-400"></i> 3 Buổi/Tuần</span>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-900 mb-3 group-hover:text-emerald-600 transition-colors">
+                            Chinh phục Toán 11 
+                        </h3>
+                        <p class="text-gray-500 text-sm mb-6 line-clamp-2">Bứt phá giới hạn với các chuyên đề Lượng giác, Tổ hợp xác suất và Hình học không gian.</p>
+                        
+                        <div class="mt-auto pt-5 border-t border-gray-100 flex items-center justify-between">
+                            <div class="flex flex-col">
+                                <span class="text-xs text-gray-400 line-through">900,000đ</span>
+                                <span class="text-lg font-extrabold text-emerald-600">Liên hệ</span>
+                            </div>
+                            <div class="bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white h-12 w-12 rounded-full flex items-center justify-center transition-colors shadow-sm">
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- CARD TOÁN 12 -->
+                <a id="card-toan-12" style="display: none;" href="courses/toan-12.html" class="bg-white rounded-3xl overflow-hidden shadow-lg shadow-gray-200/50 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border border-gray-100 group flex-col cursor-pointer block ring-2 ring-purple-100 hover:ring-purple-300 relative">
+                    <div class="relative h-48 overflow-hidden rounded-t-3xl">
+                        <div class="absolute inset-0 bg-gradient-to-br from-purple-500 to-indigo-600 group-hover:scale-110 transition-transform duration-700 flex items-center justify-center">
+                            <i class="fa-solid fa-calculator text-white/30 text-7xl"></i>
+                        </div>
+                        <span class="absolute top-4 left-4 bg-white/90 backdrop-blur-sm text-purple-600 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide shadow-sm">
+                            Toán 12 & Ôn thi
+                        </span>
+                    </div>
+                    <div class="p-6 md:p-8 flex-1 flex flex-col">
+                        <div class="flex items-center justify-between text-sm text-gray-500 mb-4">
+                            <span class="flex items-center gap-1.5"><i class="fa-solid fa-book text-purple-400"></i> Chuyên đề VDC</span>
+                            <span class="flex items-center gap-1.5"><i class="fa-regular fa-clock text-purple-400"></i> 4 Buổi/Tuần</span>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-900 mb-3 group-hover:text-purple-600 transition-colors">
+                            Chinh phục Toán 12
+                        </h3>
+                        <p class="text-gray-500 text-sm mb-6 line-clamp-2">Lộ trình toàn diện từ nền tảng đến Vận dụng cao, luyện thi Tốt nghiệp THPT & ĐGNL.</p>
+                        
+                        <div class="mt-auto pt-5 border-t border-gray-100 flex items-center justify-between">
+                            <div class="flex flex-col">
+                                <span class="text-xs font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-indigo-500 uppercase tracking-wide mb-1">Khóa học Độc quyền</span>
+                                <span class="text-lg font-extrabold text-purple-600">Liên hệ</span>
+                            </div>
+                            <div class="bg-purple-50 text-purple-600 group-hover:bg-purple-600 group-hover:text-white h-12 w-12 rounded-full flex items-center justify-center transition-colors shadow-sm">
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. PHƯƠNG PHÁP GIẢNG DẠY -->
+    <section class="py-16 bg-white border-y border-slate-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-extrabold text-slate-900">Tại sao chọn DoforMath?</h2>
+                <div class="w-20 h-1.5 bg-primary mx-auto rounded-full mt-4"></div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10 text-center">
+                <div class="p-4">
+                    <div class="w-16 h-16 mx-auto bg-teal-50 text-teal-600 rounded-2xl flex items-center justify-center text-2xl mb-6 shadow-sm">
+                        <i class="fa-solid fa-laptop-code"></i>
+                    </div>
+                    <h4 class="text-xl font-bold text-slate-800 mb-3">Tài liệu chuẩn LaTeX</h4>
+                    <p class="text-slate-500 leading-relaxed text-sm">Hệ thống bài giảng và bài tập được biên soạn 100% bằng LaTeX, mang lại trải nghiệm đọc sắc nét và chuyên nghiệp nhất trên mọi thiết bị.</p>
+                </div>
+                <div class="p-4">
+                    <div class="w-16 h-16 mx-auto bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center text-2xl mb-6 shadow-sm">
+                        <i class="fa-solid fa-microscope"></i>
+                    </div>
+                    <h4 class="text-xl font-bold text-slate-800 mb-3">Kỹ thuật chuyên sâu</h4>
+                    <p class="text-slate-500 leading-relaxed text-sm">Tiếp cận các phương pháp giải độc quyền, các bổ đề chuyên sâu giúp tối ưu hóa thời gian xử lý câu hỏi Vận dụng cao (VDC).</p>
+                </div>
+                <div class="p-4">
+                    <div class="w-16 h-16 mx-auto bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center text-2xl mb-6 shadow-sm">
+                        <i class="fa-solid fa-brain"></i>
+                    </div>
+                    <h4 class="text-xl font-bold text-slate-800 mb-3">Tư duy Đột phá</h4>
+                    <p class="text-slate-500 leading-relaxed text-sm">Không giải vẹt, không học thuộc. Rèn luyện bản chất toán học, phát triển tư duy logic để bẻ khóa mọi dạng bài mới lạ.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. LỘ TRÌNH SẮP RA MẮT -->
+    <section class="py-16 bg-slate-50">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <div class="border-2 border-dashed border-teal-200 bg-teal-50/50 rounded-3xl p-8 md:p-12 relative overflow-hidden">
+                <div class="absolute -top-6 -right-6 text-teal-100">
+                    <i class="fa-solid fa-rocket text-9xl transform rotate-12 opacity-50"></i>
+                </div>
+                <div class="relative z-10">
+                    <span class="bg-white text-teal-600 border border-teal-200 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-widest shadow-sm inline-block mb-4">
+                        Sắp ra mắt
+                    </span>
+                    <h3 class="text-2xl md:text-3xl font-extrabold text-slate-800 mb-4">
+                        Khóa học Toán trong DGNL & SAT
+                    </h3>
+                    <p class="text-slate-600 mb-8 max-w-lg mx-auto">
+                        Dành riêng cho học sinh muốn chinh phục các kỳ thi đánh giá năng lực, SAT, V-ACT,... với các chuyên đề Toán nâng cao và kỹ thuật giải nhanh độc quyền.
+                    </p>
+                    <button class="bg-slate-800 text-white font-medium px-8 py-3 rounded-full hover:bg-slate-700 transition-colors shadow-md">
+                        Đăng ký nhận thông báo
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Script Kích hoạt KaTeX cho Logo -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false}
+                ],
+                throwOnError : false
+            });
+        });
+    </script>
+    <!-- Nhúng thư viện Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyD-NDo43O3Q_9GVii6pDOM7D6SQ5pxmo5g",
+            authDomain: "doformath-bac70.firebaseapp.com",
+            projectId: "doformath-bac70",
+            storageBucket: "doformath-bac70.firebasestorage.app",
+            messagingSenderId: "329095418163",
+            appId: "1:329095418163:web:226636d40b5c2960cdee46"
+        };
+        
+        // Khởi tạo Firebase nếu chưa có
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.firestore();
+
+        firebase.auth().onAuthStateChanged((user) => {
+            const loadingState = document.getElementById('loading-state');
+            const unauthState = document.getElementById('unauth-state');
+            const emptyState = document.getElementById('empty-state');
+            const coursesGrid = document.getElementById('courses-grid');
+            const greeting = document.getElementById('user-greeting');
+
+            const card10 = document.getElementById('card-toan-10');
+            const card11 = document.getElementById('card-toan-11');
+            const card12 = document.getElementById('card-toan-12');
+
+            // Ẩn vòng xoay tải trang
+            loadingState.style.display = 'none';
+
+            if (user) {
+                // Đã đăng nhập: Hiện tên người dùng
+                const tenHienThi = user.email.split('@')[0];
+                greeting.innerText = "Xin chào, " + tenHienThi + "!";
+                
+                // Mở sẵn khung chứa dạng grid
+                coursesGrid.style.display = 'grid';
+
+                // Quét Database lấy danh sách quyền
+                db.collection("phan_quyen").doc(user.email).get()
+                .then((doc) => {
+                    let hasCourse = false; // Biến kiểm tra xem có khóa nào không
+
+                    if (doc.exists) {
+                        const data = doc.data();
+                        
+                        // Bật hiển thị khóa tương ứng nếu dữ liệu trả về là true
+                        if (data['toan-10'] === true) { card10.style.display = 'flex'; hasCourse = true; }
+                        if (data['toan-11'] === true) { card11.style.display = 'flex'; hasCourse = true; }
+                        if (data['toan-12'] === true) { card12.style.display = 'flex'; hasCourse = true; }
+                    }
+
+                    // Nếu quét xong mà không có khóa nào true -> Hiện thông báo rỗng
+                    if (!hasCourse) {
+                        coursesGrid.style.display = 'none';
+                        emptyState.style.display = 'block';
+                    }
+                }).catch((error) => {
+                    console.log("Lỗi tải dữ liệu khóa học:", error);
+                    coursesGrid.style.display = 'none';
+                    emptyState.style.display = 'block';
+                });
+
+            } else {
+                // Chưa đăng nhập: Đổi lời chào và hiện thông báo khóa trang
+                greeting.innerText = "Không gian học tập";
+                unauthState.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
