@@ -36,10 +36,11 @@
     <!-- HEADER DOFORMATH -->
     <header class="fixed top-0 right-0 left-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200/60 h-14 transition-all duration-300 shadow-sm">
         <div class="flex items-center justify-between h-full px-4 lg:px-6 max-w-7xl mx-auto">
-            <a href="phong-thi.html" class="flex items-center gap-2 text-slate-500 hover:text-teal-600 font-semibold text-sm transition">
+            <!-- Nút quay lại trang trước -->
+            <a href="javascript:history.back()" class="flex items-center text-gray-500 hover:text-primary font-medium gap-2 transition">
                 <i class="fa-solid fa-arrow-left"></i> Thoát
             </a>
-            <a href="index.html" class="hover:opacity-80 transition-opacity">
+            <a href="..\..\index.html" class="hover:opacity-80 transition-opacity">
                 <span class="text-xl tracking-tight text-slate-900 font-bold">
                     $\textcolor{#0d9488}{\textsf{\textbf{Dofor}}{\sum}\textsf{\textbf{ath}}}$
                 </span>
@@ -185,9 +186,7 @@
                         <div class="relative h-2 bg-slate-100 rounded-full">
                             <div class="absolute left-0 top-0 bg-gradient-to-r from-blue-400 to-teal-400 rounded-full" :style="{ width: timelineProgress + '%', height: '100%', transition: 'width 1s linear' }"></div>
                         </div>
-                        <div class="absolute -translate-x-1/2" :style="{ left: timelineProgress + '%', top: '6px', transition: 'left 1s linear' }">
-                            <svg width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M6 8L0 0H12L6 8Z" fill="#ef4444"/></svg>
-                        </div>
+                        
                     </div>
                 </div>
             </div>

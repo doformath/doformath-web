@@ -69,7 +69,6 @@
             </a>
         </div>
     </header>
-
     <!-- Nội dung Chi tiết Khóa học -->
     <main class="max-w-5xl mx-auto px-4 py-12">
         <div class="grid grid-cols-1 md:flex md:justify-center md:gap-8">
@@ -599,19 +598,11 @@
             });
         });
     </script>
-    <!-- Nhúng thư viện Firebase Auth -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-    
-    <!-- BỔ SUNG: Nhúng thư viện Firestore để đọc Database phân quyền -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-
     <!-- Nhúng thư viện Firebase Auth & Firestore -->
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
-    <!-- Script kiểm tra quyền truy cập (Phiên bản UI đẹp) -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyD-NDo43O3Q_9GVii6pDOM7D6SQ5pxmo5g",
@@ -623,41 +614,56 @@
             measurementId: "G-RHVBMMGQGZ"
         };
         
-        firebase.initializeApp(firebaseConfig);
+        // Khởi tạo Firebase nếu chưa có
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
         const db = firebase.firestore();
 
-        // ĐỔI TÊN KHÓA HỌC Ở ĐÂY TƯƠNG ỨNG VỚI TỪNG FILE (toan-10, toan-11, toan-12)
+        // Định danh khóa học hiện tại
         const currentCourse = "toan-12"; 
 
-        // Hàm hiển thị Modal lỗi
-        function showAccessDenied() {
-            const modal = document.getElementById('access-denied-modal');
-            modal.classList.remove('hidden'); // Hiện cửa sổ lên
-            document.body.style.overflow = 'hidden'; // Khóa cuộn trang web (không cho cuộn xuống xem trộm)
+        // Các thành phần giao diện
+        const loadingScreen = document.getElementById('loading-screen');
+        const courseContent = document.getElementById('course-content');
+        const deniedModal = document.getElementById('access-denied-modal');
+
+        // Hàm xử lý khi BỊ TỪ CHỐI
+        function handleAccessDenied() {
+            loadingScreen.classList.add('hidden'); // Tắt vòng xoay
+            deniedModal.classList.remove('hidden'); // Hiện bảng cấm
+            document.body.style.overflow = 'hidden'; // Khóa cuộn trang
+            
+            // XÓA SỔ HOÀN TOÀN nội dung khóa học khỏi bộ nhớ trình duyệt
+            // Chống học sinh dùng F12 (Inspect Element) để xóa class 'hidden'
+            if(courseContent) {
+                courseContent.remove(); 
+            }
         }
 
+        // Hàm xử lý khi ĐƯỢC CẤP QUYỀN
+        function handleAccessGranted() {
+            loadingScreen.classList.add('hidden'); // Tắt vòng xoay
+            courseContent.classList.remove('hidden'); // Hiện nội dung bài học
+        }
+
+        // Bắt đầu kiểm tra bảo mật
         firebase.auth().onAuthStateChanged((user) => {
             if (!user) {
-                window.location.replace("../login.html");
+                // Chưa đăng nhập -> Đá văng ra trang login
+                window.location.replace("/login.html");
             } else {
+                // Đã đăng nhập -> Hỏi Database xem có quyền không
                 db.collection("phan_quyen").doc(user.email).get()
                 .then((doc) => {
-                    if (doc.exists) {
-                        const data = doc.data();
-                        
-                        if (data[currentCourse] === true) {
-                            console.log("Xác thực quyền hợp lệ!");
-                        } else {
-                            // Bị false -> Gọi giao diện Modal đẹp
-                            showAccessDenied();
-                        }
+                    if (doc.exists && doc.data()[currentCourse] === true) {
+                        handleAccessGranted(); // Hợp lệ -> Mở khóa
                     } else {
-                        // Không có email trong bảng -> Gọi giao diện Modal đẹp
-                        showAccessDenied();
+                        handleAccessDenied();  // Không hợp lệ -> Khóa vĩnh viễn
                     }
                 }).catch((error) => {
-                    console.log("Lỗi:", error);
-                    showAccessDenied();
+                    console.log("Lỗi tải phân quyền:", error);
+                    handleAccessDenied(); // Lỗi mạng cũng khóa luôn cho an toàn
                 });
             }
         });
