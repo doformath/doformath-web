@@ -5,13 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chinh phục Toán 12 Nâng cao - DoforMath</title>
     
-    <!-- Cấu hình Favicon -->
-    <link rel="icon" type="image/png" href="../assets/images/Doformath.png">
+    <!-- 1. PRECONNECT: Khởi động sớm các kết nối máy chủ -->
+    <link rel="preconnect" href="https://res.cloudinary.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
 
-    <!-- Font chữ Inter -->
+    <link rel="icon" type="image/png" href="../assets/images/Doformath.png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- Tailwind CSS và cấu hình màu Teal chủ đạo -->
+    <!-- CẢNH BÁO: Script này tiêu tốn nhiều CPU. Chỉ nên dùng ở môi trường phát triển (Dev) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -19,10 +23,7 @@
         }
     </script>
     
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- KaTeX cho Toán học -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
@@ -32,44 +33,28 @@
     <!-- Header Navigation -->
     <header class="bg-white shadow-sm sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-            <!-- Nút quay lại trang trước -->
-<a href="javascript:history.back()" class="flex items-center text-gray-500 hover:text-primary font-medium gap-2 transition">
-    <i class="fa-solid fa-arrow-left"></i> Quay lại
-</a>
-            
-            <!-- Logo Toán học -->
-            <!-- Đổi <div> thành <a> và thêm href="../index.html" -->
-<a href="../index.html" class="hover:opacity-80 transition-opacity block">
-    <span class="text-xl md:text-2xl tracking-tight text-slate-900 pb-1">
-        $\textcolor{#0d9488}{\textsf{\textbf{Dofor}}{\sum}\textsf{\textbf{ath}}}$
-    </span>
-</a>
+            <a href="javascript:history.back()" class="flex items-center text-gray-500 hover:text-primary font-medium gap-2 transition">
+                <i class="fa-solid fa-arrow-left"></i> Quay lại
+            </a>
+            <a href="/" class="hover:opacity-80 transition-opacity block" id="logo-math">
+                <span class="text-xl md:text-2xl tracking-tight text-slate-900 pb-1">
+                    $\textcolor{#0d9488}{\textsf{\textbf{Dofor}}{\sum}\textsf{\textbf{ath}}}$
+                </span>
+            </a>
         </div>
     </header>
 
-    <!-- Khu vực Tiêu đề động được thiết kế lại thành khối Banner -->
-    <div class="max-w-4xl mx-auto px-4 w-full mt-8 mb-6">
+    <div class="max-w-4xl mx-auto px-4 w-full mt-8 mb-6" id="title-section">
         <div class="bg-gradient-to-r from-blue-50 to-teal-50 border border-blue-100 rounded-2xl p-6 shadow-sm flex flex-col items-center text-center">
-            
-            <!-- Badge (Nhãn) có thêm icon -->
             <span class="bg-blue-100 text-blue-700 border border-blue-200 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide mb-3 shadow-sm inline-flex items-center gap-1.5">
                 <i class="fa-regular fa-folder-open"></i> Tài liệu học tập
             </span>
-            
-            <!-- Tên bài học (Javascript sẽ tự động điền vào đây) -->
             <h1 id="doc-title" class="text-2xl md:text-3xl font-bold text-gray-900 leading-snug">Đang tải tên bài học...</h1>
-            
-            <!-- Dòng kẻ gạch chân trang trí -->
             <div class="w-16 h-1 bg-gradient-to-r from-blue-400 to-teal-400 rounded-full mt-4"></div>
-            
         </div>
     </div>
-    <!-- Khu vực Tiêu đề động được thiết kế lại thành khối Banner -->
-    <div class="max-w-4xl mx-auto px-4 w-full mt-8 mb-4">
-        <!-- ... (Khối banner tiêu đề hiện tại của bạn giữ nguyên) ... -->
-    </div>
 
-    <!-- THANH CÔNG CỤ ZOOM (Nổi ở góc phải dưới, Tự động ẩn trên điện thoại) -->
+    <!-- THANH CÔNG CỤ ZOOM -->
     <div class="hidden md:flex fixed bottom-8 right-8 z-50">
         <div class="bg-white/95 backdrop-blur-md border border-gray-200 rounded-full shadow-2xl flex items-center p-1.5 gap-1 hover:shadow-teal-500/20 transition-shadow">
             <button onclick="zoomOut()" class="w-10 h-10 rounded-full flex items-center justify-center text-gray-500 hover:bg-teal-50 hover:text-primary transition-colors" title="Thu nhỏ">
@@ -81,26 +66,26 @@
             </button>
         </div>
     </div>
-    <!-- Khung chứa ảnh tự động -->
+
     <main class="flex-1 w-full max-w-9xl mx-auto px-4 pb-12 select-none" oncontextmenu="return false;">
         <div id="image-container" class="w-full bg-white rounded-xl shadow-sm border border-gray-200 flex flex-col items-center p-2 md:p-8 relative min-h-[500px]">
-            <!-- Vòng xoay tải trang -->
-            <div id="loader" class="absolute top-20 text-gray-400 flex flex-col items-center gap-2">
+            <div id="loader" class="absolute top-20 text-gray-400 flex flex-col items-center gap-2 z-10">
                 <i class="fa-solid fa-circle-notch fa-spin text-3xl"></i>
-                <span class="text-sm">Đang tải dữ liệu ...</span>
+                <span class="text-sm font-medium mt-2">Đang nạp tài liệu siêu tốc...</span>
             </div>
         </div>
     </main>
 
-    <!-- Script Tự động hóa tải ảnh từ Online -->
+    <!-- Script Tải ảnh song song theo lô (Parallel Batch Fetching) -->
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            // Lấy thông tin từ thanh địa chỉ URL
+        // Chạy NGAY LẬP TỨC, không chờ DOMContentLoaded — các phần tử DOM cần dùng
+        // đã tồn tại sẵn (script nằm sau chúng trong HTML). Nhờ vậy việc tải ảnh
+        // không còn bị "kẹt" chờ 2 script defer của KaTeX tải xong từ CDN như trước.
+        (function () {
             const urlParams = new URLSearchParams(window.location.search);
-            const folderName = urlParams.get('folder'); 
-            const title = urlParams.get('title'); 
+            const folderName = urlParams.get('folder');
+            const title = urlParams.get('title');
 
-            // Cập nhật tiêu đề trang
             if (title) {
                 document.getElementById('doc-title').innerText = title;
                 document.title = title + " - DoforMath";
@@ -108,71 +93,112 @@
 
             const container = document.getElementById('image-container');
             const loader = document.getElementById('loader');
-            let pageNum = 1;
-            
-            // ----------------------------------------------------
-            // THIẾT LẬP CLOUDINARY
-            // Bạn thay "TEN_CLOUD_CUA_BAN" bằng tên thật trên Cloudinary của bạn
-            const cloudName = "vrhp60zs"; 
-            // ----------------------------------------------------
+            const cloudName = "vrhp60zs";
 
-            // Hàm đệ quy: Tải từng ảnh một từ Cloudinary
-            function loadNextImage() {
-                if (!folderName) {
-                    loader.innerHTML = "Lỗi: Không tìm thấy thư mục tài liệu!";
-                    return;
-                }
-
-                let img = new Image();
-                
-                // Móc trực tiếp vào Cloudinary, chèn sẵn f_auto và q_auto để ảnh siêu nét mà cực nhẹ
-                img.src = `https://res.cloudinary.com/${cloudName}/image/upload/f_auto,q_auto/${folderName}-${pageNum}.png`;
-                img.className = "w-full h-auto block mb-6 shadow-sm border border-gray-100 pointer-events-none";
-                img.alt = `Trang ${pageNum}`;
-
-                // Nếu ảnh tồn tại trên mây -> Nhét vào khung và tiếp tục
-                img.onload = function() {
-                    loader.style.display = 'none'; 
-                    container.appendChild(img);
-                    pageNum++;
-                    loadNextImage();
-                };
-
-                // Nếu ảnh không tồn tại (hết ảnh trong bài) -> Dừng lại
-                img.onerror = function() {
-                    if (pageNum === 1) {
-                        loader.innerHTML = "Không tìm thấy tài liệu trên mây. Vui lòng kiểm tra lại Cloudinary.";
-                    }
-                };
+            if (!folderName) {
+                loader.innerHTML = "<span class='text-red-500 font-bold'>Lỗi: Không tìm thấy thư mục tài liệu!</span>";
+                return;
             }
 
-            // Bắt đầu chạy
-            loadNextImage();
-        });
+            const BATCH_SIZE = 6;   // Số ảnh dò/tải song song mỗi đợt
+            const MAX_PAGES = 300;  // Giới hạn an toàn, tránh vòng lặp chạy vô hạn khi có lỗi
+
+            function buildUrl(page) {
+                return `https://res.cloudinary.com/${cloudName}/image/upload/f_auto,q_auto,c_limit,w_1800/${folderName}-${page}.png`;
+            }
+
+            // Gộp bước "kiểm tra tồn tại" và "tải ảnh" làm MỘT request duy nhất
+            // (trước đây là HEAD rồi mới GET → tốn gấp đôi số vòng round-trip).
+            // Có retry 1 lần khi lỗi để tránh dừng nhầm vì mạng chập chờn.
+            function probeImage(page, allowRetry = true) {
+                return new Promise((resolve) => {
+                    const img = new Image();
+                    img.decoding = "async";
+                    img.onload = () => resolve({ page, ok: true, img });
+                    img.onerror = () => {
+                        if (allowRetry) {
+                            probeImage(page, false).then(resolve);
+                        } else {
+                            resolve({ page, ok: false });
+                        }
+                    };
+                    img.src = buildUrl(page);
+                });
+            }
+
+            function appendImage(page, img) {
+                img.loading = page <= 2 ? "eager" : "lazy";
+                if (page <= 2) img.fetchPriority = "high";
+                img.className = "w-full h-auto block mb-6 shadow-sm border border-gray-100 pointer-events-none";
+                img.alt = `Trang ${page}`;
+                container.appendChild(img);
+            }
+
+            async function loadAllPages() {
+                let pageNum = 1;
+                let loadedCount = 0;
+
+                while (pageNum <= MAX_PAGES) {
+                    const batchPages = [];
+                    for (let i = 0; i < BATCH_SIZE; i++) batchPages.push(pageNum + i);
+
+                    // Dò + tải cả lô ảnh CÙNG LÚC thay vì từng ảnh một
+                    const results = await Promise.all(batchPages.map(p => probeImage(p)));
+
+                    let reachedEnd = false;
+                    for (const r of results) {
+                        if (r.ok) {
+                            appendImage(r.page, r.img);
+                            loadedCount++;
+                            if (loadedCount === 1) {
+                                loader.style.display = 'none';
+                            }
+                        } else {
+                            reachedEnd = true;
+                            break; // gặp trang không tồn tại -> dừng dò tiếp
+                        }
+                    }
+
+                    if (reachedEnd) break;
+                    pageNum += BATCH_SIZE;
+                }
+
+                if (loadedCount === 0) {
+                    loader.innerHTML = "<span class='text-red-500'>Không tìm thấy tài liệu trên hệ thống.</span>";
+                }
+            }
+
+            loadAllPages();
+        })();
     </script>
     
-    <!-- Script Kích hoạt KaTeX cho Logo -->
+    <!-- Script Kích hoạt KaTeX được giới hạn vùng quét -->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            renderMathInElement(document.body, {
-                delimiters: [
-                    {left: '$$', right: '$$', display: true},
-                    {left: '$', right: '$', display: false}
-                ],
-                throwOnError : false
+            // Chỉ quét Logo và Tiêu đề thay vì document.body
+            const targets = [document.getElementById('logo-math'), document.getElementById('title-section')];
+            targets.forEach(el => {
+                if(el) {
+                    renderMathInElement(el, {
+                        delimiters: [
+                            {left: '$$', right: '$$', display: true},
+                            {left: '$', right: '$', display: false}
+                        ],
+                        throwOnError : false
+                    });
+                }
             });
         });
     </script>
-    <!-- Script Xử lý chức năng Zoom (Đã tối ưu Mobile) -->
-    <script>
-        let currentZoom = 80; // Mặc định 80% cho máy tính
 
-        // Áp dụng zoom ngay khi trang tải xong
+    <!-- Script Xử lý chức năng Zoom -->
+    <script>
+        let currentZoom = 80; 
+
         document.addEventListener("DOMContentLoaded", function() {
             applyZoom();
         });
 
-        // Tự động điều chỉnh lại ảnh nếu người dùng xoay ngang điện thoại hoặc đổi size cửa sổ
         window.addEventListener('resize', applyZoom);
 
         function zoomIn() {
@@ -190,25 +216,16 @@
         }
 
         function applyZoom() {
-            // Cập nhật số phần trăm trên thanh công cụ
             document.getElementById('zoom-level').innerText = currentZoom + '%';
-            
             const container = document.getElementById('image-container');
             
-            // TRÍ TUỆ NHÂN TẠO: Kiểm tra màn hình
-            // Nếu là điện thoại (chiều rộng < 768px), ép ảnh bung 100%
             if (window.innerWidth < 768) {
                 container.style.width = '100%';
-            } 
-            // Nếu là máy tính/tablet, dùng mức zoom hiện tại
-            else {
+            } else {
                 container.style.width = currentZoom + '%';
             }
-            
-            // Căn giữa khung ảnh
             container.style.margin = '0 auto';
         }
     </script>
-
 </body>
 </html>
