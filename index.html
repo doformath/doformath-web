@@ -4,6 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DoforMath Education</title>
+
+    <!-- Preconnect: mở kết nối sớm tới các máy chủ ngoài để giảm độ trễ tải -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="preconnect" href="https://www.gstatic.com">
+
     <!-- Cấu hình Favicon (Logo trên tab trình duyệt) -->
 <link rel="icon" type="image/jpeg" href="assets/images/Doformath.png">
     <!-- Font chữ Inter sắc nét -->
@@ -27,29 +35,39 @@
         }
     </script>
 
-    <!-- Font Awesome cho các Icon -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Font Awesome cho các Icon (tải kiểu media="print" để không chặn render, rồi tự chuyển sang "all") -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
 
     <!-- KaTeX cho Toán học -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+    <!-- Ẩn các phần tử điều khiển bởi Alpine.js trước khi Alpine kịp khởi tạo, tránh nháy giao diện (FOUC) -->
+    <style>[x-cloak] { display: none !important; }</style>
 </head>
 <body class="font-sans text-gray-800 bg-gray-50 antialiased">
 
     <!-- HEADER / NAVBAR (Sticky) -->
-    <header class="bg-white shadow-sm sticky top-0 z-50">
+    <header class="bg-white shadow-sm sticky top-0 z-50" x-data="{ mobileMenuOpen: false }">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Giảm chiều cao header trên mobile từ h-20 xuống h-16 -->
             <div class="flex justify-between items-center h-16 md:h-20">
                 
-                <!-- Logo Toán học -->
-                <!-- Đổi <div> thành <a>, thêm href="index.html" và bỏ bớt class cursor-pointer (vì thẻ <a> đã tự có biểu tượng bàn tay) -->
-                <a href="index.html" class="flex-shrink-0 flex items-center hover:opacity-80 transition-opacity">
-                    <span class="text-2xl md:text-3xl tracking-tight text-gray-900 pb-1">
-                        $\textcolor{#0d9488}{\textsf{\textbf{Dofor}}{\sum}\textsf{\textbf{ath}}}$
-                    </span>
-                </a>
+                <div class="flex items-center gap-1">
+                    <!-- Nút Hamburger: chỉ hiện trên mobile, mở sidebar điều hướng -->
+                    <button @click="mobileMenuOpen = true" class="md:hidden -ml-2 w-10 h-10 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 hover:text-primary transition-colors" aria-label="Mở menu điều hướng">
+                        <i class="fa-solid fa-bars text-lg"></i>
+                    </button>
+
+                    <!-- Logo Toán học -->
+                    <!-- Đổi <div> thành <a>, thêm href="index.html" và bỏ bớt class cursor-pointer (vì thẻ <a> đã tự có biểu tượng bàn tay) -->
+                    <a href="index.html" class="flex-shrink-0 flex items-center hover:opacity-80 transition-opacity">
+                        <span class="text-2xl md:text-3xl tracking-tight text-gray-900 pb-1">
+                            $\textcolor{#0d9488}{\textsf{\textbf{Dofor}}{\sum}\textsf{\textbf{ath}}}$
+                        </span>
+                    </a>
+                </div>
                 
                 <!-- Menu ngang (Ẩn trên mobile) -->
                 <nav class="hidden md:flex space-x-8">
@@ -83,11 +101,63 @@
                 </div>
             </div>
         </div>
+
+        <!-- SIDEBAR MOBILE: lớp phủ nền tối -->
+        <div x-show="mobileMenuOpen" x-cloak
+             x-transition:enter="transition-opacity ease-out duration-300"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition-opacity ease-in duration-200"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             @click="mobileMenuOpen = false"
+             class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[60] md:hidden"
+             aria-hidden="true"></div>
+
+        <!-- SIDEBAR MOBILE: panel trượt từ bên trái -->
+        <aside x-show="mobileMenuOpen" x-cloak
+               x-transition:enter="transition ease-out duration-300 transform"
+               x-transition:enter-start="-translate-x-full"
+               x-transition:enter-end="translate-x-0"
+               x-transition:leave="transition ease-in duration-200 transform"
+               x-transition:leave-start="translate-x-0"
+               x-transition:leave-end="-translate-x-full"
+               @keydown.escape.window="mobileMenuOpen = false"
+               class="fixed top-0 left-0 h-full w-72 max-w-[80%] bg-white z-[70] shadow-2xl md:hidden flex flex-col"
+               role="dialog" aria-modal="true" aria-label="Menu điều hướng">
+            <div class="flex items-center justify-between p-5 border-b border-gray-100">
+                <span class="text-xl tracking-tight text-gray-900">
+                    $\textcolor{#0d9488}{\textsf{\textbf{Dofor}}{\sum}\textsf{\textbf{ath}}}$
+                </span>
+                <button @click="mobileMenuOpen = false" class="w-9 h-9 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition-colors" aria-label="Đóng menu">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1">
+                <a href="index.html" @click="mobileMenuOpen = false" class="flex items-center gap-3 px-4 py-3 rounded-xl text-primary bg-teal-50 font-semibold">
+                    <i class="fa-solid fa-house w-5 text-center"></i> Trang chủ
+                </a>
+                <a href="courses.html" @click="mobileMenuOpen = false" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-primary font-medium transition-colors">
+                    <i class="fa-solid fa-graduation-cap w-5 text-center"></i> Khóa học của tôi
+                </a>
+                <a href="courses/tai-lieu-mien-phi.html" @click="mobileMenuOpen = false" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-primary font-medium transition-colors">
+                    <i class="fa-solid fa-book-open w-5 text-center"></i> Tài liệu miễn phí
+                </a>
+                <a href="phong-thi.html" @click="mobileMenuOpen = false" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-primary font-medium transition-colors">
+                    <i class="fa-solid fa-pen-to-square w-5 text-center"></i> Phòng thi
+                </a>
+            </nav>
+            <div class="p-5 border-t border-gray-100 text-xs text-gray-400 text-center">
+                &copy; 2026 DoforMath Education
+            </div>
+        </aside>
     </header>
 
     <!-- HERO BANNER -->
     <section class="relative bg-white overflow-hidden">
-        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5"></div>
+        <!-- Họa tiết nền dạng SVG nhúng trực tiếp (data URI) thay vì tải ảnh từ site ngoài -->
+        <!-- => bớt 1 request mạng và không phụ thuộc vào tốc độ/độ ổn định của bên thứ 3 -->
+        <div class="absolute inset-0 opacity-5" style="background-image:url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2240%22 height=%2240%22 viewBox=%220 0 40 40%22%3E%3Cg fill=%22%230d9488%22 fill-rule=%22evenodd%22%3E%3Crect width=%224%22 height=%224%22/%3E%3Crect x=%2220%22 y=%2220%22 width=%224%22 height=%224%22/%3E%3C/g%3E%3C/svg%3E');"></div>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-24 relative">
             <div class="text-center max-w-3xl mx-auto">
                 <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-teal-50 text-primary font-medium text-sm mb-6 border border-teal-100">
@@ -276,6 +346,55 @@
             </div>
         </div>
     </section>
+
+    <!-- TRUY CẬP NHANH: TÀI LIỆU MIỄN PHÍ & PHÒNG THI -->
+    <section class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-2xl mx-auto mb-10">
+                <h2 class="text-3xl font-bold text-gray-900 mb-2">Công cụ học tập miễn phí</h2>
+                <p class="text-gray-500">Không cần đăng ký khóa học, bạn vẫn có thể luyện tập ngay hôm nay</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+                <!-- Card: Tài liệu miễn phí -->
+                <a href="courses/tai-lieu-mien-phi.html" class="group relative overflow-hidden bg-gradient-to-br from-teal-50 to-blue-50 border border-teal-100 rounded-3xl p-8 md:p-10 shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
+                    <div class="w-16 h-16 rounded-2xl bg-primary text-white flex items-center justify-center text-2xl shadow-lg shadow-teal-200 mb-6 group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-book-open"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-3">Tài liệu miễn phí</h3>
+                    <p class="text-gray-500 mb-6 leading-relaxed">Kho tài liệu, đề thi và chuyên đề Toán THPT được biên soạn kỹ lưỡng, tải về hoàn toàn miễn phí.</p>
+                    <ul class="space-y-2 mb-8 text-sm text-gray-600">
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-primary"></i> Hàng trăm tài liệu chọn lọc</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-primary"></i> Cập nhật thường xuyên</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-primary"></i> Trình bày rõ ràng, dễ theo dõi</li>
+                    </ul>
+                    <div class="mt-auto flex items-center gap-2 text-primary font-semibold">
+                        Khám phá ngay <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                    </div>
+                </a>
+
+                <!-- Card: Phòng thi -->
+                <a href="phong-thi.html" class="group relative overflow-hidden bg-gradient-to-br from-purple-50 to-indigo-50 border border-purple-100 rounded-3xl p-8 md:p-10 shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
+                    <div class="w-16 h-16 rounded-2xl bg-indigo-600 text-white flex items-center justify-center text-2xl shadow-lg shadow-indigo-200 mb-6 group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-3">Phòng thi</h3>
+                    <p class="text-gray-500 mb-6 leading-relaxed">Luyện đề thi thử trực tuyến bám sát cấu trúc đề thi mới nhất, chấm điểm và thống kê ngay lập tức.</p>
+                    <ul class="space-y-2 mb-8 text-sm text-gray-600">
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-indigo-600"></i> Đề thi thử đa dạng</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-indigo-600"></i> Chấm điểm tự động, tức thì</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-indigo-600"></i> Theo dõi tiến bộ qua từng lần thi</li>
+                    </ul>
+                    <div class="mt-auto flex items-center gap-2 text-indigo-600 font-semibold">
+                        Vào phòng thi <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                    </div>
+                </a>
+
+            </div>
+        </div>
+    </section>
+
     <!-- Countdown DGNL Timer -->
     <section class="max-w-7xl mx-auto px-4 lg:px-6 mt-4" x-data="countdown('2027-04-05T07:00:00+07:00')" x-init="start()">
         <div class="bg-white dark:bg-slate-800/80 rounded-2xl border border-slate-200/80 dark:border-slate-700/50 px-5 py-4 flex flex-col sm:flex-row items-center justify-center gap-4 shadow-sm">
@@ -326,38 +445,6 @@
             <div>
                 <p class="text-4xl font-bold text-gray-900 mb-1">100%</p>
                 <p class="text-sm font-medium text-gray-500">Bài giảng LaTeX</p>
-            </div>
-        </div>
-    </section>
-    <!-- SHOWCASE TOÁN HỌC (Demo KaTeX) -->
-    <section class="py-20 bg-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="bg-gradient-to-br from-gray-900 to-primary rounded-3xl p-8 md:p-12 text-white shadow-2xl flex flex-col md:flex-row items-center gap-12">
-                <div class="flex-1">
-                    <h2 class="text-3xl md:text-4xl font-bold mb-4">Trải nghiệm bài học trực quan</h2>
-                    <p class="text-teal-100 text-lg mb-8 leading-relaxed">
-                        Hệ thống tích hợp lõi render LaTeX tốc độ cao. Mọi công thức toán học phức tạp, ma trận, hệ phương trình đều hiển thị chuẩn mực và sắc nét trên mọi thiết bị.
-                    </p>
-                    <ul class="space-y-3 mb-8">
-                        <li class="flex items-center gap-3"><i class="fa-solid fa-check text-secondary"></i> Font Toán học chuẩn quốc tế</li>
-                        <li class="flex items-center gap-3"><i class="fa-solid fa-check text-secondary"></i> Hiển thị mượt mà trên điện thoại</li>
-                    </ul>
-                </div>
-                
-                <!-- Bảng đen giả lập -->
-                <div class="flex-1 w-full bg-gray-900/80 backdrop-blur border border-white/20 p-6 rounded-2xl shadow-inner font-serif">
-                    <p class="text-gray-400 text-sm mb-4 border-b border-gray-700 pb-2">Ví dụ hiển thị:</p>
-                    <div class="space-y-6">
-                        <p>Định lý Bayes trong xác suất:</p>
-                        <div class="text-center text-xl overflow-x-auto text-yellow-300">
-                            $$ P(A|B) = \frac{P(B|A)P(A)}{P(B)} $$
-                        </div>
-                        <p>Tích phân hàm số phức tạp:</p>
-                        <div class="text-center text-xl overflow-x-auto text-yellow-300">
-                            $$ \int_{-\infty}^{\infty} e^{-x^2} \,dx = \sqrt{\pi} $$
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </section>
@@ -426,57 +513,62 @@
             });
         });
     </script>
-    <!-- Nhúng thư viện Firebase Auth (Nếu trang này chưa có) -->
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <!-- Nhúng thư viện Firebase Auth: thêm "defer" để không chặn trình duyệt hiển thị trang trong lúc tải -->
+<script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 
 <script>
-    // 1. Khai báo chìa khóa Firebase
-    const firebaseConfig = {
-        apiKey: "AIzaSyD-NDo43O3Q_9GVii6pDOM7D6SQ5pxmo5g",
-        authDomain: "doformath-bac70.firebaseapp.com",
-        projectId: "doformath-bac70",
-        storageBucket: "doformath-bac70.firebasestorage.app",
-        messagingSenderId: "329095418163",
-        appId: "1:329095418163:web:226636d40b5c2960cdee46"
-    };
-    
-    // 2. Khởi động Firebase (kiểm tra để tránh khởi động trùng lặp)
-    if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-    }
-
-    // 3. Hàm theo dõi trạng thái đăng nhập
-    firebase.auth().onAuthStateChanged((user) => {
-        const khuVucDangNhap = document.getElementById('khu-vuc-dang-nhap');
-        const khuVucUser = document.getElementById('khu-vuc-user');
-        const tenUser = document.getElementById('ten-user');
-
-        if (user) {
-            // TRƯỜNG HỢP A: CÓ USER (ĐÃ ĐĂNG NHẬP)
-            khuVucDangNhap.style.display = 'none';   
-            khuVucUser.style.display = 'flex';       
-            
-            const tenHienThi = user.email.split('@')[0];
-            
-            // CẬP NHẬT MỚI: Dùng mã HTML để ẩn chữ "Xin chào," trên điện thoại (chỉ hiện trên màn hình sm trở lên)
-            tenUser.innerHTML = '<span class="hidden sm:inline">Xin chào, </span>' + tenHienThi;
-        } else {
-            // TRƯỜNG HỢP B: KHÔNG CÓ USER (CHƯA ĐĂNG NHẬP)
-            khuVucDangNhap.style.display = 'block';  
-            khuVucUser.style.display = 'none';       
+    // Toàn bộ logic Firebase được gói trong DOMContentLoaded để đảm bảo 2 file SDK
+    // ở trên (đang tải kiểu defer) đã tải và chạy xong trước khi ta dùng biến `firebase`.
+    document.addEventListener("DOMContentLoaded", function() {
+        // 1. Khai báo chìa khóa Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyD-NDo43O3Q_9GVii6pDOM7D6SQ5pxmo5g",
+            authDomain: "doformath-bac70.firebaseapp.com",
+            projectId: "doformath-bac70",
+            storageBucket: "doformath-bac70.firebasestorage.app",
+            messagingSenderId: "329095418163",
+            appId: "1:329095418163:web:226636d40b5c2960cdee46"
+        };
+        
+        // 2. Khởi động Firebase (kiểm tra để tránh khởi động trùng lặp)
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
         }
-    });
 
-    // 4. Hàm thực thi khi bấm nút Đăng xuất
-    function dangXuat() {
-        firebase.auth().signOut().then(() => {
-            // Đăng xuất thành công thì tải lại trang web
-            window.location.reload(); 
-        }).catch((error) => {
-            console.error("Lỗi đăng xuất:", error);
+        // 3. Hàm theo dõi trạng thái đăng nhập
+        firebase.auth().onAuthStateChanged((user) => {
+            const khuVucDangNhap = document.getElementById('khu-vuc-dang-nhap');
+            const khuVucUser = document.getElementById('khu-vuc-user');
+            const tenUser = document.getElementById('ten-user');
+
+            if (user) {
+                // TRƯỜNG HỢP A: CÓ USER (ĐÃ ĐĂNG NHẬP)
+                khuVucDangNhap.style.display = 'none';   
+                khuVucUser.style.display = 'flex';       
+                
+                const tenHienThi = user.email.split('@')[0];
+                
+                // Dùng mã HTML để ẩn chữ "Xin chào," trên điện thoại (chỉ hiện trên màn hình sm trở lên)
+                tenUser.innerHTML = '<span class="hidden sm:inline">Xin chào, </span>' + tenHienThi;
+            } else {
+                // TRƯỜNG HỢP B: KHÔNG CÓ USER (CHƯA ĐĂNG NHẬP)
+                khuVucDangNhap.style.display = 'block';  
+                khuVucUser.style.display = 'none';       
+            }
         });
-    }
+
+        // 4. Hàm thực thi khi bấm nút Đăng xuất
+        // Gắn vào "window" vì thuộc tính onclick="dangXuat()" trong HTML cần gọi được hàm này từ phạm vi toàn cục
+        window.dangXuat = function() {
+            firebase.auth().signOut().then(() => {
+                // Đăng xuất thành công thì tải lại trang web
+                window.location.reload(); 
+            }).catch((error) => {
+                console.error("Lỗi đăng xuất:", error);
+            });
+        };
+    });
 </script>
 <!-- Nhúng thư viện Alpine.js -->
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
