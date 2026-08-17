@@ -69,14 +69,17 @@
         
         <!-- HEADER (Nâng chiều cao lên h-16 md:h-[72px]) -->
         <header class="bg-white/95 backdrop-blur-md shadow-sm border-b border-slate-200 h-16 md:h-[72px] shrink-0 flex items-center px-4 md:px-6 justify-between relative z-50">
-            <div class="flex items-center gap-3">
-                <!-- Nút Hamburger đổi thành fa-bars thẳng hàng -->
-                <button @click="sidebarOpen = !sidebarOpen" class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-100 text-slate-600 hover:bg-teal-50 hover:text-teal-600 transition-colors shadow-sm">
-                    <i class="fa-solid fa-bars text-lg"></i>
+            <div class="flex items-center gap-2 sm:gap-3">
+                <!-- Nút Hamburger (Thu nhỏ nhẹ trên mobile) -->
+                <button @click="sidebarOpen = !sidebarOpen" class="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-xl bg-slate-100 text-slate-600 hover:bg-teal-50 hover:text-teal-600 transition-colors shadow-sm shrink-0">
+                    <i class="fa-solid fa-bars text-base sm:text-lg"></i>
                 </button>
-                <a href="javascript:history.back()" class="flex items-center text-gray-500 hover:text-primary font-medium gap-2 transition">
-                <i class="fa-solid fa-arrow-left"></i> Quay lại
-            </a>
+                
+                <!-- Nút Quay lại (Chỉ hiện icon trên mobile, hiện cả chữ trên máy tính) -->
+                <a href="javascript:history.back()" class="flex items-center text-slate-500 hover:text-teal-600 font-medium gap-1.5 sm:gap-2 transition shrink-0">
+                    <i class="fa-solid fa-arrow-left text-sm sm:text-base"></i> 
+                    <span class="hidden sm:inline">Quay lại</span>
+                </a>
             </div>
             
             <a href="../index.html" class="hover:opacity-80 transition-opacity absolute left-1/2 -translate-x-1/2">
