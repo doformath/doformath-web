@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Phòng học: Chinh phục Toán 12 - DoforMath</title>
+    <title>Chinh phục Toán 12 - DoforMath</title>
     
     <link rel="icon" type="image/png" href="../assets/images/Doformath.png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -46,7 +46,7 @@
     <!-- 1. MÀN HÌNH CHỜ FIREBASE -->
     <div id="loading-screen" class="absolute inset-0 z-[10000] bg-slate-50 flex flex-col items-center justify-center">
         <i class="fa-solid fa-circle-notch fa-spin text-5xl text-teal-500 mb-4"></i>
-        <h3 class="text-xl font-bold text-slate-700">Đang đồng bộ dữ liệu lớp học...</h3>
+        <h3 class="text-xl font-bold text-slate-700">Đang tải...</h3>
         <p class="text-slate-500 mt-2 text-sm">Vui lòng đợi trong giây lát</p>
     </div>
 
@@ -291,6 +291,27 @@
                                             <div class="absolute w-4 h-4 rounded-full border-[3px] bg-white border-teal-400 -left-[9.5px] top-0.5 shadow-sm"></div>
                                             <a href="xem-tai-lieu.html?folder=12-Chuong1-Bai5-Dang6-Loigiai&title=Bài 5. Dạng 6 Ứng dụng đạo hàm giải toán thực tế" target="lesson-frame" @click="window.innerWidth < 1024 ? sidebarOpen = false : null" class="group/link font-medium text-sm flex items-center gap-3 text-slate-600 hover:text-teal-600 transition-colors">
                                                 <i class="fa-solid fa-folder text-slate-400 group-hover/link:text-teal-600 transition-colors text-base"></i> Dạng 6
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <!-- Bài kiểm tra cuối chương -->
+                                <div x-data="{ openLesson: false }" class="bg-gradient-to-br from-white to-slate-50 border border-slate-200 rounded-2xl p-4 hover:border-teal-300 hover:shadow-md transition-all shadow-sm group/lesson">
+                                    <div @click="openLesson = !openLesson" class="flex justify-between items-center cursor-pointer">
+                                        <h5 class="font-semibold text-slate-800 text-sm group-hover/lesson:text-teal-700 transition-colors pr-2 leading-relaxed">Bài kiểm tra cuối chương</h5>
+                                        <i class="fa-solid fa-chevron-down text-slate-400 text-sm transition-transform duration-300 group-hover/lesson:text-teal-500" :class="openLesson ? 'rotate-180 text-teal-500' : ''"></i>
+                                    </div>
+                                    <ul x-show="openLesson" x-transition class="relative border-l-[3px] border-slate-200 ml-2 mt-4 space-y-5 pb-1">
+                                        <li class="relative pl-6">
+                                            <div class="absolute w-4 h-4 rounded-full border-[3px] bg-white border-teal-400 -left-[9.5px] top-0.5 shadow-sm"></div>
+                                            <a href="about:blank" target="lesson-frame" @click="window.innerWidth < 1024 ? sidebarOpen = false : null" class="group/link font-medium text-sm flex items-center gap-3 text-slate-600 hover:text-teal-600 transition-colors">
+                                                <i class="fa-solid fa-pen-to-square text-slate-400 group-hover/link:text-teal-600 transition-colors text-base"></i> Đề bài
+                                            </a>
+                                        </li>
+                                        <li class="relative pl-6">
+                                            <div class="absolute w-4 h-4 rounded-full border-[3px] bg-white border-teal-400 -left-[9.5px] top-0.5 shadow-sm"></div>
+                                            <a href="xem-tai-lieu.html?folder=12-Bai-kiem-tra-cuoi-chuong-1-Loigiai&title=Bài kiểm tra cuối chương 1" target="lesson-frame" @click="window.innerWidth < 1024 ? sidebarOpen = false : null" class="group/link font-medium text-sm flex items-center gap-3 text-slate-600 hover:text-teal-600 transition-colors">
+                                                <i class="fa-solid fa-folder text-slate-400 group-hover/link:text-teal-600 transition-colors text-base"></i> Lời giải
                                             </a>
                                         </li>
                                     </ul>

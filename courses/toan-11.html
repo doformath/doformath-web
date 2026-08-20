@@ -3,176 +3,406 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đại số & Giải tích 11 - DoforMath</title>
+    <title>Chinh phục Toán 11 - DoforMath</title>
     
-    <!-- Cấu hình Favicon (Logo trên tab) nhớ có ../ vì đang ở thư mục con -->
     <link rel="icon" type="image/png" href="../assets/images/Doformath.png">
-
-    <!-- Font chữ Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- Tailwind CSS và cấu hình màu Teal -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
-            theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] }, colors: { primary: '#0d9488', secondary: '#facc15'} } }
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#0d9488', /* Xanh dương đậm chuyên nghiệp */
+                        secondary: '#facc15', /* Vàng tạo điểm nhấn */
+                    }
+                }
+            }
         }
     </script>
+    <!-- CSS Giao diện siêu tốc -->
+    <!-- <link rel="stylesheet" href="/assets/css/style.css"> -->
     
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- KaTeX cho Toán học -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <style>
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .custom-scrollbar:hover::-webkit-scrollbar-thumb { background: #94a3b8; }
+    </style>
 </head>
-<body class="bg-gray-50 text-gray-800 antialiased font-sans">
-    <!-- Cửa sổ thông báo Không có quyền truy cập (Được ẩn mặc định) -->
-    <div id="access-denied-modal" class="fixed inset-0 z-[9999] hidden flex items-center justify-center bg-slate-900/70 backdrop-blur-md px-4 transition-opacity">
-        <div class="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl animate-fade-in">
-            <!-- Biểu tượng ổ khóa -->
+<body class="bg-slate-50 text-slate-800 antialiased font-sans h-screen flex flex-col overflow-hidden">
+
+    <!-- 1. MÀN HÌNH CHỜ FIREBASE -->
+    <div id="loading-screen" class="absolute inset-0 z-[10000] bg-slate-50 flex flex-col items-center justify-center">
+        <i class="fa-solid fa-circle-notch fa-spin text-5xl text-teal-500 mb-4"></i>
+        <h3 class="text-xl font-bold text-slate-700">Đang tải...</h3>
+        <p class="text-slate-500 mt-2 text-sm">Vui lòng đợi trong giây lát</p>
+    </div>
+
+    <!-- 2. CỬA SỔ TỪ CHỐI TRUY CẬP -->
+    <div id="access-denied-modal" class="absolute inset-0 z-[9999] hidden flex items-center justify-center bg-slate-900/70 backdrop-blur-md px-4">
+        <div class="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl">
             <div class="w-20 h-20 bg-teal-50 text-teal-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner border border-teal-100">
                 <i class="fa-solid fa-lock text-3xl"></i>
             </div>
-            
             <h3 class="text-2xl font-extrabold text-slate-800 mb-3 tracking-tight">Truy cập bị từ chối</h3>
-            <p class="text-slate-600 mb-8 leading-relaxed text-sm font-medium">
-                Tài khoản của bạn chưa được cấp quyền truy cập khóa học này. Vui lòng liên hệ thầy Đô để được hỗ trợ mở khóa nhé!
-            </p>
-            
-            <!-- Nút Quay lại Trang chủ -->
-            <a href="../index.html" class="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-600 text-white text-base font-bold shadow-lg shadow-teal-500/30 hover:shadow-teal-500/50 hover:scale-[1.02] active:scale-[0.98] transition-all">
-                <i class="fa-solid fa-house text-sm"></i>
-                Quay lại Trang chủ
+            <p class="text-slate-600 mb-8 leading-relaxed text-sm font-medium">Tài khoản của bạn chưa được cấp quyền truy cập khóa học này. Vui lòng liên hệ Thầy Đô để được hỗ trợ!</p>
+            <a href="../index.html" class="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-600 text-white text-base font-bold shadow-lg hover:scale-[1.02] transition-all">
+                <i class="fa-solid fa-house text-sm"></i> Quay lại Trang chủ
             </a>
         </div>
     </div>
-    <!-- Header Navigation (Đã tối ưu Mobile) -->
-    <header class="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-50 border-b border-slate-200">
-        <div class="max-w-7xl mx-auto px-4 py-3 md:py-4 flex justify-between items-center">
-            <!-- Nút quay lại trang chủ: Rút gọn chữ trên mobile -->
-            <a href="../index.html" class="flex items-center text-slate-500 hover:text-teal-600 font-medium gap-1.5 md:gap-2 transition-colors text-sm md:text-base">
-                <i class="fa-solid fa-arrow-left"></i> 
-                <span class="hidden sm:inline">Trở về Trang chủ</span>
-                <span class="sm:hidden">Quay lại</span>
-            </a>
+
+    <!-- 3. GIAO DIỆN PHÒNG HỌC -->
+    <div id="course-content" class="hidden flex-1 flex flex-col h-full overflow-hidden" x-data="{ sidebarOpen: window.innerWidth >= 1024 }" @resize.window="if(window.innerWidth >= 1024 && !sidebarOpen) sidebarOpen = true">
+        
+        <!-- HEADER (Nâng chiều cao lên h-16 md:h-[72px]) -->
+        <header class="bg-white/95 backdrop-blur-md shadow-sm border-b border-slate-200 h-16 md:h-[72px] shrink-0 flex items-center px-4 md:px-6 justify-between relative z-50">
+            <div class="flex items-center gap-2 sm:gap-3">
+                <!-- Nút Hamburger (Thu nhỏ nhẹ trên mobile) -->
+                <button @click="sidebarOpen = !sidebarOpen" class="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-xl bg-slate-100 text-slate-600 hover:bg-teal-50 hover:text-teal-600 transition-colors shadow-sm shrink-0">
+                    <i class="fa-solid fa-bars text-base sm:text-lg"></i>
+                </button>
+                
+                <!-- Nút Quay lại (Chỉ hiện icon trên mobile, hiện cả chữ trên máy tính) -->
+                <a href="javascript:history.back()" class="flex items-center text-slate-500 hover:text-teal-600 font-medium gap-1.5 sm:gap-2 transition shrink-0">
+                    <i class="fa-solid fa-arrow-left text-sm sm:text-base"></i> 
+                    <span class="hidden sm:inline">Quay lại</span>
+                </a>
+            </div>
             
-            <!-- Logo Toán học: Hiện trên mobile nhưng thu nhỏ lại -->
-            <a href="../index.html" class="hover:opacity-80 transition-opacity block">
-                <span class="text-xl md:text-2xl tracking-tight text-slate-900 pb-1">
+            <a href="../index.html" class="hover:opacity-80 transition-opacity absolute left-1/2 -translate-x-1/2">
+                <span class="text-xl md:text-2xl font-bold tracking-tight text-slate-900 pb-1">
                     $\textcolor{#0d9488}{\textsf{\textbf{Dofor}}{\sum}\textsf{\textbf{ath}}}$
                 </span>
             </a>
-        </div>
-    </header>
 
-    <!-- Nội dung Chi tiết Khóa học -->
-    <main class="max-w-5xl mx-auto px-4 py-12">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Nhãn (Tag) Thiết kế phát sáng -->
+            <div class="hidden sm:flex items-center justify-center bg-white border border-teal-200/60 px-5 py-2 rounded-full relative group">
+                <span class="relative z-10 text-sm font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-emerald-600 tracking-wide uppercase">
+                    Chinh phục Toán 11
+                </span>
+            </div>
+        </header>
+
+        <!-- MAIN LAYOUT (Sidebar + Iframe) -->
+        <div class="flex-1 flex overflow-hidden relative">
             
-            <!-- Cột trái: Thông tin & Video mô tả (Chiếm 2/3) -->
-            <div class="md:col-span-2">
-                <span class="bg-teal-50 text-primary border border-teal-100 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">Toán 11</span>
-                <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mt-4 mb-6 leading-tight">Đại số & Giải tích 11 - Trọng tâm Học kỳ I</h1>
+            <!-- OVERLAY MOBILE -->
+            <div x-show="sidebarOpen" @click="sidebarOpen = false" x-transition.opacity class="absolute inset-0 bg-slate-900/50 z-30 lg:hidden" x-cloak></div>
+
+            <!-- SIDEBAR THU GỌN / MỞ RỘNG -->
+            <aside class="absolute lg:relative z-40 w-80 lg:w-[350px] shrink-0 bg-white border-r border-slate-200 flex flex-col transition-all duration-300 ease-in-out h-full"
+                   :class="sidebarOpen ? 'translate-x-0 lg:ml-0' : '-translate-x-full lg:-ml-[350px]'">
                 
-                <!-- Khung nhúng Video giới thiệu -->
-                <div class="aspect-video bg-gray-900 rounded-xl overflow-hidden mb-10 shadow-lg flex items-center justify-center">
-                    <p class="text-white opacity-70"><i class="fa-regular fa-circle-play mr-2"></i> [Nhúng video giới thiệu khóa học vào đây]</p>
+                <div class="p-5 border-b border-slate-100 shrink-0 bg-slate-50/50">
+                    <h2 class="font-extrabold text-xl text-slate-800">Nội dung khóa học</h2>
+                    <p class="text-sm text-slate-500 mt-1 font-medium">Lộ trình học tập chi tiết</p>
                 </div>
-                
-                <!-- BẮT ĐẦU: KHU VỰC 3 CHƯƠNG HỌC MÀ BẠN YÊU CẦU -->
-                <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-200">
-                    <h3 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                        <i class="fa-solid fa-list-check text-primary"></i> Lộ trình & Nội dung khóa học
-                    </h3>
+
+                <div class="flex-1 overflow-y-auto custom-scrollbar px-3 py-5 space-y-6">
                     
-                    <div class="space-y-4">
-                        <!-- Chương 1 -->
-                        <div class="border border-gray-100 rounded-xl p-5 bg-gray-50 hover:bg-teal-50/50 transition-colors group">
-                            <div class="flex items-start gap-4">
-                                <div class="bg-white w-10 h-10 rounded-full shadow-sm flex items-center justify-center text-primary font-bold border border-teal-100 shrink-0">1</div>
-                                <div>
-                                    <h4 class="text-lg font-bold text-gray-800 group-hover:text-primary transition-colors">Hàm số lượng giác và phương trình lượng giác</h4>
-                                    <p class="text-gray-500 text-sm mt-1">Nắm vững các tính chất hàm số và kỹ năng giải phương trình lượng giác từ cơ bản đến nâng cao.</p>
+                    <!-- ================= ĐẠI SỐ & GIẢI TÍCH ================= -->
+                    <div>
+                        <div class="flex items-center gap-2 mb-4 px-2">
+                            <i class="fa-solid fa-layer-group text-teal-600"></i>
+                            <h3 class="text-xs font-black text-teal-600 uppercase tracking-widest">ĐẠI SỐ & GIẢI TÍCH</h3>
+                            <div class="flex-1 h-px bg-slate-200"></div>
+                        </div>
+                    <div ></div>
+                        <!-- CHƯƠNG 1 NỀN TẢNG -->
+                        <div x-data="{ openChapter: false }" class="mb-4">
+                            <h4 @click="openChapter = !openChapter" class="text-sm font-bold text-teal-800 p-3 bg-gradient-to-r from-teal-50/80 to-transparent rounded-2xl flex items-center justify-between cursor-pointer hover:from-teal-100 transition-colors group mb-3">
+                                <div class="flex items-center gap-3">
+                                    <div class="bg-white text-teal-500 w-10 h-10 rounded-lg flex items-center justify-center shadow-sm border border-teal-100 shrink-0 group-hover:scale-110 transition-transform">
+                                        <i class="fa-solid fa-cube text-base"></i>
+                                    </div>
+                                    <span class="leading-snug line-clamp-2">Chương 1: Hàm số và phương trình lượng giác</span>
+                                </div>
+                                <div class="w-8 h-8 rounded-full flex items-center justify-center bg-teal-100/50 text-teal-600 group-hover:bg-teal-200 transition-colors shrink-0 ml-2">
+                                    <i class="fa-solid fa-chevron-down text-sm transition-transform duration-300" :class="openChapter ? 'rotate-180' : ''"></i>
+                                </div>
+                            </h4>
+                            
+                            <div x-show="openChapter" x-transition class="space-y-4 pl-1 pr-1 mb-6">
+                                <!-- Bài 1 -->
+                                <div x-data="{ openLesson: false }" class="bg-gradient-to-br from-white to-slate-50 border border-slate-200 rounded-2xl p-4 hover:border-teal-300 hover:shadow-md transition-all shadow-sm group/lesson">
+                                    <div @click="openLesson = !openLesson" class="flex justify-between items-center cursor-pointer">
+                                        <h5 class="font-semibold text-slate-800 text-sm group-hover/lesson:text-teal-700 transition-colors pr-2 leading-relaxed">Bài 1. Góc lượng giác</h5>
+                                        <i class="fa-solid fa-chevron-down text-slate-400 text-sm transition-transform duration-300 group-hover/lesson:text-teal-500" :class="openLesson ? 'rotate-180 text-teal-500' : ''"></i>
+                                    </div>
+                                    <ul x-show="openLesson" x-transition class="relative border-l-[3px] border-slate-200 ml-2 mt-4 space-y-5 pb-1">
+                                        <li class="relative pl-6">
+                                            <div class="absolute w-4 h-4 rounded-full border-[3px] bg-white border-teal-400 -left-[9.5px] top-0.5 shadow-sm"></div>
+                                            <a href="about:blank" target="lesson-frame" @click="window.innerWidth < 1024 ? sidebarOpen = false : null" class="group/link font-medium text-sm flex items-center gap-3 text-slate-600 hover:text-teal-600 transition-colors">
+                                                <i class="fa-regular fa-file-lines text-slate-400 group-hover/link:text-teal-600 transition-colors text-base"></i> Lý thuyết
+                                            </a>
+                                        </li>
+                                        <li class="relative pl-6">
+                                            <div class="absolute w-4 h-4 rounded-full border-[3px] bg-white border-teal-400 -left-[9.5px] top-0.5 shadow-sm"></div>
+                                            <a href="about:blank" target="lesson-frame" @click="window.innerWidth < 1024 ? sidebarOpen = false : null" class="group/link font-medium text-sm flex items-center gap-3 text-slate-600 hover:text-teal-600 transition-colors">
+                                                <i class="fa-solid fa-pen-to-square text-slate-400 group-hover/link:text-teal-600 transition-colors text-base"></i> Đề bài
+                                            </a>
+                                        </li>
+                                        <li class="relative pl-6">
+                                            <div class="absolute w-4 h-4 rounded-full border-[3px] bg-white border-teal-400 -left-[9.5px] top-0.5 shadow-sm"></div>
+                                            <a href="xem-tai-lieu.html?folder=11-Chuong1-Bai1-Loigiai&title=Bài 1. Giá trị lượng giác của một góc lượng giác" target="lesson-frame" @click="window.innerWidth < 1024 ? sidebarOpen = false : null" class="group/link font-medium text-sm flex items-center gap-3 text-slate-600 hover:text-teal-600 transition-colors">
+                                                <i class="fa-solid fa-folder text-slate-400 group-hover/link:text-teal-600 transition-colors text-base"></i> Lời giải
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <!-- Bài 2 -->
+                                <div x-data="{ openLesson: false }" class="bg-gradient-to-br from-white to-slate-50 border border-slate-200 rounded-2xl p-4 hover:border-teal-300 hover:shadow-md transition-all shadow-sm group/lesson">
+                                    <div @click="openLesson = !openLesson" class="flex justify-between items-center cursor-pointer">
+                                        <h5 class="font-semibold text-slate-800 text-sm group-hover/lesson:text-teal-700 transition-colors pr-2 leading-relaxed">Bài 2. Giá trị lượng giác của một góc lượng giác</h5>
+                                        <i class="fa-solid fa-chevron-down text-slate-400 text-sm transition-transform duration-300 group-hover/lesson:text-teal-500" :class="openLesson ? 'rotate-180 text-teal-500' : ''"></i>
+                                    </div>
+                                    <ul x-show="openLesson" x-transition class="relative border-l-[3px] border-slate-200 ml-2 mt-4 space-y-5 pb-1">
+                                        <li class="relative pl-6">
+                                            <div class="absolute w-4 h-4 rounded-full border-[3px] bg-white border-teal-400 -left-[9.5px] top-0.5 shadow-sm"></div>
+                                            <a href="about:blank" target="lesson-frame" @click="window.innerWidth < 1024 ? sidebarOpen = false : null" class="group/link font-medium text-sm flex items-center gap-3 text-slate-600 hover:text-teal-600 transition-colors">
+                                                <i class="fa-regular fa-file-lines text-slate-400 group-hover/link:text-teal-600 transition-colors text-base"></i> Lý thuyết
+                                            </a>
+                                        </li>
+                                        <li class="relative pl-6">
+                                            <div class="absolute w-4 h-4 rounded-full border-[3px] bg-white border-teal-400 -left-[9.5px] top-0.5 shadow-sm"></div>
+                                            <a href="about:blank" target="lesson-frame" @click="window.innerWidth < 1024 ? sidebarOpen = false : null" class="group/link font-medium text-sm flex items-center gap-3 text-slate-600 hover:text-teal-600 transition-colors">
+                                                <i class="fa-solid fa-pen-to-square text-slate-400 group-hover/link:text-teal-600 transition-colors text-base"></i> Đề bài
+                                            </a>
+                                        </li>
+                                        <li class="relative pl-6">
+                                            <div class="absolute w-4 h-4 rounded-full border-[3px] bg-white border-teal-400 -left-[9.5px] top-0.5 shadow-sm"></div>
+                                            <a href="xem-tai-lieu.html?folder=11-Chuong1-Bai2-Loigiai&title=Bài 2. Giá trị lượng giác của một góc lượng giác" target="lesson-frame" @click="window.innerWidth < 1024 ? sidebarOpen = false : null" class="group/link font-medium text-sm flex items-center gap-3 text-slate-600 hover:text-teal-600 transition-colors">
+                                                <i class="fa-solid fa-folder text-slate-400 group-hover/link:text-teal-600 transition-colors text-base"></i> Lời giải
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <!-- Bài 3 -->
+                                <div x-data="{ openLesson: false }" class="bg-gradient-to-br from-white to-slate-50 border border-slate-200 rounded-2xl p-4 hover:border-teal-300 hover:shadow-md transition-all shadow-sm group/lesson">
+                                    <div @click="openLesson = !openLesson" class="flex justify-between items-center cursor-pointer">
+                                        <h5 class="font-semibold text-slate-800 text-sm group-hover/lesson:text-teal-700 transition-colors pr-2 leading-relaxed">Bài 3. Công thức lượng giác</h5>
+                                        <i class="fa-solid fa-chevron-down text-slate-400 text-sm transition-transform duration-300 group-hover/lesson:text-teal-500" :class="openLesson ? 'rotate-180 text-teal-500' : ''"></i>
+                                    </div>
+                                    <ul x-show="openLesson" x-transition class="relative border-l-[3px] border-slate-200 ml-2 mt-4 space-y-5 pb-1">
+                                        <li class="relative pl-6">
+                                            <div class="absolute w-4 h-4 rounded-full border-[3px] bg-white border-teal-400 -left-[9.5px] top-0.5 shadow-sm"></div>
+                                            <a href="toan-12/chuong-1-ung-dung-dao-ham/bai-3-tiem-can/ly-thuyet.html" target="lesson-frame" @click="window.innerWidth < 1024 ? sidebarOpen = false : null" class="group/link font-medium text-sm flex items-center gap-3 text-slate-600 hover:text-teal-600 transition-colors">
+                                                <i class="fa-regular fa-file-lines text-slate-400 group-hover/link:text-teal-600 transition-colors text-base"></i> Lý thuyết
+                                            </a>
+                                        </li>
+                                        <li class="relative pl-6">
+                                            <div class="absolute w-4 h-4 rounded-full border-[3px] bg-white border-teal-400 -left-[9.5px] top-0.5 shadow-sm"></div>
+                                            <a href="about:blank" target="lesson-frame" @click="window.innerWidth < 1024 ? sidebarOpen = false : null" class="group/link font-medium text-sm flex items-center gap-3 text-slate-600 hover:text-teal-600 transition-colors">
+                                                <i class="fa-solid fa-pen-to-square text-slate-400 group-hover/link:text-teal-600 transition-colors text-base"></i> Đề bài
+                                            </a>
+                                        </li>
+                                        <li class="relative pl-6">
+                                            <div class="absolute w-4 h-4 rounded-full border-[3px] bg-white border-teal-400 -left-[9.5px] top-0.5 shadow-sm"></div>
+                                            <a href="xem-tai-lieu.html?folder=11-Chuong1-Bai3-Loigiai&title=Bài 3. Công thức lượng giác" target="lesson-frame" @click="window.innerWidth < 1024 ? sidebarOpen = false : null" class="group/link font-medium text-sm flex items-center gap-3 text-slate-600 hover:text-teal-600 transition-colors">
+                                                <i class="fa-solid fa-folder text-slate-400 group-hover/link:text-teal-600 transition-colors text-base"></i> Lời giải
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <!-- Bài 4 -->
+                                <div x-data="{ openLesson: false }" class="bg-gradient-to-br from-white to-slate-50 border border-slate-200 rounded-2xl p-4 hover:border-teal-300 hover:shadow-md transition-all shadow-sm group/lesson">
+                                    <div @click="openLesson = !openLesson" class="flex justify-between items-center cursor-pointer">
+                                        <h5 class="font-semibold text-slate-800 text-sm group-hover/lesson:text-teal-700 transition-colors pr-2 leading-relaxed">Bài 4. Phương trình lượng giác</h5>
+                                        <i class="fa-solid fa-chevron-down text-slate-400 text-sm transition-transform duration-300 group-hover/lesson:text-teal-500" :class="openLesson ? 'rotate-180 text-teal-500' : ''"></i>
+                                    </div>
+                                    <ul x-show="openLesson" x-transition class="relative border-l-[3px] border-slate-200 ml-2 mt-4 space-y-5 pb-1">
+                                        <li class="relative pl-6">
+                                            <div class="absolute w-4 h-4 rounded-full border-[3px] bg-white border-teal-400 -left-[9.5px] top-0.5 shadow-sm"></div>
+                                            <a href="toan-12/chuong-1-ung-dung-dao-ham/bai-4-khao-sat-va-ve-do-thi/ly-thuyet.html" target="lesson-frame" @click="window.innerWidth < 1024 ? sidebarOpen = false : null" class="group/link font-medium text-sm flex items-center gap-3 text-slate-600 hover:text-teal-600 transition-colors">
+                                                <i class="fa-regular fa-file-lines text-slate-400 group-hover/link:text-teal-600 transition-colors text-base"></i> Lý thuyết
+                                            </a>
+                                        </li>
+                                        <li class="relative pl-6">
+                                            <div class="absolute w-4 h-4 rounded-full border-[3px] bg-white border-teal-400 -left-[9.5px] top-0.5 shadow-sm"></div>
+                                            <a href="about:blank" target="lesson-frame" @click="window.innerWidth < 1024 ? sidebarOpen = false : null" class="group/link font-medium text-sm flex items-center gap-3 text-slate-600 hover:text-teal-600 transition-colors">
+                                                <i class="fa-solid fa-pen-to-square text-slate-400 group-hover/link:text-teal-600 transition-colors text-base"></i> Đề bài
+                                            </a>
+                                        </li>
+                                        <li class="relative pl-6">
+                                            <div class="absolute w-4 h-4 rounded-full border-[3px] bg-white border-teal-400 -left-[9.5px] top-0.5 shadow-sm"></div>
+                                            <a href="xem-tai-lieu.html?folder=11-Chuong1-Bai4-Loigiai&title=Bài 4. Phương trình lượng giác" target="lesson-frame" @click="window.innerWidth < 1024 ? sidebarOpen = false : null" class="group/link font-medium text-sm flex items-center gap-3 text-slate-600 hover:text-teal-600 transition-colors">
+                                                <i class="fa-solid fa-folder text-slate-400 group-hover/link:text-teal-600 transition-colors text-base"></i> Lời giải
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <!-- Bài 5 -->
+                                <div x-data="{ openLesson: false }" class="bg-gradient-to-br from-white to-slate-50 border border-slate-200 rounded-2xl p-4 hover:border-teal-300 hover:shadow-md transition-all shadow-sm group/lesson">
+                                    <div @click="openLesson = !openLesson" class="flex justify-between items-center cursor-pointer">
+                                        <h5 class="font-semibold text-slate-800 text-sm group-hover/lesson:text-teal-700 transition-colors pr-2 leading-relaxed">Bài 5. Hàm số lượng giác</h5>
+                                        <i class="fa-solid fa-chevron-down text-slate-400 text-sm transition-transform duration-300 group-hover/lesson:text-teal-500" :class="openLesson ? 'rotate-180 text-teal-500' : ''"></i>
+                                    </div>
+                                    <ul x-show="openLesson" x-transition class="relative border-l-[3px] border-slate-200 ml-2 mt-4 space-y-5 pb-1">
+                                        <li class="relative pl-6">
+                                            <div class="absolute w-4 h-4 rounded-full border-[3px] bg-white border-teal-400 -left-[9.5px] top-0.5 shadow-sm"></div>
+                                            <a href="toan-12/chuong-1-ung-dung-dao-ham/bai-3-tiem-can/ly-thuyet.html" target="lesson-frame" @click="window.innerWidth < 1024 ? sidebarOpen = false : null" class="group/link font-medium text-sm flex items-center gap-3 text-slate-600 hover:text-teal-600 transition-colors">
+                                                <i class="fa-regular fa-file-lines text-slate-400 group-hover/link:text-teal-600 transition-colors text-base"></i> Lý thuyết
+                                            </a>
+                                        </li>
+                                        <li class="relative pl-6">
+                                            <div class="absolute w-4 h-4 rounded-full border-[3px] bg-white border-teal-400 -left-[9.5px] top-0.5 shadow-sm"></div>
+                                            <a href="xem-tai-lieu.html?folder=11-Chuong1-Bai5-Loigiai&title=Bài 5. Hàm số lượng giác" target="lesson-frame" @click="window.innerWidth < 1024 ? sidebarOpen = false : null" class="group/link font-medium text-sm flex items-center gap-3 text-slate-600 hover:text-teal-600 transition-colors">
+                                                <i class="fa-solid fa-folder text-slate-400 group-hover/link:text-teal-600 transition-colors text-base"></i> Lời giải
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <!-- Bài kiểm tra cuối chương -->
+                                <div x-data="{ openLesson: false }" class="bg-gradient-to-br from-white to-slate-50 border border-slate-200 rounded-2xl p-4 hover:border-teal-300 hover:shadow-md transition-all shadow-sm group/lesson">
+                                    <div @click="openLesson = !openLesson" class="flex justify-between items-center cursor-pointer">
+                                        <h5 class="font-semibold text-slate-800 text-sm group-hover/lesson:text-teal-700 transition-colors pr-2 leading-relaxed">Bài kiểm tra cuối chương</h5>
+                                        <i class="fa-solid fa-chevron-down text-slate-400 text-sm transition-transform duration-300 group-hover/lesson:text-teal-500" :class="openLesson ? 'rotate-180 text-teal-500' : ''"></i>
+                                    </div>
+                                    <ul x-show="openLesson" x-transition class="relative border-l-[3px] border-slate-200 ml-2 mt-4 space-y-5 pb-1">
+                                        <li class="relative pl-6">
+                                            <div class="absolute w-4 h-4 rounded-full border-[3px] bg-white border-teal-400 -left-[9.5px] top-0.5 shadow-sm"></div>
+                                            <a href="about:blank" target="lesson-frame" @click="window.innerWidth < 1024 ? sidebarOpen = false : null" class="group/link font-medium text-sm flex items-center gap-3 text-slate-600 hover:text-teal-600 transition-colors">
+                                                <i class="fa-solid fa-pen-to-square text-slate-400 group-hover/link:text-teal-600 transition-colors text-base"></i> Đề bài
+                                            </a>
+                                        </li>
+                                        <li class="relative pl-6">
+                                            <div class="absolute w-4 h-4 rounded-full border-[3px] bg-white border-teal-400 -left-[9.5px] top-0.5 shadow-sm"></div>
+                                            <a href="xem-tai-lieu.html?folder=11-Bai-kiem-tra-cuoi-chuong-1-Loigiai&title=Bài kiểm tra cuối chương 1" target="lesson-frame" @click="window.innerWidth < 1024 ? sidebarOpen = false : null" class="group/link font-medium text-sm flex items-center gap-3 text-slate-600 hover:text-teal-600 transition-colors">
+                                                <i class="fa-solid fa-folder text-slate-400 group-hover/link:text-teal-600 transition-colors text-base"></i> Lời giải
+                                            </a>
+                                        </li>
+                                    </ul>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Chương 2 -->
-                        <div class="border border-gray-100 rounded-xl p-5 bg-gray-50 hover:bg-teal-50/50 transition-colors group">
-                            <div class="flex items-start gap-4">
-                                <div class="bg-white w-10 h-10 rounded-full shadow-sm flex items-center justify-center text-primary font-bold border border-teal-100 shrink-0">2</div>
-                                <div>
-                                    <h4 class="text-lg font-bold text-gray-800 group-hover:text-primary transition-colors">Dãy số. Cấp số cộng. Cấp số nhân.</h4>
-                                    <p class="text-gray-500 text-sm mt-1">Phương pháp truy hồi, chứng minh quy nạp và các bài toán thực tế về cấp số.</p>
-                                </div>
-                            </div>
+                        
+                    </div>
+                    <!-- ================= HÌNH HỌC ================= -->
+                    <div>
+                        <div class="flex items-center gap-2 mb-4 px-2">
+                            <i class="fa-solid fa-layer-group text-teal-600"></i>
+                            <h3 class="text-xs font-black text-teal-600 uppercase tracking-widest">HÌNH HỌC</h3>
+                            <div class="flex-1 h-px bg-slate-200"></div>
                         </div>
+                    <div ></div>
 
-                        <!-- Chương 3 -->
-                        <div class="border border-gray-100 rounded-xl p-5 bg-gray-50 hover:bg-teal-50/50 transition-colors group">
-                            <div class="flex items-start gap-4">
-                                <div class="bg-white w-10 h-10 rounded-full shadow-sm flex items-center justify-center text-primary font-bold border border-teal-100 shrink-0">3</div>
-                                <div>
-                                    <h4 class="text-lg font-bold text-gray-800 group-hover:text-primary transition-colors">Giới hạn. Hàm số liên tục</h4>
-                                    <p class="text-gray-500 text-sm mt-1">Tính giới hạn dãy số, hàm số và điều kiện để hàm số liên tục trên một khoảng.</p>
+                        <!-- CHƯƠNG 2 NỀN TẢNG -->
+                        <div x-data="{ openChapter: false }" class="mb-4">
+                            <h4 @click="openChapter = !openChapter" class="text-sm font-bold text-teal-800 p-3 bg-gradient-to-r from-teal-50/80 to-transparent rounded-2xl flex items-center justify-between cursor-pointer hover:from-teal-100 transition-colors group mb-3">
+                                <div class="flex items-center gap-3">
+                                    <div class="bg-white text-teal-500 w-10 h-10 rounded-lg flex items-center justify-center shadow-sm border border-teal-100 shrink-0 group-hover:scale-110 transition-transform">
+                                        <i class="fa-solid fa-cube text-base"></i>
+                                    </div>
+                                <span class="leading-snug line-clamp-2">Chương 4: Quan hệ song song trong không gian</span>
+                                </div>
+                                <div class="w-8 h-8 rounded-full flex items-center justify-center bg-teal-100/50 text-teal-600 group-hover:bg-teal-200 transition-colors shrink-0 ml-2">
+                                    <i class="fa-solid fa-chevron-down text-sm transition-transform duration-300" :class="openChapter ? 'rotate-180' : ''"></i>
+                                </div>
+                            </h4>
+                            
+                            <div x-show="openChapter" x-transition class="space-y-4 pl-1 pr-1 mb-6">
+                                <!-- Bài 1 -->
+                                <div x-data="{ openLesson: false }" class="bg-gradient-to-br from-white to-slate-50 border border-slate-200 rounded-2xl p-4 hover:border-teal-300 hover:shadow-md transition-all shadow-sm group/lesson">
+                                    <div @click="openLesson = !openLesson" class="flex justify-between items-center cursor-pointer">
+                                        <h5 class="font-semibold text-slate-800 text-sm group-hover/lesson:text-teal-700 transition-colors pr-2 leading-relaxed">Bài 1. Điểm-Đường-Mặt Phẳng</h5>
+                                        <i class="fa-solid fa-chevron-down text-slate-400 text-sm transition-transform duration-300 group-hover/lesson:text-teal-500" :class="openLesson ? 'rotate-180 text-teal-500' : ''"></i>
+                                    </div>
+                                    <ul x-show="openLesson" x-transition class="relative border-l-[3px] border-slate-200 ml-2 mt-4 space-y-5 pb-1">
+                                        <li class="relative pl-6">
+                                            <div class="absolute w-4 h-4 rounded-full border-[3px] bg-white border-teal-400 -left-[9.5px] top-0.5 shadow-sm"></div>
+                                            <a href="about:blank" target="lesson-frame" @click="window.innerWidth < 1024 ? sidebarOpen = false : null" class="group/link font-medium text-sm flex items-center gap-3 text-slate-600 hover:text-teal-600 transition-colors">
+                                                <i class="fa-regular fa-file-lines text-slate-400 group-hover/link:text-teal-600 transition-colors text-base"></i> Lý thuyết
+                                            </a>
+                                        </li>
+                                        <li class="relative pl-6">
+                                            <div class="absolute w-4 h-4 rounded-full border-[3px] bg-white border-teal-400 -left-[9.5px] top-0.5 shadow-sm"></div>
+                                            <a href="about:blank" target="lesson-frame" @click="window.innerWidth < 1024 ? sidebarOpen = false : null" class="group/link font-medium text-sm flex items-center gap-3 text-slate-600 hover:text-teal-600 transition-colors">
+                                                <i class="fa-solid fa-pen-to-square text-slate-400 group-hover/link:text-teal-600 transition-colors text-base"></i> Đề bài
+                                            </a>
+                                        </li>
+                                        <li class="relative pl-6">
+                                            <div class="absolute w-4 h-4 rounded-full border-[3px] bg-white border-teal-400 -left-[9.5px] top-0.5 shadow-sm"></div>
+                                            <a href="xem-tai-lieu.html?folder=11-Chuong4-Bai1-Loigiai&title=Bài 1. Điểm-Đường-Mặt Phẳng" target="lesson-frame" @click="window.innerWidth < 1024 ? sidebarOpen = false : null" class="group/link font-medium text-sm flex items-center gap-3 text-slate-600 hover:text-teal-600 transition-colors">
+                                                <i class="fa-solid fa-folder text-slate-400 group-hover/link:text-teal-600 transition-colors text-base"></i> Lời giải
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <!-- Bài 2 -->
+                                <div x-data="{ openLesson: false }" class="bg-gradient-to-br from-white to-slate-50 border border-slate-200 rounded-2xl p-4 hover:border-teal-300 hover:shadow-md transition-all shadow-sm group/lesson">
+                                    <div @click="openLesson = !openLesson" class="flex justify-between items-center cursor-pointer">
+                                        <h5 class="font-semibold text-slate-800 text-sm group-hover/lesson:text-teal-700 transition-colors pr-2 leading-relaxed">Bài 2. Hai đường thẳng song song</h5>
+                                        <i class="fa-solid fa-chevron-down text-slate-400 text-sm transition-transform duration-300 group-hover/lesson:text-teal-500" :class="openLesson ? 'rotate-180 text-teal-500' : ''"></i>
+                                    </div>
+                                    <ul x-show="openLesson" x-transition class="relative border-l-[3px] border-slate-200 ml-2 mt-4 space-y-5 pb-1">
+                                        <li class="relative pl-6">
+                                            <div class="absolute w-4 h-4 rounded-full border-[3px] bg-white border-teal-400 -left-[9.5px] top-0.5 shadow-sm"></div>
+                                            <a href="about:blank" target="lesson-frame" @click="window.innerWidth < 1024 ? sidebarOpen = false : null" class="group/link font-medium text-sm flex items-center gap-3 text-slate-600 hover:text-teal-600 transition-colors">
+                                                <i class="fa-regular fa-file-lines text-slate-400 group-hover/link:text-teal-600 transition-colors text-base"></i> Lý thuyết
+                                            </a>
+                                        </li>
+                                        <li class="relative pl-6">
+                                            <div class="absolute w-4 h-4 rounded-full border-[3px] bg-white border-teal-400 -left-[9.5px] top-0.5 shadow-sm"></div>
+                                            <a href="about:blank" target="lesson-frame" @click="window.innerWidth < 1024 ? sidebarOpen = false : null" class="group/link font-medium text-sm flex items-center gap-3 text-slate-600 hover:text-teal-600 transition-colors">
+                                                <i class="fa-solid fa-pen-to-square text-slate-400 group-hover/link:text-teal-600 transition-colors text-base"></i> Đề bài
+                                            </a>
+                                        </li>
+                                        <li class="relative pl-6">
+                                            <div class="absolute w-4 h-4 rounded-full border-[3px] bg-white border-teal-400 -left-[9.5px] top-0.5 shadow-sm"></div>
+                                            <a href="xem-tai-lieu.html?folder=11-Chuong4-Bai2-Loigiai&title=Bài 2. Hai đường thẳng song song" target="lesson-frame" @click="window.innerWidth < 1024 ? sidebarOpen = false : null" class="group/link font-medium text-sm flex items-center gap-3 text-slate-600 hover:text-teal-600 transition-colors">
+                                                <i class="fa-solid fa-folder text-slate-400 group-hover/link:text-teal-600 transition-colors text-base"></i> Lời giải
+                                            </a>
+                                        </li>
+                                    </ul>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <!-- KẾT THÚC: KHU VỰC 3 CHƯƠNG HỌC -->
-                
-            </div>
+            </aside>
 
-            <!-- Cột phải: Cột Đăng ký (Chiếm 1/3) -->
-            <div class="md:col-span-1">
-                <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 sticky top-24">
-                    <div class="text-3xl font-bold text-primary mb-2">699,000đ</div>
-                    <div class="text-sm text-gray-500 line-through mb-6">900,000đ</div>
-                    
-                    <button class="w-full bg-primary hover:bg-teal-700 text-white py-4 rounded-xl font-bold text-lg mb-4 shadow-md transition-all flex items-center justify-center gap-2">
-                        Đăng ký học ngay <i class="fa-solid fa-arrow-right"></i>
-                    </button>
-                    
-                    <ul class="text-sm text-gray-600 space-y-3 mt-6">
-                        <li class="flex items-center gap-3">
-                            <i class="fa-solid fa-check text-green-500"></i> Sở hữu video bài giảng trọn đời
-                        </li>
-                        <li class="flex items-center gap-3">
-                            <i class="fa-solid fa-check text-green-500"></i> Bài tập trắc nghiệm & tự luận kèm lời giải
-                        </li>
-                        <li class="flex items-center gap-3">
-                            <i class="fa-solid fa-check text-green-500"></i> Hỗ trợ giải đáp thắc mắc 24/7
-                        </li>
-                    </ul>
+            <!-- MAIN CONTENT: IFRAME PHÁT BÀI GIẢNG -->
+            <!-- Vùng xám nhẹ bao quanh tài liệu để tạo hiệu ứng 3D như một ứng dụng thực sự -->
+            <main class="flex-1 bg-slate-200 lg:p-4 overflow-hidden relative">
+                <div class="w-full h-full lg:rounded-2xl overflow-hidden shadow-sm bg-white relative">
+                    <!-- Trang mặc định khi vừa vào -->
+                    <iframe name="lesson-frame" id="lesson-frame" 
+                            src="about:blank" 
+                            class="w-full h-full border-0 absolute inset-0"
+                            allowfullscreen>
+                    </iframe>
                 </div>
-            </div>
-            
-        </div>
-    </main>
+            </main>
 
-    <!-- Script Kích hoạt KaTeX cho Logo -->
+        </div>
+    </div>
+
+    <!-- Script Kích hoạt KaTeX -->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            renderMathInElement(document.body, {
-                delimiters: [
-                    {left: '$$', right: '$$', display: true},
-                    {left: '$', right: '$', display: false}
-                ],
-                throwOnError : false
-            });
+            renderMathInElement(document.body, { delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}], throwOnError: false });
         });
     </script>
-   <!-- Nhúng thư viện Firebase Auth -->
+
+    <!-- FIREBASE AUTH BẢO MẬT -->
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-    
-    <!-- BỔ SUNG: Nhúng thư viện Firestore để đọc Database phân quyền -->
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
-    <!-- Script kiểm tra quyền truy cập (Phiên bản UI đẹp) -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyD-NDo43O3Q_9GVii6pDOM7D6SQ5pxmo5g",
@@ -184,42 +414,34 @@
             measurementId: "G-RHVBMMGQGZ"
         };
         
-        firebase.initializeApp(firebaseConfig);
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // ĐỔI TÊN KHÓA HỌC Ở ĐÂY TƯƠNG ỨNG VỚI TỪNG FILE (toan-10, toan-11, toan-12)
         const currentCourse = "toan-11"; 
+        const loadingScreen = document.getElementById('loading-screen');
+        const courseContent = document.getElementById('course-content');
+        const deniedModal = document.getElementById('access-denied-modal');
 
-        // Hàm hiển thị Modal lỗi
-        function showAccessDenied() {
-            const modal = document.getElementById('access-denied-modal');
-            modal.classList.remove('hidden'); // Hiện cửa sổ lên
-            document.body.style.overflow = 'hidden'; // Khóa cuộn trang web (không cho cuộn xuống xem trộm)
+        function handleAccessDenied() {
+            loadingScreen.remove(); 
+            deniedModal.classList.remove('hidden'); 
+            if(courseContent) courseContent.remove(); 
+        }
+
+        function handleAccessGranted() {
+            loadingScreen.remove(); 
+            courseContent.classList.remove('hidden'); 
         }
 
         firebase.auth().onAuthStateChanged((user) => {
             if (!user) {
-                window.location.replace("../login.html");
+                window.location.replace("/login.html");
             } else {
                 db.collection("phan_quyen").doc(user.email).get()
                 .then((doc) => {
-                    if (doc.exists) {
-                        const data = doc.data();
-                        
-                        if (data[currentCourse] === true) {
-                            console.log("Xác thực quyền hợp lệ!");
-                        } else {
-                            // Bị false -> Gọi giao diện Modal đẹp
-                            showAccessDenied();
-                        }
-                    } else {
-                        // Không có email trong bảng -> Gọi giao diện Modal đẹp
-                        showAccessDenied();
-                    }
-                }).catch((error) => {
-                    console.log("Lỗi:", error);
-                    showAccessDenied();
-                });
+                    if (doc.exists && doc.data()[currentCourse] === true) handleAccessGranted();
+                    else handleAccessDenied();
+                }).catch(() => handleAccessDenied());
             }
         });
     </script>
