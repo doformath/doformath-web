@@ -51,14 +51,14 @@
 <body class="font-sans text-gray-800 bg-gray-50 antialiased">
 
     <!-- HEADER / NAVBAR (Sticky) -->
-    <header class="bg-white shadow-sm sticky top-0 z-50" x-data="{ mobileMenuOpen: false }">
+    <header class="bg-white shadow-sm sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Giảm chiều cao header trên mobile từ h-20 xuống h-16 -->
             <div class="flex justify-between items-center h-16 md:h-20">
                 
                 <div class="flex items-center gap-2 md:gap-4">
                     <!-- Nút Hamburger: Thêm -mt-1 để đẩy nhẹ icon lên trên, cân bằng thị giác với chữ -->
-                    <button @click="mobileMenuOpen = true" class="md:hidden w-9 h-9 -mt-1 rounded-lg flex items-center justify-center text-gray-600 hover:bg-teal-50 hover:text-primary transition-colors shrink-0" aria-label="Mở menu điều hướng">
+                    <button id="btnOpenMenu" type="button" class="md:hidden w-9 h-9 -mt-1 rounded-lg flex items-center justify-center text-gray-600 hover:bg-teal-50 hover:text-primary transition-colors shrink-0" aria-label="Mở menu điều hướng">
                         <i class="fa-solid fa-bars text-lg"></i>
                     </button>
 
@@ -107,55 +107,7 @@
             </div>
         </div>
 
-        <!-- SIDEBAR MOBILE: lớp phủ nền tối -->
-        <div x-show="mobileMenuOpen" x-cloak
-             x-transition:enter="transition-opacity ease-out duration-300"
-             x-transition:enter-start="opacity-0"
-             x-transition:enter-end="opacity-100"
-             x-transition:leave="transition-opacity ease-in duration-200"
-             x-transition:leave-start="opacity-100"
-             x-transition:leave-end="opacity-0"
-             @click="mobileMenuOpen = false"
-             class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[60] md:hidden"
-             aria-hidden="true"></div>
-
-        <!-- SIDEBAR MOBILE: panel trượt từ bên trái -->
-        <aside x-show="mobileMenuOpen" x-cloak
-               x-transition:enter="transition ease-out duration-300 transform"
-               x-transition:enter-start="-translate-x-full"
-               x-transition:enter-end="translate-x-0"
-               x-transition:leave="transition ease-in duration-200 transform"
-               x-transition:leave-start="translate-x-0"
-               x-transition:leave-end="-translate-x-full"
-               @keydown.escape.window="mobileMenuOpen = false"
-               class="fixed top-0 left-0 h-full w-72 max-w-[80%] bg-white z-[70] shadow-2xl md:hidden flex flex-col"
-               role="dialog" aria-modal="true" aria-label="Menu điều hướng">
-            <div class="flex items-center justify-between p-5 border-b border-gray-100">
-                <span class="text-xl tracking-tight text-gray-900">
-                    $\textcolor{#0d9488}{\textsf{\textbf{Dofor}}{\sum}\textsf{\textbf{ath}}}$
-                </span>
-                <button @click="mobileMenuOpen = false" class="w-9 h-9 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition-colors" aria-label="Đóng menu">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
-            <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1">
-                <a href="index.html" @click="mobileMenuOpen = false" class="flex items-center gap-3 px-4 py-3 rounded-xl text-primary bg-teal-50 font-semibold">
-                    <i class="fa-solid fa-house w-5 text-center"></i> Trang chủ
-                </a>
-                <a href="courses.html" @click="mobileMenuOpen = false" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-primary font-medium transition-colors">
-                    <i class="fa-solid fa-graduation-cap w-5 text-center"></i> Khóa học của tôi
-                </a>
-                <a href="courses/tai-lieu-mien-phi.html" @click="mobileMenuOpen = false" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-primary font-medium transition-colors">
-                    <i class="fa-solid fa-book-open w-5 text-center"></i> Tài liệu miễn phí
-                </a>
-                <a href="phong-thi.html" @click="mobileMenuOpen = false" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-primary font-medium transition-colors">
-                    <i class="fa-solid fa-pen-to-square w-5 text-center"></i> Phòng thi
-                </a>
-            </nav>
-            <div class="p-5 border-t border-gray-100 text-xs text-gray-400 text-center">
-                &copy; 2026 DoforMath Education
-            </div>
-        </aside>
+        
     </header>
 
     <!-- HERO BANNER -->
@@ -497,7 +449,88 @@
             </div>
         </div>
     </section>
+    <!-- SIDEBAR MOBILE: lớp phủ nền tối -->
+        <div id="mobileOverlay" style="display:none;"
+             class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[60] md:hidden opacity-0 transition-opacity duration-300 ease-out"
+             aria-hidden="true"></div>
 
+        <!-- SIDEBAR MOBILE: panel trượt từ bên trái -->
+        <aside id="mobileSidebar" style="display:none;"
+               class="fixed top-0 left-0 h-full w-72 max-w-[80%] bg-white z-[70] shadow-2xl md:hidden flex-col -translate-x-full transition-transform duration-300 ease-out"
+               role="dialog" aria-modal="true" aria-label="Menu điều hướng">
+            <div class="flex items-center justify-between p-5 border-b border-gray-100">
+                <span class="text-xl tracking-tight text-gray-900">
+                    $\textcolor{#0d9488}{\textsf{\textbf{Dofor}}{\sum}\textsf{\textbf{ath}}}$
+                </span>
+                <button id="btnCloseMenu" type="button" class="w-9 h-9 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition-colors" aria-label="Đóng menu">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1">
+                <a href="index.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-primary bg-teal-50 font-semibold">
+                    <i class="fa-solid fa-house w-5 text-center"></i> Trang chủ
+                </a>
+                <a href="courses.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-primary font-medium transition-colors">
+                    <i class="fa-solid fa-graduation-cap w-5 text-center"></i> Khóa học của tôi
+                </a>
+                <a href="tai-lieu-mien-phi.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-primary font-medium transition-colors">
+                    <i class="fa-solid fa-book-open w-5 text-center"></i> Tài liệu miễn phí
+                </a>
+                <a href="phong-thi.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-primary font-medium transition-colors">
+                    <i class="fa-solid fa-pen-to-square w-5 text-center"></i> Phòng thi
+                </a>
+            </nav>
+            <div class="p-5 border-t border-gray-100 text-xs text-gray-400 text-center">
+                &copy; 2026 DoforMath Education
+            </div>
+        </aside>
+
+        <!-- Script điều khiển sidebar mobile: JS thuần, không phụ thuộc Alpine.js
+             để đảm bảo hoạt động ổn định, không bị lệ thuộc thời điểm tải thư viện ngoài -->
+        <script>
+            (function () {
+                var overlay = document.getElementById('mobileOverlay');
+                var sidebar = document.getElementById('mobileSidebar');
+                var btnOpen = document.getElementById('btnOpenMenu');
+                var btnClose = document.getElementById('btnCloseMenu');
+                if (!overlay || !sidebar || !btnOpen || !btnClose) return;
+
+                function openMenu() {
+                    overlay.style.display = 'block';
+                    sidebar.style.display = 'flex';
+                    // Ép trình duyệt render trạng thái ẩn trước, rồi mới chuyển sang trạng thái hiện
+                    // ở khung hình kế tiếp để CSS transition thực sự chạy (không bị "nhảy" tức thì)
+                    requestAnimationFrame(function () {
+                        requestAnimationFrame(function () {
+                            overlay.classList.remove('opacity-0');
+                            sidebar.classList.remove('-translate-x-full');
+                        });
+                    });
+                    document.body.style.overflow = 'hidden';
+                }
+
+                function closeMenu() {
+                    overlay.classList.add('opacity-0');
+                    sidebar.classList.add('-translate-x-full');
+                    document.body.style.overflow = '';
+                    setTimeout(function () {
+                        overlay.style.display = 'none';
+                        sidebar.style.display = 'none';
+                    }, 300);
+                }
+
+                btnOpen.addEventListener('click', openMenu);
+                btnClose.addEventListener('click', closeMenu);
+                overlay.addEventListener('click', closeMenu);
+                document.addEventListener('keydown', function (e) {
+                    if (e.key === 'Escape') closeMenu();
+                });
+                // Bấm vào link nào cũng đóng sidebar lại; trình duyệt vẫn điều hướng bình thường theo href
+                sidebar.querySelectorAll('a').forEach(function (link) {
+                    link.addEventListener('click', closeMenu);
+                });
+            })();
+        </script>
     <!-- FOOTER -->
     <footer class="bg-gray-900 text-gray-300 py-12 border-t border-gray-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
