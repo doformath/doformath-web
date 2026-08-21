@@ -17,7 +17,7 @@
     <!-- Font chữ Inter sắc nét -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- Tailwind CSS
+    <!-- Tailwind CSS-->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -33,9 +33,9 @@
                 }
             }
         }
-    </script> -->
+    </script> 
     <!-- CSS Giao diện siêu tốc -->
-    <link rel="stylesheet" href="/assets/css/style.css">
+    <!-- <link rel="stylesheet" href="/assets/css/style.css"> -->
 
     <!-- Font Awesome cho các Icon (tải kiểu media="print" để không chặn render, rồi tự chuyển sang "all") -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
@@ -56,50 +56,53 @@
             <!-- Giảm chiều cao header trên mobile từ h-20 xuống h-16 -->
             <div class="flex justify-between items-center h-16 md:h-20">
                 
-                <div class="flex items-center gap-1">
-                    <!-- Nút Hamburger: chỉ hiện trên mobile, mở sidebar điều hướng -->
-                    <button @click="mobileMenuOpen = true" class="md:hidden -ml-2 w-10 h-10 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 hover:text-primary transition-colors" aria-label="Mở menu điều hướng">
+                <div class="flex items-center gap-2 md:gap-4">
+                    <!-- Nút Hamburger: Thêm -mt-1 để đẩy nhẹ icon lên trên, cân bằng thị giác với chữ -->
+                    <button @click="mobileMenuOpen = true" class="md:hidden w-9 h-9 -mt-1 rounded-lg flex items-center justify-center text-gray-600 hover:bg-teal-50 hover:text-primary transition-colors shrink-0" aria-label="Mở menu điều hướng">
                         <i class="fa-solid fa-bars text-lg"></i>
                     </button>
 
-                    <!-- Logo Toán học -->
-                    <!-- Đổi <div> thành <a>, thêm href="index.html" và bỏ bớt class cursor-pointer (vì thẻ <a> đã tự có biểu tượng bàn tay) -->
+                    <!-- Logo Toán học: Xóa class pb-1 để trả logo về đúng trọng tâm -->
                     <a href="index.html" class="flex-shrink-0 flex items-center hover:opacity-80 transition-opacity">
-                        <span class="text-2xl md:text-3xl tracking-tight text-gray-900 pb-1">
+                        <span class="text-xl md:text-2xl tracking-tight text-gray-900">
                             $\textcolor{#0d9488}{\textsf{\textbf{Dofor}}{\sum}\textsf{\textbf{ath}}}$
                         </span>
                     </a>
                 </div>
                 
-                <!-- Menu ngang (Ẩn trên mobile) -->
-                <nav class="hidden md:flex space-x-8">
-                    <a href="#" class="text-primary font-semibold border-b-2 border-primary py-2">Trang chủ</a>
-                    <a href="courses.html" class="text-gray-500 hover:text-primary font-medium py-2 transition-colors">Khóa học của tôi</a>
-                    <a href="courses/tai-lieu-mien-phi.html" class="text-gray-500 hover:text-primary font-medium py-2 transition-colors">Tài liệu miễn phí</a>
-                    <a href="phong-thi.html" class="text-gray-500 hover:text-primary font-medium py-2 transition-colors">Phòng thi</a>
+                <!-- Menu ngang (Desktop) -->
+                <nav class="hidden md:flex items-center gap-1.5">
+                    <!-- Nút đang chọn (Active): Nền màu xanh ngọc nhạt, chữ đậm -->
+                    <a href="#" class="text-primary bg-teal-50 font-semibold px-4 py-2 rounded-full transition-all">Trang chủ</a>
+                    
+                    <!-- Các nút bình thường: Di chuột vào sẽ hiện nền xám nhạt bo tròn -->
+                    <a href="courses.html" class="text-gray-600 hover:text-primary hover:bg-gray-100 font-medium px-4 py-2 rounded-full transition-all">Khóa học của tôi</a>
+                    
+                    <a href="tai-lieu-mien-phi.html" class="text-gray-600 hover:text-primary hover:bg-gray-100 font-medium px-4 py-2 rounded-full transition-all">Tài liệu</a>
+                    
+                    <a href="phong-thi.html" class="text-gray-600 hover:text-primary hover:bg-gray-100 font-medium px-4 py-2 rounded-full transition-all">Phòng thi</a>
                 </nav>
 
                 <!-- Nút Hành động -->
-                <!-- 1. Khu vực hiển thị khi CHƯA đăng nhập -->
-                <div id="khu-vuc-dang-nhap">
-                    <!-- Thu nhỏ nút đăng nhập trên mobile -->
-                    <a href="login.html" class="bg-primary hover:bg-teal-800 text-white px-4 py-2 md:px-6 md:py-2.5 rounded-full text-sm md:text-base font-medium transition-all shadow-md hover:shadow-lg">
-                        Đăng nhập
-                    </a>
-                </div>
+                <!-- Bọc toàn bộ vào auth-container, đặt opacity = 0 để tàng hình ban đầu -->
+                <div id="auth-container" class="flex items-center transition-opacity duration-300 ease-in-out" style="opacity: 0;">
+                    
+                    <!-- 1. Khu vực hiển thị khi CHƯA đăng nhập (Ban đầu ẩn) -->
+                    <div id="khu-vuc-dang-nhap" style="display: none;">
+                        <a href="login.html" class="bg-primary hover:bg-teal-800 text-white px-4 py-2 md:px-6 md:py-2.5 rounded-full text-sm md:text-base font-medium transition-all shadow-md hover:shadow-lg">
+                            Đăng nhập
+                        </a>
+                    </div>
 
-                <!-- 2. Khu vực hiển thị khi ĐÃ đăng nhập -->
-                <!-- Giảm khoảng cách (gap) giữa tên và nút đăng xuất trên mobile -->
-                <div id="khu-vuc-user" style="display: none;" class="flex items-center gap-2 md:gap-4">
-                    
-                    <!-- Nơi chứa tên học sinh: Cắt chữ nếu dài quá 100px, thu nhỏ padding -->
-                    <span id="ten-user" class="text-xs md:text-sm font-semibold text-teal-700 bg-teal-50 px-2 py-1.5 md:px-3 md:py-1 rounded-full border border-teal-100 max-w-[100px] md:max-w-[200px] truncate inline-block text-center"></span>
-                    
-                    <!-- Nút đăng xuất: Dùng icon trên mobile, hiện chữ trên desktop -->
-                    <button onclick="dangXuat()" class="flex items-center justify-center gap-1.5 text-xs md:text-sm text-gray-500 hover:text-red-500 font-medium transition-colors bg-gray-100 hover:bg-red-50 md:bg-transparent p-2 md:p-0 rounded-full md:rounded-none w-8 h-8 md:w-auto md:h-auto">
-                        <i class="fa-solid fa-arrow-right-from-bracket"></i>
-                        <span class="hidden md:inline">Đăng xuất</span>
-                    </button>
+                    <!-- 2. Khu vực hiển thị khi ĐÃ đăng nhập (Ban đầu ẩn) -->
+                    <div id="khu-vuc-user" style="display: none;" class="flex items-center gap-2 md:gap-4">
+                        <span id="ten-user" class="text-xs md:text-sm font-semibold text-teal-700 bg-teal-50 px-2 py-1.5 md:px-3 md:py-1 rounded-full border border-teal-100 max-w-[100px] md:max-w-[200px] truncate inline-block text-center"></span>
+                        
+                        <button onclick="dangXuat()" class="flex items-center justify-center gap-1.5 text-xs md:text-sm text-gray-500 hover:text-red-500 font-medium transition-colors bg-gray-100 hover:bg-red-50 md:bg-transparent p-2 md:p-0 rounded-full md:rounded-none w-8 h-8 md:w-auto md:h-auto">
+                            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                            <span class="hidden md:inline">Đăng xuất</span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -169,7 +172,7 @@
                     </span>
                     Khai giảng các lớp Toán THPT 2026
                 </div>
-                <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 leading-tight mb-6">
+                <h1 class="text-4xl sm:text-3xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 leading-tight mb-6">
                     Làm chủ môn Toán với <br/> 
                     <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-teal-400">Tư duy Đột phá</span>
                 </h1>
@@ -352,44 +355,88 @@
     <!-- TRUY CẬP NHANH: TÀI LIỆU MIỄN PHÍ & PHÒNG THI -->
     <section class="py-16 bg-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center max-w-2xl mx-auto mb-10">
-                <h2 class="text-3xl font-bold text-gray-900 mb-2">Công cụ học tập miễn phí</h2>
-                <p class="text-gray-500">Không cần đăng ký khóa học, bạn vẫn có thể luyện tập ngay hôm nay</p>
+            <div class="text-center max-w-2xl mx-auto mb-12">
+                <h2 class="text-3xl font-extrabold text-gray-900 mb-3">Công cụ học tập miễn phí</h2>
+                <p class="text-gray-500 font-medium">Không cần đăng ký khóa học, bạn vẫn có thể luyện tập ngay hôm nay</p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
 
-                <!-- Card: Tài liệu miễn phí -->
-                <a href="courses/tai-lieu-mien-phi.html" class="group relative overflow-hidden bg-gradient-to-br from-teal-50 to-blue-50 border border-teal-100 rounded-3xl p-8 md:p-10 shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
-                    <div class="w-16 h-16 rounded-2xl bg-primary text-white flex items-center justify-center text-2xl shadow-lg shadow-teal-200 mb-6 group-hover:scale-110 transition-transform">
-                        <i class="fa-solid fa-book-open"></i>
+                <!-- Card: Tài liệu miễn phí (Theme: Teal/Emerald) -->
+                <a href="courses/tai-lieu-mien-phi.html" class="bg-white rounded-3xl overflow-hidden shadow-lg shadow-gray-200/50 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border border-gray-100 group flex flex-col cursor-pointer block ring-2 ring-transparent hover:ring-teal-100 relative">
+                    
+                    <!-- Phần Ảnh/Gradient phía trên -->
+                    <div class="relative h-48 overflow-hidden rounded-t-3xl">
+                        <div class="absolute inset-0 bg-gradient-to-br from-teal-500 to-emerald-500 group-hover:scale-110 transition-transform duration-700 flex items-center justify-center">
+                            <i class="fa-solid fa-book-open text-white/30 text-7xl"></i>
+                        </div>
+                        <span class="absolute top-4 left-4 bg-white/90 backdrop-blur-sm text-teal-600 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide shadow-sm">
+                            Miễn phí 100%
+                        </span>
                     </div>
-                    <h3 class="text-2xl font-bold text-gray-900 mb-3">Tài liệu miễn phí</h3>
-                    <p class="text-gray-500 mb-6 leading-relaxed">Kho tài liệu, đề thi và chuyên đề Toán THPT được biên soạn kỹ lưỡng, tải về hoàn toàn miễn phí.</p>
-                    <ul class="space-y-2 mb-8 text-sm text-gray-600">
-                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-primary"></i> Hàng trăm tài liệu chọn lọc</li>
-                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-primary"></i> Cập nhật thường xuyên</li>
-                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-primary"></i> Trình bày rõ ràng, dễ theo dõi</li>
-                    </ul>
-                    <div class="mt-auto flex items-center gap-2 text-primary font-semibold">
-                        Khám phá ngay <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                    
+                    <!-- Phần Nội dung phía dưới -->
+                    <div class="p-6 md:p-8 flex-1 flex flex-col">
+                        <!-- Thống kê nhanh (thay thế cho gạch đầu dòng cũ) -->
+                        <div class="flex items-center justify-between text-sm text-gray-500 mb-4">
+                            <span class="flex items-center gap-1.5"><i class="fa-solid fa-file-pdf text-teal-500"></i> Hàng trăm tài liệu</span>
+                            <span class="flex items-center gap-1.5"><i class="fa-solid fa-rotate text-teal-500"></i> Cập nhật liên tục</span>
+                        </div>
+                        
+                        <h3 class="text-2xl font-bold text-gray-900 mb-3 group-hover:text-teal-600 transition-colors">
+                            Kho Tài liệu Tự học
+                        </h3>
+                        <p class="text-gray-500 text-sm mb-6 line-clamp-2">Tổng hợp đề thi, chuyên đề và tài liệu Toán THPT được biên soạn kỹ lưỡng, trình bày rõ ràng, dễ hiểu.</p>
+                        
+                        <!-- Call to Action -->
+                        <div class="mt-auto pt-5 border-t border-gray-100 flex items-center justify-between">
+                            <div class="flex flex-col">
+                                <span class="text-xs font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-emerald-500 uppercase tracking-wide mb-1">Tải về máy ngay</span>
+                                <span class="text-lg font-extrabold text-teal-600">Khám phá ngay</span>
+                            </div>
+                            <div class="bg-teal-50 text-teal-600 group-hover:bg-teal-600 group-hover:text-white h-12 w-12 rounded-full flex items-center justify-center transition-colors shadow-sm">
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </div>
+                        </div>
                     </div>
                 </a>
 
-                <!-- Card: Phòng thi -->
-                <a href="phong-thi.html" class="group relative overflow-hidden bg-gradient-to-br from-purple-50 to-indigo-50 border border-purple-100 rounded-3xl p-8 md:p-10 shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
-                    <div class="w-16 h-16 rounded-2xl bg-indigo-600 text-white flex items-center justify-center text-2xl shadow-lg shadow-indigo-200 mb-6 group-hover:scale-110 transition-transform">
-                        <i class="fa-solid fa-pen-to-square"></i>
+                <!-- Card: Phòng thi (Theme: Indigo/Blue) -->
+                <a href="phong-thi.html" class="bg-white rounded-3xl overflow-hidden shadow-lg shadow-gray-200/50 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border border-gray-100 group flex flex-col cursor-pointer block ring-2 ring-transparent hover:ring-indigo-100 relative">
+                    
+                    <!-- Phần Ảnh/Gradient phía trên -->
+                    <div class="relative h-48 overflow-hidden rounded-t-3xl">
+                        <div class="absolute inset-0 bg-gradient-to-br from-indigo-500 to-blue-500 group-hover:scale-110 transition-transform duration-700 flex items-center justify-center">
+                            <i class="fa-solid fa-pen-to-square text-white/30 text-7xl"></i>
+                        </div>
+                        <span class="absolute top-4 left-4 bg-white/90 backdrop-blur-sm text-indigo-600 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide shadow-sm">
+                            Thi thử & Đánh giá
+                        </span>
                     </div>
-                    <h3 class="text-2xl font-bold text-gray-900 mb-3">Phòng thi</h3>
-                    <p class="text-gray-500 mb-6 leading-relaxed">Luyện đề thi thử trực tuyến bám sát cấu trúc đề thi mới nhất, chấm điểm và thống kê ngay lập tức.</p>
-                    <ul class="space-y-2 mb-8 text-sm text-gray-600">
-                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-indigo-600"></i> Đề thi thử đa dạng</li>
-                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-indigo-600"></i> Chấm điểm tự động, tức thì</li>
-                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-indigo-600"></i> Theo dõi tiến bộ qua từng lần thi</li>
-                    </ul>
-                    <div class="mt-auto flex items-center gap-2 text-indigo-600 font-semibold">
-                        Vào phòng thi <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                    
+                    <!-- Phần Nội dung phía dưới -->
+                    <div class="p-6 md:p-8 flex-1 flex flex-col">
+                        <!-- Thống kê nhanh (thay thế cho gạch đầu dòng cũ) -->
+                        <div class="flex items-center justify-between text-sm text-gray-500 mb-4">
+                            <span class="flex items-center gap-1.5"><i class="fa-solid fa-robot text-indigo-500"></i> Chấm điểm tự động</span>
+                            <span class="flex items-center gap-1.5"><i class="fa-solid fa-chart-line text-indigo-500"></i> Thống kê chi tiết</span>
+                        </div>
+                        
+                        <h3 class="text-2xl font-bold text-gray-900 mb-3 group-hover:text-indigo-600 transition-colors">
+                            Phòng thi Trực tuyến
+                        </h3>
+                        <p class="text-gray-500 text-sm mb-6 line-clamp-2">Luyện đề bám sát cấu trúc thi mới nhất, phân tích điểm yếu và đánh giá năng lực qua từng bài thi.</p>
+                        
+                        <!-- Call to Action -->
+                        <div class="mt-auto pt-5 border-t border-gray-100 flex items-center justify-between">
+                            <div class="flex flex-col">
+                                <span class="text-xs font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-blue-500 uppercase tracking-wide mb-1">Kiểm tra năng lực</span>
+                                <span class="text-lg font-extrabold text-indigo-600">Vào phòng thi</span>
+                            </div>
+                            <div class="bg-indigo-50 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white h-12 w-12 rounded-full flex items-center justify-center transition-colors shadow-sm">
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </div>
+                        </div>
                     </div>
                 </a>
 
@@ -543,20 +590,25 @@
             const khuVucDangNhap = document.getElementById('khu-vuc-dang-nhap');
             const khuVucUser = document.getElementById('khu-vuc-user');
             const tenUser = document.getElementById('ten-user');
+            const authContainer = document.getElementById('auth-container'); // <-- THÊM DÒNG NÀY LẤY HỘP CHỨA
 
             if (user) {
-                // TRƯỜNG HỢP A: CÓ USER (ĐÃ ĐĂNG NHẬP)
-                khuVucDangNhap.style.display = 'none';   
-                khuVucUser.style.display = 'flex';       
+                // 1. ĐÃ ĐĂNG NHẬP: Chuẩn bị nội dung
+                if (khuVucDangNhap) khuVucDangNhap.style.display = 'none';
+                if (khuVucUser) khuVucUser.style.display = 'flex';
                 
                 const tenHienThi = user.email.split('@')[0];
-                
-                // Dùng mã HTML để ẩn chữ "Xin chào," trên điện thoại (chỉ hiện trên màn hình sm trở lên)
-                tenUser.innerHTML = '<span class="hidden sm:inline">Xin chào, </span>' + tenHienThi;
+                if (tenUser) tenUser.innerText = tenHienThi;
+
             } else {
-                // TRƯỜNG HỢP B: KHÔNG CÓ USER (CHƯA ĐĂNG NHẬP)
-                khuVucDangNhap.style.display = 'block';  
-                khuVucUser.style.display = 'none';       
+                // 2. CHƯA ĐĂNG NHẬP: Chuẩn bị nội dung
+                if (khuVucDangNhap) khuVucDangNhap.style.display = 'block';
+                if (khuVucUser) khuVucUser.style.display = 'none';
+            }
+
+            // QUAN TRỌNG NHẤT: Bố trí xong xuôi mới kéo rèm (opacity = 1) cho hiện ra
+            if (authContainer) {
+                authContainer.style.opacity = '1';
             }
         });
 
