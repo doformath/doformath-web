@@ -29,22 +29,6 @@
 </head>
 <body class="bg-gray-50 text-gray-800 antialiased font-sans pb-16">
 
-    <!-- Header Navigation
-    <header class="bg-white shadow-sm sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-            <a href="javascript:history.back()" class="flex items-center text-gray-500 hover:text-primary font-medium gap-2 transition">
-                <i class="fa-solid fa-arrow-left"></i> Quay lại
-            </a>
-            <a href="/" class="hover:opacity-80 transition-opacity block" id="logo-math">
-                <span class="text-xl md:text-2xl tracking-tight text-slate-900 pb-1">
-                    $\textcolor{#0d9488}{\textsf{\textbf{Dofor}}{\sum}\textsf{\textbf{ath}}}$
-                </span>
-            </a>
-        </div>
-    </header> -->
-
-
-
     <!-- Banner Tiêu đề -->
     <div class="max-w-4xl mx-auto px-4 w-full mt-8 mb-8">
         <div class="bg-gradient-to-r from-teal-50 to-emerald-50 border border-teal-100 rounded-2xl p-6 md:p-10 shadow-sm flex flex-col items-center text-center">
@@ -76,24 +60,11 @@
                 </ul>
             </div>
 
-            <!-- TikZ - Đồ thị Đồng biến / Nghịch biến -->
+            <!-- SVG - Đồ thị Đồng biến / Nghịch biến -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                 <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 flex flex-col items-center justify-between">
-                    <div class="overflow-x-auto w-full flex justify-center">
-                        <script type="text/tikz">
-                            \begin{tikzpicture}[>=stealth, scale=0.7, line join=round, line cap=round]
-                                \draw[->, thick] (-1,0) -- (6,0) node[above] {$x$};
-                                \draw[->, thick] (0,-1) -- (0,4.5) node[right] {$y$};
-                                \fill (0,0) circle (1.5pt) node[above left] {$O$};
-                                \draw[thick, smooth, domain=1.5:4.5] plot (\x, {0.22*(\x-1.5)^2 + 1.5});
-                                \draw[dashed, thick] (1.5,0) node[below=2pt] {$a$} -- (1.5,1.5);
-                                \draw[dashed, thick] (4.5,0) node[below=2pt] {$b$} -- (4.5,3.5);
-                                \fill (1.5,0) circle (2pt);
-                                \fill (4.5,0) circle (2pt);
-                                \fill (1.5,1.5) circle (2pt);
-                                \fill (4.5,3.5) circle (2pt);
-                            \end{tikzpicture}
-                        </script>
+                    <div class="w-full flex justify-center">
+                        <img src="dong-bien.svg" alt="Đồ thị hàm đồng biến" class="w-full max-w-[280px] h-auto object-contain">
                     </div>
                     <div class="mt-4 text-sm font-semibold text-gray-800 text-center">
                         Hình 1. Hàm số đồng biến trên $(a;b)$
@@ -101,21 +72,8 @@
                 </div>
 
                 <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 flex flex-col items-center justify-between">
-                    <div class="overflow-x-auto w-full flex justify-center">
-                        <script type="text/tikz">
-                            \begin{tikzpicture}[>=stealth, scale=0.7, line join=round, line cap=round]
-                                \draw[->, thick] (-1,0) -- (6,0) node[above] {$x$};
-                                \draw[->, thick] (0,-1) -- (0,4.5) node[right] {$y$};
-                                \fill (0,0) circle (1.5pt) node[above left] {$O$};
-                                \draw[thick, smooth, domain=1.5:4.5] plot (\x, {0.22*(\x-4.5)^2 + 1.5});
-                                \draw[dashed, thick] (1.5,0) node[below=2pt] {$a$} -- (1.5,3.5);
-                                \draw[dashed, thick] (4.5,0) node[below=2pt] {$b$} -- (4.5,1.5);
-                                \fill (1.5,0) circle (2pt);
-                                \fill (4.5,0) circle (2pt);
-                                \fill (1.5,3.5) circle (2pt);
-                                \fill (4.5,1.5) circle (2pt);
-                            \end{tikzpicture}
-                        </script>
+                    <div class="w-full flex justify-center">
+                        <img src="nghich-bien.svg" alt="Đồ thị hàm nghịch biến" class="w-full max-w-[280px] h-auto object-contain">
                     </div>
                     <div class="mt-4 text-sm font-semibold text-gray-800 text-center">
                         Hình 2. Hàm số nghịch biến trên $(a;b)$
@@ -166,60 +124,18 @@
                 </ul>
             </div>
 
-            <!-- Bảng biến thiên thuần TikZ (Đã sửa ký hiệu CĐ, CT) -->
+            <!-- SVG - Bảng biến thiên -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 flex justify-center overflow-x-auto">
-                    <script type="text/tikz">
-                        \begin{tikzpicture}[scale=0.8]
-                            \draw (0,0) rectangle (8,3);
-                            \draw (0,2) -- (8,2);
-                            \draw (0,1) -- (8,1);
-                            \draw (1.5,0) -- (1.5,3);
-                            \node at (0.75, 2.5) {$x$};
-                            \node at (0.75, 1.5) {$f\prime(x)$};
-                            \node at (0.75, 0.5) {$f(x)$};
-                            \node at (2, 2.5) {$a$};
-                            \node at (4.75, 2.5) {$x_0$};
-                            \node at (7.5, 2.5) {$b$};
-                            \node at (3.375, 1.5) {$+$};
-                            \node at (4.75, 1.5) {$0$};
-                            \node at (6.125, 1.5) {$-$};
-                            \node at (2, 0.2) (A) {};
-                            \node at (4.75, 0.8) (B) {$f_{CD}$};
-                            \node at (7.5, 0.2) (C) {};
-                            \draw[->] (A) -- (B);
-                            \draw[->] (B) -- (C);
-                        \end{tikzpicture}
-                    </script>
+                <div class="bg-white border border-gray-200 rounded-lg p-4 flex justify-center">
+                    <img src="bbt-cucdai.svg" alt="Bảng biến thiên điểm cực đại" class="w-full max-w-[350px] h-auto object-contain">
                 </div>
                 
-                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 flex justify-center overflow-x-auto">
-                    <script type="text/tikz">
-                        \begin{tikzpicture}[scale=0.8]
-                            \draw (0,0) rectangle (8,3);
-                            \draw (0,2) -- (8,2);
-                            \draw (0,1) -- (8,1);
-                            \draw (1.5,0) -- (1.5,3);
-                            \node at (0.75, 2.5) {$x$};
-                            \node at (0.75, 1.5) {$f\prime(x)$};
-                            \node at (0.75, 0.5) {$f(x)$};
-                            \node at (2, 2.5) {$a$};
-                            \node at (4.75, 2.5) {$x_0$};
-                            \node at (7.5, 2.5) {$b$};
-                            \node at (3.375, 1.5) {$-$};
-                            \node at (4.75, 1.5) {$0$};
-                            \node at (6.125, 1.5) {$+$};
-                            \node at (2, 0.8) (A) {};
-                            \node at (4.75, 0.2) (B) {$f_{CT}$};
-                            \node at (7.5, 0.8) (C) {};
-                            \draw[->] (A) -- (B);
-                            \draw[->] (B) -- (C);
-                        \end{tikzpicture}
-                    </script>
+                <div class="bg-white border border-gray-200 rounded-lg p-4 flex justify-center">
+                    <img src="bbt-cuctieu.svg" alt="Bảng biến thiên điểm cực tiểu" class="w-full max-w-[350px] h-auto object-contain">
                 </div>
             </div>
 
-            <!-- Các dạng đồ thị cực trị (Đã sửa hàm số trong plot) -->
+            <!-- SVG - Đồ thị Cực trị -->
             <div class="space-y-6">
                 <div class="bg-gray-50 p-5 rounded-xl border border-gray-200 flex flex-col md:flex-row items-center gap-6">
                     <div class="flex-1 text-gray-800">
@@ -229,29 +145,8 @@
                             <li>$(x_{2};y_{2})$ là điểm cực tiểu của đồ thị hàm số.</li>
                         </ul>
                     </div>
-                    <div class="w-full md:w-1/2 flex justify-center overflow-x-auto">
-                        <script type="text/tikz">
-                            \begin{tikzpicture}[>=stealth, scale=0.8, line join=round, line cap=round]
-                                \draw[->] (-3,0) -- (4,0) node[above] {$x$};
-                                \draw[->] (0,-3) -- (0,3.5) node[right] {$y$};
-                                \fill (0,0) circle (1.2pt) node[above left] {$O$};
-                                
-                                \begin{scope}
-                                    \clip (-2.8,-3) rectangle (3.5,3.5);
-                                    \draw[thick, smooth, samples=50, domain=-2.5:3.2] plot (\x, {\x*\x*\x/3 - \x*\x/2 - 2*\x + 1});
-                                \end{scope}
-                                
-                                \draw[dashed, thin] (-1,0) -- (-1,2.16) -- (0,2.16);
-                                \fill (-1,0) circle (1.2pt) node[below] {$x_1$};
-                                \fill (0,2.16) circle (1.2pt) node[right] {$y_1$};
-                                \fill (-1,2.16) circle (1.2pt);
-                                
-                                \draw[dashed, thin] (2,0) -- (2,-2.33) -- (0,-2.33);
-                                \fill (2,0) circle (1.2pt) node[above] {$x_2$};
-                                \fill (0,-2.33) circle (1.2pt) node[left] {$y_2$};
-                                \fill (2,-2.33) circle (1.2pt);
-                            \end{tikzpicture}
-                        </script>
+                    <div class="w-full md:w-1/2 flex justify-center">
+                        <img src="do-thi-cuc-tri.svg" alt="Nhận diện cực trị trên đồ thị" class="w-full max-w-[300px] h-auto object-contain">
                     </div>
                 </div>
             </div>

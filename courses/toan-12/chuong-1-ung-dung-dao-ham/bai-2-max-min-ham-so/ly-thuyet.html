@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lý thuyết: Giá trị lớn nhất và Giá trị nhỏ nhất - DoforMath</title>
+    
+    <!-- Cấu hình Favicon -->
+    <link rel="icon" type="image/png" href="../../../../assets/images/Doformath.png">
+
+    <!-- Font chữ Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] }, colors: { primary: '#0d9488', secondary: '#facc15'} } }
+        }
+    </script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- KaTeX cho Toán học -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 antialiased font-sans pb-16">
+
+    <!-- Banner Tiêu đề -->
+    <div class="max-w-4xl mx-auto px-4 w-full mt-8 mb-8">
+        <div class="bg-gradient-to-r from-teal-50 to-emerald-50 border border-teal-100 rounded-2xl p-6 md:p-10 shadow-sm flex flex-col items-center text-center">
+            <span class="bg-teal-100 text-teal-700 border border-teal-200 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide mb-4 shadow-sm inline-flex items-center gap-1.5">
+                <i class="fa-solid fa-book-open"></i> Bài giảng Lý thuyết
+            </span>
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900 leading-snug">GTLN và GTNN của hàm số</h1>
+            <div class="w-20 h-1.5 bg-gradient-to-r from-teal-400 to-emerald-400 rounded-full mt-6"></div>
+        </div>
+    </div>
+
+    <!-- Nội dung Lý thuyết -->
+    <main class="max-w-4xl mx-auto px-4 w-full text-base md:text-lg leading-relaxed text-gray-700 space-y-10">
+        
+        <!-- ================= PHẦN 1 ================= -->
+        <section class="bg-white p-6 md:p-10 rounded-2xl shadow-sm border border-gray-100">
+            <h2 class="text-2xl font-bold text-teal-700 mb-6 flex items-center gap-2 border-b-2 border-teal-50 pb-3">
+                <span class="bg-teal-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-lg">1</span> 
+                Định nghĩa
+            </h2>
+            
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-5 rounded-r-lg mb-6 text-gray-800">
+                <p class="font-bold text-blue-700 mb-2">Định nghĩa:</p>
+                <p>Cho hàm số $y=f(x)$ xác định trên tập hợp $D$.</p>
+                <ul class="list-disc pl-6 mt-3 space-y-3 marker:text-blue-500">
+                    <li>Số $M$ được gọi là <strong>giá trị lớn nhất (GTLN)</strong> của hàm số $y=f(x)$ trên $D$, nếu $f(x) \le M$ với mọi $x \in D$ và tồn tại $x_0 \in D$ sao cho $f(x_0)=M$. Kí hiệu: $M = \max\limits_{D} f(x)$.</li>
+                    <li>Số $m$ được gọi là <strong>giá trị nhỏ nhất (GTNN)</strong> của hàm số $y=f(x)$ trên $D$, nếu $f(x) \ge m$ với mọi $x \in D$ và tồn tại $x_0 \in D$ sao cho $f(x_0)=m$. Kí hiệu: $m = \min\limits_{D} f(x)$.</li>
+                </ul>
+            </div>
+
+            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-5 rounded-r-lg text-gray-800 mb-8 space-y-3">
+                <p><strong><i class="fa-solid fa-triangle-exclamation text-yellow-600 mr-1"></i> Chú ý:</strong> Ta quy ước khi chỉ nói giá trị lớn nhất hay giá trị nhỏ nhất của hàm số $y=f(x)$ (mà không cho rõ tập hợp $D$) thì ta hiểu đó là giá trị lớn nhất hay nhỏ nhất của hàm số $y=f(x)$ trên tập xác định của nó.</p>
+                <p><strong><i class="fa-solid fa-lightbulb text-yellow-500 mr-1"></i> Nhận xét:</strong> Nếu biết đồ thị của hàm số trên tập hợp $D$, ta có thể xác định được giá trị lớn nhất và giá trị nhỏ nhất của hàm số trên $D$.</p>
+            </div>
+
+            <!-- SVG - Đồ thị minh họa GTLN và GTNN -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 flex flex-col items-center justify-between">
+                    <div class="w-full flex justify-center">
+                        <img src="do-thi-gtln.svg" alt="Đồ thị mô tả GTLN" class="w-full max-w-[280px] h-auto object-contain">
+                    </div>
+                    <div class="mt-4 text-sm font-semibold text-gray-800 text-center">
+                        Đồ thị minh họa giá trị lớn nhất $M$
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 flex flex-col items-center justify-between">
+                    <div class="w-full flex justify-center">
+                        <img src="do-thi-gtnn.svg" alt="Đồ thị mô tả GTNN" class="w-full max-w-[280px] h-auto object-contain">
+                    </div>
+                    <div class="mt-4 text-sm font-semibold text-gray-800 text-center">
+                        Đồ thị minh họa giá trị nhỏ nhất $m$
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= PHẦN 2 ================= -->
+        <section class="bg-white p-6 md:p-10 rounded-2xl shadow-sm border border-gray-100">
+            <h2 class="text-2xl font-bold text-teal-700 mb-6 flex items-center gap-2 border-b-2 border-teal-50 pb-3">
+                <span class="bg-teal-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-lg">2</span> 
+                Định lý và Quy tắc tìm GTLN, GTNN
+            </h2>
+            
+            <div class="mb-8">
+                <h3 class="font-bold text-gray-800 mb-3"><i class="fa-solid fa-pen-to-square text-teal-600 mr-2"></i>Định lý:</h3>
+                <p class="mb-6 bg-teal-50 p-4 rounded-lg border border-teal-100 font-medium text-gray-800">
+                    Mọi hàm số liên tục trên đoạn $[a;b]$ đều có giá trị lớn nhất và giá trị nhỏ nhất trên đoạn đó.
+                </p>
+
+                <!-- SVG - Đồ thị minh họa Định lý -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-white border border-gray-200 rounded-lg p-4 flex justify-center">
+                        <img src="dinh-ly-minh-hoa-1.svg" alt="Đồ thị hàm số liên tục 1" class="w-full max-w-[300px] h-auto object-contain">
+                    </div>
+                    <div class="bg-white border border-gray-200 rounded-lg p-4 flex justify-center">
+                        <img src="dinh-ly-minh-hoa-2.svg" alt="Đồ thị hàm số liên tục 2" class="w-full max-w-[300px] h-auto object-contain">
+                    </div>
+                </div>
+
+                <ul class="list-disc pl-6 space-y-2 text-gray-700 marker:text-teal-500 font-medium">
+                    <li>Nếu hàm số $f(x)$ đồng biến trên đoạn $[a;b]$ thì $\max\limits_{[a;b]} f(x) = f(b)$ và $\min\limits_{[a;b]} f(x) = f(a)$</li>
+                    <li>Nếu hàm số $f(x)$ nghịch biến trên đoạn $[a;b]$ thì $\max\limits_{[a;b]} f(x) = f(a)$ và $\min\limits_{[a;b]} f(x) = f(b)$</li>
+                </ul>
+            </div>
+
+            <!-- Quy tắc trên đoạn -->
+            <div class="mb-8">
+                <h3 class="font-bold text-teal-700 mb-3 uppercase tracking-wide text-sm bg-teal-50 inline-block px-3 py-1 rounded-md">Quy tắc tìm GTLN, GTNN trên một đoạn</h3>
+                <p class="mb-4 text-gray-700">Xét hàm số $y=f(x)$ liên tục trên đoạn $[a;b]$.</p>
+                
+                <div class="space-y-4">
+                    <div class="flex gap-4 items-start bg-gray-50 p-4 rounded-lg border border-gray-100">
+                        <div class="bg-teal-600 text-white font-bold rounded-full w-8 h-8 flex items-center justify-center shrink-0">1</div>
+                        <p class="pt-1">Tìm các điểm $x_1; x_2; ...; x_n$ trên khoảng $(a;b)$, tại đó $f'(x)$ bằng $0$ hoặc $f'(x)$ không xác định (gọi là các điểm tới hạn).</p>
+                    </div>
+                    <div class="flex gap-4 items-start bg-gray-50 p-4 rounded-lg border border-gray-100">
+                        <div class="bg-teal-600 text-white font-bold rounded-full w-8 h-8 flex items-center justify-center shrink-0">2</div>
+                        <p class="pt-1">Tính các giá trị $f(a); f(x_1); f(x_2); ...; f(x_n); f(b)$.</p>
+                    </div>
+                    <div class="flex gap-4 items-start bg-gray-50 p-4 rounded-lg border border-gray-100">
+                        <div class="bg-teal-600 text-white font-bold rounded-full w-8 h-8 flex items-center justify-center shrink-0">3</div>
+                        <p class="pt-1">So sánh các giá trị vừa tính. Tìm số lớn nhất $M$ và số nhỏ nhất $m$ thì: 
+                            <br><span class="inline-block mt-2 font-semibold">
+                                $\begin{cases} M = \max\limits_{[a;b]} f(x) \\ m = \min\limits_{[a;b]} f(x) \end{cases}$
+                            </span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quy tắc trên khoảng -->
+            <div>
+                <h3 class="font-bold text-teal-700 mb-3 uppercase tracking-wide text-sm bg-teal-50 inline-block px-3 py-1 rounded-md">Quy tắc tìm GTLN, GTNN trên một khoảng</h3>
+                <p class="mb-4 text-gray-700">Xét hàm số $y=f(x)$ liên tục trên khoảng $(a;b)$.</p>
+                
+                <div class="space-y-4">
+                    <div class="flex gap-4 items-start bg-gray-50 p-4 rounded-lg border border-gray-100">
+                        <div class="bg-teal-600 text-white font-bold rounded-full w-8 h-8 flex items-center justify-center shrink-0">1</div>
+                        <p class="pt-1">Tìm các điểm $x_1; x_2; ...; x_n$ trên khoảng $(a;b)$, tại đó $f'(x)$ bằng $0$ hoặc $f'(x)$ không xác định (gọi là các điểm tới hạn).</p>
+                    </div>
+                    <div class="flex gap-4 items-start bg-gray-50 p-4 rounded-lg border border-gray-100">
+                        <div class="bg-teal-600 text-white font-bold rounded-full w-8 h-8 flex items-center justify-center shrink-0">2</div>
+                        <p class="pt-1">Vẽ bảng biến thiên của hàm số trên $(a;b)$. Điền các điểm $x_1; x_2; ...; x_n$ trên khoảng $(a;b)$ vào bảng biến thiên, xét dấu đạo hàm và vẽ bảng biến thiên.</p>
+                    </div>
+                    <div class="flex gap-4 items-start bg-gray-50 p-4 rounded-lg border border-gray-100">
+                        <div class="bg-teal-600 text-white font-bold rounded-full w-8 h-8 flex items-center justify-center shrink-0">3</div>
+                        <p class="pt-1">Dựa vào bảng biến thiên để kết luận về giá trị lớn nhất và giá trị nhỏ nhất.</p>
+                    </div>
+                </div>
+            </div>
+            
+        </section>
+    </main>
+
+    <!-- Script Kích hoạt KaTeX -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false}
+                ],
+                throwOnError : false
+            });
+        });
+    </script>
+
+</body>
+</html>
