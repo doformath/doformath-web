@@ -27,7 +27,8 @@
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
 </head>
-<body class="bg-gray-50 text-gray-800 antialiased font-sans pb-16">
+<!-- TĂNG ĐỘ DÀY ĐỆM ĐÁY (pb-32 thay vì pb-16) ĐỂ KHÔNG BỊ TRÌNH DUYỆT ĐIỆN THOẠI CHE KHUẤT -->
+<body class="bg-gray-50 text-gray-800 antialiased font-sans pb-32">
 
    <!-- Banner Tiêu đề -->
     <div class="max-w-5xl mx-auto px-4 w-full mt-8 mb-8">
@@ -45,21 +46,19 @@
         
         <!-- ================= PHẦN 1 ================= -->
         <section class="bg-white p-6 md:p-10 rounded-xl shadow-sm border border-gray-100">
-            <h2 class="text-xl font-bold text-teal-700 mb-6 flex items-center gap-2 border-b-2 border-teal-50 pb-3">
-                <span class="bg-teal-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-lg">1</span> 
-                Khảo sát và lập bảng biến thiên của hàm số
+            <h2 class="text-lg md:text-xl font-bold text-teal-700 mb-6 flex items-start md:items-center gap-3 border-b-2 border-teal-50 pb-4">
+                <span class="bg-teal-600 text-white w-8 h-8 min-w-[32px] rounded-full flex items-center justify-center text-lg shrink-0 mt-0.5 md:mt-0">1</span> 
+                <span class="leading-relaxed">Khảo sát và lập bảng biến thiên của hàm số</span>
             </h2>
             
             <p class="mb-4 text-gray-800">Để khảo sát và vẽ đồ thị hàm số $y=f(x)$ thì ta thực hiện theo các bước sau đây:</p>
             
             <div class="space-y-4 mb-8">
-                <!-- Bước 1 -->
                 <div class="bg-gray-50 border border-gray-200 rounded-xl p-5 flex items-start gap-4">
                     <div class="bg-teal-600 text-white font-bold text-sm px-3 py-1 rounded-md shrink-0 mt-0.5">Bước 1</div>
                     <div class="text-gray-700"><strong>Tìm tập xác định</strong> $D$ của hàm số.</div>
                 </div>
                 
-                <!-- Bước 2 -->
                 <div class="bg-gray-50 border border-gray-200 rounded-xl p-5 flex items-start gap-4">
                     <div class="bg-teal-600 text-white font-bold text-sm px-3 py-1 rounded-md shrink-0 mt-0.5">Bước 2</div>
                     <div class="text-gray-700">
@@ -72,7 +71,6 @@
                     </div>
                 </div>
                 
-                <!-- Bước 3 -->
                 <div class="bg-gray-50 border border-gray-200 rounded-xl p-5 flex items-start gap-4">
                     <div class="bg-teal-600 text-white font-bold text-sm px-3 py-1 rounded-md shrink-0 mt-0.5">Bước 3</div>
                     <div class="text-gray-700">
@@ -93,117 +91,144 @@
 
         <!-- ================= PHẦN 2 ================= -->
         <section class="bg-white p-6 md:p-10 rounded-xl shadow-sm border border-gray-100">
-            <h2 class="text-xl font-bold text-teal-700 mb-6 flex items-center gap-2 border-b-2 border-teal-50 pb-3">
-                <span class="bg-teal-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-lg">2</span> 
-                Khảo sát hàm số bậc ba $y=ax^3+bx^2+cx+d \, (a \neq 0)$
+            <h2 class="text-lg md:text-xl font-bold text-teal-700 mb-6 flex items-start md:items-center gap-3 border-b-2 border-teal-50 pb-4">
+                <span class="bg-teal-600 text-white w-8 h-8 min-w-[32px] rounded-full flex items-center justify-center text-lg shrink-0 mt-0.5 md:mt-0">2</span> 
+                <span class="leading-relaxed">Khảo sát hàm số bậc ba $y=ax^3+bx^2+cx+d \, (a \neq 0)$</span>
             </h2>
 
-            <div class="overflow-x-auto mb-8">
-                <table class="w-full border-collapse border border-gray-200 text-center min-w-[700px]">
-                    <thead>
+            <div class="mb-8">
+                <table class="w-full border-collapse md:border border-gray-200 text-center block md:table rounded-xl md:rounded-none overflow-hidden">
+                    <thead class="hidden md:table-header-group">
                         <tr class="bg-teal-600 text-white font-bold">
-                            <!-- Đổi w-1/3 thành w-1/5 (20%) hoặc một mức cố định như w-[200px] -->
                             <th class="border border-gray-200 p-4 w-1/4">Trường hợp</th> 
-                            
-                            <!-- Xóa w-1/3 ở hai cột này để HTML tự động chia đều không gian còn lại -->
-                            <th class="border border-gray-200 p-4">$a > 0$</th>
-                            <th class="border border-gray-200 p-4">$a < 0$</th>
+                            <th class="border border-gray-200 p-4 w-[37.5%]">$a > 0$</th>
+                            <th class="border border-gray-200 p-4 w-[37.5%]">$a < 0$</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <!-- Nhóm Đồ thị -->
-                        <tr class="bg-teal-50 text-teal-800 font-bold uppercase text-base tracking-wider">
-                            <td colspan="3" class="border border-gray-200 p-3">Đồ thị hàm số</td>
+                    <tbody class="block md:table-row-group">
+                        <tr class="block md:table-row bg-teal-50 text-teal-800 font-bold uppercase text-base tracking-wider md:border-b-0 border-b-2 border-teal-200 mt-4 md:mt-0 rounded-xl md:rounded-none shadow-sm md:shadow-none mb-4 md:mb-0">
+                            <td colspan="3" class="block md:table-cell border md:border-gray-200 p-3 text-center">Đồ thị hàm số</td>
                         </tr>
-                        <tr>
-                            <td class="border border-gray-200 p-4 text-left align-middle text-gray-800 text-sm">
+                        
+                        <!-- CÁC KHỐI ẢNH ĐÃ XÓA CHIỀU CAO CỐ ĐỊNH, DÙNG w-full ĐỂ PHÓNG TO TỐI ĐA -->
+                        <tr class="block md:table-row bg-white border border-gray-200 md:border-none mb-6 md:mb-0 rounded-xl md:rounded-none shadow-sm md:shadow-none overflow-hidden">
+                            <td class="block md:table-cell border-b md:border border-gray-200 p-4 text-left align-middle text-gray-800 text-sm">
+                                <div class="md:hidden font-bold text-teal-700 mb-2 border-b border-gray-100 pb-2">Trường hợp</div>
                                 Phương trình $y'=0$ có $2$ nghiệm phân biệt<br>
                                 $\Delta_{y'} > 0 \Leftrightarrow b^2 - 3ac > 0$
                             </td>
-                            <td class="border border-gray-200 p-4">
-                                <div class="bg-gray-50 border border-gray-200 rounded-lg p-2 h-40 flex items-center justify-center">
-                                    <img src="do-thi-bac-3-a-duong-2-nghiem.svg" alt="Đồ thị hàm bậc 3, a>0, 2 nghiệm" class="max-h-full w-auto object-contain">
+                            <td class="block md:table-cell border-b md:border border-gray-200 p-4">
+                                <div class="md:hidden font-bold text-teal-700 mb-2 text-left">$a > 0$</div>
+                                <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 w-full flex items-center justify-center">
+                                    <img src="do-thi-bac-3-a-duong-2-nghiem.svg" alt="Đồ thị hàm bậc 3, a>0, 2 nghiệm" class="w-full max-w-[280px] md:max-w-full h-auto object-contain">
                                 </div>
                             </td>
-                            <td class="border border-gray-200 p-4">
-                                <div class="bg-gray-50 border border-gray-200 rounded-lg p-2 h-40 flex items-center justify-center">
-                                    <img src="do-thi-bac-3-a-am-2-nghiem.svg" alt="Đồ thị hàm bậc 3, a<0, 2 nghiệm" class="max-h-full w-auto object-contain">
+                            <td class="block md:table-cell border-b md:border border-gray-200 p-4">
+                                <div class="md:hidden font-bold text-teal-700 mb-2 text-left">$a < 0$</div>
+                                <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 w-full flex items-center justify-center">
+                                    <img src="do-thi-bac-3-a-am-2-nghiem.svg" alt="Đồ thị hàm bậc 3, a<0, 2 nghiệm" class="w-full max-w-[280px] md:max-w-full h-auto object-contain">
                                 </div>
                             </td>
                         </tr>
-                        <tr>
-                            <td class="border border-gray-200 p-4 text-left align-middle text-gray-800 text-sm">
+                        
+                        <tr class="block md:table-row bg-white border border-gray-200 md:border-none mb-6 md:mb-0 rounded-xl md:rounded-none shadow-sm md:shadow-none overflow-hidden">
+                            <td class="block md:table-cell border-b md:border border-gray-200 p-4 text-left align-middle text-gray-800 text-sm">
+                                <div class="md:hidden font-bold text-teal-700 mb-2 border-b border-gray-100 pb-2">Trường hợp</div>
                                 Phương trình $y'=0$ có nghiệm kép<br>
                                 $\Delta_{y'} = 0 \Leftrightarrow b^2 - 3ac = 0$
                             </td>
-                            <td class="border border-gray-200 p-4">
-                                <div class="bg-gray-50 border border-gray-200 rounded-lg p-2 h-40 flex items-center justify-center">
-                                    <img src="do-thi-bac-3-a-duong-nghiem-kep.svg" alt="Đồ thị hàm bậc 3, a>0, nghiệm kép" class="max-h-full w-auto object-contain">
+                            <td class="block md:table-cell border-b md:border border-gray-200 p-4">
+                                <div class="md:hidden font-bold text-teal-700 mb-2 text-left">$a > 0$</div>
+                                <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 w-full flex items-center justify-center">
+                                    <img src="do-thi-bac-3-a-duong-nghiem-kep.svg" alt="Đồ thị hàm bậc 3, a>0, nghiệm kép" class="w-full max-w-[280px] md:max-w-full h-auto object-contain">
                                 </div>
                             </td>
-                            <td class="border border-gray-200 p-4">
-                                <div class="bg-gray-50 border border-gray-200 rounded-lg p-2 h-40 flex items-center justify-center">
-                                    <img src="do-thi-bac-3-a-am-nghiem-kep.svg" alt="Đồ thị hàm bậc 3, a<0, nghiệm kép" class="max-h-full w-auto object-contain">
+                            <td class="block md:table-cell border-b md:border border-gray-200 p-4">
+                                <div class="md:hidden font-bold text-teal-700 mb-2 text-left">$a < 0$</div>
+                                <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 w-full flex items-center justify-center">
+                                    <img src="do-thi-bac-3-a-am-nghiem-kep.svg" alt="Đồ thị hàm bậc 3, a<0, nghiệm kép" class="w-full max-w-[280px] md:max-w-full h-auto object-contain">
                                 </div>
                             </td>
                         </tr>
-                        <tr>
-                            <td class="border border-gray-200 p-4 text-left align-middle text-gray-800 text-sm">
+                        
+                        <tr class="block md:table-row bg-white border border-gray-200 md:border-none mb-6 md:mb-0 rounded-xl md:rounded-none shadow-sm md:shadow-none overflow-hidden">
+                            <td class="block md:table-cell border-b md:border border-gray-200 p-4 text-left align-middle text-gray-800 text-sm">
+                                <div class="md:hidden font-bold text-teal-700 mb-2 border-b border-gray-100 pb-2">Trường hợp</div>
                                 Phương trình $y'=0$ vô nghiệm<br>
                                 $\Delta_{y'} < 0 \Leftrightarrow b^2 - 3ac < 0$
                             </td>
-                            <td class="border border-gray-200 p-4">
-                                <div class="bg-gray-50 border border-gray-200 rounded-lg p-2 h-40 flex items-center justify-center">
-                                    <img src="do-thi-bac-3-a-duong-vo-nghiem.svg" alt="Đồ thị hàm bậc 3, a>0, vô nghiệm" class="max-h-full w-auto object-contain">
+                            <td class="block md:table-cell border-b md:border border-gray-200 p-4">
+                                <div class="md:hidden font-bold text-teal-700 mb-2 text-left">$a > 0$</div>
+                                <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 w-full flex items-center justify-center">
+                                    <img src="do-thi-bac-3-a-duong-vo-nghiem.svg" alt="Đồ thị hàm bậc 3, a>0, vô nghiệm" class="w-full max-w-[280px] md:max-w-full h-auto object-contain">
                                 </div>
                             </td>
-                            <td class="border border-gray-200 p-4">
-                                <div class="bg-gray-50 border border-gray-200 rounded-lg p-2 h-40 flex items-center justify-center">
-                                    <img src="do-thi-bac-3-a-am-vo-nghiem.svg" alt="Đồ thị hàm bậc 3, a<0, vô nghiệm" class="max-h-full w-auto object-contain">
+                            <td class="block md:table-cell border-b md:border border-gray-200 p-4">
+                                <div class="md:hidden font-bold text-teal-700 mb-2 text-left">$a < 0$</div>
+                                <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 w-full flex items-center justify-center">
+                                    <img src="do-thi-bac-3-a-am-vo-nghiem.svg" alt="Đồ thị hàm bậc 3, a<0, vô nghiệm" class="w-full max-w-[280px] md:max-w-full h-auto object-contain">
                                 </div>
                             </td>
                         </tr>
                         
                         <!-- Nhóm Bảng biến thiên -->
-                        <tr class="bg-teal-50 text-teal-800 font-bold uppercase text-base tracking-wider">
-                            <td colspan="3" class="border border-gray-200 p-3">Bảng biến thiên</td>
+                        <tr class="block md:table-row bg-teal-50 text-teal-800 font-bold uppercase text-base tracking-wider md:border-b-0 border-b-2 border-teal-200 mt-6 md:mt-0 rounded-xl md:rounded-none shadow-sm md:shadow-none mb-4 md:mb-0">
+                            <td colspan="3" class="block md:table-cell border md:border-gray-200 p-3 text-center">Bảng biến thiên</td>
                         </tr>
-                        <tr>
-                            <td class="border border-gray-200 p-4 text-left align-middle text-gray-800">$y'=0$ có $2$ nghiệm phân biệt</td>
-                            <td class="border border-gray-200 p-4">
-                                <div class="bg-gray-50 border border-gray-200 rounded-lg p-2 h-32 flex items-center justify-center">
-                                    <img src="bbt-bac-3-a-duong-2-nghiem.svg" alt="BBT hàm bậc 3, a>0, 2 nghiệm" class="max-h-full w-auto object-contain">
+                        
+                        <tr class="block md:table-row bg-white border border-gray-200 md:border-none mb-6 md:mb-0 rounded-xl md:rounded-none shadow-sm md:shadow-none overflow-hidden">
+                            <td class="block md:table-cell border-b md:border border-gray-200 p-4 text-left align-middle text-gray-800">
+                                <div class="md:hidden font-bold text-teal-700 mb-2 border-b border-gray-100 pb-2">Trường hợp</div>
+                                $y'=0$ có $2$ nghiệm phân biệt
+                            </td>
+                            <td class="block md:table-cell border-b md:border border-gray-200 p-4">
+                                <div class="md:hidden font-bold text-teal-700 mb-2 text-left">$a > 0$</div>
+                                <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 w-full flex items-center justify-center">
+                                    <img src="bbt-bac-3-a-duong-2-nghiem.svg" alt="BBT hàm bậc 3, a>0, 2 nghiệm" class="w-full max-w-[320px] md:max-w-full h-auto object-contain">
                                 </div>
                             </td>
-                            <td class="border border-gray-200 p-4">
-                                <div class="bg-gray-50 border border-gray-200 rounded-lg p-2 h-32 flex items-center justify-center">
-                                    <img src="bbt-bac-3-a-am-2-nghiem.svg" alt="BBT hàm bậc 3, a<0, 2 nghiệm" class="max-h-full w-auto object-contain">
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="border border-gray-200 p-4 text-left align-middle text-gray-800m">$y'=0$ có nghiệm kép</td>
-                            <td class="border border-gray-200 p-4">
-                                <div class="bg-gray-50 border border-gray-200 rounded-lg p-2 h-24 flex items-center justify-center">
-                                    <img src="bbt-bac-3-a-duong-nghiem-kep.svg" alt="BBT hàm bậc 3, a>0, nghiệm kép" class="max-h-full w-auto object-contain">
-                                </div>
-                            </td>
-                            <td class="border border-gray-200 p-4">
-                                <div class="bg-gray-50 border border-gray-200 rounded-lg p-2 h-24 flex items-center justify-center">
-                                    <img src="bbt-bac-3-a-am-nghiem-kep.svg" alt="BBT hàm bậc 3, a<0, nghiệm kép" class="max-h-full w-auto object-contain">
+                            <td class="block md:table-cell border-b md:border border-gray-200 p-4">
+                                <div class="md:hidden font-bold text-teal-700 mb-2 text-left">$a < 0$</div>
+                                <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 w-full flex items-center justify-center">
+                                    <img src="bbt-bac-3-a-am-2-nghiem.svg" alt="BBT hàm bậc 3, a<0, 2 nghiệm" class="w-full max-w-[320px] md:max-w-full h-auto object-contain">
                                 </div>
                             </td>
                         </tr>
-                        <tr>
-                            <td class="border border-gray-200 p-4 text-left align-middle text-gray-800">$y'=0$ vô nghiệm</td>
-                            <td class="border border-gray-200 p-4">
-                                <div class="bg-gray-50 border border-gray-200 rounded-lg p-2 h-24 flex items-center justify-center">
-                                    <img src="bbt-bac-3-a-duong-vo-nghiem.svg" alt="BBT hàm bậc 3, a>0, vô nghiệm" class="max-h-full w-auto object-contain">
+                        
+                        <tr class="block md:table-row bg-white border border-gray-200 md:border-none mb-6 md:mb-0 rounded-xl md:rounded-none shadow-sm md:shadow-none overflow-hidden">
+                            <td class="block md:table-cell border-b md:border border-gray-200 p-4 text-left align-middle text-gray-800">
+                                <div class="md:hidden font-bold text-teal-700 mb-2 border-b border-gray-100 pb-2">Trường hợp</div>
+                                $y'=0$ có nghiệm kép
+                            </td>
+                            <td class="block md:table-cell border-b md:border border-gray-200 p-4">
+                                <div class="md:hidden font-bold text-teal-700 mb-2 text-left">$a > 0$</div>
+                                <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 w-full flex items-center justify-center">
+                                    <img src="bbt-bac-3-a-duong-nghiem-kep.svg" alt="BBT hàm bậc 3, a>0, nghiệm kép" class="w-full max-w-[320px] md:max-w-full h-auto object-contain">
                                 </div>
                             </td>
-                            <td class="border border-gray-200 p-4">
-                                <div class="bg-gray-50 border border-gray-200 rounded-lg p-2 h-24 flex items-center justify-center">
-                                    <img src="bbt-bac-3-a-am-vo-nghiem.svg" alt="BBT hàm bậc 3, a<0, vô nghiệm" class="max-h-full w-auto object-contain">
+                            <td class="block md:table-cell border-b md:border border-gray-200 p-4">
+                                <div class="md:hidden font-bold text-teal-700 mb-2 text-left">$a < 0$</div>
+                                <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 w-full flex items-center justify-center">
+                                    <img src="bbt-bac-3-a-am-nghiem-kep.svg" alt="BBT hàm bậc 3, a<0, nghiệm kép" class="w-full max-w-[320px] md:max-w-full h-auto object-contain">
+                                </div>
+                            </td>
+                        </tr>
+                        
+                        <tr class="block md:table-row bg-white border border-gray-200 md:border-none mb-6 md:mb-0 rounded-xl md:rounded-none shadow-sm md:shadow-none overflow-hidden">
+                            <td class="block md:table-cell border-b md:border border-gray-200 p-4 text-left align-middle text-gray-800">
+                                <div class="md:hidden font-bold text-teal-700 mb-2 border-b border-gray-100 pb-2">Trường hợp</div>
+                                $y'=0$ vô nghiệm
+                            </td>
+                            <td class="block md:table-cell border-b md:border border-gray-200 p-4">
+                                <div class="md:hidden font-bold text-teal-700 mb-2 text-left">$a > 0$</div>
+                                <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 w-full flex items-center justify-center">
+                                    <img src="bbt-bac-3-a-duong-vo-nghiem.svg" alt="BBT hàm bậc 3, a>0, vô nghiệm" class="w-full max-w-[320px] md:max-w-full h-auto object-contain">
+                                </div>
+                            </td>
+                            <td class="block md:table-cell border-b md:border border-gray-200 p-4">
+                                <div class="md:hidden font-bold text-teal-700 mb-2 text-left">$a < 0$</div>
+                                <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 w-full flex items-center justify-center">
+                                    <img src="bbt-bac-3-a-am-vo-nghiem.svg" alt="BBT hàm bậc 3, a<0, vô nghiệm" class="w-full max-w-[320px] md:max-w-full h-auto object-contain">
                                 </div>
                             </td>
                         </tr>
@@ -221,44 +246,52 @@
 
         <!-- ================= PHẦN 3 ================= -->
         <section class="bg-white p-6 md:p-10 rounded-xl shadow-sm border border-gray-100">
-            <h2 class="text-xl font-bold text-teal-700 mb-6 flex items-center gap-2 border-b-2 border-teal-50 pb-3">
-                <span class="bg-teal-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-lg">3</span> 
-                Khảo sát hàm phân thức hữu tỉ $y=\dfrac{ax+b}{cx+d} \, (c \neq 0; ad-bc \neq 0)$
+            <h2 class="text-lg md:text-xl font-bold text-teal-700 mb-6 flex items-start md:items-center gap-3 border-b-2 border-teal-50 pb-4">
+                <span class="bg-teal-600 text-white w-8 h-8 min-w-[32px] rounded-full flex items-center justify-center text-lg shrink-0 mt-0.5 md:mt-0">3</span> 
+                <span class="leading-relaxed">Khảo sát hàm phân thức hữu tỉ $y=\dfrac{ax+b}{cx+d} \, (c \neq 0; ad-bc \neq 0)$</span>
             </h2>
 
-            <div class="overflow-x-auto mb-8">
-                <table class="w-full border-collapse border border-gray-200 text-center min-w-[700px]">
-                    <thead>
+            <div class="mb-8">
+                <table class="w-full border-collapse md:border border-gray-200 text-center block md:table rounded-xl md:rounded-none overflow-hidden">
+                    <thead class="hidden md:table-header-group">
                         <tr class="bg-teal-600 text-white font-bold">
                             <th class="border border-gray-200 p-4 w-1/4">Đặc điểm</th>
-                            <th class="border border-gray-200 p-4">$ad-bc > 0$</th>
-                            <th class="border border-gray-200 p-4">$ad-bc < 0$</th>
+                            <th class="border border-gray-200 p-4 w-[37.5%]">$ad-bc > 0$</th>
+                            <th class="border border-gray-200 p-4 w-[37.5%]">$ad-bc < 0$</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td class="border border-gray-200 p-4 font-bold text-teal-800 bg-teal-50">Đồ thị hàm số</td>
-                            <td class="border border-gray-200 p-4">
-                                <div class="bg-gray-50 border border-gray-200 rounded-lg p-2 h-48 flex items-center justify-center">
-                                    <img src="do-thi-phan-thuc-bac-1-y-phay-duong.svg" alt="Đồ thị hàm phân thức, y' > 0" class="max-h-full w-auto object-contain">
+                    <tbody class="block md:table-row-group">
+                        <tr class="block md:table-row bg-white border border-gray-200 md:border-none mb-6 md:mb-0 rounded-xl md:rounded-none shadow-sm md:shadow-none overflow-hidden">
+                            <td class="block md:table-cell border-b md:border border-gray-200 p-4 font-bold text-teal-800 bg-teal-50 text-center align-middle">
+                                Đồ thị hàm số
+                            </td>
+                            <td class="block md:table-cell border-b md:border border-gray-200 p-4">
+                                <div class="md:hidden font-bold text-teal-700 mb-2 text-left">$ad-bc > 0$</div>
+                                <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 w-full flex items-center justify-center">
+                                    <img src="do-thi-phan-thuc-bac-1-y-phay-duong.svg" alt="Đồ thị hàm phân thức, y' > 0" class="w-full max-w-[280px] md:max-w-full h-auto object-contain">
                                 </div>
                             </td>
-                            <td class="border border-gray-200 p-4">
-                                <div class="bg-gray-50 border border-gray-200 rounded-lg p-2 h-48 flex items-center justify-center">
-                                    <img src="do-thi-phan-thuc-bac-1-y-phay-am.svg" alt="Đồ thị hàm phân thức, y' < 0" class="max-h-full w-auto object-contain">
+                            <td class="block md:table-cell border-b md:border border-gray-200 p-4">
+                                <div class="md:hidden font-bold text-teal-700 mb-2 text-left">$ad-bc < 0$</div>
+                                <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 w-full flex items-center justify-center">
+                                    <img src="do-thi-phan-thuc-bac-1-y-phay-am.svg" alt="Đồ thị hàm phân thức, y' < 0" class="w-full max-w-[280px] md:max-w-full h-auto object-contain">
                                 </div>
                             </td>
                         </tr>
-                        <tr>
-                            <td class="border border-gray-200 p-4 font-bold text-teal-800 bg-teal-50">Bảng biến thiên</td>
-                            <td class="border border-gray-200 p-4">
-                                <div class="bg-gray-50 border border-gray-200 rounded-lg p-2 h-32 flex items-center justify-center">
-                                    <img src="bbt-phan-thuc-bac-1-y-phay-duong.svg" alt="BBT hàm phân thức, y' > 0" class="max-h-full w-auto object-contain">
+                        <tr class="block md:table-row bg-white border border-gray-200 md:border-none mb-6 md:mb-0 rounded-xl md:rounded-none shadow-sm md:shadow-none overflow-hidden">
+                            <td class="block md:table-cell border-b md:border border-gray-200 p-4 font-bold text-teal-800 bg-teal-50 text-center align-middle">
+                                Bảng biến thiên
+                            </td>
+                            <td class="block md:table-cell border-b md:border border-gray-200 p-4">
+                                <div class="md:hidden font-bold text-teal-700 mb-2 text-left">$ad-bc > 0$</div>
+                                <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 w-full flex items-center justify-center">
+                                    <img src="bbt-phan-thuc-bac-1-y-phay-duong.svg" alt="BBT hàm phân thức, y' > 0" class="w-full max-w-[320px] md:max-w-full h-auto object-contain">
                                 </div>
                             </td>
-                            <td class="border border-gray-200 p-4">
-                                <div class="bg-gray-50 border border-gray-200 rounded-lg p-2 h-32 flex items-center justify-center">
-                                    <img src="bbt-phan-thuc-bac-1-y-phay-am.svg" alt="BBT hàm phân thức, y' < 0" class="max-h-full w-auto object-contain">
+                            <td class="block md:table-cell border-b md:border border-gray-200 p-4">
+                                <div class="md:hidden font-bold text-teal-700 mb-2 text-left">$ad-bc < 0$</div>
+                                <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 w-full flex items-center justify-center">
+                                    <img src="bbt-phan-thuc-bac-1-y-phay-am.svg" alt="BBT hàm phân thức, y' < 0" class="w-full max-w-[320px] md:max-w-full h-auto object-contain">
                                 </div>
                             </td>
                         </tr>
@@ -279,12 +312,11 @@
 
         <!-- ================= PHẦN 4 ================= -->
         <section class="bg-white p-6 md:p-10 rounded-xl shadow-sm border border-gray-100">
-            <h2 class="text-l font-bold text-teal-700 mb-6 flex items-center gap-2 border-b-2 border-teal-50 pb-3">
-                <span class="bg-teal-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-lg">4</span> 
-                Khảo sát hàm phân thức bậc hai trên bậc nhất $y=\frac{ax^2+bx+c}{mx+n} \, (a \neq 0; m \neq 0)$
+            <h2 class="text-lg md:text-xl font-bold text-teal-700 mb-6 flex items-start md:items-center gap-3 border-b-2 border-teal-50 pb-4">
+                <span class="bg-teal-600 text-white w-8 h-8 min-w-[32px] rounded-full flex items-center justify-center text-lg shrink-0 mt-0.5 md:mt-0">4</span> 
+                <span class="leading-relaxed">Khảo sát hàm phân thức bậc hai trên bậc nhất $y=\frac{ax^2+bx+c}{mx+n} \, (a \neq 0; m \neq 0)$</span>
             </h2>
             
-            <!-- Lý thuyết mở đầu -->
             <div class="bg-blue-50 border-l-4 border-blue-500 p-5 rounded-r-lg mb-8 text-gray-800 space-y-2">
                 <p><strong>Tập xác định:</strong> $D=\mathbb{R} \setminus \left\{-\dfrac{n}{m}\right\}$.</p>
                 <p><strong>Đạo hàm:</strong> $y'=\dfrac{am \cdot x^2+2an \cdot x+bn-mc}{(mx+n)^2}$.</p>
@@ -292,81 +324,98 @@
                 <p>Dấu của $y'$ là dấu của $g(x)=am \cdot x^2+2an \cdot x+bn-mc$.</p>
             </div>
 
-            <!-- Bảng -->
-            <div class="overflow-x-auto mb-8">
-                <table class="w-full border-collapse border border-gray-200 text-center min-w-[750px]">
-                    <thead>
+            <div class="mb-8">
+                <table class="w-full border-collapse md:border border-gray-200 text-center block md:table rounded-xl md:rounded-none overflow-hidden">
+                    <thead class="hidden md:table-header-group">
                         <tr class="bg-teal-600 text-white font-bold">
                             <th class="border border-gray-200 p-4 w-1/4">Trường hợp</th>
-                            <th class="border border-gray-200 p-4">$am > 0$</th>
-                            <th class="border border-gray-200 p-4">$am < 0$</th>
+                            <th class="border border-gray-200 p-4 w-[37.5%]">$am > 0$</th>
+                            <th class="border border-gray-200 p-4 w-[37.5%]">$am < 0$</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <!-- Nhóm Đồ thị -->
-                        <tr class="bg-teal-50 text-teal-800 font-bold uppercase text-sm tracking-wider">
-                            <td colspan="3" class="border border-gray-200 p-3">Đồ thị hàm số</td>
+                    <tbody class="block md:table-row-group">
+                        <tr class="block md:table-row bg-teal-50 text-teal-800 font-bold uppercase text-sm tracking-wider md:border-b-0 border-b-2 border-teal-200 mt-4 md:mt-0 rounded-xl md:rounded-none shadow-sm md:shadow-none mb-4 md:mb-0">
+                            <td colspan="3" class="block md:table-cell border md:border-gray-200 p-3 text-center">Đồ thị hàm số</td>
                         </tr>
-                        <tr>
-                            <td class="border border-gray-200 p-4 text-left align-middle text-gray-800">
+                        
+                        <tr class="block md:table-row bg-white border border-gray-200 md:border-none mb-6 md:mb-0 rounded-xl md:rounded-none shadow-sm md:shadow-none overflow-hidden">
+                            <td class="block md:table-cell border-b md:border border-gray-200 p-4 text-left align-middle text-gray-800">
+                                <div class="md:hidden font-bold text-teal-700 mb-2 border-b border-gray-100 pb-2">Trường hợp</div>
                                 Phương trình $y'=0$ có $2$ nghiệm phân biệt<br>
                                 $\Delta_{g(x)} > 0$
                             </td>
-                            <td class="border border-gray-200 p-4">
-                                <div class="bg-gray-50 border border-gray-200 rounded-lg p-2 h-48 flex items-center justify-center">
-                                    <img src="do-thi-phan-thuc-bac-2-am-duong-2-nghiem.svg" alt="Đồ thị, am>0, 2 nghiệm" class="max-h-full w-auto object-contain">
+                            <td class="block md:table-cell border-b md:border border-gray-200 p-4">
+                                <div class="md:hidden font-bold text-teal-700 mb-2 text-left">$am > 0$</div>
+                                <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 w-full flex items-center justify-center">
+                                    <img src="do-thi-phan-thuc-bac-2-am-duong-2-nghiem.svg" alt="Đồ thị, am>0, 2 nghiệm" class="w-full max-w-[280px] md:max-w-full h-auto object-contain">
                                 </div>
                             </td>
-                            <td class="border border-gray-200 p-4">
-                                <div class="bg-gray-50 border border-gray-200 rounded-lg p-2 h-48 flex items-center justify-center">
-                                    <img src="do-thi-phan-thuc-bac-2-am-am-2-nghiem.svg" alt="Đồ thị, am<0, 2 nghiệm" class="max-h-full w-auto object-contain">
+                            <td class="block md:table-cell border-b md:border border-gray-200 p-4">
+                                <div class="md:hidden font-bold text-teal-700 mb-2 text-left">$am < 0$</div>
+                                <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 w-full flex items-center justify-center">
+                                    <img src="do-thi-phan-thuc-bac-2-am-am-2-nghiem.svg" alt="Đồ thị, am<0, 2 nghiệm" class="w-full max-w-[280px] md:max-w-full h-auto object-contain">
                                 </div>
                             </td>
                         </tr>
-                        <tr>
-                            <td class="border border-gray-200 p-4 text-left align-middle text-gray-800">
+                        
+                        <tr class="block md:table-row bg-white border border-gray-200 md:border-none mb-6 md:mb-0 rounded-xl md:rounded-none shadow-sm md:shadow-none overflow-hidden">
+                            <td class="block md:table-cell border-b md:border border-gray-200 p-4 text-left align-middle text-gray-800">
+                                <div class="md:hidden font-bold text-teal-700 mb-2 border-b border-gray-100 pb-2">Trường hợp</div>
                                 Phương trình $y'=0$ có nghiệm kép hoặc vô nghiệm<br>
                                 $\Delta_{g(x)} \le 0$
                             </td>
-                            <td class="border border-gray-200 p-4">
-                                <div class="bg-gray-50 border border-gray-200 rounded-lg p-2 h-48 flex items-center justify-center">
-                                    <img src="do-thi-phan-thuc-bac-2-am-duong-vo-nghiem.svg" alt="Đồ thị, am>0, vô nghiệm/nghiệm kép" class="max-h-full w-auto object-contain">
+                            <td class="block md:table-cell border-b md:border border-gray-200 p-4">
+                                <div class="md:hidden font-bold text-teal-700 mb-2 text-left">$am > 0$</div>
+                                <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 w-full flex items-center justify-center">
+                                    <img src="do-thi-phan-thuc-bac-2-am-duong-vo-nghiem.svg" alt="Đồ thị, am>0, vô nghiệm/nghiệm kép" class="w-full max-w-[280px] md:max-w-full h-auto object-contain">
                                 </div>
                             </td>
-                            <td class="border border-gray-200 p-4">
-                                <div class="bg-gray-50 border border-gray-200 rounded-lg p-2 h-48 flex items-center justify-center">
-                                    <img src="do-thi-phan-thuc-bac-2-am-am-vo-nghiem.svg" alt="Đồ thị, am<0, vô nghiệm/nghiệm kép" class="max-h-full w-auto object-contain">
+                            <td class="block md:table-cell border-b md:border border-gray-200 p-4">
+                                <div class="md:hidden font-bold text-teal-700 mb-2 text-left">$am < 0$</div>
+                                <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 w-full flex items-center justify-center">
+                                    <img src="do-thi-phan-thuc-bac-2-am-am-vo-nghiem.svg" alt="Đồ thị, am<0, vô nghiệm/nghiệm kép" class="w-full max-w-[280px] md:max-w-full h-auto object-contain">
                                 </div>
                             </td>
                         </tr>
 
-                        <!-- Nhóm Bảng biến thiên -->
-                        <tr class="bg-teal-50 text-teal-800 font-bold uppercase text-sm tracking-wider">
-                            <td colspan="3" class="border border-gray-200 p-3">Bảng biến thiên</td>
+                        <tr class="block md:table-row bg-teal-50 text-teal-800 font-bold uppercase text-sm tracking-wider md:border-b-0 border-b-2 border-teal-200 mt-6 md:mt-0 rounded-xl md:rounded-none shadow-sm md:shadow-none mb-4 md:mb-0">
+                            <td colspan="3" class="block md:table-cell border md:border-gray-200 p-3 text-center">Bảng biến thiên</td>
                         </tr>
-                        <tr>
-                            <td class="border border-gray-200 p-4 text-left align-middle text-gray-800">Hàm số có $2$ cực trị</td>
-                            <td class="border border-gray-200 p-4">
-                                <div class="bg-gray-50 border border-gray-200 rounded-lg p-2 h-32 flex items-center justify-center">
-                                    <img src="bbt-phan-thuc-bac-2-am-duong-2-nghiem.svg" alt="BBT, am>0, 2 cực trị" class="max-h-full w-auto object-contain">
+                        
+                        <tr class="block md:table-row bg-white border border-gray-200 md:border-none mb-6 md:mb-0 rounded-xl md:rounded-none shadow-sm md:shadow-none overflow-hidden">
+                            <td class="block md:table-cell border-b md:border border-gray-200 p-4 text-left align-middle text-gray-800">
+                                <div class="md:hidden font-bold text-teal-700 mb-2 border-b border-gray-100 pb-2">Trường hợp</div>
+                                Hàm số có $2$ cực trị
+                            </td>
+                            <td class="block md:table-cell border-b md:border border-gray-200 p-4">
+                                <div class="md:hidden font-bold text-teal-700 mb-2 text-left">$am > 0$</div>
+                                <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 w-full flex items-center justify-center">
+                                    <img src="bbt-phan-thuc-bac-2-am-duong-2-nghiem.svg" alt="BBT, am>0, 2 cực trị" class="w-full max-w-[320px] md:max-w-full h-auto object-contain">
                                 </div>
                             </td>
-                            <td class="border border-gray-200 p-4">
-                                <div class="bg-gray-50 border border-gray-200 rounded-lg p-2 h-32 flex items-center justify-center">
-                                    <img src="bbt-phan-thuc-bac-2-am-am-2-nghiem.svg" alt="BBT, am<0, 2 cực trị" class="max-h-full w-auto object-contain">
+                            <td class="block md:table-cell border-b md:border border-gray-200 p-4">
+                                <div class="md:hidden font-bold text-teal-700 mb-2 text-left">$am < 0$</div>
+                                <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 w-full flex items-center justify-center">
+                                    <img src="bbt-phan-thuc-bac-2-am-am-2-nghiem.svg" alt="BBT, am<0, 2 cực trị" class="w-full max-w-[320px] md:max-w-full h-auto object-contain">
                                 </div>
                             </td>
                         </tr>
-                        <tr>
-                            <td class="border border-gray-200 p-4 text-left align-middle text-gray-800">Hàm số không có cực trị</td>
-                            <td class="border border-gray-200 p-4">
-                                <div class="bg-gray-50 border border-gray-200 rounded-lg p-2 h-32 flex items-center justify-center">
-                                    <img src="bbt-phan-thuc-bac-2-am-duong-vo-nghiem.svg" alt="BBT, am>0, không có cực trị" class="max-h-full w-auto object-contain">
+                        
+                        <tr class="block md:table-row bg-white border border-gray-200 md:border-none mb-6 md:mb-0 rounded-xl md:rounded-none shadow-sm md:shadow-none overflow-hidden">
+                            <td class="block md:table-cell border-b md:border border-gray-200 p-4 text-left align-middle text-gray-800">
+                                <div class="md:hidden font-bold text-teal-700 mb-2 border-b border-gray-100 pb-2">Trường hợp</div>
+                                Hàm số không có cực trị
+                            </td>
+                            <td class="block md:table-cell border-b md:border border-gray-200 p-4">
+                                <div class="md:hidden font-bold text-teal-700 mb-2 text-left">$am > 0$</div>
+                                <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 w-full flex items-center justify-center">
+                                    <img src="bbt-phan-thuc-bac-2-am-duong-vo-nghiem.svg" alt="BBT, am>0, không có cực trị" class="w-full max-w-[320px] md:max-w-full h-auto object-contain">
                                 </div>
                             </td>
-                            <td class="border border-gray-200 p-4">
-                                <div class="bg-gray-50 border border-gray-200 rounded-lg p-2 h-32 flex items-center justify-center">
-                                    <img src="bbt-phan-thuc-bac-2-am-am-vo-nghiem.svg" alt="BBT, am<0, không có cực trị" class="max-h-full w-auto object-contain">
+                            <td class="block md:table-cell border-b md:border border-gray-200 p-4">
+                                <div class="md:hidden font-bold text-teal-700 mb-2 text-left">$am < 0$</div>
+                                <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 w-full flex items-center justify-center">
+                                    <img src="bbt-phan-thuc-bac-2-am-am-vo-nghiem.svg" alt="BBT, am<0, không có cực trị" class="w-full max-w-[320px] md:max-w-full h-auto object-contain">
                                 </div>
                             </td>
                         </tr>
