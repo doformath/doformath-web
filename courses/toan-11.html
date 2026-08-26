@@ -6,9 +6,14 @@
     <title>Chinh phục Toán 11 - DoforMath</title>
     
     <link rel="icon" type="image/png" href="../assets/images/Doformath.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- Tailwind CSS -->
+    <!-- LƯU Ý: tailwindcss CDN biên dịch CSS ngay trong trình duyệt (JIT runtime) mỗi lần tải trang.
+         Đây là script nặng nhất và tự nó khuyến cáo KHÔNG dùng cho production. Cách tối ưu triệt để
+         là build sẵn file CSS tĩnh (xem ghi chú ở cuối file) rồi dùng lại dòng <link> đã comment bên dưới. -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -83,7 +88,7 @@
             </div>
             
             <a href="../index.html" class="hover:opacity-80 transition-opacity absolute left-1/2 -translate-x-1/2">
-                <span class="text-xl md:text-2xl font-bold tracking-tight text-slate-900 pb-1">
+                <span id="site-logo-math" class="text-xl md:text-2xl font-bold tracking-tight text-slate-900 pb-1">
                     $\textcolor{#0d9488}{\textsf{\textbf{Dofor}}{\sum}\textsf{\textbf{ath}}}$
                 </span>
             </a>
@@ -274,8 +279,8 @@
                                     <ul x-show="openLesson" x-transition class="relative border-l-[3px] border-slate-200 ml-2 mt-4 space-y-5 pb-1">
                                         <li class="relative pl-6">
                                             <div class="absolute w-4 h-4 rounded-full border-[3px] bg-white border-teal-400 -left-[9.5px] top-0.5 shadow-sm"></div>
-                                            <a href="about:blank" target="lesson-frame" @click="window.innerWidth < 1024 ? sidebarOpen = false : null" class="group/link font-medium text-sm flex items-center gap-3 text-slate-600 hover:text-teal-600 transition-colors">
-                                                <i class="fa-solid fa-pen-to-square text-slate-400 group-hover/link:text-teal-600 transition-colors text-base"></i> Đề bài
+                                            <a href="toan-11/chuong1-lythuyet.html" target="lesson-frame" @click="window.innerWidth < 1024 ? sidebarOpen = false : null" class="group/link font-medium text-sm flex items-center gap-3 text-slate-600 hover:text-teal-600 transition-colors">
+                                                <i class="fa-solid fa-pen-to-square text-slate-400 group-hover/link:text-teal-600 transition-colors text-base"></i> Tổng hợp lý thuyết
                                             </a>
                                         </li>
                                         <li class="relative pl-6">
@@ -380,8 +385,9 @@
             <main class="flex-1 bg-slate-200 lg:p-4 overflow-hidden relative">
                 <div class="w-full h-full lg:rounded-2xl overflow-hidden shadow-sm bg-white relative">
                     <!-- Trang mặc định khi vừa vào -->
+                    <!-- Trang mặc định khi vừa vào -->
                     <iframe name="lesson-frame" id="lesson-frame" 
-                            src="xem-tai-lieu.html?folder=11-Chuong1-Bai1-Loigiai&title=Bài 1. Giá trị lượng giác của một góc lượng giác" 
+                            src="about:blank" 
                             class="w-full h-full border-0 absolute inset-0"
                             allowfullscreen>
                     </iframe>
@@ -394,7 +400,13 @@
     <!-- Script Kích hoạt KaTeX -->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            renderMathInElement(document.body, { delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}], throwOnError: false });
+            // Chỉ có duy nhất logo header dùng công thức KaTeX -> quét đúng phần tử đó
+            // thay vì quét toàn bộ document.body (hàng trăm thẻ trong sidebar), giúp KaTeX
+            // không phải duyệt qua toàn bộ cây DOM của danh sách bài học.
+            const logoEl = document.getElementById('site-logo-math');
+            if (logoEl) {
+                renderMathInElement(logoEl, { delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}], throwOnError: false });
+            }
         });
     </script>
 
@@ -443,6 +455,34 @@
                     else handleAccessDenied();
                 }).catch(() => handleAccessDenied());
             }
+        });
+    </script>
+    <!-- SCRIPT GHI NHỚ BÀI HỌC CUỐI CÙNG -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const iframe = document.getElementById('lesson-frame');
+            // Link mặc định nếu học sinh mới vào lần đầu
+            const defaultUrl = "xem-tai-lieu.html?folder=11-Chuong1-Bai1-Loigiai&title=Bài 1. Giá trị lượng giác của một góc lượng giác";
+            const storageKey = 'doforMath_lastLesson_toan11';
+
+            // 1. Phục hồi trang cũ khi vừa load web
+            const savedUrl = localStorage.getItem(storageKey);
+            if (savedUrl) {
+                iframe.src = savedUrl;
+            } else {
+                iframe.src = defaultUrl;
+            }
+
+            // 2. Lắng nghe các thao tác click vào menu để lưu lại trang mới
+            const lessonLinks = document.querySelectorAll('a[target="lesson-frame"]');
+            lessonLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    const targetUrl = this.getAttribute('href');
+                    if (targetUrl) {
+                        localStorage.setItem(storageKey, targetUrl);
+                    }
+                });
+            });
         });
     </script>
 </body>

@@ -605,7 +605,7 @@
                 <div class="w-full h-full lg:rounded-2xl overflow-hidden shadow-sm bg-white relative">
                     <!-- Trang mặc định khi vừa vào -->
                     <iframe name="lesson-frame" id="lesson-frame" 
-                            src="toan-12/chuong-1-ung-dung-dao-ham/bai-1-tinh-don-dieu/ly-thuyet.html" 
+                            src="about:blank" 
                             class="w-full h-full border-0 absolute inset-0"
                             allowfullscreen>
                     </iframe>
@@ -667,6 +667,34 @@
                     else handleAccessDenied();
                 }).catch(() => handleAccessDenied());
             }
+        });
+    </script>
+    <!-- SCRIPT GHI NHỚ BÀI HỌC CUỐI CÙNG -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const iframe = document.getElementById('lesson-frame');
+            // Link mặc định nếu học sinh mới vào lần đầu
+            const defaultUrl = "xem-tai-lieu.html?folder=12-Bai1-Loigiai&title=Bài 1. Tính đơn điệu và cực trị của hàm số";
+            const storageKey = 'doforMath_lastLesson_toan12';
+
+            // 1. Phục hồi trang cũ khi vừa load web
+            const savedUrl = localStorage.getItem(storageKey);
+            if (savedUrl) {
+                iframe.src = savedUrl;
+            } else {
+                iframe.src = defaultUrl;
+            }
+
+            // 2. Lắng nghe các thao tác click vào menu để lưu lại trang mới
+            const lessonLinks = document.querySelectorAll('a[target="lesson-frame"]');
+            lessonLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    const targetUrl = this.getAttribute('href');
+                    if (targetUrl) {
+                        localStorage.setItem(storageKey, targetUrl);
+                    }
+                });
+            });
         });
     </script>
 </body>
