@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chuyên đề: Tổ hợp & Đếm nâng cao - DoforMath</title>
+    
+    <!-- Cấu hình Favicon -->
+    <link rel="icon" type="image/png" href="../../../../assets/images/Doformath.png">
+
+    <!-- Font chữ Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] }, colors: { primary: '#0d9488', secondary: '#facc15'} } }
+        }
+    </script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- KaTeX cho Toán học -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    
+    <!-- Alpine.js cho hiệu ứng Accordion -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 antialiased font-sans pb-16">
+
+    <!-- Banner Tiêu đề -->
+    <div class="max-w-4xl mx-auto px-4 w-full mt-8 mb-8">
+        <div class="bg-gradient-to-r from-teal-50 to-emerald-50 border border-teal-100 rounded-2xl p-6 md:p-10 shadow-sm flex flex-col items-center text-center">
+            <span class="bg-teal-100 text-teal-700 border border-teal-200 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide mb-4 shadow-sm inline-flex items-center gap-1.5">
+                <i class="fa-solid fa-book-open"></i> Tài liệu Chuyên đề
+            </span>
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900 leading-snug">CÁC KỸ THUẬT TỔ HỢP & ĐẾM NÂNG CAO</h1>
+            <p class="text-slate-500 font-medium mt-3">Vách ngăn, Kaplansky, Dirichlet và Các bài toán đếm vận dụng cao</p>
+            <div class="w-20 h-1.5 bg-gradient-to-r from-teal-400 to-emerald-400 rounded-full mt-6"></div>
+        </div>
+    </div>
+
+    <!-- Nội dung chính -->
+    <main class="max-w-4xl mx-auto px-4 w-full text-base leading-relaxed text-gray-700">
+        
+        <div class="space-y-4">
+            <!-- ========================================================================= -->
+            <!-- CHƯƠNG 1: BÀI TOÁN XẾP TUYẾN TÍNH -->
+            <!-- ========================================================================= -->
+            <div x-data="{ openChapter: false }" class="mb-4">
+                <h4 @click="openChapter = !openChapter" class="text-sm font-bold text-teal-800 p-3 bg-gradient-to-r from-teal-50/80 to-transparent rounded-2xl flex items-center justify-between cursor-pointer hover:from-teal-100 transition-colors group mb-3">
+                    <div class="flex items-center gap-3">
+                        <div class="bg-white text-teal-500 w-10 h-10 rounded-lg flex items-center justify-center shadow-sm border border-teal-100 shrink-0 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-bars-staggered text-base"></i>
+                        </div>
+                        <span class="leading-snug line-clamp-2 uppercase">1. BÀI TOÁN XẾP TUYẾN TÍNH (TRÊN ĐƯỜNG THẲNG)</span>
+                    </div>
+                    <div class="w-8 h-8 rounded-full flex items-center justify-center bg-teal-100/50 text-teal-600 group-hover:bg-teal-200 transition-colors shrink-0 ml-2">
+                        <i class="fa-solid fa-chevron-down text-sm transition-transform duration-300" :class="openChapter ? 'rotate-180' : ''"></i>
+                    </div>
+                </h4>
+                
+                <div x-show="openChapter" x-transition class="space-y-4 pl-1 pr-1 mb-6">
+                    
+                    <!-- Subsection 1.1 -->
+                    <div class="flex items-center gap-2 mb-3 mt-4 px-2">
+                        <i class="fa-solid fa-tag text-teal-600 text-xs"></i>
+                        <h5 class="text-xs font-black text-teal-600 uppercase tracking-widest">Xếp các phần tử cùng một loại</h5>
+                        <div class="flex-1 h-px bg-slate-200"></div>
+                    </div>
+
+                    <!-- Item 1.1 -->
+                    <div x-data="{ openItem: false }" class="bg-gradient-to-br from-white to-slate-50 border border-slate-200 rounded-2xl shadow-sm hover:border-teal-300 transition-colors overflow-hidden">
+                        <div @click="openItem = !openItem" class="p-4 flex items-center justify-between cursor-pointer group">
+                            <h6 class="font-bold text-slate-800 text-sm group-hover:text-teal-700 pr-2 leading-relaxed">1.1. Kỹ thuật Bó phần tử (Block Technique) -- "Đứng cạnh nhau"</h6>
+                            <i class="fa-solid fa-chevron-down text-slate-400 text-sm transition-transform duration-300 group-hover:text-teal-500" :class="openItem ? 'rotate-180 text-teal-500' : ''"></i>
+                        </div>
+                        <div x-show="openItem" x-transition class="px-4 pb-4 border-t border-slate-100 pt-3">
+                            <ul class="list-disc pl-5 space-y-1.5 text-sm text-slate-600">
+                                <li><span class="font-semibold text-slate-700">Bản chất:</span> Gom $k$ phần tử có ràng buộc kề nhau thành một khối duy nhất $X$.</li>
+                                <li><span class="font-semibold text-slate-700">Quy trình:</span>
+                                    <ol class="list-decimal pl-5 mt-1 space-y-1">
+                                        <li>Hoán vị nội bộ các phần tử trong khối $X$: có $k!$ cách.</li>
+                                        <li>Xếp khối $X$ cùng $(n-k)$ phần tử còn lại: có $(n-k+1)!$ cách.</li>
+                                        <li>Tổng số cách: $k! \times (n-k+1)!$.</li>
+                                    </ol>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Item 1.2 -->
+                    <div x-data="{ openItem: false }" class="bg-gradient-to-br from-white to-slate-50 border border-slate-200 rounded-2xl shadow-sm hover:border-teal-300 transition-colors overflow-hidden">
+                        <div @click="openItem = !openItem" class="p-4 flex items-center justify-between cursor-pointer group">
+                            <h6 class="font-bold text-slate-800 text-sm group-hover:text-teal-700 pr-2 leading-relaxed">1.2. Kỹ thuật Hoán vị lặp (Multinomial) -- Phần tử lặp lại</h6>
+                            <i class="fa-solid fa-chevron-down text-slate-400 text-sm transition-transform duration-300 group-hover:text-teal-500" :class="openItem ? 'rotate-180 text-teal-500' : ''"></i>
+                        </div>
+                        <div x-show="openItem" x-transition class="px-4 pb-4 border-t border-slate-100 pt-3">
+                            <ul class="list-disc pl-5 space-y-1.5 text-sm text-slate-600">
+                                <li><span class="font-semibold text-slate-700">Bản chất:</span> Sắp xếp $n$ phần tử, trong đó có $n_1$ loại 1, $n_2$ loại 2, $\dots$, $n_k$ loại $k$ ($\sum n_i = n$).</li>
+                                <li><span class="font-semibold text-slate-700">Công thức:</span>
+                                    <div class="text-center my-2 text-base text-slate-800">
+                                        $$ P_n(n_1, n_2, \dots, n_k) = \frac{n!}{n_1! \, n_2! \, \dots \, n_k!} $$
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Item 1.3 -->
+                    <div x-data="{ openItem: false }" class="bg-gradient-to-br from-white to-slate-50 border border-slate-200 rounded-2xl shadow-sm hover:border-teal-300 transition-colors overflow-hidden">
+                        <div @click="openItem = !openItem" class="p-4 flex items-center justify-between cursor-pointer group">
+                            <h6 class="font-bold text-slate-800 text-sm group-hover:text-teal-700 pr-2 leading-relaxed">1.3. Kỹ thuật Tính tổng theo từng hàng (Digit-Sum by Column)</h6>
+                            <i class="fa-solid fa-chevron-down text-slate-400 text-sm transition-transform duration-300 group-hover:text-teal-500" :class="openItem ? 'rotate-180 text-teal-500' : ''"></i>
+                        </div>
+                        <div x-show="openItem" x-transition class="px-4 pb-4 border-t border-slate-100 pt-3">
+                            <ul class="list-disc pl-5 space-y-1.5 text-sm text-slate-600">
+                                <li><span class="font-semibold text-slate-700">Bản chất:</span> Tính tổng của tất cả các số lập được bằng cách xét tính đối xứng xuất hiện của mỗi chữ số $d \in D$ ở từng vị trí.</li>
+                                <li><span class="font-semibold text-slate-700">Công thức:</span> $\text{Tổng} = \left(\sum d_i\right) \times (\text{Số lần xuất hiện ở 1 hàng}) \times \underbrace{11\dots1}_{m \text{ chữ số}}$.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Item 1.4 -->
+                    <div x-data="{ openItem: false }" class="bg-gradient-to-br from-white to-slate-50 border border-slate-200 rounded-2xl shadow-sm hover:border-teal-300 transition-colors overflow-hidden">
+                        <div @click="openItem = !openItem" class="p-4 flex items-center justify-between cursor-pointer group">
+                            <h6 class="font-bold text-slate-800 text-sm group-hover:text-teal-700 pr-2 leading-relaxed">1.4. Kỹ thuật Lùa cừu vào chuồng (Quy trình đếm độc lập)</h6>
+                            <i class="fa-solid fa-chevron-down text-slate-400 text-sm transition-transform duration-300 group-hover:text-teal-500" :class="openItem ? 'rotate-180 text-teal-500' : ''"></i>
+                        </div>
+                        <div x-show="openItem" x-transition class="px-4 pb-4 border-t border-slate-100 pt-3">
+                            <ul class="list-disc pl-5 space-y-1.5 text-sm text-slate-600">
+                                <li><span class="font-semibold text-slate-700">Bản chất:</span> Phân rã bài toán đếm phức tạp thành một chuỗi các công đoạn (quy tắc nhân), chọn các phần tử có ràng buộc gắt gao nhất trước.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Subsection 1.2 -->
+                    <div class="flex items-center gap-2 mb-3 mt-6 px-2">
+                        <i class="fa-solid fa-tag text-teal-600 text-xs"></i>
+                        <h5 class="text-xs font-black text-teal-600 uppercase tracking-widest">Xếp phần tử nhiều loại / Khoảng cách phức tạp</h5>
+                        <div class="flex-1 h-px bg-slate-200"></div>
+                    </div>
+
+                    <!-- Item 2.1 -->
+                    <div x-data="{ openItem: false }" class="bg-gradient-to-br from-white to-slate-50 border border-slate-200 rounded-2xl shadow-sm hover:border-teal-300 transition-colors overflow-hidden">
+                        <div @click="openItem = !openItem" class="p-4 flex items-center justify-between cursor-pointer group">
+                            <h6 class="font-bold text-slate-800 text-sm group-hover:text-teal-700 pr-2 leading-relaxed">2.1. Kỹ thuật Vách ngăn -- "Không đứng cạnh nhau"</h6>
+                            <i class="fa-solid fa-chevron-down text-slate-400 text-sm transition-transform duration-300 group-hover:text-teal-500" :class="openItem ? 'rotate-180 text-teal-500' : ''"></i>
+                        </div>
+                        <div x-show="openItem" x-transition class="px-4 pb-4 border-t border-slate-100 pt-3">
+                            <ul class="list-disc pl-5 space-y-1.5 text-sm text-slate-600">
+                                <li><span class="font-semibold text-slate-700">Bản chất:</span> Xếp $m$ phần tử tự do làm vách ngăn trước, tạo ra $m+1$ khoảng trống (khe hở). Đặt $k$ phần tử không kề nhau vào khe ($k \le m+1$).</li>
+                                <li><span class="font-semibold text-slate-700">Công thức cơ bản:</span> $m! \times A_{m+1}^k$.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Item 2.2 -->
+                    <div x-data="{ openItem: false }" class="bg-gradient-to-br from-white to-slate-50 border border-slate-200 rounded-2xl shadow-sm hover:border-teal-300 transition-colors overflow-hidden">
+                        <div @click="openItem = !openItem" class="p-4 flex items-center justify-between cursor-pointer group">
+                            <h6 class="font-bold text-slate-800 text-sm group-hover:text-teal-700 pr-2 leading-relaxed">2.2. Kỹ thuật Đánh số thứ tự (Vách ngăn Level 2)</h6>
+                            <i class="fa-solid fa-chevron-down text-slate-400 text-sm transition-transform duration-300 group-hover:text-teal-500" :class="openItem ? 'rotate-180 text-teal-500' : ''"></i>
+                        </div>
+                        <div x-show="openItem" x-transition class="px-4 pb-4 border-t border-slate-100 pt-3">
+                            <ul class="list-disc pl-5 space-y-1.5 text-sm text-slate-600">
+                                <li><span class="font-semibold text-slate-700">Giả thiết:</span> Chọn $k$ phần tử từ $\{1, 2, \dots, n\}$ sao cho khoảng cách giữa 2 phần tử $\ge d$ (tức là $x_{i+1} - x_i \ge d$).</li>
+                                <li><span class="font-semibold text-slate-700">Đại số hóa quy luật:</span> 
+                                    <div class="text-center my-2">$$ 1 \le x_1 < x_2 < \dots < x_k \le n \quad \text{với } x_{i+1} - x_i \ge d $$</div>
+                                </li>
+                                <li><span class="font-semibold text-slate-700">Đổi biến:</span> Đặt $y_i = x_i - (i-1)(d-1)$. Hệ điều kiện trở thành:
+                                    <div class="text-center my-2">$$ 1 \le y_1 < y_2 < \dots < y_k \le n - (k-1)(d-1) $$</div>
+                                </li>
+                                <li><span class="font-semibold text-slate-700">Số cách chọn:</span> $C_{n - (k-1)(d-1)}^k$.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Item 2.3 -->
+                    <div x-data="{ openItem: false }" class="bg-gradient-to-br from-white to-slate-50 border border-slate-200 rounded-2xl shadow-sm hover:border-teal-300 transition-colors overflow-hidden">
+                        <div @click="openItem = !openItem" class="p-4 flex items-center justify-between cursor-pointer group">
+                            <h6 class="font-bold text-slate-800 text-sm group-hover:text-teal-700 pr-2 leading-relaxed">2.3. Bài toán Chia kẹo Euler (Phương trình nghiệm nguyên)</h6>
+                            <i class="fa-solid fa-chevron-down text-slate-400 text-sm transition-transform duration-300 group-hover:text-teal-500" :class="openItem ? 'rotate-180 text-teal-500' : ''"></i>
+                        </div>
+                        <div x-show="openItem" x-transition class="px-4 pb-4 border-t border-slate-100 pt-3">
+                            <ul class="list-disc pl-5 space-y-1.5 text-sm text-slate-600">
+                                <li><span class="font-semibold text-slate-700">Dạng nguyên dương:</span> Số nghiệm nguyên dương ($x_i \ge 1$) của phương trình $x_1 + \dots + x_k = n$ là: $$ C_{n-1}^{k-1} $$</li>
+                                <li><span class="font-semibold text-slate-700">Dạng nguyên không âm:</span> Số nghiệm nguyên không âm ($x_i \ge 0$) là: $$ C_{n+k-1}^{k-1} $$</li>
+                                <li><span class="font-semibold text-slate-700">Dạng có điều kiện biên ($x_i \ge c_i$):</span> Đổi biến $y_i = x_i - c_i + 1 \ge 1$ đưa về dạng nguyên dương.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Item 2.4 -->
+                    <div x-data="{ openItem: false }" class="bg-gradient-to-br from-white to-slate-50 border border-slate-200 rounded-2xl shadow-sm hover:border-teal-300 transition-colors overflow-hidden">
+                        <div @click="openItem = !openItem" class="p-4 flex items-center justify-between cursor-pointer group">
+                            <h6 class="font-bold text-slate-800 text-sm group-hover:text-teal-700 pr-2 leading-relaxed">2.4. Các Mô hình lai (Hybrid) & Bổ đề Kaplansky</h6>
+                            <i class="fa-solid fa-chevron-down text-slate-400 text-sm transition-transform duration-300 group-hover:text-teal-500" :class="openItem ? 'rotate-180 text-teal-500' : ''"></i>
+                        </div>
+                        <div x-show="openItem" x-transition class="px-4 pb-4 border-t border-slate-100 pt-3">
+                            <ul class="list-disc pl-5 space-y-1.5 text-sm text-slate-600">
+                                <li><span class="font-semibold text-slate-700">Block & Gap:</span> Vừa có nhóm kề nhau, vừa có nhóm rời nhau: Bó khối $\Rightarrow$ Xếp vách ngăn tự do $\Rightarrow$ Đặt khối vào khe hở.</li>
+                                <li><span class="font-semibold text-slate-700">Bổ đề Kaplansky thẳng:</span> Số tập con $k$ phần tử từ $\{1, \dots, n\}$ không chứa 2 phần tử liên tiếp là $C_{n-k+1}^k$.</li>
+                                <li><span class="font-semibold text-slate-700">Bổ đề Kaplansky tròn:</span> Chọn $k$ phần tử từ $n$ phần tử trên đường tròn sao cho không có 2 phần tử kề nhau: $$ \frac{n}{n-k} C_{n-k}^k $$</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ========================================================================= -->
+            <!-- CHƯƠNG 2: BÀI TOÁN XẾP PHI TUYẾN -->
+            <!-- ========================================================================= -->
+            <div x-data="{ openChapter: false }" class="mb-4">
+                <h4 @click="openChapter = !openChapter" class="text-sm font-bold text-teal-800 p-3 bg-gradient-to-r from-teal-50/80 to-transparent rounded-2xl flex items-center justify-between cursor-pointer hover:from-teal-100 transition-colors group mb-3">
+                    <div class="flex items-center gap-3">
+                        <div class="bg-white text-teal-500 w-10 h-10 rounded-lg flex items-center justify-center shadow-sm border border-teal-100 shrink-0 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-circle-nodes text-base"></i>
+                        </div>
+                        <span class="leading-snug line-clamp-2 uppercase">2. BÀI TOÁN XẾP PHI TUYẾN (VÒNG TRÒN, Ô LƯỚI)</span>
+                    </div>
+                    <div class="w-8 h-8 rounded-full flex items-center justify-center bg-teal-100/50 text-teal-600 group-hover:bg-teal-200 transition-colors shrink-0 ml-2">
+                        <i class="fa-solid fa-chevron-down text-sm transition-transform duration-300" :class="openChapter ? 'rotate-180' : ''"></i>
+                    </div>
+                </h4>
+                
+                <div x-show="openChapter" x-transition class="space-y-3 pl-1 pr-1 mb-6">
+                    
+                    <div x-data="{ openItem: false }" class="bg-gradient-to-br from-white to-slate-50 border border-slate-200 rounded-2xl shadow-sm hover:border-teal-300 transition-colors overflow-hidden">
+                        <div @click="openItem = !openItem" class="p-4 flex items-center justify-between cursor-pointer group">
+                            <h6 class="font-bold text-slate-800 text-sm group-hover:text-teal-700 pr-2 leading-relaxed">2.1. Hoán vị vòng tròn (Circular Permutation)</h6>
+                            <i class="fa-solid fa-chevron-down text-slate-400 text-sm transition-transform duration-300 group-hover:text-teal-500" :class="openItem ? 'rotate-180 text-teal-500' : ''"></i>
+                        </div>
+                        <div x-show="openItem" x-transition class="px-4 pb-4 border-t border-slate-100 pt-3">
+                            <ul class="list-disc pl-5 space-y-1 text-sm text-slate-600">
+                                <li>Số cách xếp $n$ phần tử khác nhau vào bàn tròn $n$ vị trí: $(n-1)!$.</li>
+                                <li><span class="font-semibold text-slate-700">Phá vỡ tính đối xứng:</span> Cố định 1 phần tử làm mốc $\Rightarrow$ Các vị trí còn lại trở thành bài toán thẳng.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div x-data="{ openItem: false }" class="bg-gradient-to-br from-white to-slate-50 border border-slate-200 rounded-2xl shadow-sm hover:border-teal-300 transition-colors overflow-hidden">
+                        <div @click="openItem = !openItem" class="p-4 flex items-center justify-between cursor-pointer group">
+                            <h6 class="font-bold text-slate-800 text-sm group-hover:text-teal-700 pr-2 leading-relaxed">2.2. Xếp trên Ô lưới / Đường đi ngắn nhất (Grid Walking)</h6>
+                            <i class="fa-solid fa-chevron-down text-slate-400 text-sm transition-transform duration-300 group-hover:text-teal-500" :class="openItem ? 'rotate-180 text-teal-500' : ''"></i>
+                        </div>
+                        <div x-show="openItem" x-transition class="px-4 pb-4 border-t border-slate-100 pt-3">
+                            <ul class="list-disc pl-5 space-y-1 text-sm text-slate-600">
+                                <li>Đếm đường đi ngắn nhất từ $(0,0)$ đến $(m,n)$ qua lưới (bước phải $R$, đi lên $U$): Hoán vị lặp của $m$ bước $R$ và $n$ bước $U \Rightarrow C_{m+n}^m$.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div x-data="{ openItem: false }" class="bg-gradient-to-br from-white to-slate-50 border border-slate-200 rounded-2xl shadow-sm hover:border-teal-300 transition-colors overflow-hidden">
+                        <div @click="openItem = !openItem" class="p-4 flex items-center justify-between cursor-pointer group">
+                            <h6 class="font-bold text-slate-800 text-sm group-hover:text-teal-700 pr-2 leading-relaxed">2.3. Xếp phần tử không đối diện nhau qua tâm bàn tròn</h6>
+                            <i class="fa-solid fa-chevron-down text-slate-400 text-sm transition-transform duration-300 group-hover:text-teal-500" :class="openItem ? 'rotate-180 text-teal-500' : ''"></i>
+                        </div>
+                        <div x-show="openItem" x-transition class="px-4 pb-4 border-t border-slate-100 pt-3">
+                            <ul class="list-disc pl-5 space-y-1 text-sm text-slate-600">
+                                <li><span class="font-semibold text-slate-700">Phương pháp:</span> Dùng nguyên lý bù trừ hoặc đếm gián tiếp: Tổng số cách trừ đi các trường hợp có ít nhất $1, 2, \dots$ cặp đối diện.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ========================================================================= -->
+            <!-- CHƯƠNG 3: ĐẾM SỐ HỌC VÀ ĐỒNG DƯ -->
+            <!-- ========================================================================= -->
+            <div x-data="{ openChapter: false }" class="mb-4">
+                <h4 @click="openChapter = !openChapter" class="text-sm font-bold text-teal-800 p-3 bg-gradient-to-r from-teal-50/80 to-transparent rounded-2xl flex items-center justify-between cursor-pointer hover:from-teal-100 transition-colors group mb-3">
+                    <div class="flex items-center gap-3">
+                        <div class="bg-white text-teal-500 w-10 h-10 rounded-lg flex items-center justify-center shadow-sm border border-teal-100 shrink-0 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-divide text-base"></i>
+                        </div>
+                        <span class="leading-snug line-clamp-2 uppercase">3. ĐẾM SỐ HỌC VÀ CÁC TÍNH CHẤT ĐỒNG DƯ</span>
+                    </div>
+                    <div class="w-8 h-8 rounded-full flex items-center justify-center bg-teal-100/50 text-teal-600 group-hover:bg-teal-200 transition-colors shrink-0 ml-2">
+                        <i class="fa-solid fa-chevron-down text-sm transition-transform duration-300" :class="openChapter ? 'rotate-180' : ''"></i>
+                    </div>
+                </h4>
+                
+                <div x-show="openChapter" x-transition class="space-y-4 pl-1 pr-1 mb-6">
+                    
+                    <div class="flex items-center gap-2 mb-3 mt-4 px-2">
+                        <i class="fa-solid fa-tag text-teal-600 text-xs"></i>
+                        <h5 class="text-xs font-black text-teal-600 uppercase tracking-widest">Tương quan Số học & Ước số</h5>
+                        <div class="flex-1 h-px bg-slate-200"></div>
+                    </div>
+
+                    <div x-data="{ openItem: false }" class="bg-gradient-to-br from-white to-slate-50 border border-slate-200 rounded-2xl shadow-sm hover:border-teal-300 transition-colors overflow-hidden">
+                        <div @click="openItem = !openItem" class="p-4 flex items-center justify-between cursor-pointer group">
+                            <h6 class="font-bold text-slate-800 text-sm group-hover:text-teal-700 pr-2 leading-relaxed">3.1. Phân tích Thừa số nguyên tố & Đếm số ước</h6>
+                            <i class="fa-solid fa-chevron-down text-slate-400 text-sm transition-transform duration-300 group-hover:text-teal-500" :class="openItem ? 'rotate-180 text-teal-500' : ''"></i>
+                        </div>
+                        <div x-show="openItem" x-transition class="px-4 pb-4 border-t border-slate-100 pt-3">
+                            <ul class="list-disc pl-5 space-y-1.5 text-sm text-slate-600">
+                                <li>Cho $N = p_1^{a_1} p_2^{a_2} \dots p_k^{a_k}$. Số ước nguyên dương của $N$ là: $$ d(N) = (a_1 + 1)(a_2 + 1)\dots(a_k + 1) $$</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div x-data="{ openItem: false }" class="bg-gradient-to-br from-white to-slate-50 border border-slate-200 rounded-2xl shadow-sm hover:border-teal-300 transition-colors overflow-hidden">
+                        <div @click="openItem = !openItem" class="p-4 flex items-center justify-between cursor-pointer group">
+                            <h6 class="font-bold text-slate-800 text-sm group-hover:text-teal-700 pr-2 leading-relaxed">3.2. Kỹ thuật Gián tiếp tương quan (Bù trừ / Song ánh)</h6>
+                            <i class="fa-solid fa-chevron-down text-slate-400 text-sm transition-transform duration-300 group-hover:text-teal-500" :class="openItem ? 'rotate-180 text-teal-500' : ''"></i>
+                        </div>
+                        <div x-show="openItem" x-transition class="px-4 pb-4 border-t border-slate-100 pt-3">
+                            <ul class="list-disc pl-5 space-y-1 text-sm text-slate-600">
+                                <li>Thiết lập ánh xạ 1-1 (song ánh) hoặc dùng công thức phủ định $N(\text{thỏa mãn}) = N(\text{tổng}) - N(\text{vi phạm})$.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2 mb-3 mt-6 px-2">
+                        <i class="fa-solid fa-tag text-teal-600 text-xs"></i>
+                        <h5 class="text-xs font-black text-teal-600 uppercase tracking-widest">Bài toán Chia hết & Cấu trúc Đồng dư</h5>
+                        <div class="flex-1 h-px bg-slate-200"></div>
+                    </div>
+
+                    <div x-data="{ openItem: false }" class="bg-gradient-to-br from-white to-slate-50 border border-slate-200 rounded-2xl shadow-sm hover:border-teal-300 transition-colors overflow-hidden">
+                        <div @click="openItem = !openItem" class="p-4 flex items-center justify-between cursor-pointer group">
+                            <h6 class="font-bold text-slate-800 text-sm group-hover:text-teal-700 pr-2 leading-relaxed">3.3. Cân bằng phần tử khóa (Key-Element)</h6>
+                            <i class="fa-solid fa-chevron-down text-slate-400 text-sm transition-transform duration-300 group-hover:text-teal-500" :class="openItem ? 'rotate-180 text-teal-500' : ''"></i>
+                        </div>
+                        <div x-show="openItem" x-transition class="px-4 pb-4 border-t border-slate-100 pt-3">
+                            <ul class="list-disc pl-5 space-y-1 text-sm text-slate-600">
+                                <li>Khi lập số $m$ chữ số thỏa mãn điều kiện chia hết, chọn tự do $m-1$ chữ số đầu. Luôn tồn tại số cách cố định cho chữ số cuối cùng để tổng chia hết.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div x-data="{ openItem: false }" class="bg-gradient-to-br from-white to-slate-50 border border-slate-200 rounded-2xl shadow-sm hover:border-teal-300 transition-colors overflow-hidden">
+                        <div @click="openItem = !openItem" class="p-4 flex items-center justify-between cursor-pointer group">
+                            <h6 class="font-bold text-slate-800 text-sm group-hover:text-teal-700 pr-2 leading-relaxed">3.4. Phân tập Đồng dư (Partition by Modulo Classes)</h6>
+                            <i class="fa-solid fa-chevron-down text-slate-400 text-sm transition-transform duration-300 group-hover:text-teal-500" :class="openItem ? 'rotate-180 text-teal-500' : ''"></i>
+                        </div>
+                        <div x-show="openItem" x-transition class="px-4 pb-4 border-t border-slate-100 pt-3">
+                            <ul class="list-disc pl-5 space-y-1 text-sm text-slate-600">
+                                <li>Phân chia tập số thành các lớp đồng dư modulo $m$: $X_0, X_1, \dots, X_{m-1}$. Chọn $k$ số có tổng chia hết cho $m$ quy về việc kết hợp các lớp đồng dư sao cho $\sum r_i \equiv 0 \pmod m$.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ========================================================================= -->
+            <!-- CHƯƠNG 4: HÌNH HỌC TỔ HỢP TRONG ĐA GIÁC ĐỀU -->
+            <!-- ========================================================================= -->
+            <div x-data="{ openChapter: false }" class="mb-4">
+                <h4 @click="openChapter = !openChapter" class="text-sm font-bold text-teal-800 p-3 bg-gradient-to-r from-teal-50/80 to-transparent rounded-2xl flex items-center justify-between cursor-pointer hover:from-teal-100 transition-colors group mb-3">
+                    <div class="flex items-center gap-3">
+                        <div class="bg-white text-teal-500 w-10 h-10 rounded-lg flex items-center justify-center shadow-sm border border-teal-100 shrink-0 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-draw-polygon text-base"></i>
+                        </div>
+                        <span class="leading-snug line-clamp-2 uppercase">4. HÌNH HỌC TỔ HỢP TRONG ĐA GIÁC ĐỀU</span>
+                    </div>
+                    <div class="w-8 h-8 rounded-full flex items-center justify-center bg-teal-100/50 text-teal-600 group-hover:bg-teal-200 transition-colors shrink-0 ml-2">
+                        <i class="fa-solid fa-chevron-down text-sm transition-transform duration-300" :class="openChapter ? 'rotate-180' : ''"></i>
+                    </div>
+                </h4>
+                
+                <div x-show="openChapter" x-transition class="space-y-4 pl-1 pr-1 mb-6">
+                    <p class="text-sm italic text-slate-500 px-3">Cho đa giác đều $A_1A_2\dots A_n$ ($n$ đỉnh) nội tiếp đường tròn $(O)$.</p>
+
+                    <div class="flex items-center gap-2 mb-3 mt-2 px-2">
+                        <i class="fa-solid fa-tag text-teal-600 text-xs"></i>
+                        <h5 class="text-xs font-black text-teal-600 uppercase tracking-widest">Đếm Tam giác & Tứ giác</h5>
+                        <div class="flex-1 h-px bg-slate-200"></div>
+                    </div>
+
+                    <div x-data="{ openItem: false }" class="bg-gradient-to-br from-white to-slate-50 border border-slate-200 rounded-2xl shadow-sm hover:border-teal-300 transition-colors overflow-hidden">
+                        <div @click="openItem = !openItem" class="p-4 flex items-center justify-between cursor-pointer group">
+                            <h6 class="font-bold text-slate-800 text-sm group-hover:text-teal-700 pr-2 leading-relaxed">4.1. Đếm các loại Tam giác</h6>
+                            <i class="fa-solid fa-chevron-down text-slate-400 text-sm transition-transform duration-300 group-hover:text-teal-500" :class="openItem ? 'rotate-180 text-teal-500' : ''"></i>
+                        </div>
+                        <div x-show="openItem" x-transition class="px-4 pb-4 border-t border-slate-100 pt-3">
+                            <ul class="list-disc pl-5 space-y-3 text-sm text-slate-600">
+                                <li><span class="font-bold text-slate-800">Tam giác vuông:</span> Chỉ có khi $n$ chẵn ($n = 2m$). $$ N_{\text{vuông}} = \frac{n}{2} \times (n - 2) $$</li>
+                                <li><span class="font-bold text-slate-800">Tam giác đều:</span> Chỉ có khi $n \ \vdots \ 3$. $$ N_{\text{đều}} = \frac{n}{3} $$</li>
+                                <li><span class="font-bold text-slate-800">Tam giác cân (không đều):</span> $$ N_{\text{cân}} = n \times \left[ \frac{n - 1}{2} \right] - 2 \times N_{\text{đều}} \quad (\text{nếu } n \ \vdots \ 3) $$</li>
+                                <li><span class="font-bold text-slate-800">Tam giác tù / nhọn:</span> 
+                                    <br>- Tù: Cố định 1 đỉnh góc tù, đếm 2 đỉnh nằm cùng nửa đường tròn.
+                                    <br>- Nhọn: $N_{\text{nhọn}} = C_n^3 - N_{\text{vuông}} - N_{\text{tù}}$.
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div x-data="{ openItem: false }" class="bg-gradient-to-br from-white to-slate-50 border border-slate-200 rounded-2xl shadow-sm hover:border-teal-300 transition-colors overflow-hidden">
+                        <div @click="openItem = !openItem" class="p-4 flex items-center justify-between cursor-pointer group">
+                            <h6 class="font-bold text-slate-800 text-sm group-hover:text-teal-700 pr-2 leading-relaxed">4.2. Đếm Tứ giác & Đường chéo</h6>
+                            <i class="fa-solid fa-chevron-down text-slate-400 text-sm transition-transform duration-300 group-hover:text-teal-500" :class="openItem ? 'rotate-180 text-teal-500' : ''"></i>
+                        </div>
+                        <div x-show="openItem" x-transition class="px-4 pb-4 border-t border-slate-100 pt-3">
+                            <ul class="list-disc pl-5 space-y-2 text-sm text-slate-600">
+                                <li><span class="font-bold text-slate-800">Số đường chéo:</span> $\frac{n(n-3)}{2}$.</li>
+                                <li><span class="font-bold text-slate-800">Số tứ giác bất kỳ:</span> $C_n^4$.</li>
+                                <li><span class="font-bold text-slate-800">Hình chữ nhật:</span> Có khi $n$ chẵn $\Rightarrow N_{\text{HCN}} = C_{n/2}^2$.</li>
+                                <li><span class="font-bold text-slate-800">Hình thang cân:</span> Chọn 1 trục đối xứng $\Rightarrow$ Chọn 2 cặp đỉnh đối xứng qua trục đó.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ========================================================================= -->
+            <!-- CHƯƠNG 5: CHUYÊN ĐỀ NÂNG CAO KHÁC -->
+            <!-- ========================================================================= -->
+            <div x-data="{ openChapter: false }" class="mb-4">
+                <h4 @click="openChapter = !openChapter" class="text-sm font-bold text-teal-800 p-3 bg-gradient-to-r from-teal-50/80 to-transparent rounded-2xl flex items-center justify-between cursor-pointer hover:from-teal-100 transition-colors group mb-3">
+                    <div class="flex items-center gap-3">
+                        <div class="bg-white text-teal-500 w-10 h-10 rounded-lg flex items-center justify-center shadow-sm border border-teal-100 shrink-0 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-boxes-stacked text-base"></i>
+                        </div>
+                        <span class="leading-snug line-clamp-2 uppercase">5. CHUYÊN ĐỀ NÂNG CAO KHÁC</span>
+                    </div>
+                    <div class="w-8 h-8 rounded-full flex items-center justify-center bg-teal-100/50 text-teal-600 group-hover:bg-teal-200 transition-colors shrink-0 ml-2">
+                        <i class="fa-solid fa-chevron-down text-sm transition-transform duration-300" :class="openChapter ? 'rotate-180' : ''"></i>
+                    </div>
+                </h4>
+                
+                <div x-show="openChapter" x-transition class="space-y-4 pl-1 pr-1 mb-6">
+                    
+                    <div x-data="{ openItem: false }" class="bg-gradient-to-br from-white to-slate-50 border border-slate-200 rounded-2xl shadow-sm hover:border-teal-300 transition-colors overflow-hidden">
+                        <div @click="openItem = !openItem" class="p-4 flex items-center justify-between cursor-pointer group">
+                            <h6 class="font-bold text-slate-800 text-sm group-hover:text-teal-700 pr-2 leading-relaxed">5.1. Bài toán Phân phối / Chia đồ vật</h6>
+                            <i class="fa-solid fa-chevron-down text-slate-400 text-sm transition-transform duration-300 group-hover:text-teal-500" :class="openItem ? 'rotate-180 text-teal-500' : ''"></i>
+                        </div>
+                        <div x-show="openItem" x-transition class="px-4 pb-4 border-t border-slate-100 pt-3">
+                            <ul class="list-disc pl-5 space-y-1.5 text-sm text-slate-600">
+                                <li><span class="font-semibold text-slate-700">Vật KHÁC NHAU vào hộp KHÁC NHAU:</span> Dùng hoán vị lặp (nếu phân hoạch) hoặc nguyên lý Bù trừ / số Stirling loại 2.</li>
+                                <li><span class="font-semibold text-slate-700">Vật GIỐNG NHAU vào hộp GIỐNG NHAU:</span> Phân hoạch $n = x_1 + \dots + x_k$ với $x_1 \ge \dots \ge x_k$. Chặn biến lớn nhất và bấm Casio tổng $\sum f(x_1)$.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div x-data="{ openItem: false }" class="bg-gradient-to-br from-white to-slate-50 border border-slate-200 rounded-2xl shadow-sm hover:border-teal-300 transition-colors overflow-hidden">
+                        <div @click="openItem = !openItem" class="p-4 flex items-center justify-between cursor-pointer group">
+                            <h6 class="font-bold text-slate-800 text-sm group-hover:text-teal-700 pr-2 leading-relaxed">5.2. Kỹ thuật Đối xứng / Trục định vị (CSC, CSN)</h6>
+                            <i class="fa-solid fa-chevron-down text-slate-400 text-sm transition-transform duration-300 group-hover:text-teal-500" :class="openItem ? 'rotate-180 text-teal-500' : ''"></i>
+                        </div>
+                        <div x-show="openItem" x-transition class="px-4 pb-4 border-t border-slate-100 pt-3">
+                            <ul class="list-disc pl-5 space-y-1.5 text-sm text-slate-600">
+                                <li><span class="font-semibold text-slate-700">CSC:</span> $a+c=2b \Rightarrow$ $b$ là tâm đối xứng.</li>
+                                <li><span class="font-semibold text-slate-700">CSN:</span> $ac=b^2 \Rightarrow$ phân tích nguyên tố & đối xứng số mũ.</li>
+                                <li><span class="font-semibold text-slate-700">Biểu đồ Venn:</span> Cố định các vùng giao nhau trước.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div x-data="{ openItem: false }" class="bg-gradient-to-br from-white to-slate-50 border border-slate-200 rounded-2xl shadow-sm hover:border-teal-300 transition-colors overflow-hidden">
+                        <div @click="openItem = !openItem" class="p-4 flex items-center justify-between cursor-pointer group">
+                            <h6 class="font-bold text-slate-800 text-sm group-hover:text-teal-700 pr-2 leading-relaxed">5.3. Xác suất nâng cao & Quy hoạch truy hồi</h6>
+                            <i class="fa-solid fa-chevron-down text-slate-400 text-sm transition-transform duration-300 group-hover:text-teal-500" :class="openItem ? 'rotate-180 text-teal-500' : ''"></i>
+                        </div>
+                        <div x-show="openItem" x-transition class="px-4 pb-4 border-t border-slate-100 pt-3">
+                            <ul class="list-disc pl-5 space-y-1.5 text-sm text-slate-600">
+                                <li><span class="font-semibold text-slate-700">Cây điều kiện & Markov:</span> Lập sai phân $u_n = a u_{n-1} + b u_{n-2} \Rightarrow$ Casio / PT đặc trưng.</li>
+                                <li><span class="font-semibold text-slate-700">Dừng phép thử Bernoulli:</span> Dừng ở ván $n$ khi thắng ván $k$: $$ P = p \times \left[ C_{n-1}^{k-1} \, p^{k-1} \, (1-p)^{(n-1)-(k-1)} \right] $$</li>
+                                <li><span class="font-semibold text-slate-700">Tô màu TDM:</span> Tô $n$ đỉnh bằng $k$ màu, kề nhau khác màu: $$ P_n(k) = (k-1)^n + (-1)^n(k-1) $$</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Script Kích hoạt KaTeX -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false}
+                ],
+                throwOnError : false
+            });
+        });
+    </script>
+
+</body>
+</html>

@@ -355,7 +355,7 @@
                                         </li>
                                         <li class="relative pl-6">
                                             <div class="absolute w-4 h-4 rounded-full border-[3px] bg-white border-teal-400 -left-[9.5px] top-0.5 shadow-sm"></div>
-                                            <a href="about:blank" target="lesson-frame" @click="window.innerWidth < 1024 ? sidebarOpen = false : null" class="group/link font-medium text-sm flex items-center gap-3 text-slate-600 hover:text-teal-600 transition-colors">
+                                            <a href="xem-tai-lieu.html?folder=12-Chuong2-Bai1-Loigiai&title=Bài 1. Vectơ và các phép toán trong không gian" target="lesson-frame" @click="window.innerWidth < 1024 ? sidebarOpen = false : null" class="group/link font-medium text-sm flex items-center gap-3 text-slate-600 hover:text-teal-600 transition-colors">
                                                 <i class="fa-solid fa-folder text-slate-400 group-hover/link:text-teal-600 transition-colors text-base"></i> Lời giải
                                             </a>
                                         </li>
@@ -388,6 +388,21 @@
                             </h4>
                             
                             <div x-show="openChapter" x-transition class="space-y-4 pl-1 pr-1 mb-6">
+                                <!-- Tổng quan THXS -->
+                                <div x-data="{ openLesson: false }" class="bg-gradient-to-br from-white to-slate-50 border border-slate-200 rounded-2xl p-4 hover:border-teal-300 hover:shadow-md transition-all shadow-sm group/lesson">
+                                    <div @click="openLesson = !openLesson" class="flex justify-between items-center cursor-pointer">
+                                        <h5 class="font-semibold text-slate-800 text-sm group-hover/lesson:text-teal-700 transition-colors pr-2 leading-relaxed">Tổng quan các dạng toán Tổ hợp - Xác suất</h5>
+                                        <i class="fa-solid fa-chevron-down text-slate-400 text-sm transition-transform duration-300 group-hover/lesson:text-teal-500" :class="openLesson ? 'rotate-180 text-teal-500' : ''"></i>
+                                    </div>
+                                    <ul x-show="openLesson" x-transition class="relative border-l-[3px] border-slate-200 ml-2 mt-4 space-y-5 pb-1">
+                                        <li class="relative pl-6">
+                                            <div class="absolute w-4 h-4 rounded-full border-[3px] bg-white border-teal-400 -left-[9.5px] top-0.5 shadow-sm"></div>
+                                            <a href="toan-12/chuong-8-thxs/tong-quan-cac-dang-to-hop-xac-suat.html" target="lesson-frame" @click="window.innerWidth < 1024 ? sidebarOpen = false : null" class="group/link font-medium text-sm flex items-center gap-3 text-slate-600 hover:text-teal-600 transition-colors">
+                                                <i class="fa-regular fa-file-lines text-slate-400 group-hover/link:text-teal-600 transition-colors text-base"></i> Lý thuyết
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
                                 <!-- Bài 1 -->
                                 <div x-data="{ openLesson: false }" class="bg-gradient-to-br from-white to-slate-50 border border-slate-200 rounded-2xl p-4 hover:border-teal-300 hover:shadow-md transition-all shadow-sm group/lesson">
                                     <div @click="openLesson = !openLesson" class="flex justify-between items-center cursor-pointer">
