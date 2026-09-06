@@ -485,5 +485,45 @@
             });
         });
     </script>
+    <script>
+    // 1. Chặn chuột phải và bôi đen
+    document.addEventListener('contextmenu', event => event.preventDefault());
+    document.onselectstart = function() { return false; };
+
+    // 2. Chặn các phím tắt nguy hiểm (F12, Ctrl+U, Ctrl+S, Ctrl+Shift+I/J/C)
+    document.addEventListener('keydown', function(e) {
+        if (
+            e.key === 'F12' || 
+            (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key.toUpperCase())) || 
+            (e.ctrlKey && e.key.toUpperCase() === 'U') || // Chặn xem mã nguồn
+            (e.ctrlKey && e.key.toUpperCase() === 'S') || // Chặn tải trang (Save As)
+            (e.ctrlKey && e.key.toUpperCase() === 'P')    // Chặn in trang
+        ) {
+            e.preventDefault();
+            return false;
+        }
+    });
+
+    // 3. Vòng lặp đóng băng (Anti-DevTools)
+    // Lệnh này liên tục gọi hàm 'debugger'. Nếu F12 bị ép mở, trình duyệt sẽ bị treo liên tục ở trạng thái gỡ lỗi.
+    setInterval(function() {
+        (function() {
+            return false;
+        }['constructor']('debugger')['call']());
+    }, 100);
+    
+    document.addEventListener('keydown', function(e) {
+    // Bắt cả Ctrl và Cmd (metaKey) kết hợp với các phím S, U, P, I, J, C
+    if (
+        e.key === 'F12' || 
+        ((e.ctrlKey || e.metaKey) && e.shiftKey && ['I', 'J', 'C'].includes(e.key.toUpperCase())) || 
+        ((e.ctrlKey || e.metaKey) && ['U', 'S', 'P'].includes(e.key.toUpperCase()))
+    ) {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+    }
+}, true);
+</script>
 </body>
 </html>
