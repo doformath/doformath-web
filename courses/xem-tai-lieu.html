@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chinh phục Toán 12 Nâng cao - DoforMath</title>
-    
+
     <!-- 1. PRECONNECT: Khởi động sớm các kết nối máy chủ -->
     <link rel="preconnect" href="https://res.cloudinary.com">
+    <link rel="dns-prefetch" href="https://res.cloudinary.com">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
@@ -14,19 +15,19 @@
 
     <link rel="icon" type="image/png" href="../assets/images/Doformath.png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- CẢNH BÁO: Script này tiêu tốn nhiều CPU. Chỉ nên dùng ở môi trường phát triển (Dev) -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] }, colors: { primary: '#0d9488', secondary: '#facc15'} } }
-        }
-    </script>
-    
+
+    <!-- TỐI ƯU #1: Đã bỏ script CDN "cdn.tailwindcss.com" (biên dịch JIT bằng
+         JS ngay trên trình duyệt của người dùng — nặng CPU, chặn render, và
+         nạp lại từ đầu mỗi lần vào trang). Thay bằng CSS đã build sẵn, chỉ
+         chứa đúng các class thực sự dùng trong trang này (~11KB, không cần
+         biên dịch runtime). Nếu sau này thêm class Tailwind mới vào HTML,
+         cần build lại file CSS này (xem ghi chú cuối file). -->
+    <style>
+*,:after,:before{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgba(59,130,246,.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgba(59,130,246,.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/*! tailwindcss v3.4.13 | MIT License | https://tailwindcss.com*/*,:after,:before{box-sizing:border-box;border:0 solid #e5e7eb}:after,:before{--tw-content:""}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;-o-tab-size:4;tab-size:4;font-family:Inter,sans-serif;font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0}fieldset,legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::-moz-placeholder,textarea::-moz-placeholder{opacity:1;color:#9ca3af}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]{display:none}.container{width:100%}@media (min-width:640px){.container{max-width:640px}}@media (min-width:768px){.container{max-width:768px}}@media (min-width:1024px){.container{max-width:1024px}}@media (min-width:1280px){.container{max-width:1280px}}@media (min-width:1536px){.container{max-width:1536px}}.pointer-events-none{pointer-events:none}.fixed{position:fixed}.absolute{position:absolute}.relative{position:relative}.sticky{position:sticky}.bottom-8{bottom:2rem}.right-8{right:2rem}.top-0{top:0}.top-20{top:5rem}.z-10{z-index:10}.z-50{z-index:50}.mx-auto{margin-left:auto;margin-right:auto}.mb-3{margin-bottom:.75rem}.mb-6{margin-bottom:1.5rem}.mt-2{margin-top:.5rem}.mt-4{margin-top:1rem}.mt-8{margin-top:2rem}.block{display:block}.flex{display:flex}.inline-flex{display:inline-flex}.hidden{display:none}.h-1{height:.25rem}.h-10{height:2.5rem}.h-auto{height:auto}.min-h-\[500px\]{min-height:500px}.w-10{width:2.5rem}.w-12{width:3rem}.w-16{width:4rem}.w-full{width:100%}.max-w-4xl{max-width:56rem}.max-w-7xl{max-width:80rem}.flex-1{flex:1 1 0%}.select-none{-webkit-user-select:none;-moz-user-select:none;user-select:none}.resize{resize:both}.flex-col{flex-direction:column}.items-center{align-items:center}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-1{gap:.25rem}.gap-1\.5{gap:.375rem}.gap-2{gap:.5rem}.rounded-2xl{border-radius:1rem}.rounded-full{border-radius:9999px}.rounded-xl{border-radius:.75rem}.border{border-width:1px}.border-blue-100{--tw-border-opacity:1;border-color:rgb(219 234 254/var(--tw-border-opacity))}.border-blue-200{--tw-border-opacity:1;border-color:rgb(191 219 254/var(--tw-border-opacity))}.border-gray-100{--tw-border-opacity:1;border-color:rgb(243 244 246/var(--tw-border-opacity))}.border-gray-200{--tw-border-opacity:1;border-color:rgb(229 231 235/var(--tw-border-opacity))}.bg-blue-100{--tw-bg-opacity:1;background-color:rgb(219 234 254/var(--tw-bg-opacity))}.bg-gray-50{--tw-bg-opacity:1;background-color:rgb(249 250 251/var(--tw-bg-opacity))}.bg-white{--tw-bg-opacity:1;background-color:rgb(255 255 255/var(--tw-bg-opacity))}.bg-white\/95{background-color:hsla(0,0%,100%,.95)}.bg-gradient-to-r{background-image:linear-gradient(to right,var(--tw-gradient-stops))}.from-blue-400{--tw-gradient-from:#60a5fa var(--tw-gradient-from-position);--tw-gradient-to:rgba(96,165,250,0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from),var(--tw-gradient-to)}.from-blue-50{--tw-gradient-from:#eff6ff var(--tw-gradient-from-position);--tw-gradient-to:rgba(239,246,255,0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from),var(--tw-gradient-to)}.to-teal-400{--tw-gradient-to:#2dd4bf var(--tw-gradient-to-position)}.to-teal-50{--tw-gradient-to:#f0fdfa var(--tw-gradient-to-position)}.p-1\.5{padding:.375rem}.p-2{padding:.5rem}.p-6{padding:1.5rem}.px-3{padding-left:.75rem;padding-right:.75rem}.px-4{padding-left:1rem;padding-right:1rem}.py-1{padding-top:.25rem;padding-bottom:.25rem}.py-4{padding-top:1rem;padding-bottom:1rem}.pb-1{padding-bottom:.25rem}.pb-12{padding-bottom:3rem}.text-center{text-align:center}.font-sans{font-family:Inter,sans-serif}.text-2xl{font-size:1.5rem;line-height:2rem}.text-3xl{font-size:1.875rem;line-height:2.25rem}.text-sm{font-size:.875rem;line-height:1.25rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.text-xs{font-size:.75rem;line-height:1rem}.font-bold{font-weight:700}.font-medium{font-weight:500}.uppercase{text-transform:uppercase}.leading-snug{line-height:1.375}.tracking-tight{letter-spacing:-.025em}.tracking-wide{letter-spacing:.025em}.text-blue-700{--tw-text-opacity:1;color:rgb(29 78 216/var(--tw-text-opacity))}.text-gray-400{--tw-text-opacity:1;color:rgb(156 163 175/var(--tw-text-opacity))}.text-gray-500{--tw-text-opacity:1;color:rgb(107 114 128/var(--tw-text-opacity))}.text-gray-800{--tw-text-opacity:1;color:rgb(31 41 55/var(--tw-text-opacity))}.text-gray-900{--tw-text-opacity:1;color:rgb(17 24 39/var(--tw-text-opacity))}.text-primary{--tw-text-opacity:1;color:rgb(13 148 136/var(--tw-text-opacity))}.text-red-500{--tw-text-opacity:1;color:rgb(239 68 68/var(--tw-text-opacity))}.text-slate-900{--tw-text-opacity:1;color:rgb(15 23 42/var(--tw-text-opacity))}.antialiased{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}.shadow-2xl{--tw-shadow:0 25px 50px -12px rgba(0,0,0,.25);--tw-shadow-colored:0 25px 50px -12px var(--tw-shadow-color)}.shadow-2xl,.shadow-sm{box-shadow:var(--tw-ring-offset-shadow,0 0 #0000),var(--tw-ring-shadow,0 0 #0000),var(--tw-shadow)}.shadow-sm{--tw-shadow:0 1px 2px 0 rgba(0,0,0,.05);--tw-shadow-colored:0 1px 2px 0 var(--tw-shadow-color)}.backdrop-blur-md{--tw-backdrop-blur:blur(12px);-webkit-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)}.transition{transition-property:color,background-color,border-color,text-decoration-color,fill,stroke,opacity,box-shadow,transform,filter,-webkit-backdrop-filter;transition-property:color,background-color,border-color,text-decoration-color,fill,stroke,opacity,box-shadow,transform,filter,backdrop-filter;transition-property:color,background-color,border-color,text-decoration-color,fill,stroke,opacity,box-shadow,transform,filter,backdrop-filter,-webkit-backdrop-filter;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:.15s}.transition-colors{transition-property:color,background-color,border-color,text-decoration-color,fill,stroke;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:.15s}.transition-opacity{transition-property:opacity;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:.15s}.transition-shadow{transition-property:box-shadow;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:.15s}.hover\:bg-teal-50:hover{--tw-bg-opacity:1;background-color:rgb(240 253 250/var(--tw-bg-opacity))}.hover\:text-primary:hover{--tw-text-opacity:1;color:rgb(13 148 136/var(--tw-text-opacity))}.hover\:opacity-80:hover{opacity:.8}.hover\:shadow-teal-500\/20:hover{--tw-shadow-color:rgba(20,184,166,.2);--tw-shadow:var(--tw-shadow-colored)}@media (min-width:768px){.md\:flex{display:flex}.md\:p-8{padding:2rem}.md\:text-2xl{font-size:1.5rem;line-height:2rem}.md\:text-3xl{font-size:1.875rem;line-height:2.25rem}}
+    </style>
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
 </head>
 <body class="bg-gray-50 text-gray-800 antialiased font-sans">
 
@@ -76,11 +77,9 @@
         </div>
     </main>
 
-    <!-- Script Tải ảnh song song theo lô (Parallel Batch Fetching) -->
+    <!-- Script Tải ảnh song song theo POOL (Concurrency Pool) -->
     <script>
-        // Chạy NGAY LẬP TỨC, không chờ DOMContentLoaded — các phần tử DOM cần dùng
-        // đã tồn tại sẵn (script nằm sau chúng trong HTML). Nhờ vậy việc tải ảnh
-        // không còn bị "kẹt" chờ 2 script defer của KaTeX tải xong từ CDN như trước.
+        // Chạy NGAY LẬP TỨC, không chờ DOMContentLoaded.
         (function () {
             const urlParams = new URLSearchParams(window.location.search);
             const folderName = urlParams.get('folder');
@@ -100,16 +99,19 @@
                 return;
             }
 
-            const BATCH_SIZE = 6;   // Số ảnh dò/tải song song mỗi đợt
+            const CONCURRENCY = 8;  // Số ảnh tải song song CÙNG LÚC (pool), thay vì
+                                     // chờ hết cả lô 6 ảnh chậm nhất mới mở lô tiếp theo.
             const MAX_PAGES = 300;  // Giới hạn an toàn, tránh vòng lặp chạy vô hạn khi có lỗi
 
+            // TỐI ƯU #2 — ĐỘ NÉT: thêm dpr_auto để Cloudinary tự trả ảnh có mật độ
+            // điểm ảnh khớp với devicePixelRatio của máy (màn Retina/2x, 3x sẽ
+            // nhận ảnh nét hơn thay vì bị phóng to từ 1x và mờ đi). Nâng độ rộng
+            // giới hạn lên 2200px và dùng q_auto:good để giữ chi tiết chữ/số nhỏ
+            // trong tài liệu Toán rõ hơn so với q_auto mặc định.
             function buildUrl(page) {
-                return `https://res.cloudinary.com/${cloudName}/image/upload/f_auto,q_auto,c_limit,w_1800/${folderName}-${page}.png`;
+                return `https://res.cloudinary.com/${cloudName}/image/upload/f_auto,q_auto:good,dpr_auto,c_limit,w_2200/${folderName}-${page}.png`;
             }
 
-            // Gộp bước "kiểm tra tồn tại" và "tải ảnh" làm MỘT request duy nhất
-            // (trước đây là HEAD rồi mới GET → tốn gấp đôi số vòng round-trip).
-            // Có retry 1 lần khi lỗi để tránh dừng nhầm vì mạng chập chờn.
             function probeImage(page, allowRetry = true) {
                 return new Promise((resolve) => {
                     const img = new Image();
@@ -134,34 +136,45 @@
                 container.appendChild(img);
             }
 
+            // TỐI ƯU #3 — TỐC ĐỘ: thay cơ chế "tải lô 6 ảnh rồi CHỜ CẢ LÔ xong mới
+            // mở lô tiếp theo" bằng một pool 8 worker chạy song song liên tục —
+            // hễ 1 ảnh tải xong là worker đó lập tức xin trang kế tiếp, không phải
+            // chờ ảnh chậm nhất trong lô. Vì các worker hoàn thành không theo đúng
+            // thứ tự trang, kết quả được gom vào hàng đợi và chèn vào DOM đúng thứ
+            // tự trang (1, 2, 3, …) để người đọc không thấy trang bị đảo lộn.
             async function loadAllPages() {
-                let pageNum = 1;
+                let nextPageToFetch = 1;
+                let firstMissingPage = Infinity;
                 let loadedCount = 0;
+                let nextPageToInsert = 1;
+                const pending = new Map(); // page -> img, chờ tới lượt chèn vào DOM
 
-                while (pageNum <= MAX_PAGES) {
-                    const batchPages = [];
-                    for (let i = 0; i < BATCH_SIZE; i++) batchPages.push(pageNum + i);
+                function flushInOrder() {
+                    while (pending.has(nextPageToInsert) && nextPageToInsert < firstMissingPage) {
+                        const img = pending.get(nextPageToInsert);
+                        pending.delete(nextPageToInsert);
+                        appendImage(nextPageToInsert, img);
+                        loadedCount++;
+                        if (loadedCount === 1) loader.style.display = 'none';
+                        nextPageToInsert++;
+                    }
+                }
 
-                    // Dò + tải cả lô ảnh CÙNG LÚC thay vì từng ảnh một
-                    const results = await Promise.all(batchPages.map(p => probeImage(p)));
-
-                    let reachedEnd = false;
-                    for (const r of results) {
-                        if (r.ok) {
-                            appendImage(r.page, r.img);
-                            loadedCount++;
-                            if (loadedCount === 1) {
-                                loader.style.display = 'none';
-                            }
-                        } else {
-                            reachedEnd = true;
-                            break; // gặp trang không tồn tại -> dừng dò tiếp
+                async function worker() {
+                    while (true) {
+                        if (nextPageToFetch > MAX_PAGES || nextPageToFetch >= firstMissingPage) return;
+                        const page = nextPageToFetch++;
+                        const result = await probeImage(page);
+                        if (result.ok) {
+                            pending.set(page, result.img);
+                            flushInOrder();
+                        } else if (page < firstMissingPage) {
+                            firstMissingPage = page;
                         }
                     }
-
-                    if (reachedEnd) break;
-                    pageNum += BATCH_SIZE;
                 }
+
+                await Promise.all(Array.from({ length: CONCURRENCY }, worker));
 
                 if (loadedCount === 0) {
                     loader.innerHTML = "<span class='text-red-500'>Không tìm thấy tài liệu trên hệ thống.</span>";
@@ -169,31 +182,43 @@
             }
 
             loadAllPages();
+
+            // TỐI ƯU #4 — chỉ nạp KaTeX (2 request JS + CSS đã có sẵn ở <head>)
+            // khi tiêu đề THỰC SỰ chứa công thức Toán (ký hiệu $...$). Nhiều tài
+            // liệu có tiêu đề thuần văn bản thì không cần tải/parse KaTeX chút nào.
+            const needsKatex = !!(title && title.indexOf('$') !== -1);
+            if (needsKatex) {
+                const s1 = document.createElement('script');
+                s1.src = "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js";
+                s1.onload = function () {
+                    const s2 = document.createElement('script');
+                    s2.src = "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js";
+                    s2.onload = renderKatexTargets;
+                    document.head.appendChild(s2);
+                };
+                document.head.appendChild(s1);
+            }
+
+            function renderKatexTargets() {
+                const targets = [document.getElementById('logo-math'), document.getElementById('title-section')];
+                targets.forEach(el => {
+                    if (el && window.renderMathInElement) {
+                        renderMathInElement(el, {
+                            delimiters: [
+                                { left: '$$', right: '$$', display: true },
+                                { left: '$', right: '$', display: false }
+                            ],
+                            throwOnError: false
+                        });
+                    }
+                });
+            }
         })();
-    </script>
-    
-    <!-- Script Kích hoạt KaTeX được giới hạn vùng quét -->
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            // Chỉ quét Logo và Tiêu đề thay vì document.body
-            const targets = [document.getElementById('logo-math'), document.getElementById('title-section')];
-            targets.forEach(el => {
-                if(el) {
-                    renderMathInElement(el, {
-                        delimiters: [
-                            {left: '$$', right: '$$', display: true},
-                            {left: '$', right: '$', display: false}
-                        ],
-                        throwOnError : false
-                    });
-                }
-            });
-        });
     </script>
 
     <!-- Script Xử lý chức năng Zoom -->
     <script>
-        let currentZoom = 80; 
+        let currentZoom = 80;
 
         document.addEventListener("DOMContentLoaded", function() {
             applyZoom();
@@ -202,14 +227,14 @@
         window.addEventListener('resize', applyZoom);
 
         function zoomIn() {
-            if (currentZoom < 150) { 
+            if (currentZoom < 150) {
                 currentZoom += 10;
                 applyZoom();
             }
         }
 
         function zoomOut() {
-            if (currentZoom > 50) { 
+            if (currentZoom > 50) {
                 currentZoom -= 10;
                 applyZoom();
             }
@@ -218,7 +243,7 @@
         function applyZoom() {
             document.getElementById('zoom-level').innerText = currentZoom + '%';
             const container = document.getElementById('image-container');
-            
+
             if (window.innerWidth < 768) {
                 container.style.width = '100%';
             } else {

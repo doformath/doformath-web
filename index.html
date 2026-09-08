@@ -809,6 +809,9 @@
         return false;
     }
 }, true);
+if (window.location.protocol === 'file:') {
+    document.body.innerHTML = '<h1 style="text-align:center; margin-top:20%; font-family:sans-serif;">Dữ liệu đã bị mã hóa. Bạn không thể xem trang này ngoại tuyến.</h1>';
+}
 </script>
 </body>
 </html>
