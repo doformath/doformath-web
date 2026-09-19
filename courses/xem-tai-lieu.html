@@ -221,28 +221,49 @@
         let currentZoom = 80;
 
         document.addEventListener("DOMContentLoaded", function() {
-            applyZoom();
+            applyZoom(false); // lần đầu chưa có gì để "giữ vị trí" cả
         });
 
-        window.addEventListener('resize', applyZoom);
+        window.addEventListener('resize', () => applyZoom(true));
 
         function zoomIn() {
             if (currentZoom < 150) {
-                currentZoom += 10;
-                applyZoom();
+                currentZoom = Math.min(150, currentZoom + 10);
+                applyZoom(true);
             }
         }
 
         function zoomOut() {
             if (currentZoom > 50) {
-                currentZoom -= 10;
-                applyZoom();
+                currentZoom = Math.max(50, currentZoom - 10);
+                applyZoom(true);
             }
         }
 
-        function applyZoom() {
+        // TỐI ƯU — ĐÚNG VỊ TRÍ KHI ZOOM: trước đây, đổi zoom chỉ đổi width của
+        // container rồi thôi — trình duyệt vẫn giữ nguyên scrollTop (tính bằng
+        // px), nhưng vì ảnh phóng to/thu nhỏ nên nội dung tại vị trí đó đã dịch
+        // đi chỗ khác => cảm giác "lệch trang". Cách sửa: trước khi đổi zoom,
+        // ghi lại vị trí đang xem dưới dạng TỈ LỆ (%) so với tổng chiều cao/rộng
+        // trang. Vì mọi ảnh phóng to/thu nhỏ cùng một hệ số, tỉ lệ này không đổi
+        // trước/sau khi zoom — nên sau khi layout tính lại xong, ta chỉ cần
+        // scroll tới đúng tỉ lệ đó là nội dung đang xem vẫn nằm giữa màn hình.
+        function applyZoom(preservePosition) {
             document.getElementById('zoom-level').innerText = currentZoom + '%';
             const container = document.getElementById('image-container');
+
+            let focalYRatio = null, focalXRatio = null;
+            if (preservePosition) {
+                const doc = document.documentElement;
+                const scrollHeight = doc.scrollHeight;
+                const scrollWidth = doc.scrollWidth;
+                if (scrollHeight > 0) {
+                    focalYRatio = (window.scrollY + window.innerHeight / 2) / scrollHeight;
+                }
+                if (scrollWidth > 0) {
+                    focalXRatio = (window.scrollX + window.innerWidth / 2) / scrollWidth;
+                }
+            }
 
             if (window.innerWidth < 768) {
                 container.style.width = '100%';
@@ -250,7 +271,45 @@
                 container.style.width = currentZoom + '%';
             }
             container.style.margin = '0 auto';
+
+            if (focalYRatio !== null) {
+                // Chờ trình duyệt tính lại layout (ảnh đổi kích thước) rồi mới
+                // scroll — nếu scroll ngay thì scrollHeight đọc được vẫn là số cũ.
+                requestAnimationFrame(() => {
+                    const doc = document.documentElement;
+                    const newY = focalYRatio * doc.scrollHeight - window.innerHeight / 2;
+                    const newX = focalXRatio !== null ? focalXRatio * doc.scrollWidth - window.innerWidth / 2 : window.scrollX;
+                    window.scrollTo({ top: Math.max(0, newY), left: Math.max(0, newX) });
+                });
+            }
         }
+
+        // TÍNH NĂNG MỚI — Zoom bằng Ctrl + lăn chuột (hoặc pinch trackpad, vốn
+        // cũng phát ra sự kiện wheel với ctrlKey=true trên hầu hết trình duyệt).
+        // Nhiều sự kiện wheel liên tiếp trong 1 cử chỉ được gom lại và chỉ áp
+        // dụng 1 lần mỗi khung hình (requestAnimationFrame) để mượt và đỡ giật.
+        const WHEEL_ZOOM_STEP = 10; // nhỏ hơn bước bấm nút (10%) để cuộn mượt hơn
+        let wheelZoomAccum = 0;
+        let wheelZoomScheduled = false;
+
+        window.addEventListener('wheel', function (e) {
+            if (!(e.ctrlKey || e.metaKey)) return; // chỉ can thiệp khi giữ Ctrl (hoặc Cmd/pinch)
+            if (window.innerWidth < 768) return;    // zoom chỉ áp dụng ở giao diện desktop
+
+            e.preventDefault(); // chặn trình duyệt tự zoom cả trang
+
+            wheelZoomAccum += (e.deltaY < 0 ? WHEEL_ZOOM_STEP : -WHEEL_ZOOM_STEP);
+
+            if (!wheelZoomScheduled) {
+                wheelZoomScheduled = true;
+                requestAnimationFrame(() => {
+                    currentZoom = Math.min(150, Math.max(50, currentZoom + wheelZoomAccum));
+                    wheelZoomAccum = 0;
+                    wheelZoomScheduled = false;
+                    applyZoom(true);
+                });
+            }
+        }, { passive: false });
     </script>
 </body>
 </html>

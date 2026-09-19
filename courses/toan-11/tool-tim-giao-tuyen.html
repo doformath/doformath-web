@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thực hành: Tìm giao tuyến - DoforMath</title>
+    
+    <!-- Cấu hình Favicon -->
+    <link rel="icon" type="image/png" href="../../../../assets/images/Doformath.png">
+
+    <!-- Font chữ Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- KaTeX cho Toán học (Phải load trước để lấy font) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: { 
+                extend: { 
+                    fontFamily: { 
+                        sans: ['Inter', 'sans-serif'],
+                        // Khai báo thêm font chuẩn của KaTeX
+                        math: ['KaTeX_Math', 'KaTeX_Main', 'Times New Roman', 'serif']
+                    }, 
+                    colors: { primary: '#0d9488', secondary: '#facc15'} 
+                } 
+            }
+        }
+    </script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Alpine.js cho Tương tác -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 antialiased font-sans pb-16">
+
+    <!-- Banner Tiêu đề -->
+    <div class="max-w-4xl mx-auto px-4 w-full mt-8 mb-8">
+        <div class="bg-gradient-to-r from-teal-50 to-emerald-50 border border-teal-100 rounded-2xl p-6 md:p-10 shadow-sm flex flex-col items-center text-center">
+            <span class="bg-teal-100 text-teal-700 border border-teal-200 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide mb-4 shadow-sm inline-flex items-center gap-1.5">
+                <i class="fa-solid fa-laptop-code"></i> Thực hành Tương tác
+            </span>
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900 leading-snug">Tìm giao tuyến của hai mặt phẳng</h1>
+            <p class="text-gray-500 mt-3 font-medium">Hệ thống sẽ hướng dẫn bạn tư duy từng bước theo chuẩn thuật toán</p>
+            <div class="w-20 h-1.5 bg-gradient-to-r from-teal-400 to-emerald-400 rounded-full mt-6"></div>
+        </div>
+    </div>
+
+    <!-- Vùng tương tác Alpine.js -->
+    <main class="max-w-4xl mx-auto px-4 w-full" 
+          x-data="{ 
+              step: 1, 
+              mp1: '', 
+              mp2: '', 
+              diemM: '', 
+              modeStep3: 'cach1', /* Biến mới để điều khiển Cách 1 hoặc Cách 2 */
+              mp1_ext: '', 
+              mp2_ext: '', 
+              duongA: '', 
+              duongB: '', 
+              mpPhu: '', 
+              viTri: '', 
+              diemN: '' 
+          }">
+        
+        <!-- THUẬT TOÁN TÓM TẮT -->
+        <section class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
+            <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-clipboard-list text-teal-600"></i> Nhắc lại thuật toán
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                    <span class="font-bold text-teal-700 block mb-1">Bước 1:</span>
+                    Tìm 1 điểm chung $M$ của hai mặt phẳng $(\alpha)$ và $(\beta)$.
+                </div>
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                    <span class="font-bold text-teal-700 block mb-1">Bước 2:</span>
+                    Tìm $a \subset (\alpha)$ và $b \subset (\beta)$ sao cho $a$ và $b$ đồng phẳng. Xét vị trí tương đối của $a$ và $b$.
+                </div>
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                    <span class="font-bold text-teal-700 block mb-1">Bước 3:</span>
+                    Kết luận giao tuyến dựa trên giao điểm hoặc phương song song.
+                </div>
+            </div>
+        </section>
+
+        <!-- KHU VỰC THỰC HÀNH -->
+        <section class="space-y-6">
+            
+            <!-- BƯỚC 1: KHỞI TẠO -->
+            <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-teal-100 relative overflow-hidden transition-all" :class="step >= 1 ? 'opacity-100' : 'opacity-50 pointer-events-none'">
+                <div class="absolute top-0 left-0 w-1.5 h-full bg-teal-500"></div>
+                <h3 class="text-lg font-bold text-gray-800 mb-4">Khởi tạo bài toán</h3>
+                <p class="text-gray-600 mb-4">Nhập tên hai mặt phẳng bạn cần tìm giao tuyến:</p>
+                <div class="flex flex-col md:flex-row gap-1 items-center">
+                    <div class="flex items-center gap-1 w-full md:w-auto">
+                    <span class="font-math text-xl text-gray-500">(</span>
+                    <!-- Thêm @keydown.enter -->
+                    <input type="text" x-model="mp1" @input="mp1 = mp1.toUpperCase()" @keydown.enter="if(mp1 && mp2) step = 2" class="bg-transparent border-b-2 border-gray-400 focus:border-teal-500 outline-none px-2 py-1 w-20 text-center font-math text-xl  text-teal-700" placeholder="">
+                    <span class="font-math text-xl text-gray-500">)</span>
+                </div>
+                    <span class="font-bold text-gray-400 hidden md:block">và</span>
+                    <div class="flex items-center gap-1 w-full md:w-auto">
+                    <span class="font-math text-xl text-gray-500">(</span>
+                    <!-- Thêm @keydown.enter -->
+                    <input type="text" x-model="mp2" @input="mp2 = mp2.toUpperCase()" @keydown.enter="if(mp1 && mp2) step = 2" class="bg-transparent border-b-2 border-gray-400 focus:border-teal-500 outline-none px-2 py-1 w-20 text-center font-math text-xl text-teal-700" placeholder="">
+                    <span class="font-math text-xl text-gray-500">)</span>
+                </div>
+                    <button x-show="step === 1" @click="step = 2" :disabled="!mp1 || !mp2" class="mt-4 md:mt-0 ml-auto bg-teal-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed transition">Tiếp tục <i class="fa-solid fa-arrow-right ml-1"></i></button>
+                </div>
+            </div>
+
+            <!-- BƯỚC 2: ĐIỂM CHUNG THỨ NHẤT -->
+            <div x-show="step >= 2" x-transition class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-blue-100 relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-1.5 h-full bg-blue-500"></div>
+                <h3 class="text-lg font-bold text-gray-800 mb-4">Bước 1: Tìm điểm chung thứ nhất</h3>
+                <p class="text-gray-600 mb-4">Quan sát hình vẽ, hãy chỉ ra 1 điểm cùng thuộc cả (<span class="font-math  text-lg text-teal-700" x-text="mp1"></span>) và (<span class="font-math  text-lg text-teal-700" x-text="mp2"></span>):</p>
+                <div class="flex flex-col md:flex-row gap-4 items-center">
+                     <div class="flex items-center gap-2">
+                    <span class="text-gray-600">Điểm chung:</span>
+                    <!-- Thêm @keydown.enter -->
+                    <input type="text" x-model="diemM" @input="diemM = diemM.toUpperCase()" @keydown.enter="if(diemM) step = 3" class="bg-transparent border-b-2 border-gray-400 focus:border-blue-500 outline-none px-2 py-1 w-16 text-center font-math text-xl text-blue-700" placeholder="M">
+                </div>
+                    <div x-show="diemM" x-transition class="text-base text-gray-600 bg-gray-50 px-4 py-2 rounded-lg border border-gray-200 flex items-center gap-1.5">
+                        Ta có: <span class="font-math  text-blue-600 text-lg" x-text="diemM"></span> $\in$ (<span class="font-math  text-lg" x-text="mp1"></span>) $\cap$ (<span class="font-math  text-lg" x-text="mp2"></span>)
+                    </div>
+                    <button x-show="step === 2" @click="step = 3" :disabled="!diemM" class="mt-4 md:mt-0 ml-auto bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 transition">Xác nhận <i class="fa-solid fa-check ml-1"></i></button>
+                </div>
+            </div>
+
+            <!-- BƯỚC 3: TÌM YẾU TỐ ĐỒNG PHẲNG (Được thiết kế lại theo yêu cầu) -->
+            <div x-show="step >= 3" x-transition class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-yellow-200 relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-1.5 h-full bg-yellow-400"></div>
+                <h3 class="text-lg font-bold text-gray-800 mb-4">Bước 2: Tìm hai đường thẳng đồng phẳng</h3>
+                
+                <!-- GIAO DIỆN CÁCH 1: LỌC TỪ TÊN GỌI -->
+                <div x-show="modeStep3 === 'cach1'" x-transition>
+                    <div class="bg-yellow-50/80 p-5 rounded-xl border border-yellow-200 mb-6 text-sm text-gray-700 shadow-sm">
+                        <p class="font-bold text-yellow-800 mb-2 flex items-center gap-2"><i class="fa-solid fa-lightbulb text-yellow-500"></i> Mẹo tư duy (Cách 1):</p>
+                        <p>Thử che điểm chung <span class="font-math text-lg text-yellow-700" x-text="diemM"></span> khỏi tên của 2 mặt phẳng ban đầu là (<span class="font-math text-lg text-yellow-700" x-text="mp1"></span>) và (<span class="font-math text-lg text-yellow-700" x-text="mp2"></span>). Hai đường thẳng còn lại là gì?</p>
+                    </div>
+                </div>
+
+                <!-- GIAO DIỆN CÁCH 2: MỞ RỘNG / THU HẸP MẶT PHẲNG -->
+                <div x-show="modeStep3 === 'cach2'" x-transition x-cloak>
+                    <div class="bg-orange-50/80 p-5 rounded-xl border border-orange-200 mb-6 text-sm text-gray-700 shadow-sm">
+                        <p class="font-bold text-orange-800 mb-2 flex items-center gap-2"><i class="fa-solid fa-expand text-orange-500"></i> Mẹo tư duy (Cách 2): Mở rộng / Thu hẹp mặt phẳng</p>
+                        <p>Hãy kéo dài các cạnh trên hình vẽ để tìm thêm giao điểm mới. Sau đó <strong>đọc lại tên hai mặt phẳng</strong> sao cho chứa các giao điểm mới đó.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 bg-orange-50/30 p-4 rounded-xl border border-orange-100">
+                        <div class="space-y-2">
+                            <label class="text-sm text-gray-500 flex items-center gap-1">Đổi tên (<span class="font-math  text-base" x-text="mp1"></span>) thành:</label>
+                            <div class="flex items-center gap-2">
+                                <span class="font-math  text-xl text-gray-500">(</span>
+                                <input type="text" x-model="mp1_ext" @input="mp1_ext = mp1_ext.toUpperCase()" class="border-b-2 border-gray-300 focus:border-orange-500 outline-none px-2 py-1 w-full text-center font-math  text-xl font-bold text-orange-700 uppercase" placeholder="VD: SAB">
+                                <span class="font-math  text-xl text-gray-500">)</span>
+                            </div>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-sm text-gray-500 flex items-center gap-1">Đổi tên (<span class="font-math  text-base" x-text="mp2"></span>) thành:</label>
+                            <div class="flex items-center gap-2">
+                                <span class="font-math  text-xl text-gray-500">(</span>
+                                <input type="text" x-model="mp2_ext" @input="mp2_ext = mp2_ext.toUpperCase()" class="border-b-2 border-gray-300 focus:border-orange-500 outline-none px-2 py-1 w-full text-center font-math  text-xl font-bold text-orange-700 uppercase" placeholder="VD: SCD">
+                                <span class="font-math  text-xl text-gray-500">)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div x-show="mp1_ext && mp2_ext" x-transition>
+                        <p class="text-gray-700 font-medium mb-4 flex items-center flex-wrap gap-1">Bây giờ, hãy thử che điểm chung <span class="font-math  text-lg text-orange-700" x-text="diemM"></span> khỏi 2 mặt phẳng mới (<span class="font-math  text-lg text-orange-700" x-text="mp1_ext"></span>) và (<span class="font-math  text-lg text-orange-700" x-text="mp2_ext"></span>):</p>
+                    </div>
+                </div>
+
+                <!-- KHỐI NHẬP LIỆU A, B CHUNG -->
+                <!-- Khối này sẽ tự động thay đổi tên mặt phẳng hiển thị dựa trên việc học sinh chọn Cách 1 hay Cách 2 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6" x-show="modeStep3 === 'cach1' || (modeStep3 === 'cach2' && mp1_ext && mp2_ext)" x-transition>
+                    <div class="space-y-2">
+                        <label class="text-sm text-gray-500 flex items-center gap-1">Đường thẳng $\subset$ (<span class="font-math  text-base" x-text="modeStep3 === 'cach1' ? mp1 : mp1_ext"></span>)</label>
+                        <input type="text" x-model="duongA" @input="duongA = duongA.toUpperCase()" class="w-full border-2 border-gray-200 focus:border-yellow-500 rounded-lg px-3 py-2 font-math  text-xl text-gray-700 uppercase" placeholder="AB">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-sm text-gray-500 flex items-center gap-1">Đường thẳng $\subset$ (<span class="font-math  text-base" x-text="modeStep3 === 'cach1' ? mp2 : mp2_ext"></span>)</label>
+                        <input type="text" x-model="duongB" @input="duongB = duongB.toUpperCase()" class="w-full border-2 border-gray-200 focus:border-yellow-500 rounded-lg px-3 py-2 font-math  text-xl text-gray-700 uppercase" placeholder="CD">
+                    </div>
+                </div>
+
+                <!-- Hỏi mặt phẳng phụ chứa cả 2 đường -->
+                <div x-show="duongA && duongB" x-transition class="flex flex-col md:flex-row items-center gap-4 bg-gray-50 p-4 rounded-xl border border-gray-200">
+                    <div class="flex items-center gap-1 flex-wrap text-gray-700 font-medium">
+                        Đường <span class="font-math  text-lg" x-text="duongA"></span> và <span class="font-math  text-lg" x-text="duongB"></span> cùng nằm trong mp nào?
+                    </div>
+                   <div class="flex items-center gap-1">
+                    <span class="font-math text-xl text-gray-500">(</span>
+                    <!-- Thêm @keydown.enter -->
+                    <input type="text" x-model="mpPhu" @input="mpPhu = mpPhu.toUpperCase()" @keydown.enter="if(mpPhu) step = 4" class="bg-transparent border-b-2 border-gray-400 focus:border-yellow-500 outline-none px-1 py-1 w-20 text-center font-math text-xl text-yellow-700 uppercase" placeholder="ABCD">
+                    <span class="font-math text-xl text-gray-500">)</span>
+                </div>
+                </div>
+
+                <!-- KHỐI ĐIỀU HƯỚNG BƯỚC 3 -->
+                <div class="flex flex-col md:flex-row items-center gap-2 mt-6 border-t border-gray-100 pt-6">
+                    <button x-show="step === 3" @click="step = 4" :disabled="!mpPhu" class="bg-yellow-500 text-white px-6 py-2 rounded-lg font-medium hover:bg-yellow-600 disabled:opacity-50 transition w-full md:w-auto">Tiếp tục <i class="fa-solid fa-arrow-right ml-1"></i></button>
+                    
+                    <button x-show="step === 3 && modeStep3 === 'cach1'" @click="modeStep3 = 'cach2'; duongA = ''; duongB = ''; mpPhu = '';" class="text-gray-500 hover:text-red-500 font-medium transition text-sm underline underline-offset-4 w-full md:w-auto text-center mt-2 md:mt-0">Không tìm được hai đường thẳng đồng phẳng từ tên?</button>
+
+                    <button x-show="step === 3 && modeStep3 === 'cach2'" @click="modeStep3 = 'cach1'; mp1_ext = ''; mp2_ext = ''; duongA = ''; duongB = ''; mpPhu = '';" class="text-gray-500 hover:text-orange-600 font-medium transition text-sm underline underline-offset-4 w-full md:w-auto text-center mt-2 md:mt-0"><i class="fa-solid fa-arrow-rotate-left mr-1"></i> Quay lại Cách 1</button>
+                </div>
+            </div>
+
+            <!-- BƯỚC 4: XÉT VỊ TRÍ TƯƠNG ĐỐI -->
+            <div x-show="step >= 4" x-transition class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-purple-200 relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-1.5 h-full bg-purple-500"></div>
+                <h3 class="text-lg font-bold text-gray-800 mb-4">Bước 3: Xét vị trí tương đối</h3>
+                <p class="text-gray-700 font-medium mb-5 flex items-center gap-1 flex-wrap">Trong mặt phẳng chung (<span class="font-math  text-lg text-purple-700" x-text="mpPhu"></span>), hai đường thẳng <span class="font-math  text-lg" x-text="duongA"></span> và <span class="font-math  text-lg" x-text="duongB"></span> có vị trí tương đối như thế nào?</p>
+                
+                <div class="flex flex-wrap gap-4">
+                    <button @click="viTri = 'cat'; step = 5" :class="viTri === 'cat' ? 'bg-indigo-600 text-white border-indigo-600 shadow-md ring-2 ring-indigo-200' : 'bg-white text-gray-600 border-gray-200 hover:border-indigo-400 hover:bg-indigo-50'" class="border-2 px-6 py-3 rounded-xl font-semibold transition flex items-center gap-2">
+                        <i class="fa-solid fa-xmark text-lg"></i> Cắt nhau
+                    </button>
+                    <button @click="viTri = 'songsong'; step = 5" :class="viTri === 'songsong' ? 'bg-emerald-600 text-white border-emerald-600 shadow-md ring-2 ring-emerald-200' : 'bg-white text-gray-600 border-gray-200 hover:border-emerald-400 hover:bg-emerald-50'" class="border-2 px-6 py-3 rounded-xl font-semibold transition flex items-center gap-2">
+                        <i class="fa-solid fa-equals transform -rotate-45 text-lg"></i> Song song
+                    </button>
+                </div>
+            </div>
+
+            <!-- BƯỚC 5: KẾT LUẬN -->
+            <div x-show="step >= 5" x-transition>
+                
+                <!-- Trường hợp CẮT NHAU -->
+                <div x-show="viTri === 'cat'" class="bg-indigo-50 p-6 md:p-8 rounded-2xl border-2 border-indigo-200 shadow-sm">
+                    <h3 class="text-xl font-bold text-indigo-800 mb-4"><i class="fa-solid fa-flag-checkered mr-2"></i>Kết luận (Trường hợp cắt nhau)</h3>
+                    <div class="flex items-center gap-3 mb-6">
+                        <span class="text-gray-700">Gọi giao điểm:</span>
+                        <input type="text" x-model="diemN" @input="diemN = diemN.toUpperCase()" class="border-2 border-indigo-200 focus:border-indigo-500 rounded-lg outline-none px-3 py-2 w-20 text-center font-math  text-xl text-indigo-700 uppercase" placeholder="N">
+                        <span class="text-gray-700 flex items-center gap-1.5 text-lg">= <span class="font-math " x-text="duongA"></span> $\cap$ <span class="font-math " x-text="duongB"></span></span>
+                    </div>
+                    <div x-show="diemN" x-transition class="bg-white p-5 rounded-xl border border-indigo-100">
+                        <p class="text-gray-800 mb-2 flex items-center flex-wrap gap-1">Vì <span class="font-math  text-indigo-600 text-lg" x-text="diemN"></span> thuộc <span class="font-math  text-lg" x-text="duongA"></span> $\subset$ (<span class="font-math  text-lg" x-text="mp1_ext || mp1"></span>) và <span class="font-math  text-lg" x-text="duongB"></span> $\subset$ (<span class="font-math  text-lg" x-text="mp2_ext || mp2"></span>) nên <span class="font-math  text-indigo-600 text-lg" x-text="diemN"></span> là điểm chung thứ hai.</p>
+                        <p class="text-xl text-indigo-700 mt-4 border-t border-indigo-100 pt-4 flex items-center gap-1.5 flex-wrap">
+                            <span class="font-bold text-lg font-sans">Giao tuyến cần tìm:</span> (<span class="font-math " x-text="mp1"></span>) $\cap$ (<span class="font-math " x-text="mp2"></span>) = <span class="font-math  text-2xl font-bold" x-text="diemM + diemN"></span>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Trường hợp SONG SONG -->
+                <div x-show="viTri === 'songsong'" class="bg-emerald-50 p-6 md:p-8 rounded-2xl border-2 border-emerald-200 shadow-sm">
+                    <h3 class="text-xl font-bold text-emerald-800 mb-4"><i class="fa-solid fa-flag-checkered mr-2"></i>Kết luận (Trường hợp song song)</h3>
+                    <p class="text-gray-700 mb-4">Áp dụng hệ quả định lý giao tuyến 3 mặt phẳng:</p>
+                    <div class="bg-white p-5 rounded-xl border border-emerald-100 space-y-2 text-gray-800 text-base">
+                        <p class="flex items-center gap-1 flex-wrap">- Hai mặt phẳng (<span class="font-math  text-lg" x-text="mp1"></span>) và (<span class="font-math  text-lg" x-text="mp2"></span>) có điểm chung <span class="font-math  text-emerald-600 text-lg" x-text="diemM"></span>.</p>
+                        <p class="flex items-center gap-1 flex-wrap">- Lần lượt chứa hai đường thẳng song song là <span class="font-math  text-lg" x-text="duongA"></span> $\subset$ (<span class="font-math  text-lg" x-text="mp1_ext || mp1"></span>) và <span class="font-math  text-lg" x-text="duongB"></span> $\subset$ (<span class="font-math  text-lg" x-text="mp2_ext || mp2"></span>).</p>
+                        <p class="text-xl text-emerald-700 mt-4 border-t border-emerald-100 pt-4 flex items-center gap-1.5 flex-wrap">
+                            $\Rightarrow$ <span class="font-bold text-lg font-sans">Giao tuyến là đường thẳng</span> <span class="font-math  text-2xl ">d</span> <span class="font-bold text-lg font-sans">đi qua</span> <span class="font-math  text-lg" x-text="diemM"></span> <span class="font-bold text-lg font-sans">và</span> <span class="font-math  text-xl">d</span> $\parallel$ <span class="font-math  text-lg" x-text="duongA"></span> $\parallel$ <span class="font-math  text-lg" x-text="duongB"></span>.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+            
+            <!-- Nút làm lại từ đầu -->
+            <div x-show="step >= 4" class="flex justify-center mt-8">
+                <button @click="step = 1; mp1 = ''; mp2 = ''; diemM = ''; duongA = ''; duongB = ''; mpPhu = ''; viTri = ''; diemN = '';" class="text-gray-500 hover:text-teal-600 font-medium transition underline underline-offset-4">Làm lại bài toán khác</button>
+            </div>
+            
+        </section>
+    </main>
+
+    <!-- Script Kích hoạt KaTeX -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false}
+                ],
+                throwOnError : false
+            });
+        });
+    </script>
+
+</body>
+</html>
