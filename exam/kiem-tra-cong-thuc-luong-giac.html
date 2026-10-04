@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dò bài công thức Lượng giác - DoforMath</title>
+
+    <!-- Cấu hình Favicon -->
+    <link rel="icon" type="image/png" href="../assets/images/Doformath.png">
+
+    <!-- Font chữ Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] }, colors: { primary: '#0d9488', secondary: '#facc15'} } }
+        }
+    </script>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- KaTeX cho Toán học -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 antialiased font-sans pb-16">
+
+    <!-- HEADER -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 h-16 flex justify-between items-center gap-3">
+            <a id="nutQuayLai" href="../phong-thi.html" class="flex items-center text-gray-500 hover:text-primary font-medium transition-colors text-sm md:text-base">
+                <i class="fa-solid fa-arrow-left mr-2"></i> Phòng thi
+            </a>
+            <span id="tenBaiHeader" class="hidden font-bold text-gray-700 text-sm md:text-base truncate">Kiểm tra công thức Lượng giác</span>
+            <div class="flex items-center gap-3">
+                <span id="dongHoHeader" class="hidden font-bold text-teal-700 bg-teal-50 border border-teal-100 px-3 py-1 rounded-full tabular-nums text-sm">
+                    <i class="fa-solid fa-stopwatch mr-1"></i><span id="dongHo">0:00.0</span>
+                </span>
+                <span id="ten-user" class="hidden text-xs md:text-sm font-semibold text-teal-700 bg-teal-50 px-3 py-1 rounded-full border border-teal-100 max-w-[140px] truncate"></span>
+                <a id="nut-dang-nhap" href="../login.html" class="hidden bg-primary hover:bg-teal-800 text-white px-4 py-2 rounded-full text-sm font-medium transition-all shadow-md">Đăng nhập</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 w-full mt-8 space-y-8">
+
+        <!-- ================= MÀN HÌNH BẮT ĐẦU ================= -->
+        <section id="manHinhBatDau">
+            <div class="bg-gradient-to-r from-teal-50 to-emerald-50 border border-teal-100 rounded-2xl p-6 md:p-10 shadow-sm flex flex-col items-center text-center">
+                <span class="bg-teal-100 text-teal-700 border border-teal-200 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide mb-4 shadow-sm inline-flex items-center gap-1.5">
+                    <i class="fa-solid fa-bolt"></i> Dò bài nhanh
+                </span>
+                <h1 class="text-3xl md:text-4xl font-bold text-gray-900 leading-snug">KIỂM TRA CÔNG THỨC LƯỢNG GIÁC</h1>
+                <div class="w-20 h-1.5 bg-gradient-to-r from-teal-400 to-emerald-400 rounded-full mt-6 mb-6"></div>
+                <ul class="text-left text-gray-700 space-y-2 mb-6 max-w-xl">
+                    <li><i class="fa-solid fa-shuffle text-teal-600 w-6"></i>Mỗi lượt gồm <strong>10 câu</strong>, thứ tự câu hỏi của mỗi bạn <strong>khác nhau</strong>.</li>
+                    <li><i class="fa-solid fa-hand-pointer text-teal-600 w-6"></i>Chọn các cụm bên dưới để <strong>ghép thành công thức đúng</strong>.</li>
+                    <li><i class="fa-solid fa-stopwatch text-teal-600 w-6"></i>Xếp hạng theo <strong>số câu đúng</strong>, bằng điểm thì ai <strong>nhanh hơn</strong> đứng trên.</li>
+                    <li><i class="fa-solid fa-shield-halved text-teal-600 w-6"></i>Bài làm ở chế độ <strong>toàn màn hình</strong>. Thoát toàn màn hình hoặc chuyển tab sẽ bị <strong>ghi lại trên bảng xếp hạng</strong>; quá 3 lần bài tự động nộp.</li>
+                </ul>
+                <div class="w-full max-w-sm">
+                    <input id="oTen" type="text" maxlength="30" placeholder="Nhập họ và tên của bạn" class="w-full px-4 py-3 rounded-xl border-2 border-teal-100 focus:border-teal-400 focus:outline-none text-center font-medium">
+                    <input id="oMa" type="text" maxlength="12" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Mã kiểm tra do thầy cấp" class="mt-3 w-full px-4 py-3 rounded-xl border-2 border-teal-100 focus:border-teal-400 focus:outline-none text-center font-bold tracking-widest uppercase placeholder:font-medium placeholder:tracking-normal placeholder:normal-case">
+                    <p id="loiMa" class="hidden text-sm font-semibold text-red-500 mt-2"></p>
+                    <p id="ghiChuDangNhap" class="text-sm text-gray-500 mt-2"></p>
+                    <button id="nutBatDau" type="button" class="mt-4 w-full bg-primary hover:bg-teal-800 text-white font-bold py-3 rounded-xl shadow-md hover:shadow-lg transition-all">
+                        <i class="fa-solid fa-play mr-2"></i>Bắt đầu
+                    </button>
+                </div>
+            </div>
+
+            <p class="text-center mt-3"><button id="gvMo" type="button" class="text-xs text-gray-400 hover:text-gray-600 underline">Dành cho giáo viên</button></p>
+            <div id="khuGiaoVien" class="hidden mt-3 bg-white p-6 rounded-2xl shadow-sm border border-amber-200">
+                <h2 class="font-bold text-gray-800 mb-4"><i class="fa-solid fa-key text-amber-500 mr-2"></i>Tạo mã kiểm tra</h2>
+                <div class="flex flex-wrap items-center gap-3">
+                    <label class="text-sm text-gray-600">Mã có hiệu lực trong
+                        <input id="gvSoPhut" type="number" min="1" max="600" value="5" class="w-20 mx-1 px-2 py-1.5 rounded-lg border border-gray-200 text-center font-semibold"> phút
+                    </label>
+                    <button id="gvTaoMa" type="button" class="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold shadow-sm">Tạo mã mới</button>
+                </div>
+                <div id="gvKetQua" class="hidden mt-4 px-4 py-3 rounded-xl bg-emerald-50 border border-emerald-200 text-center">
+                    <p id="gvMa" class="font-mono font-extrabold text-3xl tracking-widest text-gray-900 select-all"></p>
+                    <p id="gvHan" class="text-sm text-gray-600 mt-1"></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= MÀN HÌNH LÀM BÀI ================= -->
+        <section id="manHinhLamBai" class="hidden bg-white p-5 md:p-8 rounded-2xl shadow-sm border border-gray-100">
+            <div class="flex items-center justify-between mb-2 text-sm font-semibold">
+                <span class="text-teal-700">Câu <span id="soCau">1</span>/<span id="tongCau">10</span></span>
+                <span id="nhanChuDe" class="bg-teal-50 text-teal-700 border border-teal-100 px-3 py-1 rounded-full text-xs"></span>
+            </div>
+            <div class="w-full h-2 bg-gray-100 rounded-full mb-6 overflow-hidden">
+                <div id="thanhTienDo" class="h-full bg-gradient-to-r from-teal-400 to-emerald-400 rounded-full transition-all duration-300" style="width:0%"></div>
+            </div>
+
+            <p id="ghiChuCau" class="text-gray-600 mb-2"></p>
+            <div id="deBai" class="text-xl md:text-2xl text-gray-900 mb-4 overflow-x-auto py-1"></div>
+            <div id="vungDapAn" class="mb-4"></div>
+
+            <div id="thongBao" class="hidden rounded-xl p-4 mb-4 text-base"></div>
+
+            <div id="vungChon">
+                <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Phép toán</p>
+                <div id="khoPhepToan" class="flex flex-wrap gap-2 mb-4"></div>
+                <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Cụm công thức</p>
+                <div id="khoCum" class="flex flex-wrap gap-2 mb-6"></div>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2 border-t border-gray-100 pt-4">
+                <button id="nutXoaLui" type="button" class="px-4 py-2.5 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 font-medium"><i class="fa-solid fa-delete-left mr-1.5"></i>Xóa lùi</button>
+                <button id="nutXoaHet" type="button" class="px-4 py-2.5 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 font-medium"><i class="fa-solid fa-trash-can mr-1.5"></i>Xóa hết</button>
+                <button id="nutBoQua" type="button" class="px-4 py-2.5 rounded-xl text-gray-400 hover:text-red-500 font-medium">Bỏ qua</button>
+                <button id="nutKiemTra" type="button" class="ml-auto px-6 py-2.5 rounded-xl bg-primary hover:bg-teal-800 text-white font-bold shadow-md">Kiểm tra</button>
+            </div>
+        </section>
+
+        <!-- ================= MÀN HÌNH KẾT QUẢ ================= -->
+        <section id="manHinhKetQua" class="hidden bg-white p-6 md:p-10 rounded-2xl shadow-sm border border-gray-100">
+            <div class="text-center">
+                <p class="text-sm font-bold text-teal-600 uppercase tracking-widest mb-2">Kết quả của bạn</p>
+                <div class="flex items-center justify-center gap-8">
+                    <div>
+                        <p id="kqDiem" class="text-4xl md:text-5xl font-extrabold text-gray-900"></p>
+                        <p class="text-sm text-gray-500 mt-1">câu đúng</p>
+                    </div>
+                    <div class="w-px h-14 bg-gray-200"></div>
+                    <div>
+                        <p id="kqThoiGian" class="text-4xl md:text-5xl font-extrabold text-gray-900 tabular-nums"></p>
+                        <p class="text-sm text-gray-500 mt-1">thời gian</p>
+                    </div>
+                </div>
+                <p id="kqViPham" class="text-sm font-semibold mt-4"></p>
+                <p id="kqLuu" class="text-sm text-gray-500 mt-2"></p>
+                <button id="nutLamLai" type="button" class="mt-5 bg-primary hover:bg-teal-800 text-white font-bold px-8 py-3 rounded-xl shadow-md hover:shadow-lg transition-all">
+                    <i class="fa-solid fa-arrow-left mr-2"></i>Quay lại
+                </button>
+            </div>
+        </section>
+
+        <!-- ================= BẢNG XẾP HẠNG ================= -->
+        <section id="bangXepHang" class="bg-white p-6 md:p-10 rounded-2xl shadow-sm border border-gray-100">
+            <h2 class="text-2xl font-bold text-teal-700 mb-6 flex items-center gap-2 border-b-2 border-teal-50 pb-3">
+                <i class="fa-solid fa-trophy text-amber-400"></i> BẢNG XẾP HẠNG
+            </h2>
+            <div id="bxhNoiDung" class="text-gray-500">Đang tải...</div>
+        </section>
+    </main>
+
+    <!-- ================= CẢNH BÁO VI PHẠM ================= -->
+    <div id="hopViPham" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-gray-900/80 backdrop-blur-sm px-4">
+        <div class="bg-white rounded-3xl p-6 md:p-8 max-w-md w-full shadow-2xl text-center">
+            <div class="w-20 h-20 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-5">
+                <i class="fa-solid fa-triangle-exclamation text-4xl text-red-500"></i>
+            </div>
+            <h3 id="vpTieuDe" class="text-xl font-bold text-gray-900 mb-2"></h3>
+            <p id="vpNoiDung" class="text-gray-600 mb-6"></p>
+            <button id="vpNut" type="button" class="w-full py-3 rounded-xl bg-red-500 hover:bg-red-600 text-white font-bold shadow-md transition-all"></button>
+        </div>
+    </div>
+
+    <div id="hopGiaoVien" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-gray-900/80 backdrop-blur-sm px-4">
+        <form id="gvForm" class="bg-white rounded-3xl p-6 md:p-8 max-w-sm w-full shadow-2xl text-center" autocomplete="off">
+            <div class="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center mx-auto mb-4">
+                <i class="fa-solid fa-key text-2xl text-amber-500"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-4">Mật khẩu giáo viên</h3>
+            <input id="gvMatKhau" type="password" autocomplete="new-password" class="w-full px-4 py-3 rounded-xl border-2 border-amber-100 focus:border-amber-400 focus:outline-none text-center font-medium">
+            <p id="gvLoi" class="hidden text-sm font-semibold text-red-500 mt-2">Sai mật khẩu.</p>
+            <div class="flex gap-3 mt-5">
+                <button id="gvHuy" type="button" class="flex-1 py-3 rounded-xl border border-gray-200 text-gray-600 font-bold hover:bg-gray-50">Hủy</button>
+                <button type="submit" class="flex-1 py-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold shadow-md">Mở</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Firebase: đăng nhập + lưu bảng xếp hạng -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyD-NDo43O3Q_9GVii6pDOM7D6SQ5pxmo5g",
+            authDomain: "doformath-bac70.firebaseapp.com",
+            projectId: "doformath-bac70",
+            storageBucket: "doformath-bac70.firebasestorage.app",
+            messagingSenderId: "329095418163",
+            appId: "1:329095418163:web:226636d40b5c2960cdee46"
+        };
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.firestore();
+    </script>
+
+    <script>
+    /* CORE-START: ngân hàng câu hỏi + bộ chấm (không dùng DOM) */
+
+    // Mỗi cụm: tex để hiển thị, js để tính giá trị khi chấm
+    const TOK = {
+        '+': { tex: '+', js: '+', op: 1 },
+        '-': { tex: '-', js: '-', op: 1 },
+        '*': { tex: '\\times', js: '*', op: 1 },
+        '/': { tex: ':', js: '/', op: 1 },
+        '(': { tex: '(', js: '(', open: 1 },
+        ')': { tex: ')', js: ')', close: 1 },
+
+        '0': { tex: '0', js: '0' },
+        '1': { tex: '1', js: '1' },
+        '2': { tex: '2', js: '2' },
+        '1/2': { tex: '\\dfrac{1}{2}', js: '1/2' },
+        '180': { tex: '180', js: '180' },
+        '360': { tex: '360', js: '360' },
+
+        'sin_a': { tex: '\\sin a', js: 'Math.sin(a)' },
+        'cos_a': { tex: '\\cos a', js: 'Math.cos(a)' },
+        'tan_a': { tex: '\\tan a', js: 'Math.tan(a)' },
+        'sin_b': { tex: '\\sin b', js: 'Math.sin(b)' },
+        'cos_b': { tex: '\\cos b', js: 'Math.cos(b)' },
+        'tan_b': { tex: '\\tan b', js: 'Math.tan(b)' },
+        'sin^2a': { tex: '\\sin^2 a', js: 'Math.sin(a)*Math.sin(a)' },
+        'cos^2a': { tex: '\\cos^2 a', js: 'Math.cos(a)*Math.cos(a)' },
+        'tan^2a': { tex: '\\tan^2 a', js: 'Math.tan(a)*Math.tan(a)' },
+        'sin2a': { tex: '\\sin 2a', js: 'Math.sin(2*a)' },
+        'cos2a': { tex: '\\cos 2a', js: 'Math.cos(2*a)' },
+
+        'cos(a+b)': { tex: '\\cos(a+b)', js: 'Math.cos(a+b)' },
+        'cos(a-b)': { tex: '\\cos(a-b)', js: 'Math.cos(a-b)' },
+        'sin(a+b)': { tex: '\\sin(a+b)', js: 'Math.sin(a+b)' },
+        'sin(a-b)': { tex: '\\sin(a-b)', js: 'Math.sin(a-b)' },
+        'sin+/2': { tex: '\\sin\\dfrac{a+b}{2}', js: 'Math.sin((a+b)/2)' },
+        'cos+/2': { tex: '\\cos\\dfrac{a+b}{2}', js: 'Math.cos((a+b)/2)' },
+        'sin-/2': { tex: '\\sin\\dfrac{a-b}{2}', js: 'Math.sin((a-b)/2)' },
+        'cos-/2': { tex: '\\cos\\dfrac{a-b}{2}', js: 'Math.cos((a-b)/2)' },
+
+        'sinα': { tex: '\\sin\\alpha', js: 'Math.sin(al)' },
+        'cosα': { tex: '\\cos\\alpha', js: 'Math.cos(al)' },
+        'tanα': { tex: '\\tan\\alpha', js: 'Math.tan(al)' },
+        'cotα': { tex: '\\cot\\alpha', js: '1/Math.tan(al)' },
+        'sin^2α': { tex: '\\sin^2\\alpha', js: 'Math.sin(al)*Math.sin(al)' },
+        'cos^2α': { tex: '\\cos^2\\alpha', js: 'Math.cos(al)*Math.cos(al)' },
+        'α': { tex: '\\alpha', js: 'al' },
+        'R': { tex: 'R', js: 'R' },
+
+        'π': { tex: '\\pi', js: 'pi' },
+        'π/2': { tex: '\\dfrac{\\pi}{2}', js: 'pi/2' },
+        'π/4': { tex: '\\dfrac{\\pi}{4}', js: 'pi/4' },
+        'kπ': { tex: 'k\\pi', js: 'k*pi' },
+        'k2π': { tex: 'k2\\pi', js: 'k*2*pi' },
+        'arcsin': { tex: '\\arcsin a', js: 'Math.asin(m)' },
+        'arccos': { tex: '\\arccos a', js: 'Math.acos(m)' },
+        'arctan': { tex: '\\arctan a', js: 'Math.atan(m)' },
+        'arccot': { tex: '\\operatorname{arccot} a', js: 'pi/2-Math.atan(m)' },
+        'β': { tex: '\\beta^\\circ', js: 'be' },
+        '180°': { tex: '180^\\circ', js: '180' },
+        '360°': { tex: '360^\\circ', js: '360' },
+        'k180': { tex: 'k\\cdot 180^\\circ', js: 'k*180' },
+        'k360': { tex: 'k\\cdot 360^\\circ', js: 'k*360' }
+    };
+    const PHEP_TOAN = ['+', '-', '*', '/', '(', ')'];
+
+    // type 'expr': một dòng; 'frac': tử/mẫu; 'eq': họ nghiệm (chấm theo chu kì P)
+    // lhs: biểu thức js của vế trái (dùng để chấm); sol: đáp án mẫu theo từng dòng
+    const CAU_HOI = [];
+    function them(cat, type, q, lhs, sol, bank, extra) {
+        CAU_HOI.push(Object.assign({ cat: cat, type: type, q: q, lhs: lhs, sol: sol, bank: bank }, extra || {}));
+    }
+
+    (function () {
+        let c, k;
+
+        c = 'Đơn vị đo góc';
+        them(c, 'frac', '1^\\circ =', 'pi/180', ['π', '180'], ['π', '180', '360', '1', '2'], { note: 'Đổi sang radian:', sau: '\\text{ rad}' });
+        them(c, 'frac', '1\\text{ rad} =', '180/pi', ['180', 'π'], ['π', '180', '360', '1', '2'], { note: 'Đổi sang độ:', sau: '\\text{ (độ)}' });
+
+        c = 'Hệ thức cơ bản';
+        them(c, 'frac', '1+\\tan^2\\alpha =', '1+Math.tan(al)**2', ['1', 'cos^2α'], ['1', '2', 'sin^2α', 'cos^2α']);
+        them(c, 'frac', '1+\\cot^2\\alpha =', '1+1/Math.tan(al)**2', ['1', 'sin^2α'], ['1', '2', 'sin^2α', 'cos^2α']);
+
+        c = 'Góc liên quan đặc biệt';
+        k = ['sinα', 'cosα', 'tanα', 'cotα'];
+        [
+            ['\\cos(-\\alpha)', 'Math.cos(-al)', 'cosα'],
+            ['\\sin(-\\alpha)', 'Math.sin(-al)', '- sinα'],
+            ['\\tan(-\\alpha)', 'Math.tan(-al)', '- tanα'],
+            ['\\cot(-\\alpha)', '1/Math.tan(-al)', '- cotα'],
+            ['\\sin(\\pi-\\alpha)', 'Math.sin(pi-al)', 'sinα'],
+            ['\\cos(\\pi-\\alpha)', 'Math.cos(pi-al)', '- cosα'],
+            ['\\tan(\\pi-\\alpha)', 'Math.tan(pi-al)', '- tanα'],
+            ['\\cot(\\pi-\\alpha)', '1/Math.tan(pi-al)', '- cotα'],
+            ['\\sin\\left(\\dfrac{\\pi}{2}-\\alpha\\right)', 'Math.sin(pi/2-al)', 'cosα'],
+            ['\\cos\\left(\\dfrac{\\pi}{2}-\\alpha\\right)', 'Math.cos(pi/2-al)', 'sinα'],
+            ['\\tan\\left(\\dfrac{\\pi}{2}-\\alpha\\right)', 'Math.tan(pi/2-al)', 'cotα'],
+            ['\\cot\\left(\\dfrac{\\pi}{2}-\\alpha\\right)', '1/Math.tan(pi/2-al)', 'tanα'],
+            ['\\sin(\\alpha+\\pi)', 'Math.sin(al+pi)', '- sinα'],
+            ['\\cos(\\alpha+\\pi)', 'Math.cos(al+pi)', '- cosα'],
+            ['\\tan(\\alpha+\\pi)', 'Math.tan(al+pi)', 'tanα'],
+            ['\\cot(\\alpha+\\pi)', '1/Math.tan(al+pi)', 'cotα']
+        ].forEach(function (r) { them(c, 'expr', r[0] + ' =', r[1], [r[2]], k); });
+
+        c = 'Công thức cộng';
+        k = ['sin_a', 'cos_a', 'sin_b', 'cos_b'];
+        them(c, 'expr', '\\sin(a+b) =', 'Math.sin(a+b)', ['sin_a cos_b + sin_b cos_a'], k);
+        them(c, 'expr', '\\sin(a-b) =', 'Math.sin(a-b)', ['sin_a cos_b - sin_b cos_a'], k);
+        them(c, 'expr', '\\cos(a+b) =', 'Math.cos(a+b)', ['cos_a cos_b - sin_a sin_b'], k);
+        them(c, 'expr', '\\cos(a-b) =', 'Math.cos(a-b)', ['cos_a cos_b + sin_a sin_b'], k);
+        k = ['tan_a', 'tan_b', '1', '2'];
+        them(c, 'frac', '\\tan(a+b) =', 'Math.tan(a+b)', ['tan_a + tan_b', '1 - tan_a tan_b'], k);
+        them(c, 'frac', '\\tan(a-b) =', 'Math.tan(a-b)', ['tan_a - tan_b', '1 + tan_a tan_b'], k);
+
+        c = 'Nhân đôi – Hạ bậc';
+        k = ['sin_a', 'cos_a', 'sin^2a', 'cos^2a', '1', '2'];
+        them(c, 'expr', '\\sin 2a =', 'Math.sin(2*a)', ['2 sin_a cos_a'], k);
+        them(c, 'expr', '\\cos 2a =', 'Math.cos(2*a)', ['cos^2a - sin^2a'], k);
+        them(c, 'frac', '\\tan 2a =', 'Math.tan(2*a)', ['2 tan_a', '1 - tan^2a'], ['tan_a', 'tan^2a', '1', '2']);
+        k = ['1', '2', 'cos2a', 'sin2a'];
+        them(c, 'frac', '\\sin^2 a =', 'Math.sin(a)**2', ['1 - cos2a', '2'], k);
+        them(c, 'frac', '\\cos^2 a =', 'Math.cos(a)**2', ['1 + cos2a', '2'], k);
+        them(c, 'frac', '\\tan^2 a =', 'Math.tan(a)**2', ['1 - cos2a', '1 + cos2a'], k);
+
+        c = 'Tích thành tổng';
+        k = ['1/2', '2', 'cos(a+b)', 'cos(a-b)', 'sin(a+b)', 'sin(a-b)'];
+        them(c, 'expr', '\\cos a\\cos b =', 'Math.cos(a)*Math.cos(b)', ['1/2 ( cos(a+b) + cos(a-b) )'], k);
+        them(c, 'expr', '\\sin a\\sin b =', 'Math.sin(a)*Math.sin(b)', ['- 1/2 ( cos(a+b) - cos(a-b) )'], k);
+        them(c, 'expr', '\\sin a\\cos b =', 'Math.sin(a)*Math.cos(b)', ['1/2 ( sin(a+b) + sin(a-b) )'], k);
+        them(c, 'expr', '\\cos a\\sin b =', 'Math.cos(a)*Math.sin(b)', ['1/2 ( sin(a+b) - sin(a-b) )'], k);
+
+        c = 'Tổng thành tích';
+        k = ['2', '1/2', 'sin+/2', 'cos+/2', 'sin-/2', 'cos-/2'];
+        them(c, 'expr', '\\cos a+\\cos b =', 'Math.cos(a)+Math.cos(b)', ['2 cos+/2 cos-/2'], k);
+        them(c, 'expr', '\\cos a-\\cos b =', 'Math.cos(a)-Math.cos(b)', ['- 2 sin+/2 sin-/2'], k);
+        them(c, 'expr', '\\sin a+\\sin b =', 'Math.sin(a)+Math.sin(b)', ['2 sin+/2 cos-/2'], k);
+        them(c, 'expr', '\\sin a-\\sin b =', 'Math.sin(a)-Math.sin(b)', ['2 cos+/2 sin-/2'], k);
+
+        c = 'Phương trình lượng giác';
+        const PI = Math.PI;
+        k = ['arcsin', 'arccos', 'π', 'kπ', 'k2π'];
+        them(c, 'eq', '\\sin x = a\\ (|a|\\le 1) \\Leftrightarrow', null, ['arcsin + k2π', 'π - arcsin + k2π'], k, { P: 2 * PI, eqn: 'Math.sin(x)-m' });
+        them(c, 'eq', '\\cos x = a\\ (|a|\\le 1) \\Leftrightarrow', null, ['arccos + k2π', '- arccos + k2π'], k, { P: 2 * PI, eqn: 'Math.cos(x)-m' });
+        k = ['arctan', 'arccot', 'π', 'kπ', 'k2π'];
+        them(c, 'eq', '\\tan x = a \\Leftrightarrow', null, ['arctan + kπ'], k, { P: PI, eqn: 'Math.tan(x)-m' });
+        them(c, 'eq', '\\cot x = a \\Leftrightarrow', null, ['arccot + kπ'], k, { P: PI, eqn: '1/Math.tan(x)-m' });
+
+        k = ['π', 'π/2', 'π/4', 'kπ', 'k2π'];
+        [
+            ['\\sin x = 0', 'kπ', PI, 'Math.sin(x)'],
+            ['\\sin x = 1', 'π/2 + k2π', 2 * PI, 'Math.sin(x)-1'],
+            ['\\sin x = -1', '- π/2 + k2π', 2 * PI, 'Math.sin(x)+1'],
+            ['\\cos x = 0', 'π/2 + kπ', PI, 'Math.cos(x)'],
+            ['\\cos x = 1', 'k2π', 2 * PI, 'Math.cos(x)-1'],
+            ['\\cos x = -1', 'π + k2π', 2 * PI, 'Math.cos(x)+1'],
+            ['\\tan x = 0', 'kπ', PI, 'Math.tan(x)'],
+            ['\\tan x = 1', 'π/4 + kπ', PI, 'Math.tan(x)-1'],
+            ['\\tan x = -1', '- π/4 + kπ', PI, 'Math.tan(x)+1'],
+            ['\\cot x = 0', 'π/2 + kπ', PI, '1/Math.tan(x)'],
+            ['\\cot x = 1', 'π/4 + kπ', PI, '1/Math.tan(x)-1'],
+            ['\\cot x = -1', '- π/4 + kπ', PI, '1/Math.tan(x)+1']
+        ].forEach(function (r) { them(c, 'eq', r[0] + ' \\Leftrightarrow', null, [r[1]], k, { P: r[2], eqn: r[3] }); });
+
+        k = ['β', '180°', '360°', 'k180', 'k360'];
+        const d = 'pi/180';
+        them(c, 'eq', '\\sin x = \\sin\\beta^\\circ \\Leftrightarrow', null, ['β + k360', '180° - β + k360'], k, { P: 360, eqn: 'Math.sin(x*' + d + ')-Math.sin(be*' + d + ')' });
+        them(c, 'eq', '\\cos x = \\cos\\beta^\\circ \\Leftrightarrow', null, ['β + k360', '- β + k360'], k, { P: 360, eqn: 'Math.cos(x*' + d + ')-Math.cos(be*' + d + ')' });
+        them(c, 'eq', '\\tan x = \\tan\\beta^\\circ \\Leftrightarrow', null, ['β + k180'], k, { P: 180, eqn: 'Math.tan(x*' + d + ')-Math.tan(be*' + d + ')' });
+        them(c, 'eq', '\\cot x = \\cot\\beta^\\circ \\Leftrightarrow', null, ['β + k180'], k, { P: 180, eqn: '1/Math.tan(x*' + d + ')-1/Math.tan(be*' + d + ')' });
+    })();
+
+    function ngauNhien(lo, hi) { return lo + Math.random() * (hi - lo); }
+
+    function giaTriThu() {
+        const a = ngauNhien(0.3, 0.7), b = ngauNhien(0.85, 1.2);
+        const m = ngauNhien(0.2, 0.8) * (Math.random() < 0.5 ? -1 : 1);
+        return { a: a, b: b, al: ngauNhien(0.3, 1.2), m: m, k: 0, R: ngauNhien(1.5, 3), be: ngauNhien(10, 80) };
+    }
+
+    function bienDichJs(js) {
+        return new Function('v', 'const a=v.a,b=v.b,al=v.al,m=v.m,k=v.k,R=v.R,be=v.be,x=v.x,pi=Math.PI; return (' + js + ');');
+    }
+
+    // Ghép dãy cụm thành hàm số; hai cụm đứng cạnh nhau hiểu là nhân. Trả null nếu biểu thức chưa hợp lệ.
+    function bienDich(ids) {
+        if (!ids.length) return null;
+        const parts = [];
+        let truoc = null;
+        ids.forEach(function (id) {
+            const t = TOK[id];
+            const laGiaTri = !t.op && !t.open && !t.close;
+            if (truoc && (laGiaTri || t.open) && (truoc.close || (!truoc.op && !truoc.open))) parts.push('*');
+            parts.push(laGiaTri ? '(' + t.js + ')' : t.js);
+            truoc = t;
+        });
+        try {
+            const fn = bienDichJs(parts.join(' '));
+            return Number.isNaN(fn(giaTriThu())) ? null : fn;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    function gan(x, y) { return Math.abs(x - y) <= 1e-6 * Math.max(1, Math.abs(y)); }
+
+    // Họ nghiệm f trùng họ nghiệm t khi hệ số của k là ±P và lệch nhau một bội của P
+    function trungHoNghiem(f, t, P, v) {
+        const tai = function (g, k) { return g(Object.assign({}, v, { k: k })); };
+        const f0 = tai(f, 0), f1 = tai(f, 1), f2 = tai(f, 2);
+        if (!gan(Math.abs(f1 - f0), P) || !gan(f2 - f1, f1 - f0)) return false;
+        const lech = (f0 - tai(t, 0)) / P;
+        return Math.abs(lech - Math.round(lech)) < 1e-6;
+    }
+
+    // Trả true/false, hoặc null nếu bài làm chưa thành biểu thức hợp lệ
+    function cham(q, rows) {
+        const fs = rows.map(bienDich);
+        if (fs.some(function (f) { return !f; })) return null;
+        if (q.type === 'eq') {
+            const ts = q.sol.map(function (s) { return bienDich(s.split(' ')); });
+            const hoanVi = ts.length === 2 ? [[0, 1], [1, 0]] : [[0]];
+            return hoanVi.some(function (p) {
+                for (let i = 0; i < 3; i++) {
+                    const v = giaTriThu();
+                    if (!fs.every(function (f, j) { return trungHoNghiem(f, ts[p[j]], q.P, v); })) return false;
+                }
+                return true;
+            });
+        }
+        const dich = bienDichJs(q.lhs);
+        for (let i = 0; i < 4; i++) {
+            const v = giaTriThu();
+            const lam = q.type === 'frac' ? fs[0](v) / fs[1](v) : fs[0](v);
+            if (!gan(lam, dich(v))) return false;
+        }
+        return true;
+    }
+
+    function xaoTron(arr) {
+        const a = arr.slice();
+        for (let i = a.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            const t = a[i]; a[i] = a[j]; a[j] = t;
+        }
+        return a;
+    }
+
+    // Các chủ đề trọng tâm: mỗi chủ đề góp 2 câu vào đề
+    const TRONG_TAM = ['Nhân đôi – Hạ bậc', 'Tích thành tổng', 'Tổng thành tích'];
+
+    // Đề n câu: 2 câu mỗi chủ đề trọng tâm, phần còn lại mỗi chủ đề khác tối đa 1 câu,
+    // rồi xáo trộn để mỗi học sinh gặp một thứ tự câu khác nhau
+    function taoDe(n) {
+        const dem = {}, de = [], tron = xaoTron(CAU_HOI);
+        const lay = function (trongTam, toiDa) {
+            tron.forEach(function (q) {
+                if ((TRONG_TAM.indexOf(q.cat) >= 0) !== trongTam || de.length >= n || (dem[q.cat] || 0) >= toiDa) return;
+                dem[q.cat] = (dem[q.cat] || 0) + 1;
+                de.push(q);
+            });
+        };
+        lay(true, 2);
+        lay(false, 1);
+        return xaoTron(de);
+    }
+
+    function texDong(ids) { return ids.map(function (id) { return TOK[id].tex; }).join(' '); }
+
+    function texDapAn(q) {
+        const r = q.sol.map(function (s) { return texDong(s.split(' ')); });
+        if (q.type === 'frac') return q.q + ' \\dfrac{' + r[0] + '}{' + r[1] + '}' + (q.sau || '');
+        if (q.type === 'eq') {
+            if (r.length === 1) return q.q + ' x = ' + r[0];
+            return q.q + ' \\left[\\begin{aligned} &x = ' + r[0] + ' \\\\ &x = ' + r[1] + ' \\end{aligned}\\right.';
+        }
+        return (q.noteTex ? q.noteTex + ':\\quad ' : '') + q.q + ' ' + r[0];
+    }
+    /* CORE-END */
+    </script>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const SO_CAU = 10;
+        const BXH = 'bxh_luong_giac';
+        // Mã kiểm tra = hạn dùng (4 ký tự) + chữ ký (4 ký tự), tự kiểm tra ngay trên trang, không cần máy chủ
+        const KHOA_MA = '69XMmLnaElloGinboJo-0yYl';
+        const BAM_MAT_KHAU_GV = 656711425877204;
+        const CHU_MA = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // bỏ các ký tự dễ nhầm (O/0, I/1)
+        const MOC_MA = Date.UTC(2026, 0, 1), VONG_MA = 1 << 20, HAN_TOI_DA = 600;
+        const $ = function (id) { return document.getElementById(id); };
+        const tex = function (s) { return katex.renderToString(s, { throwOnError: false }); };
+
+        let de = [], viTri = 0, dong = [], dongChon = 0, daCham = false;
+        let ketQua = [], daTroi = 0, mocBatDau = 0, hengio = null;
+        const GIOI_HAN_VI_PHAM = 3;
+        let dangLam = false, viPham = 0, mocViPham = 0;
+
+        function dinhDangGio(ms) {
+            const s = ms / 1000;
+            const giay = (s % 60).toFixed(1);
+            return Math.floor(s / 60) + ':' + (giay < 10 ? '0' : '') + giay;
+        }
+        function thoiGianHienTai() { return daTroi + (hengio ? Date.now() - mocBatDau : 0); }
+        function chayDongHo() {
+            mocBatDau = Date.now();
+            hengio = setInterval(function () { $('dongHo').textContent = dinhDangGio(thoiGianHienTai()); }, 100);
+        }
+        function dungDongHo() {
+            if (!hengio) return;
+            daTroi += Date.now() - mocBatDau;
+            clearInterval(hengio);
+            hengio = null;
+        }
+
+        function hienManHinh(ten) {
+            ['manHinhBatDau', 'manHinhLamBai', 'manHinhKetQua'].forEach(function (id) { $(id).classList.toggle('hidden', id !== ten); });
+            $('bangXepHang').classList.toggle('hidden', ten === 'manHinhLamBai');
+            $('dongHoHeader').classList.toggle('hidden', ten !== 'manHinhLamBai');
+            // Đang làm bài thì không có lối thoát nào trên giao diện
+            $('nutQuayLai').classList.toggle('hidden', ten === 'manHinhLamBai');
+            $('tenBaiHeader').classList.toggle('hidden', ten !== 'manHinhLamBai');
+            $('nut-dang-nhap').classList.toggle('hidden', ten === 'manHinhLamBai' || !!firebase.auth().currentUser);
+            window.scrollTo(0, 0);
+        }
+
+        // ---------- Chống rời bài: toàn màn hình + theo dõi chuyển tab ----------
+        function dangToanManHinh() { return !!(document.fullscreenElement || document.webkitFullscreenElement); }
+        function vaoToanManHinh() {
+            const el = document.documentElement;
+            try {
+                if (el.requestFullscreen) el.requestFullscreen().catch(function () {});
+                else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+            } catch (e) {}
+        }
+        function thoatToanManHinh() {
+            if (!dangToanManHinh()) return;
+            try {
+                if (document.exitFullscreen) document.exitFullscreen().catch(function () {});
+                else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+            } catch (e) {}
+        }
+
+        function ghiViPham(lyDo) {
+            // Rời tab thường kéo theo cả sự kiện thoát toàn màn hình: gộp các sự kiện sát nhau thành một lần
+            if (!dangLam || Date.now() - mocViPham < 1000) return;
+            mocViPham = Date.now();
+            viPham++;
+            const hetLuot = viPham >= GIOI_HAN_VI_PHAM;
+            $('vpTieuDe').textContent = hetLuot ? 'ĐÌNH CHỈ LÀM BÀI' : 'CẢNH BÁO VI PHẠM';
+            $('vpNoiDung').textContent = 'Lý do: ' + lyDo + '. ' + (hetLuot
+                ? 'Bạn đã vi phạm ' + GIOI_HAN_VI_PHAM + ' lần nên bài đã tự động nộp, các câu chưa làm tính là sai.'
+                : 'Cảnh báo lần ' + viPham + '/' + GIOI_HAN_VI_PHAM + '. Số lần vi phạm sẽ hiện trên bảng xếp hạng; đủ ' + GIOI_HAN_VI_PHAM + ' lần bài sẽ tự động nộp.');
+            $('vpNut').textContent = hetLuot ? 'Xem kết quả' : 'Đã hiểu & quay lại làm bài';
+            $('hopViPham').classList.remove('hidden');
+            if (hetLuot) nopSom();
+        }
+
+        // Nộp bài giữa chừng: câu đang làm dở và các câu còn lại tính là sai
+        function nopSom() {
+            dungDongHo();
+            for (let i = ketQua.length; i < de.length; i++) ketQua.push({ q: de[i], dung: false });
+            ketThuc();
+        }
+
+        $('vpNut').addEventListener('click', function () {
+            $('hopViPham').classList.add('hidden');
+            if (dangLam && !dangToanManHinh()) vaoToanManHinh();
+        });
+        document.addEventListener('visibilitychange', function () {
+            if (document.hidden) ghiViPham('chuyển sang tab hoặc ứng dụng khác');
+        });
+        ['fullscreenchange', 'webkitfullscreenchange'].forEach(function (suKien) {
+            document.addEventListener(suKien, function () {
+                if (!dangToanManHinh()) ghiViPham('thoát chế độ toàn màn hình');
+            });
+        });
+
+        // ---------- Làm bài ----------
+        function oDong(i) {
+            const dangChon = i === dongChon && !daCham && dong.length > 1;
+            const chips = dong[i].map(function (id, j) {
+                return '<button type="button" data-chip="' + j + '" class="px-2 py-1 rounded-lg bg-teal-50 border border-teal-200 hover:bg-red-50 hover:border-red-300">' + tex(TOK[id].tex) + '</button>';
+            }).join('');
+            return '<div data-row="' + i + '" class="flex-1 min-w-[140px] min-h-[52px] flex flex-wrap items-center gap-1.5 px-3 py-2 rounded-xl border-2 border-dashed cursor-pointer ' +
+                (dangChon ? 'border-teal-500 bg-teal-50/40' : 'border-gray-300 bg-gray-50') + '">' +
+                (chips || '<span class="text-gray-400 text-sm">Chọn cụm bên dưới...</span>') + '</div>';
+        }
+
+        function veDapAn() {
+            const q = de[viTri];
+            let html;
+            if (q.type === 'frac') {
+                html = '<div class="flex items-center gap-3"><div class="flex-1 flex flex-col gap-2">' + oDong(0) +
+                    '<div class="h-0.5 bg-gray-800 rounded"></div>' + oDong(1) + '</div>' +
+                    (q.sau ? '<span class="text-xl">' + tex(q.sau) + '</span>' : '') + '</div>';
+            } else if (q.type === 'eq') {
+                const cacDong = dong.map(function (_, i) {
+                    return '<div class="flex items-center gap-2"><span class="text-xl shrink-0">' + tex('x =') + '</span>' + oDong(i) + '</div>';
+                }).join('');
+                html = '<div class="space-y-2 ' + (dong.length > 1 ? 'border-l-2 border-gray-800 rounded-l-md pl-3' : '') + '">' + cacDong + '</div>';
+            } else {
+                html = oDong(0);
+            }
+            $('vungDapAn').innerHTML = html;
+        }
+
+        function nutCum(id) {
+            return '<button type="button" data-tok="' + id + '" class="px-3 py-2 min-w-[44px] rounded-xl border border-gray-200 bg-white shadow-sm hover:border-teal-400 hover:bg-teal-50 active:scale-95 transition-all">' + tex(TOK[id].tex) + '</button>';
+        }
+
+        function veCau() {
+            const q = de[viTri];
+            dong = q.sol.map(function () { return []; });
+            dongChon = 0;
+            daCham = false;
+            $('soCau').textContent = viTri + 1;
+            $('tongCau').textContent = de.length;
+            $('thanhTienDo').style.width = (viTri / de.length * 100) + '%';
+            $('nhanChuDe').textContent = q.cat;
+            $('ghiChuCau').innerHTML = q.note ? q.note + (q.noteTex ? ' ' + tex(q.noteTex) : '') : 'Hoàn thành công thức sau:';
+            $('deBai').innerHTML = katex.renderToString(q.q, { throwOnError: false, displayMode: false });
+            $('khoPhepToan').innerHTML = PHEP_TOAN.map(nutCum).join('');
+            $('khoCum').innerHTML = xaoTron(q.bank).map(nutCum).join('');
+            $('thongBao').classList.add('hidden');
+            $('vungChon').classList.remove('hidden');
+            ['nutXoaLui', 'nutXoaHet', 'nutBoQua'].forEach(function (id) { $(id).classList.remove('hidden'); });
+            $('nutKiemTra').textContent = 'Kiểm tra';
+            veDapAn();
+            chayDongHo();
+        }
+
+        function baoLoi(html, kieu) {
+            const mau = { dung: 'bg-emerald-50 border border-emerald-200 text-emerald-800', sai: 'bg-red-50 border border-red-200 text-red-800', nhac: 'bg-amber-50 border border-amber-200 text-amber-800' };
+            $('thongBao').className = 'rounded-xl p-4 mb-4 text-base overflow-x-auto ' + mau[kieu];
+            $('thongBao').innerHTML = html;
+        }
+
+        function chot(dung) {
+            dungDongHo();
+            daCham = true;
+            const q = de[viTri];
+            ketQua.push({ q: q, dung: dung });
+            baoLoi(dung
+                ? '<p class="font-bold"><i class="fa-solid fa-circle-check mr-2"></i>Chính xác!</p>'
+                : '<p class="font-bold mb-2"><i class="fa-solid fa-circle-xmark mr-2"></i>Chưa đúng. Đáp án:</p><div class="text-gray-900">' + tex(texDapAn(q)) + '</div>',
+                dung ? 'dung' : 'sai');
+            $('vungChon').classList.add('hidden');
+            ['nutXoaLui', 'nutXoaHet', 'nutBoQua'].forEach(function (id) { $(id).classList.add('hidden'); });
+            $('nutKiemTra').textContent = viTri + 1 < de.length ? 'Câu tiếp theo' : 'Xem kết quả';
+            $('thanhTienDo').style.width = ((viTri + 1) / de.length * 100) + '%';
+            veDapAn();
+        }
+
+        $('vungChon').addEventListener('click', function (e) {
+            const nut = e.target.closest('[data-tok]');
+            if (!nut || daCham) return;
+            dong[dongChon].push(nut.dataset.tok);
+            $('thongBao').classList.add('hidden');
+            veDapAn();
+        });
+
+        $('vungDapAn').addEventListener('click', function (e) {
+            if (daCham) return;
+            const o = e.target.closest('[data-row]');
+            if (!o) return;
+            dongChon = +o.dataset.row;
+            const chip = e.target.closest('[data-chip]');
+            if (chip) dong[dongChon].splice(+chip.dataset.chip, 1);
+            veDapAn();
+        });
+
+        $('nutXoaLui').addEventListener('click', function () { dong[dongChon].pop(); veDapAn(); });
+        $('nutXoaHet').addEventListener('click', function () { dong = dong.map(function () { return []; }); veDapAn(); });
+        $('nutBoQua').addEventListener('click', function () { chot(false); });
+
+        $('nutKiemTra').addEventListener('click', function () {
+            if (daCham) {
+                viTri++;
+                if (viTri < de.length) veCau(); else ketThuc();
+                return;
+            }
+            const kq = cham(de[viTri], dong);
+            if (kq === null) {
+                baoLoi('<i class="fa-solid fa-triangle-exclamation mr-2"></i>Biểu thức chưa hoàn chỉnh, em kiểm tra lại các ô và dấu ngoặc nhé.', 'nhac');
+                return;
+            }
+            chot(kq);
+        });
+
+        function batDau() {
+            const ten = $('oTen').value.trim();
+            if (ten.length < 2) {
+                $('oTen').focus();
+                $('oTen').classList.add('border-red-400');
+                return;
+            }
+            const ma = $('oMa').value.trim().toUpperCase();
+            if (!maConHan(ma)) {
+                baoLoiMa('Mã không đúng hoặc đã hết hiệu lực.');
+                return;
+            }
+            if (maDaDung().indexOf(ma) !== -1) {
+                baoLoiMa('Em đã dùng mã này rồi. Mỗi mã chỉ làm được một lần.');
+                return;
+            }
+            // Ghi nhận ngay khi bắt đầu để tải lại trang cũng không làm lại được
+            dsMaDaDung = maDaDung().concat(ma).slice(-30);
+            try { localStorage.setItem('dfm_ma_da_dung', JSON.stringify(dsMaDaDung)); } catch (e) {}
+            try { localStorage.setItem('dfm_ten', ten); } catch (e) {}
+            $('oMa').value = '';
+            $('loiMa').classList.add('hidden');
+            vaoToanManHinh();
+            vaoBai();
+        }
+
+        // ---------- Mã kiểm tra ----------
+        function bam(s) {
+            let h1 = 0xdeadbeef, h2 = 0x41c6ce57;
+            for (let i = 0; i < s.length; i++) {
+                const c = s.charCodeAt(i);
+                h1 = Math.imul(h1 ^ c, 2654435761);
+                h2 = Math.imul(h2 ^ c, 1597334677);
+            }
+            h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+            h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+            return 4294967296 * (2097151 & h2) + (h1 >>> 0);
+        }
+        function soThanhChu(n) {
+            let kq = '';
+            for (let i = 0; i < 4; i++) { kq += CHU_MA[n % 32]; n = Math.floor(n / 32); }
+            return kq;
+        }
+        function phutHienTai() { return Math.floor((Date.now() - MOC_MA) / 60000); }
+        function taoMa(phutHetHan) { return soThanhChu(phutHetHan % VONG_MA) + soThanhChu(bam(KHOA_MA + ':' + phutHetHan) % VONG_MA); }
+        function maConHan(ma) {
+            if (ma.length !== 8) return false;
+            let t = 0;
+            for (let i = 3; i >= 0; i--) {
+                const k = CHU_MA.indexOf(ma[i]);
+                if (k < 0) return false;
+                t = t * 32 + k;
+            }
+            const nay = phutHienTai();
+            let het = nay - nay % VONG_MA + t;
+            if (het <= nay) het += VONG_MA;
+            return het - nay <= HAN_TOI_DA && taoMa(het) === ma;
+        }
+        let dsMaDaDung = null;
+        function maDaDung() {
+            if (!dsMaDaDung) {
+                try { dsMaDaDung = JSON.parse(localStorage.getItem('dfm_ma_da_dung')) || []; } catch (e) { dsMaDaDung = []; }
+            }
+            return dsMaDaDung;
+        }
+        function baoLoiMa(html) {
+            $('loiMa').innerHTML = html;
+            $('loiMa').classList.remove('hidden');
+        }
+        function vaoBai() {
+            de = taoDe(SO_CAU);
+            viTri = 0;
+            ketQua = [];
+            daTroi = 0;
+            viPham = 0;
+            mocViPham = 0;
+            dangLam = true;
+            $('dongHo').textContent = dinhDangGio(0);
+            hienManHinh('manHinhLamBai');
+            veCau();
+        }
+        $('nutBatDau').addEventListener('click', batDau);
+        $('oTen').addEventListener('keydown', function (e) { if (e.key === 'Enter') batDau(); });
+        $('oTen').addEventListener('input', function () { $('oTen').classList.remove('border-red-400'); });
+        $('oMa').addEventListener('keydown', function (e) { if (e.key === 'Enter') batDau(); });
+        $('oMa').addEventListener('input', function () { $('oMa').classList.remove('border-red-400'); $('loiMa').classList.add('hidden'); });
+        $('nutLamLai').addEventListener('click', function () { hienManHinh('manHinhBatDau'); });
+
+        // ---------- Kết quả + bảng xếp hạng ----------
+        function ketThuc() {
+            dangLam = false;
+            thoatToanManHinh();
+            $('kqViPham').textContent = viPham ? 'Số lần rời bài (thoát toàn màn hình / chuyển tab): ' + viPham : 'Không rời bài lần nào.';
+            $('kqViPham').className = 'text-sm font-semibold mt-4 ' + (viPham ? 'text-red-500' : 'text-emerald-600');
+            const diem = ketQua.filter(function (r) { return r.dung; }).length;
+            $('kqDiem').textContent = diem + '/' + de.length;
+            $('kqThoiGian').textContent = dinhDangGio(daTroi);
+            hienManHinh('manHinhKetQua');
+            luuKetQua(diem, daTroi);
+        }
+
+        // Mỗi học sinh một dòng (theo uid), chỉ giữ thành tích tốt nhất
+        function luuKetQua(diem, ms) {
+            const user = firebase.auth().currentUser;
+            if (!user) {
+                $('kqLuu').innerHTML = 'Bạn chưa đăng nhập nên kết quả không được ghi vào bảng xếp hạng. <a href="../login.html" class="text-primary font-semibold underline">Đăng nhập</a>';
+                return;
+            }
+            $('kqLuu').textContent = 'Đang lưu kết quả...';
+            const ref = db.collection(BXH).doc(user.uid);
+            ref.get().then(function (snap) {
+                const cu = snap.exists ? snap.data() : null;
+                const totHon = !cu || cu.diem === undefined || diem > cu.diem || (diem === cu.diem && ms < cu.thoiGian);
+                const duLieu = { ten: $('oTen').value.trim().slice(0, 30), soLan: ((cu && cu.soLan) || 0) + 1 };
+                if (totHon) {
+                    duLieu.diem = diem;
+                    duLieu.tong = de.length;
+                    duLieu.thoiGian = ms;
+                    duLieu.viPham = viPham;
+                    duLieu.ngay = firebase.firestore.FieldValue.serverTimestamp();
+                }
+                return ref.set(duLieu, { merge: true }).then(function () {
+                    $('kqLuu').textContent = totHon
+                        ? 'Đã ghi thành tích mới vào bảng xếp hạng.'
+                        : 'Thành tích tốt nhất của bạn vẫn là ' + cu.diem + '/' + cu.tong + ' trong ' + dinhDangGio(cu.thoiGian) + '.';
+                    taiBangXepHang();
+                });
+            }).catch(function (err) {
+                console.error('Lỗi lưu bảng xếp hạng:', err);
+                $('kqLuu').textContent = 'Chưa lưu được kết quả lên bảng xếp hạng.';
+            });
+        }
+
+        function taiBangXepHang() {
+            db.collection(BXH).get().then(function (snap) {
+                const user = firebase.auth().currentUser;
+                const ds = [];
+                snap.forEach(function (doc) {
+                    const d = doc.data();
+                    if (typeof d.diem === 'number' && typeof d.thoiGian === 'number') ds.push(Object.assign({ id: doc.id }, d));
+                });
+                ds.sort(function (x, y) { return y.diem - x.diem || x.thoiGian - y.thoiGian; });
+
+                const hop = $('bxhNoiDung');
+                hop.textContent = '';
+                if (!ds.length) {
+                    hop.textContent = 'Chưa có ai trên bảng xếp hạng. Hãy là người đầu tiên!';
+                    return;
+                }
+                const bang = document.createElement('table');
+                bang.className = 'w-full text-sm md:text-base text-gray-700';
+                bang.innerHTML = '<thead><tr class="text-left text-xs uppercase tracking-wide text-gray-400 border-b border-gray-100">' +
+                    '<th class="py-2 pr-2 w-12">Hạng</th><th class="py-2">Học sinh</th><th class="py-2 text-center">Đúng</th><th class="py-2 text-center">Rời bài</th><th class="py-2 text-right">Thời gian</th></tr></thead>';
+                const than = document.createElement('tbody');
+                const huyChuong = ['🥇', '🥈', '🥉'];
+                ds.forEach(function (d, i) {
+                    const laToi = user && d.id === user.uid;
+                    if (i >= 20 && !laToi) return;
+                    const tr = document.createElement('tr');
+                    tr.className = 'border-b border-gray-50 ' + (laToi ? 'bg-teal-50 font-semibold' : '');
+                    const o = function (noiDung, lop) {
+                        const td = document.createElement('td');
+                        td.className = 'py-2.5 ' + lop;
+                        td.textContent = noiDung;
+                        tr.appendChild(td);
+                    };
+                    o(huyChuong[i] || (i + 1), 'pr-2 text-center');
+                    o(d.ten || 'Ẩn danh', 'truncate max-w-[160px]');
+                    o(d.diem + '/' + (d.tong || SO_CAU), 'text-center');
+                    o(d.viPham ? d.viPham + ' lần' : '0', 'text-center ' + (d.viPham ? 'text-red-500 font-bold' : 'text-gray-400'));
+                    o(dinhDangGio(d.thoiGian), 'text-right tabular-nums');
+                    than.appendChild(tr);
+                });
+                bang.appendChild(than);
+                hop.appendChild(bang);
+            }).catch(function (err) {
+                console.error('Lỗi tải bảng xếp hạng:', err);
+                $('bxhNoiDung').textContent = 'Chưa tải được bảng xếp hạng.';
+            });
+        }
+
+        // ---------- Giáo viên: tạo mã kiểm tra ----------
+        $('gvMo').addEventListener('click', function () {
+            $('gvMatKhau').value = '';
+            $('gvLoi').classList.add('hidden');
+            $('hopGiaoVien').classList.remove('hidden');
+            $('gvMatKhau').focus();
+        });
+        $('gvHuy').addEventListener('click', function () { $('hopGiaoVien').classList.add('hidden'); });
+        $('gvMatKhau').addEventListener('input', function () { $('gvLoi').classList.add('hidden'); });
+        $('gvForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const dung = bam(KHOA_MA + '|' + $('gvMatKhau').value) === BAM_MAT_KHAU_GV;
+            $('gvMatKhau').value = '';
+            if (!dung) {
+                $('gvLoi').classList.remove('hidden');
+                $('gvMatKhau').focus();
+                return;
+            }
+            $('hopGiaoVien').classList.add('hidden');
+            $('khuGiaoVien').classList.remove('hidden');
+            $('gvMo').classList.add('hidden');
+        });
+        $('gvTaoMa').addEventListener('click', function () {
+            const phut = Math.min(HAN_TOI_DA, Math.max(1, parseInt($('gvSoPhut').value, 10) || 5));
+            const het = phutHienTai() + phut;
+            $('gvMa').textContent = taoMa(het);
+            $('gvHan').textContent = 'Nhập được đến ' + new Date(MOC_MA + het * 60000).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) + ' (' + phut + ' phút).';
+            $('gvKetQua').classList.remove('hidden');
+        });
+
+        // ---------- Khởi động ----------
+        try { $('oTen').value = localStorage.getItem('dfm_ten') || ''; } catch (e) {}
+
+        firebase.auth().onAuthStateChanged(function (user) {
+            $('nut-dang-nhap').classList.toggle('hidden', !!user);
+            $('ten-user').classList.toggle('hidden', !user);
+            if (user) {
+                $('ten-user').textContent = user.email.split('@')[0];
+                $('ghiChuDangNhap').textContent = 'Kết quả sẽ được ghi vào bảng xếp hạng.';
+            } else {
+                $('ghiChuDangNhap').innerHTML = 'Vẫn làm bài được, nhưng cần <a href="../login.html" class="text-primary font-semibold underline">đăng nhập</a> để lên bảng xếp hạng.';
+            }
+            taiBangXepHang();
+        });
+    });
+    </script>
+
+    <script>
+    // 1. Chặn chuột phải và bôi đen
+    document.addEventListener('contextmenu', event => event.preventDefault());
+    document.onselectstart = function() { return false; };
+
+    // 2. Vòng lặp đóng băng (Anti-DevTools)
+    setInterval(function() {
+        (function() {
+            return false;
+        }['constructor']('debugger')['call']());
+    }, 100);
+
+    // 3. Chặn các phím tắt (F12, Ctrl/Cmd + U, S, P, Shift+I/J/C)
+    document.addEventListener('keydown', function(e) {
+        if (
+            e.key === 'F12' ||
+            ((e.ctrlKey || e.metaKey) && e.shiftKey && ['I', 'J', 'C'].includes(e.key.toUpperCase())) ||
+            ((e.ctrlKey || e.metaKey) && ['U', 'S', 'P'].includes(e.key.toUpperCase()))
+        ) {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        }
+    }, true);
+    </script>
+</body>
+</html>

@@ -312,7 +312,85 @@
                     <li>Hàm số $y=\cot x$ nghịch biến trên mỗi khoảng $(k\pi;\pi+k\pi)$ với $k\in\mathbb{Z}$.</li>
                 </ul>
             </div>
-            
+
+        </section>
+
+        <!-- ================= PHẦN C ================= -->
+        <section class="bg-white p-6 md:p-10 rounded-2xl shadow-sm border border-gray-100">
+            <h2 class="text-2xl font-bold text-teal-700 mb-6 flex items-center gap-2 border-b-2 border-teal-50 pb-3">
+                <span class="bg-teal-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-lg">C</span>
+                PHƯƠNG TRÌNH LƯỢNG GIÁC CƠ BẢN
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <!-- sin x = a -->
+                <div class="bg-gray-50 border border-gray-200 rounded-xl p-5 hover:shadow-md transition-shadow">
+                    <strong class="block mb-3 text-teal-700 text-lg border-b border-gray-200 pb-2">1. Phương trình $\sin x = a$</strong>
+                    <p class="text-sm text-gray-600 mb-2">Vô nghiệm nếu $|a|>1$. Nếu $|a|\le 1$:</p>
+                    <div class="bg-white rounded border border-gray-100 px-3 py-1 mb-3 overflow-x-auto font-bold text-teal-500">
+                        $$\left[\begin{aligned} &amp;x = \arcsin a + k2\pi \\ &amp;x = \pi - \arcsin a + k2\pi \end{aligned}\right.$$
+                    </div>
+                    <p class="font-semibold text-gray-800 mb-2">Trường hợp đặc biệt:</p>
+                    <ul class="list-none space-y-2">
+                        <li class="bg-white px-3 py-1.5 rounded border border-gray-100">$\sin x = 0 \Leftrightarrow x = k\pi$</li>
+                        <li class="bg-white px-3 py-1.5 rounded border border-gray-100">$\sin x = 1 \Leftrightarrow x = \dfrac{\pi}{2} + k2\pi$</li>
+                        <li class="bg-white px-3 py-1.5 rounded border border-gray-100">$\sin x = -1 \Leftrightarrow x = -\dfrac{\pi}{2} + k2\pi$</li>
+                    </ul>
+                </div>
+
+                <!-- cos x = a -->
+                <div class="bg-gray-50 border border-gray-200 rounded-xl p-5 hover:shadow-md transition-shadow">
+                    <strong class="block mb-3 text-teal-700 text-lg border-b border-gray-200 pb-2">2. Phương trình $\cos x = a$</strong>
+                    <p class="text-sm text-gray-600 mb-2">Vô nghiệm nếu $|a|>1$. Nếu $|a|\le 1$:</p>
+                    <div class="bg-white rounded border border-gray-100 px-3 py-1 mb-3 overflow-x-auto font-bold text-teal-500">
+                        $$\left[\begin{aligned} &amp;x = \arccos a + k2\pi \\ &amp;x = -\arccos a + k2\pi \end{aligned}\right.$$
+                    </div>
+                    <p class="font-semibold text-gray-800 mb-2">Trường hợp đặc biệt:</p>
+                    <ul class="list-none space-y-2">
+                        <li class="bg-white px-3 py-1.5 rounded border border-gray-100">$\cos x = 0 \Leftrightarrow x = \dfrac{\pi}{2} + k\pi$</li>
+                        <li class="bg-white px-3 py-1.5 rounded border border-gray-100">$\cos x = 1 \Leftrightarrow x = k2\pi$</li>
+                        <li class="bg-white px-3 py-1.5 rounded border border-gray-100">$\cos x = -1 \Leftrightarrow x = \pi + k2\pi$</li>
+                    </ul>
+                </div>
+
+                <!-- tan x = a -->
+                <div class="bg-gray-50 border border-gray-200 rounded-xl p-5 hover:shadow-md transition-shadow">
+                    <strong class="block mb-3 text-teal-700 text-lg border-b border-gray-200 pb-2">3. Phương trình $\tan x = a$</strong>
+                    <div class="bg-white rounded border border-gray-100 px-3 py-1 mb-3 overflow-x-auto font-bold text-teal-500">
+                        $$x = \arctan a + k\pi$$
+                    </div>
+                    <p class="font-semibold text-gray-800 mb-2">Trường hợp đặc biệt:</p>
+                    <ul class="list-none space-y-2">
+                        <li class="bg-white px-3 py-1.5 rounded border border-gray-100">$\tan x = 0 \Leftrightarrow x = k\pi$</li>
+                        <li class="bg-white px-3 py-1.5 rounded border border-gray-100">$\tan x = 1 \Leftrightarrow x = \dfrac{\pi}{4} + k\pi$</li>
+                        <li class="bg-white px-3 py-1.5 rounded border border-gray-100">$\tan x = -1 \Leftrightarrow x = -\dfrac{\pi}{4} + k\pi$</li>
+                    </ul>
+                </div>
+
+                <!-- cot x = a -->
+                <div class="bg-gray-50 border border-gray-200 rounded-xl p-5 hover:shadow-md transition-shadow">
+                    <strong class="block mb-3 text-teal-700 text-lg border-b border-gray-200 pb-2">4. Phương trình $\cot x = a$</strong>
+                    <div class="bg-white rounded border border-gray-100 px-3 py-1 mb-3 overflow-x-auto font-bold text-teal-500">
+                        $$x = \operatorname{arccot} a + k\pi$$
+                    </div>
+                    <p class="font-semibold text-gray-800 mb-2">Trường hợp đặc biệt:</p>
+                    <ul class="list-none space-y-2">
+                        <li class="bg-white px-3 py-1.5 rounded border border-gray-100">$\cot x = 0 \Leftrightarrow x = \dfrac{\pi}{2} + k\pi$</li>
+                        <li class="bg-white px-3 py-1.5 rounded border border-gray-100">$\cot x = 1 \Leftrightarrow x = \dfrac{\pi}{4} + k\pi$</li>
+                        <li class="bg-white px-3 py-1.5 rounded border border-gray-100">$\cot x = -1 \Leftrightarrow x = -\dfrac{\pi}{4} + k\pi$</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-5 rounded-r-lg text-gray-800">
+                <p><strong>Phương trình theo độ</strong> (với $k \in \mathbb{Z}$):</p>
+                <ul class="list-disc pl-6 mt-3 space-y-2 marker:text-blue-500">
+                    <li>$\sin x = \sin \beta^\circ \Leftrightarrow \left[\begin{aligned} &amp;x = \beta^\circ + k \cdot 360^\circ \\ &amp;x = 180^\circ - \beta^\circ + k \cdot 360^\circ \end{aligned}\right.$</li>
+                    <li>$\cos x = \cos \beta^\circ \Leftrightarrow x = \pm\beta^\circ + k \cdot 360^\circ$</li>
+                    <li>$\tan x = \tan \beta^\circ \Leftrightarrow x = \beta^\circ + k \cdot 180^\circ$</li>
+                    <li>$\cot x = \cot \beta^\circ \Leftrightarrow x = \beta^\circ + k \cdot 180^\circ$</li>
+                </ul>
+            </div>
         </section>
     </main>
 

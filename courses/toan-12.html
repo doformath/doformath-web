@@ -3,6 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- CHẶN MỞ BẢN LƯU OFFLINE (Ctrl+S / Save Page As): chạy đầu tiên, dừng tải phần còn lại -->
+    <script>
+        if (location.protocol === 'file:') {
+            window.stop();
+            // Tạo nội dung bằng createElement (không viết thẻ đóng trong chuỗi, tránh bị các công cụ chèn mã làm vỡ)
+            document.documentElement.innerHTML = '';
+            var h = document.createElement('h1');
+            h.textContent = 'Dữ liệu đã bị mã hóa. Bạn không thể xem trang này ngoại tuyến.';
+            document.body.style.cssText = 'font-family:sans-serif;text-align:center;padding-top:20vh;color:#334155';
+            document.body.appendChild(h);
+        }
+    </script>
     <title>Chinh phục Toán 12 - DoforMath</title>
     
     <link rel="icon" type="image/png" href="../assets/images/Doformath.png">
@@ -39,6 +51,28 @@
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         .custom-scrollbar:hover::-webkit-scrollbar-thumb { background: #94a3b8; }
+        [x-cloak] { display: none !important; }
+
+        /* ===== SIDEBAR KÉO ĐỔI ĐỘ RỘNG (chỉ trên máy tính ≥ 1024px) ===== */
+        :root { --sb-w: 350px; }
+        #sidebar-resizer {
+            display: none; position: absolute; top: 0; right: -5px; width: 10px; height: 100%;
+            cursor: col-resize; z-index: 50; touch-action: none; outline: none;
+        }
+        /* Trong lúc kéo: tắt hiệu ứng trượt, không cho iframe "nuốt" chuột */
+        .sb-resizing, .sb-resizing * { cursor: col-resize !important; user-select: none !important; }
+        .sb-resizing #sidebar { transition: none !important; }
+        .sb-resizing iframe { pointer-events: none; }
+        @media (min-width: 1024px) {
+            #sidebar { width: var(--sb-w); }
+            #sidebar.sb-closed { margin-left: calc(-1 * var(--sb-w)); }
+            #sidebar-resizer { display: block; }
+            #sidebar.sb-closed #sidebar-resizer { display: none; }
+        }
+
+        /* ===== BẢO MẬT BẰNG CSS ===== */
+        img { -webkit-user-drag: none; -webkit-touch-callout: none; }
+        @media print { body { display: none !important; } }  /* In từ menu trình duyệt → trang trắng */
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased font-sans h-screen flex flex-col overflow-hidden">
@@ -103,8 +137,8 @@
             <div x-show="sidebarOpen" @click="sidebarOpen = false" x-transition.opacity class="absolute inset-0 bg-slate-900/50 z-30 lg:hidden" x-cloak></div>
 
             <!-- SIDEBAR THU GỌN / MỞ RỘNG -->
-            <aside class="absolute lg:relative z-40 w-80 lg:w-[350px] shrink-0 bg-white border-r border-slate-200 flex flex-col transition-all duration-300 ease-in-out h-full"
-                   :class="sidebarOpen ? 'translate-x-0 lg:ml-0' : '-translate-x-full lg:-ml-[350px]'">
+            <aside id="sidebar" class="absolute lg:relative z-40 w-80 shrink-0 bg-white border-r border-slate-200 flex flex-col transition-all duration-300 ease-in-out h-full"
+                   :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full sb-closed'">
                 
                 <div class="p-5 border-b border-slate-100 shrink-0 bg-slate-50/50">
                     <h2 class="font-extrabold text-xl text-slate-800">Nội dung khóa học</h2>
@@ -1495,6 +1529,9 @@
 
                     </div>
                 </div>
+
+                <!-- VÙNG KÉO ĐỘ RỘNG SIDEBAR (vô hình, rê chuột vào mép phải mục lục sẽ đổi con trỏ) -->
+                <div id="sidebar-resizer" role="separator" aria-orientation="vertical" aria-label="Kéo để chỉnh độ rộng mục lục" tabindex="0"></div>
             </aside>
 
             <!-- MAIN CONTENT: IFRAME PHÁT BÀI GIẢNG -->
@@ -1575,16 +1612,19 @@
             const defaultUrl = "xem-tai-lieu.html?folder=12-Bai1-Loigiai&title=Bài 1. Tính đơn điệu và cực trị của hàm số";
             const storageKey = 'doforMath_lastLesson_toan12';
 
+            const lessonLinks = document.querySelectorAll('a[target="lesson-frame"]');
+            // Chỉ chấp nhận link có thật trong mục lục (chặn chèn link lạ / javascript: vào localStorage)
+            const allowedUrls = new Set(Array.from(lessonLinks, a => a.getAttribute('href')));
+
             // 1. Phục hồi trang cũ khi vừa load web
             const savedUrl = localStorage.getItem(storageKey);
-            if (savedUrl) {
+            if (savedUrl && allowedUrls.has(savedUrl)) {
                 iframe.src = savedUrl;
             } else {
                 iframe.src = defaultUrl;
             }
 
             // 2. Lắng nghe các thao tác click vào menu để lưu lại trang mới
-            const lessonLinks = document.querySelectorAll('a[target="lesson-frame"]');
             lessonLinks.forEach(link => {
                 link.addEventListener('click', function() {
                     const targetUrl = this.getAttribute('href');
@@ -1595,45 +1635,118 @@
             });
         });
     </script>
+    <!-- ================= BẢO MẬT + SIDEBAR KÉO ĐỘ RỘNG ================= -->
     <script>
-    // 1. Chặn chuột phải và bôi đen
-    document.addEventListener('contextmenu', event => event.preventDefault());
-    document.onselectstart = function() { return false; };
+    (function () {
+        const iframe = document.getElementById('lesson-frame');
 
-    // 2. Chặn các phím tắt nguy hiểm (F12, Ctrl+U, Ctrl+S, Ctrl+Shift+I/J/C)
-    document.addEventListener('keydown', function(e) {
-        if (
-            e.key === 'F12' || 
-            (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key.toUpperCase())) || 
-            (e.ctrlKey && e.key.toUpperCase() === 'U') || // Chặn xem mã nguồn
-            (e.ctrlKey && e.key.toUpperCase() === 'S') || // Chặn tải trang (Save As)
-            (e.ctrlKey && e.key.toUpperCase() === 'P')    // Chặn in trang
-        ) {
-            e.preventDefault();
-            return false;
+        // ---------- 1. Hàm chặn dùng chung (trang chính + bên trong iframe) ----------
+        const block = e => { e.preventDefault(); return false; };
+
+        // Dùng e.code để bắt đúng phím trên mọi bàn phím; bắt cả Cmd (Mac) và Cmd+Option (DevTools trên Mac)
+        function blockKeys(e) {
+            const mod = e.ctrlKey || e.metaKey;
+            if (
+                e.key === 'F12' ||
+                (mod && (e.shiftKey || e.altKey) && ['KeyI', 'KeyJ', 'KeyC'].includes(e.code)) || // DevTools
+                (mod && ['KeyU', 'KeyS', 'KeyP'].includes(e.code))                                 // Xem nguồn / Lưu / In
+            ) {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            }
         }
-    });
 
-    // 3. Vòng lặp đóng băng (Anti-DevTools)
-    // Lệnh này liên tục gọi hàm 'debugger'. Nếu F12 bị ép mở, trình duyệt sẽ bị treo liên tục ở trạng thái gỡ lỗi.
-    setInterval(function() {
-        (function() {
-            return false;
-        }['constructor']('debugger')['call']());
-    }, 100);
-    
-    document.addEventListener('keydown', function(e) {
-    // Bắt cả Ctrl và Cmd (metaKey) kết hợp với các phím S, U, P, I, J, C
-    if (
-        e.key === 'F12' || 
-        ((e.ctrlKey || e.metaKey) && e.shiftKey && ['I', 'J', 'C'].includes(e.key.toUpperCase())) || 
-        ((e.ctrlKey || e.metaKey) && ['U', 'S', 'P'].includes(e.key.toUpperCase()))
-    ) {
-        e.preventDefault();
-        e.stopPropagation();
-        return false;
-    }
-}, true);
-</script>
+        function protect(doc) {
+            doc.addEventListener('contextmenu', block);   // chuột phải
+            doc.addEventListener('selectstart', block);   // bôi đen
+            doc.addEventListener('dragstart', block);     // kéo ảnh ra desktop để lưu
+            doc.addEventListener('copy', block);          // Ctrl+C
+            doc.addEventListener('keydown', blockKeys, true);
+        }
+        protect(document);
+
+        // ---------- 2. Bảo vệ luôn bên trong iframe ----------
+        // Trước đây: học sinh bấm vào bài giảng (iframe) rồi Ctrl+S / F12 / chuột phải là lọt,
+        // vì phím và chuột lúc đó thuộc về trang trong iframe chứ không phải trang chính.
+        iframe.addEventListener('load', function () {
+            try {
+                const doc = iframe.contentDocument;
+                if (!doc || doc.__dfmProtected) return;
+                doc.__dfmProtected = true;
+                protect(doc);
+                const st = doc.createElement('style');
+                st.textContent =
+                    'body{-webkit-user-select:none;user-select:none}' +
+                    'img{-webkit-user-drag:none;-webkit-touch-callout:none}' +   /* chặn nhấn giữ lưu ảnh trên iPhone */
+                    '@media print{body{display:none!important}}';
+                (doc.head || doc.documentElement).appendChild(st);
+            } catch (err) { /* trang khác tên miền: trình duyệt không cho can thiệp, bỏ qua */ }
+        });
+
+        // ---------- 3. Vòng lặp đóng băng khi mở DevTools ----------
+        setInterval(function () {
+            (function () { return false; }['constructor']('debugger')['call']());
+        }, 100);
+
+        // ---------- 4. Lớp dự phòng cho bản lưu offline ----------
+        if (location.protocol === 'file:') {
+            document.body.innerHTML = '<h1 style="text-align:center;margin-top:20%;font-family:sans-serif;">Dữ liệu đã bị mã hóa. Bạn không thể xem trang này ngoại tuyến.</h1>';
+        }
+
+        // ---------- 5. Sidebar kéo đổi độ rộng ----------
+        const sidebar = document.getElementById('sidebar');
+        const handle  = document.getElementById('sidebar-resizer');
+        const KEY = 'doforMath_sidebarWidth';
+        const MIN = 260, DEFAULT = 350;
+        const maxW = () => Math.max(MIN, Math.min(640, window.innerWidth * 0.6));
+
+        function setW(w) {
+            w = Math.round(Math.min(maxW(), Math.max(MIN, w)));
+            document.documentElement.style.setProperty('--sb-w', w + 'px');
+            return w;
+        }
+        function saveW() { try { localStorage.setItem(KEY, current); } catch (e) {} }
+
+        let saved = DEFAULT;
+        try { saved = parseInt(localStorage.getItem(KEY), 10) || DEFAULT; } catch (e) {}
+        let current = setW(saved);
+
+        handle.addEventListener('pointerdown', function (e) {
+            if (window.innerWidth < 1024 || e.button !== 0) return;
+            e.preventDefault();
+            handle.setPointerCapture(e.pointerId);
+            document.body.classList.add('sb-resizing');
+            const startX = e.clientX, startW = sidebar.getBoundingClientRect().width;
+
+            const move = ev => { current = setW(startW + ev.clientX - startX); };
+            const up = () => {
+                handle.removeEventListener('pointermove', move);
+                handle.removeEventListener('pointerup', up);
+                handle.removeEventListener('pointercancel', up);
+                document.body.classList.remove('sb-resizing');
+                saveW();
+            };
+            handle.addEventListener('pointermove', move);
+            handle.addEventListener('pointerup', up);
+            handle.addEventListener('pointercancel', up);
+        });
+
+        // Nhấp đúp → về độ rộng mặc định
+        handle.addEventListener('dblclick', () => { current = setW(DEFAULT); saveW(); });
+
+        // Dùng phím mũi tên khi tay nắm đang được chọn (Tab tới)
+        handle.addEventListener('keydown', function (e) {
+            if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+                e.preventDefault();
+                current = setW(current + (e.key === 'ArrowRight' ? 20 : -20));
+                saveW();
+            }
+        });
+
+        // Thu nhỏ cửa sổ thì sidebar tự co lại cho vừa
+        window.addEventListener('resize', () => setW(current));
+    })();
+    </script>
 </body>
 </html>
