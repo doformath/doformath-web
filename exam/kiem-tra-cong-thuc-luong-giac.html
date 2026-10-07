@@ -37,7 +37,7 @@
             <span id="tenBaiHeader" class="hidden font-bold text-gray-700 text-sm md:text-base truncate">Kiểm tra công thức Lượng giác</span>
             <div class="flex items-center gap-3">
                 <span id="dongHoHeader" class="hidden font-bold text-teal-700 bg-teal-50 border border-teal-100 px-3 py-1 rounded-full tabular-nums text-sm">
-                    <i class="fa-solid fa-stopwatch mr-1"></i><span id="dongHo">0:00.0</span>
+                    <i class="fa-solid fa-hourglass-half mr-1"></i><span id="dongHo">5:00.0</span>
                 </span>
                 <span id="ten-user" class="hidden text-xs md:text-sm font-semibold text-teal-700 bg-teal-50 px-3 py-1 rounded-full border border-teal-100 max-w-[140px] truncate"></span>
                 <a id="nut-dang-nhap" href="../login.html" class="hidden bg-primary hover:bg-teal-800 text-white px-4 py-2 rounded-full text-sm font-medium transition-all shadow-md">Đăng nhập</a>
@@ -59,7 +59,8 @@
                     <li><i class="fa-solid fa-shuffle text-teal-600 w-6"></i>Mỗi lượt gồm <strong>10 câu</strong>, thứ tự câu hỏi của mỗi bạn <strong>khác nhau</strong>.</li>
                     <li><i class="fa-solid fa-hand-pointer text-teal-600 w-6"></i>Chọn các cụm bên dưới để <strong>ghép thành công thức đúng</strong>.</li>
                     <li><i class="fa-solid fa-stopwatch text-teal-600 w-6"></i>Xếp hạng theo <strong>số câu đúng</strong>, bằng điểm thì ai <strong>nhanh hơn</strong> đứng trên.</li>
-                    <li><i class="fa-solid fa-shield-halved text-teal-600 w-6"></i>Bài làm ở chế độ <strong>toàn màn hình</strong>. Thoát toàn màn hình hoặc chuyển tab sẽ bị <strong>ghi lại trên bảng xếp hạng</strong>; quá 3 lần bài tự động nộp.</li>
+                    <li><i class="fa-solid fa-hourglass-half text-teal-600 w-6"></i>Thời gian làm bài <strong>5 phút</strong>, đồng hồ <strong>đếm ngược</strong>. Hết giờ bài tự động nộp, câu chưa làm tính là sai.</li>
+                    <li><i class="fa-solid fa-shield-halved text-teal-600 w-6"></i>Bài làm ở chế độ <strong>toàn màn hình</strong>. Thoát toàn màn hình, chuyển tab hoặc chuyển sang ứng dụng khác sẽ bị <strong>ghi lại trên bảng xếp hạng</strong>; quá 3 lần bài tự động nộp.</li>
                 </ul>
                 <div class="w-full max-w-sm">
                     <input id="oTen" type="text" maxlength="30" placeholder="Nhập họ và tên của bạn" class="w-full px-4 py-3 rounded-xl border-2 border-teal-100 focus:border-teal-400 focus:outline-none text-center font-medium">
@@ -493,6 +494,7 @@
         let de = [], viTri = 0, dong = [], dongChon = 0, daCham = false;
         let ketQua = [], daTroi = 0, mocBatDau = 0, hengio = null;
         const GIOI_HAN_VI_PHAM = 3;
+        const GIOI_HAN_GIO = 5 * 60 * 1000; // thời gian làm bài (ms)
         let dangLam = false, viPham = 0, mocViPham = 0;
 
         function dinhDangGio(ms) {
@@ -501,9 +503,18 @@
             return Math.floor(s / 60) + ':' + (giay < 10 ? '0' : '') + giay;
         }
         function thoiGianHienTai() { return daTroi + (hengio ? Date.now() - mocBatDau : 0); }
+        // Đồng hồ đếm ngược: hiện thời gian còn lại, đổi sang màu đỏ ở phút cuối
+        function capNhatDongHo() {
+            const con = Math.max(0, GIOI_HAN_GIO - thoiGianHienTai());
+            const gap = con <= 60000;
+            $('dongHo').textContent = dinhDangGio(con);
+            ['text-red-600', 'bg-red-50', 'border-red-200'].forEach(function (lop) { $('dongHoHeader').classList.toggle(lop, gap); });
+            ['text-teal-700', 'bg-teal-50', 'border-teal-100'].forEach(function (lop) { $('dongHoHeader').classList.toggle(lop, !gap); });
+            return con;
+        }
         function chayDongHo() {
             mocBatDau = Date.now();
-            hengio = setInterval(function () { $('dongHo').textContent = dinhDangGio(thoiGianHienTai()); }, 100);
+            hengio = setInterval(function () { if (capNhatDongHo() <= 0) hetGio(); }, 100);
         }
         function dungDongHo() {
             if (!hengio) return;
@@ -562,6 +573,16 @@
             ketThuc();
         }
 
+        function hetGio() {
+            dungDongHo();
+            daTroi = GIOI_HAN_GIO;
+            $('vpTieuDe').textContent = 'HẾT GIỜ LÀM BÀI';
+            $('vpNoiDung').textContent = 'Đã hết ' + (GIOI_HAN_GIO / 60000) + ' phút nên bài đã tự động nộp, các câu chưa làm tính là sai.';
+            $('vpNut').textContent = 'Xem kết quả';
+            $('hopViPham').classList.remove('hidden');
+            nopSom();
+        }
+
         $('vpNut').addEventListener('click', function () {
             $('hopViPham').classList.add('hidden');
             if (dangLam && !dangToanManHinh()) vaoToanManHinh();
@@ -569,6 +590,14 @@
         document.addEventListener('visibilitychange', function () {
             if (document.hidden) ghiViPham('chuyển sang tab hoặc ứng dụng khác');
         });
+        // Điện thoại (nhất là iPhone) không có chế độ toàn màn hình nên bắt thêm lúc trang mất tiêu điểm.
+        // Chờ một nhịp rồi mới kiểm tra để bỏ qua các lần mất tiêu điểm thoáng qua.
+        window.addEventListener('blur', function () {
+            setTimeout(function () {
+                if (!document.hasFocus()) ghiViPham('rời khỏi trang làm bài');
+            }, 300);
+        });
+        window.addEventListener('pagehide', function () { ghiViPham('rời khỏi trang làm bài'); });
         ['fullscreenchange', 'webkitfullscreenchange'].forEach(function (suKien) {
             document.addEventListener(suKien, function () {
                 if (!dangToanManHinh()) ghiViPham('thoát chế độ toàn màn hình');
@@ -764,7 +793,7 @@
             viPham = 0;
             mocViPham = 0;
             dangLam = true;
-            $('dongHo').textContent = dinhDangGio(0);
+            capNhatDongHo();
             hienManHinh('manHinhLamBai');
             veCau();
         }
