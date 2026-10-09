@@ -67,7 +67,7 @@
                     <input id="oMa" type="text" maxlength="12" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Mã kiểm tra do thầy cấp" class="mt-3 w-full px-4 py-3 rounded-xl border-2 border-teal-100 focus:border-teal-400 focus:outline-none text-center font-bold tracking-widest uppercase placeholder:font-medium placeholder:tracking-normal placeholder:normal-case">
                     <p id="loiMa" class="hidden text-sm font-semibold text-red-500 mt-2"></p>
                     <p id="ghiChuDangNhap" class="text-sm text-gray-500 mt-2"></p>
-                    <button id="nutBatDau" type="button" class="mt-4 w-full bg-primary hover:bg-teal-800 text-white font-bold py-3 rounded-xl shadow-md hover:shadow-lg transition-all">
+                    <button id="nutBatDau" type="button" disabled class="mt-4 w-full bg-primary hover:bg-teal-800 text-white font-bold py-3 rounded-xl shadow-md hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-primary">
                         <i class="fa-solid fa-play mr-2"></i>Bắt đầu
                     </button>
                 </div>
@@ -717,6 +717,8 @@
         });
 
         function batDau() {
+            // Chỉ học sinh đã đăng nhập mới được làm bài
+            if (!firebase.auth().currentUser) return;
             const ten = $('oTen').value.trim();
             if (ten.length < 2) {
                 $('oTen').focus();
@@ -933,11 +935,14 @@
         firebase.auth().onAuthStateChanged(function (user) {
             $('nut-dang-nhap').classList.toggle('hidden', !!user);
             $('ten-user').classList.toggle('hidden', !user);
+            $('nutBatDau').disabled = !user;
+            $('oTen').disabled = !user;
+            $('oMa').disabled = !user;
             if (user) {
                 $('ten-user').textContent = user.email.split('@')[0];
                 $('ghiChuDangNhap').textContent = 'Kết quả sẽ được ghi vào bảng xếp hạng.';
             } else {
-                $('ghiChuDangNhap').innerHTML = 'Vẫn làm bài được, nhưng cần <a href="../login.html" class="text-primary font-semibold underline">đăng nhập</a> để lên bảng xếp hạng.';
+                $('ghiChuDangNhap').innerHTML = 'Bạn cần <a href="../login.html" class="text-primary font-semibold underline">đăng nhập</a> để làm bài.';
             }
             taiBangXepHang();
         });

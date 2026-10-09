@@ -27,7 +27,7 @@
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
 </head>
-<body class="bg-slate-50 text-slate-800 antialiased font-sans">
+<body class="pl-14 md:pl-0 bg-slate-50 text-slate-800 antialiased font-sans">
 
     <!-- HEADER / NAVBAR (Sticky) -->
     <header class="bg-white shadow-sm sticky top-0 z-50">
@@ -36,11 +36,6 @@
             <div class="flex justify-between items-center h-16 md:h-20">
                 
                 <div class="flex items-center gap-2 md:gap-4">
-                    <!-- Nút Hamburger: Thêm -mt-1 để đẩy nhẹ icon lên trên, cân bằng thị giác với chữ -->
-                    <button id="btnOpenMenu" type="button" class="md:hidden w-9 h-9 -mt-1 rounded-lg flex items-center justify-center text-gray-600 hover:bg-teal-50 hover:text-primary transition-colors shrink-0" aria-label="Mở menu điều hướng">
-                        <i class="fa-solid fa-bars text-lg"></i>
-                    </button>
-
                     <!-- Logo Toán học: Xóa class pb-1 để trả logo về đúng trọng tâm -->
                     <a href="index.html" class="flex-shrink-0 flex items-center hover:opacity-80 transition-opacity">
                         <span class="text-xl md:text-2xl tracking-tight text-gray-900">
@@ -86,42 +81,83 @@
             </div>
         </div>
 
-        <!-- SIDEBAR MOBILE: lớp phủ nền tối -->
-        <div id="mobileOverlay" style="display:none;"
-             class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[60] md:hidden opacity-0 transition-opacity duration-300 ease-out"
-             aria-hidden="true"></div>
-
-        <!-- SIDEBAR MOBILE: panel trượt từ bên trái -->
-        <aside id="mobileSidebar" style="display:none;"
-               class="fixed top-0 left-0 h-full w-72 max-w-[80%] bg-white z-[70] shadow-2xl md:hidden flex-col -translate-x-full transition-transform duration-300 ease-out"
-               role="dialog" aria-modal="true" aria-label="Menu điều hướng">
-            <div class="flex items-center justify-between p-5 border-b border-gray-100">
-                <span class="text-xl tracking-tight text-gray-900">
-                    $\textcolor{#0d9488}{\textsf{\textbf{Dofor}}{\sum}\textsf{\textbf{ath}}}$
-                </span>
-                <button id="btnCloseMenu" type="button" class="w-9 h-9 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition-colors" aria-label="Đóng menu">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
-            <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1">
-                <a href="index.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-primary font-medium transition-colors">
-                    <i class="fa-solid fa-house w-5 text-center"></i> Trang chủ
-                </a>
-                <a href="courses.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-primary font-medium transition-colors">
-                    <i class="fa-solid fa-graduation-cap w-5 text-center"></i> Khóa học của tôi
-                </a>
-                <a href="tai-lieu-mien-phi.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-primary bg-teal-50 font-semibold">
-                    <i class="fa-solid fa-book-open w-5 text-center"></i> Tài liệu miễn phí
-                </a>
-                <a href="phong-thi.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-primary font-medium transition-colors">
-                    <i class="fa-solid fa-stopwatch w-5 text-center"></i> Phòng thi
-                </a>
-            </nav>
-            <div class="p-5 border-t border-gray-100 text-xs text-gray-400 text-center">
-                &copy; 2026 DoforMath Education
-            </div>
-        </aside>
     </header>
+
+    <!-- SIDEBAR MOBILE: thu gọn chỉ hiện icon, bấm nút hamburger để mở rộng hiện cả tên mục -->
+    <style>
+        #mobileSidebar { width: 3.5rem; transition: width .25s ease, box-shadow .25s ease; }
+        #mobileSidebar.is-open { width: 16rem; max-width: 80%; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, .25); }
+        #mobileOverlay { opacity: 0; pointer-events: none; transition: opacity .25s ease; }
+        #mobileOverlay.is-open { opacity: 1; pointer-events: auto; }
+    </style>
+
+    <div id="mobileOverlay" class="fixed inset-0 bg-gray-900/60 z-[60] md:hidden" aria-hidden="true"></div>
+
+    <aside id="mobileSidebar" class="fixed top-0 left-0 h-full bg-teal-600 text-white z-[70] md:hidden flex flex-col overflow-hidden" aria-label="Menu điều hướng">
+        <div class="flex items-center h-16 px-2 shrink-0 border-b border-white/10 whitespace-nowrap">
+            <button id="btnToggleMenu" type="button" class="w-10 h-10 shrink-0 rounded-xl flex items-center justify-center text-white hover:bg-white/15 transition-colors" aria-label="Mở rộng menu" aria-expanded="false" aria-controls="mobileSidebar">
+                <i class="fa-solid fa-bars text-xl"></i>
+            </button>
+            <span class="pl-3 text-xl tracking-tight text-white">
+                $\textcolor{#ffffff}{\textsf{\textbf{Dofor}}{\sum}\textsf{\textbf{ath}}}$
+            </span>
+        </div>
+        <nav class="flex-1 overflow-y-auto overflow-x-hidden py-2">
+            <a href="index.html" title="Trang chủ" class="flex items-center h-12 whitespace-nowrap transition-colors text-teal-100 hover:bg-white/10 hover:text-white font-medium">
+                <i class="fa-solid fa-house w-14 shrink-0 text-center text-xl"></i>
+                <span class="pr-4">Trang chủ</span>
+            </a>
+            <a href="courses.html" title="Khóa học của tôi" class="flex items-center h-12 whitespace-nowrap transition-colors text-teal-100 hover:bg-white/10 hover:text-white font-medium">
+                <i class="fa-solid fa-graduation-cap w-14 shrink-0 text-center text-xl"></i>
+                <span class="pr-4">Khóa học của tôi</span>
+            </a>
+            <a href="tai-lieu-mien-phi.html" title="Tài liệu miễn phí" aria-current="page" class="flex items-center h-12 whitespace-nowrap transition-colors bg-white/20 text-white font-semibold">
+                <i class="fa-solid fa-book-open w-14 shrink-0 text-center text-xl"></i>
+                <span class="pr-4">Tài liệu miễn phí</span>
+            </a>
+            <a href="phong-thi.html" title="Phòng thi" class="flex items-center h-12 whitespace-nowrap transition-colors text-teal-100 hover:bg-white/10 hover:text-white font-medium">
+                <i class="fa-solid fa-stopwatch w-14 shrink-0 text-center text-xl"></i>
+                <span class="pr-4">Phòng thi</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Script điều khiển sidebar mobile: JS thuần, không phụ thuộc Alpine.js -->
+    <script>
+        (function () {
+            var overlay = document.getElementById('mobileOverlay');
+            var sidebar = document.getElementById('mobileSidebar');
+            var btnToggle = document.getElementById('btnToggleMenu');
+            if (!overlay || !sidebar || !btnToggle) return;
+            var icon = btnToggle.querySelector('i');
+
+            function setOpen(open) {
+                sidebar.classList.toggle('is-open', open);
+                overlay.classList.toggle('is-open', open);
+                icon.classList.toggle('fa-bars', !open);
+                icon.classList.toggle('fa-xmark', open);
+                btnToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+                btnToggle.setAttribute('aria-label', open ? 'Thu gọn menu' : 'Mở rộng menu');
+                document.body.style.overflow = open ? 'hidden' : '';
+            }
+
+            btnToggle.addEventListener('click', function () {
+                setOpen(!sidebar.classList.contains('is-open'));
+            });
+            overlay.addEventListener('click', function () { setOpen(false); });
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') setOpen(false);
+            });
+            // Bấm vào link nào cũng thu gọn sidebar lại; trình duyệt vẫn điều hướng bình thường theo href
+            sidebar.querySelectorAll('a').forEach(function (link) {
+                link.addEventListener('click', function () { setOpen(false); });
+            });
+            // Xoay ngang / phóng to sang giao diện desktop thì tự thu gọn để không kẹt khóa cuộn trang
+            window.matchMedia('(min-width: 768px)').addEventListener('change', function (e) {
+                if (e.matches) setOpen(false);
+            });
+        })();
+    </script>
 
     <!-- HERO BANNER -->
     <section class="relative bg-teal-50/50 py-16 overflow-hidden border-b border-teal-100">
@@ -335,47 +371,6 @@
                 authContainer.style.opacity = '1';
             }
         });
-
-        // Script điều khiển sidebar mobile: JS thuần, không phụ thuộc Alpine.js -->
-        (function () {
-            var overlay = document.getElementById('mobileOverlay');
-            var sidebar = document.getElementById('mobileSidebar');
-            var btnOpen = document.getElementById('btnOpenMenu');
-            var btnClose = document.getElementById('btnCloseMenu');
-            if (!overlay || !sidebar || !btnOpen || !btnClose) return;
-
-            function openMenu() {
-                overlay.style.display = 'block';
-                sidebar.style.display = 'flex';
-                requestAnimationFrame(function () {
-                    requestAnimationFrame(function () {
-                        overlay.classList.remove('opacity-0');
-                        sidebar.classList.remove('-translate-x-full');
-                    });
-                });
-                document.body.style.overflow = 'hidden';
-            }
-
-            function closeMenu() {
-                overlay.classList.add('opacity-0');
-                sidebar.classList.add('-translate-x-full');
-                document.body.style.overflow = '';
-                setTimeout(function () {
-                    overlay.style.display = 'none';
-                    sidebar.style.display = 'none';
-                }, 300);
-            }
-
-            btnOpen.addEventListener('click', openMenu);
-            btnClose.addEventListener('click', closeMenu);
-            overlay.addEventListener('click', closeMenu);
-            document.addEventListener('keydown', function (e) {
-                if (e.key === 'Escape') closeMenu();
-            });
-            sidebar.querySelectorAll('a').forEach(function (link) {
-                link.addEventListener('click', closeMenu);
-            });
-        })();
     </script>
     <script>
     // 1. Chặn chuột phải và bôi đen
