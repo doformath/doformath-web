@@ -84,7 +84,7 @@
                     <div id="khu-vuc-user" style="display: none;" class="flex items-center gap-2 md:gap-4">
                         <span id="ten-user" class="text-xs md:text-sm font-semibold text-teal-700 bg-teal-50 px-2 py-1.5 md:px-3 md:py-1 rounded-full border border-teal-100 max-w-[100px] md:max-w-[200px] truncate inline-block text-center"></span>
                         
-                        <button onclick="dangXuat()" class="flex items-center justify-center gap-1.5 text-xs md:text-sm text-gray-500 hover:text-red-500 font-medium transition-colors bg-gray-100 hover:bg-red-50 md:bg-transparent p-2 md:p-0 rounded-full md:rounded-none w-8 h-8 md:w-auto md:h-auto shrink-0">
+                        <button onclick="dangXuat()" class="hidden md:flex items-center justify-center gap-1.5 text-xs md:text-sm text-gray-500 hover:text-red-500 font-medium transition-colors bg-gray-100 hover:bg-red-50 md:bg-transparent p-2 md:p-0 rounded-full md:rounded-none w-8 h-8 md:w-auto md:h-auto shrink-0">
                             <i class="fa-solid fa-arrow-right-from-bracket"></i>
                             <span class="hidden md:inline">Đăng xuất</span>
                         </button>
@@ -133,6 +133,11 @@
                 <span class="pr-4">Phòng thi</span>
             </a>
         </nav>
+        <!-- Nút đăng xuất (mobile): chỉ hiện khi đã đăng nhập -->
+        <button id="nutDangXuatMobile" type="button" onclick="dangXuat()" title="Đăng xuất" style="display: none;" class="items-center h-12 w-full shrink-0 mb-2 whitespace-nowrap border-t border-white/10 text-teal-100 hover:bg-white/10 hover:text-white font-medium transition-colors">
+            <i class="fa-solid fa-arrow-right-from-bracket w-14 shrink-0 text-center text-xl"></i>
+            <span class="pr-4">Đăng xuất</span>
+        </button>
     </aside>
 
     <!-- Script điều khiển sidebar mobile: JS thuần, không phụ thuộc Alpine.js -->
@@ -418,6 +423,7 @@
             const authContainer = document.getElementById('auth-container'); // <-- THÊM KHỐI NÀY
             const khuVucDangNhap = document.getElementById('khu-vuc-dang-nhap');
             const khuVucUser = document.getElementById('khu-vuc-user');
+            const nutDangXuatMobile = document.getElementById('nutDangXuatMobile');
             const tenUser = document.getElementById('ten-user');
 
             const card10 = document.getElementById('card-toan-10');
@@ -430,6 +436,7 @@
                 // 1. ĐÃ ĐĂNG NHẬP: Xử lý Header trước
                 if (khuVucDangNhap) khuVucDangNhap.style.display = 'none';
                 if (khuVucUser) khuVucUser.style.display = 'flex';
+                if (nutDangXuatMobile) nutDangXuatMobile.style.display = 'flex';
                 
                 const tenHienThi = user.email.split('@')[0];
                 if (tenUser) tenUser.innerText = tenHienThi;
@@ -463,6 +470,7 @@
                 // 2. CHƯA ĐĂNG NHẬP: Xử lý Header
                 if (khuVucDangNhap) khuVucDangNhap.style.display = 'block';
                 if (khuVucUser) khuVucUser.style.display = 'none';
+                if (nutDangXuatMobile) nutDangXuatMobile.style.display = 'none';
                 
                 if (greeting) greeting.innerText = "Không gian học tập";
                 unauthState.style.display = 'block';

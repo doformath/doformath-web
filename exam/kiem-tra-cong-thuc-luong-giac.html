@@ -144,7 +144,7 @@
         </section>
 
         <!-- ================= BẢNG XẾP HẠNG ================= -->
-        <section id="bangXepHang" class="bg-white p-6 md:p-10 rounded-2xl shadow-sm border border-gray-100">
+        <section id="bangXepHang" class="hidden bg-white p-6 md:p-10 rounded-2xl shadow-sm border border-gray-100">
             <h2 class="text-2xl font-bold text-teal-700 mb-6 flex items-center gap-2 border-b-2 border-teal-50 pb-3">
                 <i class="fa-solid fa-trophy text-amber-400"></i> BẢNG XẾP HẠNG
             </h2>
@@ -483,6 +483,12 @@
     document.addEventListener('DOMContentLoaded', function () {
         const SO_CAU = 10;
         const BXH = 'bxh_luong_giac';
+        // Chỉ tài khoản giáo viên này mới xem được bảng xếp hạng
+        const EMAIL_GIAO_VIEN = 'thanhdo@dfm.com';
+        function laGiaoVien() {
+            const user = firebase.auth().currentUser;
+            return !!(user && user.email && user.email.toLowerCase() === EMAIL_GIAO_VIEN);
+        }
         // Mã kiểm tra = hạn dùng (4 ký tự) + chữ ký (4 ký tự), tự kiểm tra ngay trên trang, không cần máy chủ
         const KHOA_MA = '69XMmLnaElloGinboJo-0yYl';
         const BAM_MAT_KHAU_GV = 656711425877204;
@@ -525,7 +531,7 @@
 
         function hienManHinh(ten) {
             ['manHinhBatDau', 'manHinhLamBai', 'manHinhKetQua'].forEach(function (id) { $(id).classList.toggle('hidden', id !== ten); });
-            $('bangXepHang').classList.toggle('hidden', ten === 'manHinhLamBai');
+            $('bangXepHang').classList.toggle('hidden', ten === 'manHinhLamBai' || !laGiaoVien());
             $('dongHoHeader').classList.toggle('hidden', ten !== 'manHinhLamBai');
             // Đang làm bài thì không có lối thoát nào trên giao diện
             $('nutQuayLai').classList.toggle('hidden', ten === 'manHinhLamBai');
@@ -841,7 +847,8 @@
             luuKetQua(diem, daTroi);
         }
 
-        // Mỗi học sinh một dòng (theo uid), chỉ giữ thành tích tốt nhất
+        // Mỗi học sinh một dòng (theo uid): thành tích tốt nhất + lịch sử từng lần làm (kèm ngày giờ)
+        const LICH_SU_TOI_DA = 100;
         let dangLuu = false;
         function luuKetQua(diem, ms) {
             if (dangLuu) return;
@@ -856,7 +863,16 @@
             ref.get().then(function (snap) {
                 const cu = snap.exists ? snap.data() : null;
                 const totHon = !cu || cu.diem === undefined || diem > cu.diem || (diem === cu.diem && ms < cu.thoiGian);
-                const duLieu = { ten: $('oTen').value.trim().slice(0, 30), soLan: ((cu && cu.soLan) || 0) + 1 };
+                const luc = Date.now();
+                const lichSu = (cu && Array.isArray(cu.lichSu) ? cu.lichSu : [])
+                    .concat({ luc: luc, diem: diem, tong: de.length, thoiGian: ms, viPham: viPham })
+                    .slice(-LICH_SU_TOI_DA);
+                const duLieu = {
+                    ten: $('oTen').value.trim().slice(0, 30),
+                    soLan: ((cu && cu.soLan) || 0) + 1,
+                    lanCuoi: luc,
+                    lichSu: lichSu
+                };
                 if (totHon) {
                     duLieu.diem = diem;
                     duLieu.tong = de.length;
@@ -866,95 +882,162 @@
                 }
                 return ref.set(duLieu, { merge: true }).then(function () {
                     $('kqLuu').textContent = totHon
-                        ? 'Đã ghi thành tích mới vào bảng xếp hạng.'
+                        ? 'Đã ghi nhận thành tích mới.'
                         : 'Thành tích tốt nhất của bạn vẫn là ' + cu.diem + '/' + cu.tong + ' trong ' + dinhDangGio(cu.thoiGian) + '.';
-                    taiBangXepHang(true);
                 });
             }).catch(function (err) {
                 console.error('Lỗi lưu bảng xếp hạng:', err);
-                $('kqLuu').textContent = 'Chưa lưu được kết quả lên bảng xếp hạng.';
+                $('kqLuu').textContent = 'Chưa lưu được kết quả.';
             }).then(function () { dangLuu = false; });
         }
 
-        // Bảng xếp hạng được nhớ tạm trong trình duyệt: tải lại trang liên tục (F5) không đọc lại Firestore,
-        // tránh bị spam làm cạn hạn mức đọc trong ngày của cả trang web
-        const BXH_NHO = 'dfm_bxh_luong_giac', BXH_NHO_MS = 60 * 1000;
-        let dangTaiBxh = false;
         // Dữ liệu trên Firestore có thể bị ghi bậy: chỉ nhận dòng hợp lệ và cắt gọn trước khi hiển thị
+        function locLan(l) {
+            if (!l || !Number.isFinite(l.luc) || !Number.isFinite(l.diem) || !Number.isFinite(l.thoiGian)) return null;
+            const tong = Number.isFinite(l.tong) && l.tong > 0 ? Math.min(Math.floor(l.tong), 100) : SO_CAU;
+            return {
+                luc: l.luc,
+                diem: Math.max(0, Math.min(tong, Math.floor(l.diem))),
+                tong: tong,
+                thoiGian: Math.max(0, Math.min(l.thoiGian, GIOI_HAN_GIO)),
+                viPham: Number.isFinite(l.viPham) ? Math.max(0, Math.min(99, Math.floor(l.viPham))) : 0
+            };
+        }
         function locDong(id, d) {
             if (!d || !Number.isFinite(d.diem) || !Number.isFinite(d.thoiGian)) return null;
             const tong = Number.isFinite(d.tong) && d.tong > 0 ? Math.min(Math.floor(d.tong), 100) : SO_CAU;
             if (d.diem < 0 || d.diem > tong || d.thoiGian <= 0) return null;
+            const lichSu = (Array.isArray(d.lichSu) ? d.lichSu : []).slice(-LICH_SU_TOI_DA).map(locLan).filter(Boolean);
+            // Ngày đạt thành tích tốt nhất (dữ liệu cũ chỉ có mốc này, chưa có lịch sử từng lần)
+            const ngayTot = d.ngay && typeof d.ngay.toMillis === 'function' ? d.ngay.toMillis() : 0;
             return {
                 id: String(id),
                 ten: String(d.ten || '').slice(0, 30),
                 diem: Math.floor(d.diem),
                 tong: tong,
                 thoiGian: Math.min(d.thoiGian, GIOI_HAN_GIO),
-                viPham: Number.isFinite(d.viPham) ? Math.max(0, Math.min(99, Math.floor(d.viPham))) : 0
+                viPham: Number.isFinite(d.viPham) ? Math.max(0, Math.min(99, Math.floor(d.viPham))) : 0,
+                soLan: Number.isFinite(d.soLan) && d.soLan > 0 ? Math.floor(d.soLan) : Math.max(1, lichSu.length),
+                lanCuoi: Number.isFinite(d.lanCuoi) ? d.lanCuoi : ngayTot,
+                ngayTot: ngayTot,
+                lichSu: lichSu
             };
         }
-        function taiBangXepHang(batBuoc) {
-            if (dangTaiBxh) return;
-            if (!batBuoc) {
-                try {
-                    const nho = JSON.parse(sessionStorage.getItem(BXH_NHO));
-                    if (nho && Date.now() - nho.luc < BXH_NHO_MS && Array.isArray(nho.ds)) {
-                        veBangXepHang(nho.ds.map(function (d) { return locDong(d.id, d); }).filter(Boolean));
-                        return;
-                    }
-                } catch (e) {}
+        function dinhDangNgayGio(ms) {
+            if (!ms) return '—';
+            return new Date(ms).toLocaleString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+        }
+
+        // Bảng xếp hạng chỉ tải cho giáo viên và tự cập nhật ngay khi có học sinh nộp bài (không cần tải lại trang).
+        // Dùng lắng nghe trực tiếp thay vì đọc lại cả bảng theo chu kỳ để không tốn hạn mức đọc Firestore.
+        let huyNgheBxh = null;
+        function ngheBangXepHang() {
+            if (huyNgheBxh) { huyNgheBxh(); huyNgheBxh = null; }
+            const duocXem = laGiaoVien();
+            $('bangXepHang').classList.toggle('hidden', !duocXem || dangLam);
+            if (!duocXem) {
+                $('bxhNoiDung').textContent = '';
+                return;
             }
-            dangTaiBxh = true;
-            db.collection(BXH).get().then(function (snap) {
+            huyNgheBxh = db.collection(BXH).onSnapshot(function (snap) {
                 const ds = [];
                 snap.forEach(function (doc) {
                     const d = locDong(doc.id, doc.data());
                     if (d) ds.push(d);
                 });
                 ds.sort(function (x, y) { return y.diem - x.diem || x.thoiGian - y.thoiGian; });
-                try { sessionStorage.setItem(BXH_NHO, JSON.stringify({ luc: Date.now(), ds: ds })); } catch (e) {}
                 veBangXepHang(ds);
-            }).catch(function (err) {
+            }, function (err) {
                 console.error('Lỗi tải bảng xếp hạng:', err);
                 $('bxhNoiDung').textContent = 'Chưa tải được bảng xếp hạng.';
-            }).then(function () { dangTaiBxh = false; });
+            });
+        }
+        const dongDangMo = {}; // học sinh đang mở lịch sử, giữ nguyên khi bảng tự cập nhật
+        function veLichSu(d) {
+            const hop = document.createElement('div');
+            hop.className = 'bg-gray-50 rounded-xl p-3 md:p-4 text-sm';
+            if (!d.lichSu.length) {
+                hop.textContent = 'Chưa có lịch sử từng lần làm (bài làm trước khi có tính năng này). Thành tích tốt nhất đạt lúc ' + dinhDangNgayGio(d.ngayTot) + '.';
+                return hop;
+            }
+            const bang = document.createElement('table');
+            bang.className = 'w-full text-gray-600';
+            bang.innerHTML = '<thead><tr class="text-left text-xs uppercase tracking-wide text-gray-400">' +
+                '<th class="py-1.5">Lần</th><th class="py-1.5">Ngày giờ làm bài</th><th class="py-1.5 text-center">Đúng</th><th class="py-1.5 text-center">Rời bài</th><th class="py-1.5 text-right">Thời gian</th></tr></thead>';
+            const than = document.createElement('tbody');
+            const dau = Math.max(0, d.soLan - d.lichSu.length);
+            // Lần mới nhất nằm trên cùng
+            d.lichSu.slice().reverse().forEach(function (l, i) {
+                const tr = document.createElement('tr');
+                tr.className = 'border-t border-gray-200/70';
+                [[dau + d.lichSu.length - i, ''], [dinhDangNgayGio(l.luc), 'tabular-nums'], [l.diem + '/' + l.tong, 'text-center font-semibold'],
+                 [l.viPham ? l.viPham + ' lần' : '0', 'text-center ' + (l.viPham ? 'text-red-500 font-bold' : 'text-gray-400')],
+                 [dinhDangGio(l.thoiGian), 'text-right tabular-nums']].forEach(function (c) {
+                    const td = document.createElement('td');
+                    td.className = 'py-1.5 ' + c[1];
+                    td.textContent = c[0];
+                    tr.appendChild(td);
+                });
+                than.appendChild(tr);
+            });
+            bang.appendChild(than);
+            hop.appendChild(bang);
+            return hop;
         }
         function veBangXepHang(ds) {
-                const user = firebase.auth().currentUser;
+            const hop = $('bxhNoiDung');
+            hop.textContent = '';
+            if (!ds.length) {
+                hop.textContent = 'Chưa có học sinh nào nộp bài.';
+                return;
+            }
+            const ghiChu = document.createElement('p');
+            ghiChu.className = 'text-xs text-gray-400 mb-3';
+            ghiChu.textContent = 'Bấm vào một học sinh để xem ngày giờ và kết quả từng lần làm bài.';
+            hop.appendChild(ghiChu);
+            const khung = document.createElement('div');
+            khung.className = 'overflow-x-auto';
+            const bang = document.createElement('table');
+            bang.className = 'w-full text-sm md:text-base text-gray-700';
+            bang.innerHTML = '<thead><tr class="text-left text-xs uppercase tracking-wide text-gray-400 border-b border-gray-100">' +
+                '<th class="py-2 pr-2 w-12">Hạng</th><th class="py-2">Học sinh</th><th class="py-2 text-center">Đúng</th><th class="py-2 text-center">Rời bài</th><th class="py-2 text-right">Thời gian</th>' +
+                '<th class="py-2 text-center">Số lần</th><th class="py-2 text-right whitespace-nowrap">Lần làm gần nhất</th></tr></thead>';
+            const than = document.createElement('tbody');
+            const huyChuong = ['🥇', '🥈', '🥉'];
+            ds.forEach(function (d, i) {
+                const tr = document.createElement('tr');
+                tr.className = 'border-b border-gray-50 cursor-pointer hover:bg-teal-50/60';
+                const o = function (noiDung, lop) {
+                    const td = document.createElement('td');
+                    td.className = 'py-2.5 px-1 ' + lop;
+                    td.textContent = noiDung;
+                    tr.appendChild(td);
+                };
+                o(huyChuong[i] || (i + 1), 'pr-2 text-center');
+                o(d.ten || 'Ẩn danh', 'truncate max-w-[160px]');
+                o(d.diem + '/' + d.tong, 'text-center');
+                o(d.viPham ? d.viPham + ' lần' : '0', 'text-center ' + (d.viPham ? 'text-red-500 font-bold' : 'text-gray-400'));
+                o(dinhDangGio(d.thoiGian), 'text-right tabular-nums');
+                o(d.soLan, 'text-center');
+                o(dinhDangNgayGio(d.lanCuoi), 'text-right tabular-nums whitespace-nowrap text-gray-500');
+                than.appendChild(tr);
 
-                const hop = $('bxhNoiDung');
-                hop.textContent = '';
-                if (!ds.length) {
-                    hop.textContent = 'Chưa có ai trên bảng xếp hạng. Hãy là người đầu tiên!';
-                    return;
-                }
-                const bang = document.createElement('table');
-                bang.className = 'w-full text-sm md:text-base text-gray-700';
-                bang.innerHTML = '<thead><tr class="text-left text-xs uppercase tracking-wide text-gray-400 border-b border-gray-100">' +
-                    '<th class="py-2 pr-2 w-12">Hạng</th><th class="py-2">Học sinh</th><th class="py-2 text-center">Đúng</th><th class="py-2 text-center">Rời bài</th><th class="py-2 text-right">Thời gian</th></tr></thead>';
-                const than = document.createElement('tbody');
-                const huyChuong = ['🥇', '🥈', '🥉'];
-                ds.forEach(function (d, i) {
-                    const laToi = user && d.id === user.uid;
-                    if (i >= 20 && !laToi) return;
-                    const tr = document.createElement('tr');
-                    tr.className = 'border-b border-gray-50 ' + (laToi ? 'bg-teal-50 font-semibold' : '');
-                    const o = function (noiDung, lop) {
-                        const td = document.createElement('td');
-                        td.className = 'py-2.5 ' + lop;
-                        td.textContent = noiDung;
-                        tr.appendChild(td);
-                    };
-                    o(huyChuong[i] || (i + 1), 'pr-2 text-center');
-                    o(d.ten || 'Ẩn danh', 'truncate max-w-[160px]');
-                    o(d.diem + '/' + (d.tong || SO_CAU), 'text-center');
-                    o(d.viPham ? d.viPham + ' lần' : '0', 'text-center ' + (d.viPham ? 'text-red-500 font-bold' : 'text-gray-400'));
-                    o(dinhDangGio(d.thoiGian), 'text-right tabular-nums');
-                    than.appendChild(tr);
+                const trLs = document.createElement('tr');
+                trLs.className = dongDangMo[d.id] ? '' : 'hidden';
+                const tdLs = document.createElement('td');
+                tdLs.colSpan = 7;
+                tdLs.className = 'pb-3';
+                tdLs.appendChild(veLichSu(d));
+                trLs.appendChild(tdLs);
+                than.appendChild(trLs);
+                tr.addEventListener('click', function () {
+                    dongDangMo[d.id] = !dongDangMo[d.id];
+                    trLs.classList.toggle('hidden', !dongDangMo[d.id]);
                 });
-                bang.appendChild(than);
-                hop.appendChild(bang);
+            });
+            bang.appendChild(than);
+            khung.appendChild(bang);
+            hop.appendChild(khung);
         }
 
         // ---------- Giáo viên: tạo mã kiểm tra ----------
@@ -1008,11 +1091,11 @@
             $('oMa').disabled = !user;
             if (user) {
                 $('ten-user').textContent = user.email.split('@')[0];
-                $('ghiChuDangNhap').textContent = 'Kết quả sẽ được ghi vào bảng xếp hạng.';
+                $('ghiChuDangNhap').textContent = 'Kết quả sẽ được gửi cho thầy.';
             } else {
                 $('ghiChuDangNhap').innerHTML = 'Bạn cần <a href="../login.html" class="text-primary font-semibold underline">đăng nhập</a> để làm bài.';
             }
-            taiBangXepHang();
+            ngheBangXepHang();
         });
     });
     </script>
