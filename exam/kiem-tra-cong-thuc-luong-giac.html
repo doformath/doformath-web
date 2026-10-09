@@ -716,20 +716,42 @@
             chot(kq);
         });
 
+        // ---------- Chống dò mã / mật khẩu: sai quá số lần cho phép thì khóa tạm ----------
+        const SAI_TOI_DA = 5, KHOA_SAI_MS = 60 * 1000;
+        function docSai(khoa) {
+            try { return JSON.parse(localStorage.getItem(khoa)) || { lan: 0, den: 0 }; } catch (e) { return { lan: 0, den: 0 }; }
+        }
+        // Trả về số giây còn bị khóa (0 = không khóa)
+        function conKhoa(khoa) { return Math.max(0, Math.ceil((docSai(khoa).den - Date.now()) / 1000)); }
+        function ghiSai(khoa) {
+            const d = docSai(khoa);
+            d.lan++;
+            if (d.lan >= SAI_TOI_DA) { d.lan = 0; d.den = Date.now() + KHOA_SAI_MS; }
+            try { localStorage.setItem(khoa, JSON.stringify(d)); } catch (e) {}
+        }
+        function xoaSai(khoa) { try { localStorage.removeItem(khoa); } catch (e) {} }
+
         function batDau() {
             // Chỉ học sinh đã đăng nhập mới được làm bài
-            if (!firebase.auth().currentUser) return;
+            if (!firebase.auth().currentUser || dangLam) return;
             const ten = $('oTen').value.trim();
             if (ten.length < 2) {
                 $('oTen').focus();
                 $('oTen').classList.add('border-red-400');
                 return;
             }
+            const khoaMa = conKhoa('dfm_sai_ma');
+            if (khoaMa) {
+                baoLoiMa('Nhập sai mã quá nhiều lần. Thử lại sau ' + khoaMa + ' giây.');
+                return;
+            }
             const ma = $('oMa').value.trim().toUpperCase();
             if (!maConHan(ma)) {
+                ghiSai('dfm_sai_ma');
                 baoLoiMa('Mã không đúng hoặc đã hết hiệu lực.');
                 return;
             }
+            xoaSai('dfm_sai_ma');
             if (maDaDung().indexOf(ma) !== -1) {
                 baoLoiMa('Em đã dùng mã này rồi. Mỗi mã chỉ làm được một lần.');
                 return;
@@ -820,13 +842,16 @@
         }
 
         // Mỗi học sinh một dòng (theo uid), chỉ giữ thành tích tốt nhất
+        let dangLuu = false;
         function luuKetQua(diem, ms) {
+            if (dangLuu) return;
             const user = firebase.auth().currentUser;
             if (!user) {
                 $('kqLuu').innerHTML = 'Bạn chưa đăng nhập nên kết quả không được ghi vào bảng xếp hạng. <a href="../login.html" class="text-primary font-semibold underline">Đăng nhập</a>';
                 return;
             }
             $('kqLuu').textContent = 'Đang lưu kết quả...';
+            dangLuu = true;
             const ref = db.collection(BXH).doc(user.uid);
             ref.get().then(function (snap) {
                 const cu = snap.exists ? snap.data() : null;
@@ -843,23 +868,60 @@
                     $('kqLuu').textContent = totHon
                         ? 'Đã ghi thành tích mới vào bảng xếp hạng.'
                         : 'Thành tích tốt nhất của bạn vẫn là ' + cu.diem + '/' + cu.tong + ' trong ' + dinhDangGio(cu.thoiGian) + '.';
-                    taiBangXepHang();
+                    taiBangXepHang(true);
                 });
             }).catch(function (err) {
                 console.error('Lỗi lưu bảng xếp hạng:', err);
                 $('kqLuu').textContent = 'Chưa lưu được kết quả lên bảng xếp hạng.';
-            });
+            }).then(function () { dangLuu = false; });
         }
 
-        function taiBangXepHang() {
+        // Bảng xếp hạng được nhớ tạm trong trình duyệt: tải lại trang liên tục (F5) không đọc lại Firestore,
+        // tránh bị spam làm cạn hạn mức đọc trong ngày của cả trang web
+        const BXH_NHO = 'dfm_bxh_luong_giac', BXH_NHO_MS = 60 * 1000;
+        let dangTaiBxh = false;
+        // Dữ liệu trên Firestore có thể bị ghi bậy: chỉ nhận dòng hợp lệ và cắt gọn trước khi hiển thị
+        function locDong(id, d) {
+            if (!d || !Number.isFinite(d.diem) || !Number.isFinite(d.thoiGian)) return null;
+            const tong = Number.isFinite(d.tong) && d.tong > 0 ? Math.min(Math.floor(d.tong), 100) : SO_CAU;
+            if (d.diem < 0 || d.diem > tong || d.thoiGian <= 0) return null;
+            return {
+                id: String(id),
+                ten: String(d.ten || '').slice(0, 30),
+                diem: Math.floor(d.diem),
+                tong: tong,
+                thoiGian: Math.min(d.thoiGian, GIOI_HAN_GIO),
+                viPham: Number.isFinite(d.viPham) ? Math.max(0, Math.min(99, Math.floor(d.viPham))) : 0
+            };
+        }
+        function taiBangXepHang(batBuoc) {
+            if (dangTaiBxh) return;
+            if (!batBuoc) {
+                try {
+                    const nho = JSON.parse(sessionStorage.getItem(BXH_NHO));
+                    if (nho && Date.now() - nho.luc < BXH_NHO_MS && Array.isArray(nho.ds)) {
+                        veBangXepHang(nho.ds.map(function (d) { return locDong(d.id, d); }).filter(Boolean));
+                        return;
+                    }
+                } catch (e) {}
+            }
+            dangTaiBxh = true;
             db.collection(BXH).get().then(function (snap) {
-                const user = firebase.auth().currentUser;
                 const ds = [];
                 snap.forEach(function (doc) {
-                    const d = doc.data();
-                    if (typeof d.diem === 'number' && typeof d.thoiGian === 'number') ds.push(Object.assign({ id: doc.id }, d));
+                    const d = locDong(doc.id, doc.data());
+                    if (d) ds.push(d);
                 });
                 ds.sort(function (x, y) { return y.diem - x.diem || x.thoiGian - y.thoiGian; });
+                try { sessionStorage.setItem(BXH_NHO, JSON.stringify({ luc: Date.now(), ds: ds })); } catch (e) {}
+                veBangXepHang(ds);
+            }).catch(function (err) {
+                console.error('Lỗi tải bảng xếp hạng:', err);
+                $('bxhNoiDung').textContent = 'Chưa tải được bảng xếp hạng.';
+            }).then(function () { dangTaiBxh = false; });
+        }
+        function veBangXepHang(ds) {
+                const user = firebase.auth().currentUser;
 
                 const hop = $('bxhNoiDung');
                 hop.textContent = '';
@@ -893,10 +955,6 @@
                 });
                 bang.appendChild(than);
                 hop.appendChild(bang);
-            }).catch(function (err) {
-                console.error('Lỗi tải bảng xếp hạng:', err);
-                $('bxhNoiDung').textContent = 'Chưa tải được bảng xếp hạng.';
-            });
         }
 
         // ---------- Giáo viên: tạo mã kiểm tra ----------
@@ -910,13 +968,23 @@
         $('gvMatKhau').addEventListener('input', function () { $('gvLoi').classList.add('hidden'); });
         $('gvForm').addEventListener('submit', function (e) {
             e.preventDefault();
+            const khoaGv = conKhoa('dfm_sai_gv');
+            if (khoaGv) {
+                $('gvMatKhau').value = '';
+                $('gvLoi').textContent = 'Nhập sai quá nhiều lần. Thử lại sau ' + khoaGv + ' giây.';
+                $('gvLoi').classList.remove('hidden');
+                return;
+            }
             const dung = bam(KHOA_MA + '|' + $('gvMatKhau').value) === BAM_MAT_KHAU_GV;
             $('gvMatKhau').value = '';
             if (!dung) {
+                ghiSai('dfm_sai_gv');
+                $('gvLoi').textContent = 'Sai mật khẩu.';
                 $('gvLoi').classList.remove('hidden');
                 $('gvMatKhau').focus();
                 return;
             }
+            xoaSai('dfm_sai_gv');
             $('hopGiaoVien').classList.add('hidden');
             $('khuGiaoVien').classList.remove('hidden');
             $('gvMo').classList.add('hidden');
