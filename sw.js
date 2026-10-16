@@ -4,7 +4,7 @@
 // - Firebase (đăng nhập, Firestore), YouTube, Cloudinary... không bị can thiệp.
 // Khi đổi danh sách PRECACHE hoặc logic trong file này, tăng VERSION để xoá cache cũ.
 
-const VERSION = 'v1';
+const VERSION = 'v2';
 const PAGE_CACHE = `doformath-pages-${VERSION}`;
 const ASSET_CACHE = `doformath-assets-${VERSION}`;
 const OFFLINE_URL = 'offline.html';
