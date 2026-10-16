@@ -1667,7 +1667,10 @@
 
         function protect(doc) {
             doc.addEventListener('contextmenu', block);   // chuột phải
-            doc.addEventListener('selectstart', block);   // bôi đen
+            doc.addEventListener('selectstart', e => {    // bôi đen (trừ ô nhập liệu, để iPhone còn bật bàn phím)
+                const el = e.target.nodeType === 1 ? e.target : e.target.parentElement;
+                if (!(el && el.closest('input, textarea, select, [contenteditable]'))) block(e);
+            });
             doc.addEventListener('dragstart', block);     // kéo ảnh ra desktop để lưu
             doc.addEventListener('copy', block);          // Ctrl+C
             doc.addEventListener('keydown', blockKeys, true);
@@ -1686,6 +1689,7 @@
                 const st = doc.createElement('style');
                 st.textContent =
                     'body{-webkit-user-select:none;user-select:none}' +
+                    'input,textarea,select,[contenteditable]{-webkit-user-select:text;user-select:text}' +
                     'img{-webkit-user-drag:none;-webkit-touch-callout:none}' +   /* chặn nhấn giữ lưu ảnh trên iPhone */
                     '@media print{body{display:none!important}}';
                 (doc.head || doc.documentElement).appendChild(st);

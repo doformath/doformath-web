@@ -1321,7 +1321,11 @@
     <script>
     // 1. Chặn chuột phải và bôi đen
     document.addEventListener('contextmenu', event => event.preventDefault());
-    document.onselectstart = function() { return false; };
+    document.onselectstart = function(e) {
+        // Vẫn cho chọn trong ô nhập liệu, nếu chặn thì iPhone không bật bàn phím
+        const el = e.target.nodeType === 1 ? e.target : e.target.parentElement;
+        return !!(el && el.closest('input, textarea, select, [contenteditable]'));
+    };
 
     // 2. Vòng lặp đóng băng (Anti-DevTools)
     setInterval(function() {
