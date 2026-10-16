@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chinh phục Toán 10 - DoforMath</title>
     
-    <link rel="icon" type="image/png" href="../assets/images/Doformath.png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- Tailwind CSS -->
@@ -40,6 +39,15 @@
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         .custom-scrollbar:hover::-webkit-scrollbar-thumb { background: #94a3b8; }
     </style>
+    <!-- PWA: cho phép cài DoforMath như ứng dụng -->
+    <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+    <link rel="manifest" href="../manifest.webmanifest">
+    <meta name="theme-color" content="#0d9488">
+    <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="DoforMath">
+    <script defer src="../pwa.js"></script>
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased font-sans h-screen flex flex-col overflow-hidden">
 

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mất kết nối | DoforMath</title>
+    <meta name="theme-color" content="#0d9488">
+    <link rel="icon" type="image/png" href="assets/icons/favicon-32.png">
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #f9fafb;
+            color: #1f2937;
+            text-align: center;
+        }
+        .card {
+            max-width: 420px;
+            background: #fff;
+            border-radius: 20px;
+            padding: 32px 24px;
+            box-shadow: 0 10px 30px rgba(13, 148, 136, 0.12);
+        }
+        img { width: 96px; height: 96px; }
+        h1 { font-size: 22px; margin: 16px 0 8px; color: #0d9488; }
+        p { margin: 0 0 24px; line-height: 1.6; color: #4b5563; }
+        .actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+        button, a {
+            border: 0;
+            border-radius: 999px;
+            padding: 12px 22px;
+            font: inherit;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        button { background: #0d9488; color: #fff; }
+        a { background: #f0fdfa; color: #0d9488; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <img src="assets/icons/icon-192.png" alt="DoforMath">
+        <h1>Bạn đang ngoại tuyến</h1>
+        <p>Không kết nối được Internet nên trang này chưa tải được. Những trang bạn đã mở trước đó vẫn xem được khi không có mạng.</p>
+        <div class="actions">
+            <button type="button" onclick="location.reload()">Thử lại</button>
+            <a href="index.html">Về trang chủ</a>
+        </div>
+    </div>
+    <script>
+        // Tự tải lại khi có mạng trở lại
+        window.addEventListener('online', () => location.reload());
+    </script>
+</body>
+</html>

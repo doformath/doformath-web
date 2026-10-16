@@ -6,7 +6,6 @@
     <title>Đăng nhập - DoforMath</title>
     
     <!-- Cấu hình Favicon -->
-    <link rel="icon" type="image/png" href="../assets/images/Doformath.png">
 
     <!-- Nhúng font chữ Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -70,6 +69,15 @@
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
+    <!-- PWA: cho phép cài DoforMath như ứng dụng -->
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png">
+    <link rel="manifest" href="manifest.webmanifest">
+    <meta name="theme-color" content="#0d9488">
+    <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="DoforMath">
+    <script defer src="pwa.js"></script>
 </head>
 <!-- Đã gỡ bỏ overflow-hidden để trên mobile có thể cuộn tự do -->
 <body class="bg-slate-50 min-h-screen selection:bg-teal-500/20 selection:text-teal-900 overflow-x-hidden">

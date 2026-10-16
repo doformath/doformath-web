@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Làm bài thi - DoforMath</title>
     
-    <link rel="icon" type="image/png" href="assets/images/Doformath.png">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     
     <!-- <script src="https://cdn.tailwindcss.com"></script>
@@ -52,6 +51,15 @@
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         [x-cloak] { display: none !important; }
     </style>
+    <!-- PWA: cho phép cài DoforMath như ứng dụng -->
+    <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+    <link rel="manifest" href="../manifest.webmanifest">
+    <meta name="theme-color" content="#0d9488">
+    <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="DoforMath">
+    <script defer src="../pwa.js"></script>
 </head>
 <body class="bg-[#EAF4F8] text-slate-800 antialiased font-sans min-h-screen flex flex-col" x-data="quizPlayer()" x-init="init()">
 
