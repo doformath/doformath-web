@@ -89,6 +89,7 @@
                     <a href="tai-lieu-mien-phi.html" class="text-gray-600 hover:text-primary hover:bg-gray-100 font-medium px-4 py-2 rounded-full transition-all">Tài liệu</a>
                     
                     <a href="phong-thi.html" class="text-gray-600 hover:text-primary hover:bg-gray-100 font-medium px-4 py-2 rounded-full transition-all">Phòng thi</a>
+                    <a href="admin.html" data-admin-link style="display: none;" class="text-primary hover:text-teal-700 hover:bg-teal-50 font-medium px-4 py-2 rounded-full transition-all"><i class="fa-solid fa-chart-line mr-1.5"></i>Quản trị</a>
                 </nav>
 
                 <!-- Nút Hành động -->
@@ -154,6 +155,10 @@
             <a href="phong-thi.html" title="Phòng thi" class="flex items-center h-12 whitespace-nowrap transition-colors text-teal-100 hover:bg-white/10 hover:text-white font-medium">
                 <i class="fa-solid fa-stopwatch w-14 shrink-0 text-center text-xl"></i>
                 <span class="pr-4">Phòng thi</span>
+            </a>
+            <a href="admin.html" data-admin-link title="Quản trị" style="display: none;" class="flex items-center h-12 whitespace-nowrap transition-colors text-teal-100 hover:bg-white/10 hover:text-white font-medium">
+                <i class="fa-solid fa-chart-line w-14 shrink-0 text-center text-xl"></i>
+                <span class="pr-4">Quản trị</span>
             </a>
         </nav>
         <!-- Nút đăng xuất (mobile): chỉ hiện khi đã đăng nhập -->
@@ -703,6 +708,8 @@
                 if (khuVucDangNhap) khuVucDangNhap.style.display = 'none';
                 if (khuVucUser) khuVucUser.style.display = 'flex';
                 if (nutDangXuatMobile) nutDangXuatMobile.style.display = 'flex';
+                // Nút Quản trị: chỉ hiện với tài khoản admin (quyền thật do Firestore Rules kiểm soát)
+                document.querySelectorAll('[data-admin-link]').forEach(a => { a.style.display = user.email === 'thanhdo@dfm.com' ? '' : 'none'; });
                 
                 const tenHienThi = user.email.split('@')[0];
                 if (tenUser) tenUser.innerText = tenHienThi;

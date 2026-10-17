@@ -4,7 +4,7 @@
 // - Firebase (đăng nhập, Firestore), YouTube, Cloudinary... không bị can thiệp.
 // Khi đổi danh sách PRECACHE hoặc logic trong file này, tăng VERSION để xoá cache cũ.
 
-const VERSION = 'v2';
+const VERSION = 'v3';
 const PAGE_CACHE = `doformath-pages-${VERSION}`;
 const ASSET_CACHE = `doformath-assets-${VERSION}`;
 const OFFLINE_URL = 'offline.html';
@@ -16,6 +16,7 @@ const PRECACHE = [
   'manifest.webmanifest',
   'assets/icons/favicon-32.png',
   'assets/icons/icon-192.png',
+  'assets/icons/logo-tron-192.png',
   'assets/icons/icon-512.png',
   'assets/icons/apple-touch-icon.png',
 ];

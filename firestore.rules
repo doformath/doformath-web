@@ -1,0 +1,88 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // MỌI rule phải nằm bên trong khối này thì Firestore mới áp dụng
+
+    function laAdmin() {
+      return request.auth != null && request.auth.token.email == 'thanhdo@dfm.com';
+    }
+
+    // Phân quyền khóa học: học sinh chỉ đọc quyền của chính mình; chỉ Admin xem tất cả và sửa
+    match /phan_quyen/{email} {
+      allow read: if request.auth != null && (request.auth.token.email == email || laAdmin());
+      allow write: if laAdmin();
+    }
+
+    // Theo dõi học tập: học sinh chỉ ghi vào hồ sơ của chính mình; chỉ Admin đọc
+    match /hoc_sinh/{uid} {
+      allow read, delete: if laAdmin();
+      allow create, update: if request.auth != null && request.auth.uid == uid
+                            && request.resource.data.email == request.auth.token.email;
+      match /hoat_dong/{id} {
+        allow read, delete: if laAdmin();
+        allow create: if request.auth != null && request.auth.uid == uid;
+      }
+    }
+
+    // Bài học thêm từ trang Admin: học sinh đã đăng nhập được đọc; chỉ Admin sửa
+    match /bai_hoc_them/{id} {
+      allow read: if request.auth != null;
+      allow write: if laAdmin();
+    }
+
+    // Bảng xếp hạng các bài kiểm tra: mỗi học sinh chỉ đọc/ghi dòng của mình; Admin xem tất cả
+    match /bxh_luong_giac/{uid} {
+      allow get: if request.auth != null
+        && (request.auth.uid == uid || request.auth.token.email == 'thanhdo@dfm.com');
+      allow list: if request.auth != null
+        && request.auth.token.email == 'thanhdo@dfm.com';
+      allow write: if request.auth != null
+        && request.auth.uid == uid
+        && request.resource.data.ten is string
+        && request.resource.data.ten.size() <= 30
+        && request.resource.data.diem is int
+        && request.resource.data.diem >= 0
+        && request.resource.data.diem <= 10
+        && request.resource.data.thoiGian is number
+        && request.resource.data.thoiGian > 0
+        && request.resource.data.thoiGian <= 300000;
+      allow delete: if false;
+    }
+
+    match /bxh_day_so_thong_ke/{uid} {
+      allow get: if request.auth != null
+        && (request.auth.uid == uid || request.auth.token.email == 'thanhdo@dfm.com');
+      allow list: if request.auth != null
+        && request.auth.token.email == 'thanhdo@dfm.com';
+      allow write: if request.auth != null
+        && request.auth.uid == uid
+        && request.resource.data.ten is string
+        && request.resource.data.ten.size() <= 30
+        && request.resource.data.diem is int
+        && request.resource.data.diem >= 0
+        && request.resource.data.diem <= 10
+        && request.resource.data.thoiGian is number
+        && request.resource.data.thoiGian > 0
+        && request.resource.data.thoiGian <= 300000;
+      allow delete: if false;
+    }
+
+    match /bxh_tap_hop_he_thuc_luong/{uid} {
+      allow get: if request.auth != null
+        && (request.auth.uid == uid || request.auth.token.email == 'thanhdo@dfm.com');
+      allow list: if request.auth != null
+        && request.auth.token.email == 'thanhdo@dfm.com';
+      allow write: if request.auth != null
+        && request.auth.uid == uid
+        && request.resource.data.ten is string
+        && request.resource.data.ten.size() <= 30
+        && request.resource.data.diem is int
+        && request.resource.data.diem >= 0
+        && request.resource.data.diem <= 10
+        && request.resource.data.thoiGian is number
+        && request.resource.data.thoiGian > 0
+        && request.resource.data.thoiGian <= 300000;
+      allow delete: if false;
+    }
+  }
+}

@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Quản trị | DoforMath</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] }, colors: { primary: '#0d9488', secondary: '#facc15' } } }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- PWA: cho phép cài DoforMath như ứng dụng -->
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png">
+    <link rel="manifest" href="manifest.webmanifest">
+    <meta name="theme-color" content="#0d9488">
+    <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="DoforMath">
+    <script defer src="pwa.js"></script>
+
+    <style>
+        [hidden] { display: none !important; }
+        .tab-btn[aria-selected="true"] { color: #0d9488; background: #f0fdfa; font-weight: 600; }
+        .bang th { font-weight: 600; color: #64748b; font-size: 12px; text-transform: uppercase; letter-spacing: .03em; text-align: left; padding: 10px 12px; white-space: nowrap; }
+        .bang td { padding: 12px; border-top: 1px solid #f1f5f9; vertical-align: middle; }
+        .bang tbody tr.co-the-bam:hover { background: #f8fafc; cursor: pointer; }
+        .so { font-variant-numeric: tabular-nums; }
+        .bieu-do-tooltip { position: absolute; pointer-events: none; background: #0f172a; color: #fff; font-size: 12px; line-height: 1.4; padding: 6px 10px; border-radius: 8px; white-space: nowrap; transform: translate(-50%, -100%); margin-top: -8px; box-shadow: 0 4px 12px rgba(0,0,0,.15); }
+        .cong-tac { position: relative; width: 40px; height: 22px; border-radius: 999px; background: #cbd5e1; transition: background .2s; flex-shrink: 0; }
+        .cong-tac::after { content: ""; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: transform .2s; box-shadow: 0 1px 2px rgba(0,0,0,.2); }
+        .cong-tac[aria-checked="true"] { background: #0d9488; }
+        .cong-tac[aria-checked="true"]::after { transform: translateX(18px); }
+        .cong-tac:disabled { opacity: .5; }
+    </style>
+</head>
+<body class="font-sans text-gray-800 bg-gray-50 antialiased min-h-screen">
+
+    <!-- HEADER -->
+    <header class="bg-white shadow-sm sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
+            <a href="index.html" class="flex items-center gap-2 text-gray-500 hover:text-primary font-medium transition-colors shrink-0">
+                <i class="fa-solid fa-arrow-left"></i><span class="hidden sm:inline">Trang chủ</span>
+            </a>
+            <div class="flex items-center gap-2 min-w-0">
+                <span class="w-9 h-9 rounded-xl bg-teal-50 text-primary flex items-center justify-center shrink-0"><i class="fa-solid fa-chart-line"></i></span>
+                <h1 class="text-lg md:text-xl font-bold text-gray-900 truncate">Quản trị DoforMath</h1>
+            </div>
+            <button id="nut-tai-lai" type="button" class="flex items-center gap-2 text-sm text-gray-500 hover:text-primary font-medium transition-colors shrink-0" title="Tải lại dữ liệu">
+                <i class="fa-solid fa-rotate"></i><span class="hidden sm:inline">Tải lại</span>
+            </button>
+        </div>
+        <nav id="thanh-tab" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex gap-1 overflow-x-auto pb-2" role="tablist" hidden>
+            <button class="tab-btn px-4 py-2 rounded-full text-sm text-gray-600 hover:bg-gray-100 whitespace-nowrap" role="tab" data-tab="tong-quan" aria-selected="true"><i class="fa-solid fa-gauge-high mr-1.5"></i>Tổng quan</button>
+            <button class="tab-btn px-4 py-2 rounded-full text-sm text-gray-600 hover:bg-gray-100 whitespace-nowrap" role="tab" data-tab="hoc-sinh" aria-selected="false"><i class="fa-solid fa-user-graduate mr-1.5"></i>Học sinh</button>
+            <button class="tab-btn px-4 py-2 rounded-full text-sm text-gray-600 hover:bg-gray-100 whitespace-nowrap" role="tab" data-tab="bai-hoc" aria-selected="false"><i class="fa-solid fa-book-open mr-1.5"></i>Bài học</button>
+            <button class="tab-btn px-4 py-2 rounded-full text-sm text-gray-600 hover:bg-gray-100 whitespace-nowrap" role="tab" data-tab="kiem-tra" aria-selected="false"><i class="fa-solid fa-clipboard-check mr-1.5"></i>Kiểm tra</button>
+        </nav>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <!-- Trạng thái tải / không có quyền -->
+        <div id="trang-thai" class="py-24 text-center text-gray-500">
+            <i class="fa-solid fa-circle-notch fa-spin text-3xl text-primary"></i>
+            <p class="mt-4">Đang kiểm tra quyền truy cập...</p>
+        </div>
+
+        <!-- Cảnh báo khi không đọc được một phần dữ liệu (thường do Firestore Rules) -->
+        <div id="canh-bao" class="mb-6 bg-amber-50 border border-amber-200 text-amber-800 rounded-2xl p-4 text-sm" hidden></div>
+
+        <!-- ========== TAB TỔNG QUAN ========== -->
+        <section id="tab-tong-quan" data-panel hidden>
+            <div id="o-so-lieu" class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6"></div>
+
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 mb-6">
+                <div class="flex flex-wrap items-baseline justify-between gap-2 mb-1">
+                    <h2 class="font-bold text-gray-900">Học sinh vào học mỗi ngày</h2>
+                    <span class="text-sm text-gray-500">30 ngày gần nhất</span>
+                </div>
+                <p class="text-sm text-gray-500 mb-4">Số học sinh có vào khóa học hoặc mở bài trong ngày. Rê chuột / chạm vào cột để xem chi tiết.</p>
+                <div id="bieu-do-tong" class="relative"></div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+                    <h2 class="font-bold text-gray-900 mb-1">Hoạt động gần đây</h2>
+                    <p class="text-sm text-gray-500 mb-4">Học sinh vào học gần nhất và bài các em đang xem.</p>
+                    <ul id="ds-gan-day" class="divide-y divide-gray-100"></ul>
+                </div>
+                <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+                    <h2 class="font-bold text-gray-900 mb-1">Bài được xem nhiều nhất</h2>
+                    <p class="text-sm text-gray-500 mb-4">Xếp theo số học sinh đã mở bài.</p>
+                    <ul id="ds-bai-nhieu" class="space-y-3"></ul>
+                </div>
+                <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 lg:col-span-2">
+                    <h2 class="font-bold text-gray-900 mb-1">Cần chú ý</h2>
+                    <p class="text-sm text-gray-500 mb-4">Học sinh đã được cấp khóa học nhưng hơn 7 ngày chưa vào học (hoặc chưa vào lần nào).</p>
+                    <div id="ds-chu-y" class="flex flex-wrap gap-2"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== TAB HỌC SINH ========== -->
+        <section id="tab-hoc-sinh" data-panel hidden>
+            <div class="flex flex-wrap gap-3 items-center mb-4">
+                <div class="relative flex-1 min-w-[200px]">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none"></i>
+                    <input id="tim-hs" type="search" placeholder="Tìm theo email..." class="w-full pl-10 pr-3 py-2.5 rounded-xl border border-gray-200 bg-white text-base focus:outline-none focus:ring-4 focus:ring-teal-100 focus:border-teal-400">
+                </div>
+                <select id="loc-khoa" class="py-2.5 px-3 rounded-xl border border-gray-200 bg-white text-sm">
+                    <option value="">Tất cả khóa</option>
+                    <option value="toan-10">Toán 10</option>
+                    <option value="toan-11">Toán 11</option>
+                    <option value="toan-12">Toán 12</option>
+                    <option value="khong">Chưa có khóa</option>
+                </select>
+                <select id="sap-xep-hs" class="py-2.5 px-3 rounded-xl border border-gray-200 bg-white text-sm">
+                    <option value="lanCuoi">Mới vào gần đây</option>
+                    <option value="thoiGianHoc">Học nhiều nhất</option>
+                    <option value="ngayHoc">Nhiều ngày học nhất</option>
+                    <option value="email">Theo email (A-Z)</option>
+                </select>
+                <button id="nut-them-hs" type="button" class="bg-primary hover:bg-teal-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold shadow-sm transition-colors">
+                    <i class="fa-solid fa-user-plus mr-1.5"></i>Thêm học sinh
+                </button>
+            </div>
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-x-auto">
+                <table class="bang w-full text-sm min-w-[760px]">
+                    <thead><tr>
+                        <th>Học sinh</th><th>Khóa học</th><th>Tình trạng</th><th>Lần cuối</th>
+                        <th class="text-right">Ngày học (30 ngày)</th><th class="text-right">Lượt mở bài</th><th class="text-right">Thời gian học</th>
+                    </tr></thead>
+                    <tbody id="bang-hs"></tbody>
+                </table>
+            </div>
+            <p class="text-xs text-gray-400 mt-3">Thời gian học là ước tính: chỉ tính lúc trang khóa học đang hiện trên màn hình, mỗi lần tối đa 1 giờ.</p>
+        </section>
+
+        <!-- ========== TAB BÀI HỌC ========== -->
+        <section id="tab-bai-hoc" data-panel hidden>
+            <!-- Đưa lời giải (PDF) lên Cloudinary -->
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 mb-8">
+                <div class="flex items-start gap-3 mb-4">
+                    <span class="w-10 h-10 rounded-xl bg-teal-50 text-primary flex items-center justify-center shrink-0"><i class="fa-solid fa-cloud-arrow-up"></i></span>
+                    <div>
+                        <h2 class="font-bold text-gray-900">Đưa lời giải lên</h2>
+                        <p class="text-sm text-gray-500">Thả file PDF vào, chọn bài, rồi bấm Tải lên. Trang tự cắt PDF thành ảnh, đặt tên và đưa lên Cloudinary để bài hiển thị được ngay.</p>
+                    </div>
+                </div>
+                <label id="tl-drop" class="relative block border-2 border-dashed border-teal-200 hover:border-teal-400 bg-teal-50/40 rounded-2xl py-10 px-4 text-center cursor-pointer transition-colors">
+                    <i class="fa-regular fa-file-pdf text-3xl text-teal-500"></i>
+                    <span class="block font-semibold text-teal-800 mt-2">Kéo thả file PDF lời giải vào đây</span>
+                    <span class="block text-sm text-gray-500">hoặc bấm để chọn, chọn được nhiều file một lúc</span>
+                    <input type="file" id="tl-chon" accept=".pdf,application/pdf" multiple class="absolute opacity-0 w-px h-px">
+                </label>
+                <div id="tl-ds" class="divide-y divide-gray-100"></div>
+                <div id="tl-nut" class="flex flex-wrap items-center gap-2 mt-4" hidden>
+                    <button id="tl-tai" type="button" class="bg-primary hover:bg-teal-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow-sm transition-colors disabled:opacity-50"><i class="fa-solid fa-upload mr-1.5"></i>Tải lên</button>
+                    <button id="tl-xoa" type="button" class="px-4 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-100">Xóa danh sách</button>
+                </div>
+                <details class="mt-4 text-sm">
+                    <summary class="cursor-pointer text-gray-500 hover:text-primary"><i class="fa-solid fa-gear mr-1"></i>Cài đặt Cloudinary</summary>
+                    <p class="text-gray-400 mt-2 mb-3">Đã điền sẵn theo tài khoản của bạn, thường không cần đổi.</p>
+                    <div class="grid sm:grid-cols-3 gap-3">
+                        <label class="block font-medium text-gray-700">Cloud name<input id="tl-cloud" autocomplete="off" class="mt-1 w-full px-3 py-2 rounded-lg border border-gray-200 text-base font-normal"></label>
+                        <label class="block font-medium text-gray-700">Upload preset<input id="tl-preset" autocomplete="off" class="mt-1 w-full px-3 py-2 rounded-lg border border-gray-200 text-base font-normal"></label>
+                        <label class="block font-medium text-gray-700">Thư mục cha (để trống nếu không có)<input id="tl-cha" autocomplete="off" class="mt-1 w-full px-3 py-2 rounded-lg border border-gray-200 text-base font-normal"></label>
+                    </div>
+                </details>
+            </div>
+
+            <h2 class="font-bold text-gray-900 mb-3">Bài học thêm</h2>
+            <div class="flex flex-wrap gap-3 items-center justify-between mb-4">
+                <div class="flex gap-1 bg-white border border-gray-200 rounded-xl p-1" id="chon-khoa-bai">
+                    <button type="button" data-khoa="toan-10" class="px-4 py-1.5 rounded-lg text-sm font-medium">Toán 10</button>
+                    <button type="button" data-khoa="toan-11" class="px-4 py-1.5 rounded-lg text-sm font-medium">Toán 11</button>
+                    <button type="button" data-khoa="toan-12" class="px-4 py-1.5 rounded-lg text-sm font-medium">Toán 12</button>
+                </div>
+                <button id="nut-them-bai" type="button" class="bg-primary hover:bg-teal-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold shadow-sm transition-colors">
+                    <i class="fa-solid fa-plus mr-1.5"></i>Thêm bài học
+                </button>
+            </div>
+            <p class="text-sm text-gray-500 mb-4">Bài thêm ở đây sẽ tự hiện trong mục lục khóa học, ở cuối chương bạn chọn (hoặc thành chương mới). Các bài có sẵn trong code không hiện ở đây.</p>
+            <div id="ds-bai-them" class="space-y-4"></div>
+        </section>
+
+        <!-- ========== TAB KIỂM TRA ========== -->
+        <section id="tab-kiem-tra" data-panel hidden>
+            <div class="flex flex-wrap gap-3 items-center mb-4">
+                <select id="chon-bai-kt" class="py-2.5 px-3 rounded-xl border border-gray-200 bg-white text-sm"></select>
+                <span id="tom-tat-kt" class="text-sm text-gray-500"></span>
+            </div>
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-x-auto">
+                <table class="bang w-full text-sm min-w-[720px]">
+                    <thead><tr>
+                        <th>#</th><th>Học sinh</th><th class="text-right">Điểm tốt nhất</th><th class="text-right">Thời gian</th>
+                        <th class="text-right">Số lần làm</th><th class="text-right">Vi phạm</th><th>Lần cuối</th>
+                    </tr></thead>
+                    <tbody id="bang-kt"></tbody>
+                </table>
+            </div>
+            <p class="text-xs text-gray-400 mt-3">Bấm vào một dòng để xem lịch sử các lần làm bài.</p>
+        </section>
+    </main>
+
+    <!-- ========== HỘP THOẠI (dùng chung) ========== -->
+    <div id="hop-thoai" class="fixed inset-0 z-50 bg-gray-900/50 flex items-end sm:items-center justify-center sm:p-4" hidden>
+        <div class="bg-white w-full sm:max-w-3xl max-h-[92vh] overflow-y-auto rounded-t-3xl sm:rounded-3xl shadow-2xl" role="dialog" aria-modal="true" aria-labelledby="hop-thoai-tieu-de">
+            <div class="sticky top-0 bg-white/95 backdrop-blur border-b border-gray-100 px-5 py-4 flex items-center justify-between gap-3 z-10">
+                <h2 id="hop-thoai-tieu-de" class="font-bold text-gray-900 truncate"></h2>
+                <button type="button" data-dong class="w-9 h-9 rounded-full hover:bg-gray-100 text-gray-500 shrink-0" aria-label="Đóng"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div id="hop-thoai-noi-dung" class="p-5"></div>
+        </div>
+    </div>
+
+    <!-- Thông báo nhỏ -->
+    <div id="thong-bao" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-[60] bg-gray-900 text-white text-sm px-4 py-2.5 rounded-xl shadow-lg max-w-[calc(100vw-32px)]" role="status" hidden></div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script>
+    (function () {
+        const firebaseConfig = {
+            apiKey: "AIzaSyD-NDo43O3Q_9GVii6pDOM7D6SQ5pxmo5g",
+            authDomain: "doformath-bac70.firebaseapp.com",
+            projectId: "doformath-bac70",
+            storageBucket: "doformath-bac70.firebasestorage.app",
+            messagingSenderId: "329095418163",
+            appId: "1:329095418163:web:226636d40b5c2960cdee46"
+        };
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const FV = firebase.firestore.FieldValue;
+
+        // Chỉ ẩn/hiện giao diện. Quyền thật sự do Firestore Rules kiểm soát.
+        const ADMIN_EMAIL = 'thanhdo@dfm.com';
+        const KHOA = { 'toan-10': 'Toán 10', 'toan-11': 'Toán 11', 'toan-12': 'Toán 12' };
+        const BAI_KIEM_TRA = [
+            { id: 'bxh_luong_giac', ten: 'Công thức lượng giác' },
+            { id: 'bxh_tap_hop_he_thuc_luong', ten: 'Tập hợp & hệ thức lượng' },
+            { id: 'bxh_day_so_thong_ke', ten: 'Dãy số & thống kê' }
+        ];
+        const MOT_NGAY = 86400000;
+
+        const S = { hocSinh: [], theoUid: new Map(), baiThem: [], bxh: {}, khoaBai: 'toan-12', chuong: {}, trangKhoa: {} };
+        const $ = (id) => document.getElementById(id);
+
+        // ---------- Tiện ích hiển thị ----------
+        function esc(s) {
+            return String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        }
+        function ngayKey(d) {
+            return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+        }
+        function thanhDate(v) {
+            if (!v) return null;
+            if (v.toDate) return v.toDate();
+            if (typeof v === 'number') return new Date(v);
+            return null;
+        }
+        function truocDay(d) {
+            if (!d) return 'Chưa vào học';
+            const s = (Date.now() - d.getTime()) / 1000;
+            if (s < 60) return 'Vừa xong';
+            if (s < 3600) return Math.floor(s / 60) + ' phút trước';
+            if (s < 86400) return Math.floor(s / 3600) + ' giờ trước';
+            const n = Math.floor(s / 86400);
+            if (n === 1) return 'Hôm qua';
+            if (n < 30) return n + ' ngày trước';
+            return d.toLocaleDateString('vi-VN');
+        }
+        function ngayGio(d) {
+            return d ? d.toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric' }) : '—';
+        }
+        function thoiLuong(giay) {
+            giay = Math.round(giay || 0);
+            if (giay < 60) return giay ? '< 1 phút' : '—';
+            const g = Math.floor(giay / 3600), p = Math.floor((giay % 3600) / 60);
+            return g ? g + ' giờ ' + (p ? p + ' phút' : '') : p + ' phút';
+        }
+        function phutGiay(ms) {
+            if (!Number.isFinite(ms)) return '—';
+            const s = Math.round(ms / 1000);
+            return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+        }
+        function soNgayHoc(hs, soNgay) {
+            const ngay = hs.ngay || {};
+            let dem = 0;
+            for (let i = 0; i < soNgay; i++) if (ngay[ngayKey(new Date(Date.now() - i * MOT_NGAY))] > 0) dem++;
+            return dem;
+        }
+        function tinhTrang(hs) {
+            if (!hs.lanCuoi) return { nhan: 'Chưa vào học', lop: 'bg-gray-100 text-gray-600', icon: 'fa-circle-minus' };
+            const n = (Date.now() - hs.lanCuoi.getTime()) / MOT_NGAY;
+            if (n <= 2) return { nhan: 'Đang học đều', lop: 'bg-emerald-50 text-emerald-700', icon: 'fa-circle-check' };
+            if (n <= 7) return { nhan: 'Ít vào', lop: 'bg-amber-50 text-amber-700', icon: 'fa-circle-exclamation' };
+            return { nhan: 'Lâu không vào', lop: 'bg-red-50 text-red-700', icon: 'fa-triangle-exclamation' };
+        }
+        function huyHieuKhoa(quyen) {
+            const co = Object.keys(KHOA).filter((k) => quyen && quyen[k] === true);
+            if (!co.length) return '<span class="text-gray-400 text-xs">Chưa có</span>';
+            return co.map((k) => '<span class="inline-block text-xs font-medium bg-teal-50 text-teal-700 border border-teal-100 px-2 py-0.5 rounded-full mr-1 mb-1">' + KHOA[k] + '</span>').join('');
+        }
+        function thongBao(noiDung) {
+            const tb = $('thong-bao');
+            tb.textContent = noiDung;
+            tb.hidden = false;
+            clearTimeout(thongBao.t);
+            thongBao.t = setTimeout(() => { tb.hidden = true; }, 3500);
+        }
+
+        // ---------- Biểu đồ cột (SVG) ----------
+        // duLieu: [{ nhan, giaTri, chiTiet }] — một chuỗi số liệu nên không cần chú thích màu.
+        // Vẽ theo bề rộng thật của khung (chữ, cột giữ đúng kích thước px); tự vẽ lại khi khung đổi bề rộng.
+        function veBieuDoCot(khung, duLieu, donVi) {
+            khung.__bieuDo = { duLieu: duLieu, donVi: donVi };
+            if (!khung.__ro) {
+                khung.__ro = new ResizeObserver(() => {
+                    if (khung.clientWidth && khung.clientWidth !== khung.__rong) veBieuDoCotNgay(khung);
+                });
+                khung.__ro.observe(khung);
+            }
+            veBieuDoCotNgay(khung);
+        }
+        function veBieuDoCotNgay(khung) {
+            const { duLieu, donVi } = khung.__bieuDo;
+            khung.__rong = khung.clientWidth;
+            const W = Math.max(280, khung.clientWidth || 720), H = 220, T = 16, B = 28, L = 32, R = 8;
+            const max = Math.max(1, ...duLieu.map((d) => d.giaTri));
+            const buoc = max <= 5 ? 1 : max <= 10 ? 2 : Math.ceil(max / 5 / 5) * 5;
+            const tran = Math.ceil(max / buoc) * buoc;
+            const y = (v) => T + (H - T - B) * (1 - v / tran);
+            const o = (W - L - R) / duLieu.length;
+            const rong = Math.min(24, o - 2);
+            let svg = '<svg width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" class="block" role="img" aria-label="Biểu đồ cột ' + esc(donVi) + '">';
+            for (let v = 0; v <= tran; v += buoc) {
+                svg += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + y(v) + '" y2="' + y(v) + '" stroke="#eef2f6" stroke-width="1"/>';
+                svg += '<text x="' + (L - 6) + '" y="' + (y(v) + 4) + '" text-anchor="end" font-size="11" fill="#94a3b8">' + v + '</text>';
+            }
+            const iMax = duLieu.reduce((m, d, i) => (d.giaTri > duLieu[m].giaTri ? i : m), 0);
+            duLieu.forEach((d, i) => {
+                const x = L + i * o + (o - rong) / 2;
+                const h = (H - T - B) * (d.giaTri / tran);
+                if (h > 0) {
+                    const r = Math.min(4, h, rong / 2), yt = y(d.giaTri), yb = y(0);
+                    svg += '<path d="M' + x + ' ' + yb + 'V' + (yt + r) + 'Q' + x + ' ' + yt + ' ' + (x + r) + ' ' + yt + 'H' + (x + rong - r) + 'Q' + (x + rong) + ' ' + yt + ' ' + (x + rong) + ' ' + (yt + r) + 'V' + yb + 'Z" fill="#0d9488" data-cot="' + i + '"/>';
+                }
+                if (i === iMax && d.giaTri > 0) {
+                    svg += '<text x="' + (x + rong / 2) + '" y="' + (y(d.giaTri) - 5) + '" text-anchor="middle" font-size="11" font-weight="600" fill="#334155">' + d.giaTri + '</text>';
+                }
+                if (i % 5 === (duLieu.length - 1) % 5) {
+                    svg += '<text x="' + (L + i * o + o / 2) + '" y="' + (H - 8) + '" text-anchor="middle" font-size="11" fill="#94a3b8">' + esc(d.nhan) + '</text>';
+                }
+                svg += '<rect x="' + (L + i * o) + '" y="' + T + '" width="' + o + '" height="' + (H - T - B) + '" fill="transparent" data-o="' + i + '"/>';
+            });
+            svg += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + y(0) + '" y2="' + y(0) + '" stroke="#cbd5e1" stroke-width="1"/></svg>';
+
+            const bang = '<details class="mt-3 text-sm"><summary class="cursor-pointer text-gray-500 hover:text-primary">Xem dạng bảng</summary>' +
+                '<div class="max-h-60 overflow-y-auto mt-2"><table class="bang w-full"><thead><tr><th>Ngày</th><th class="text-right">' + esc(donVi) + '</th><th>Chi tiết</th></tr></thead><tbody>' +
+                duLieu.slice().reverse().map((d) => '<tr><td>' + esc(d.nhan) + '</td><td class="text-right so">' + d.giaTri + '</td><td class="text-gray-500">' + esc(d.chiTiet || '') + '</td></tr>').join('') +
+                '</tbody></table></div></details>';
+            khung.innerHTML = '<div class="relative" data-khung-svg>' + svg + '<div class="bieu-do-tooltip" hidden></div></div>' + bang;
+
+            const vung = khung.querySelector('[data-khung-svg]');
+            const tip = vung.querySelector('.bieu-do-tooltip');
+            const svgEl = vung.querySelector('svg');
+            function hien(e) {
+                const t = e.target.closest('[data-o]');
+                svgEl.querySelectorAll('[data-cot]').forEach((c) => c.setAttribute('fill-opacity', '1'));
+                if (!t) { tip.hidden = true; return; }
+                const i = +t.getAttribute('data-o'), d = duLieu[i];
+                const cot = svgEl.querySelector('[data-cot="' + i + '"]');
+                svgEl.querySelectorAll('[data-cot]').forEach((c) => { if (c !== cot) c.setAttribute('fill-opacity', '.45'); });
+                tip.innerHTML = '<b>' + esc(d.nhan) + '</b> · ' + d.giaTri + ' ' + esc(donVi) + (d.chiTiet ? '<br><span style="opacity:.75">' + esc(d.chiTiet) + '</span>' : '');
+                tip.style.left = Math.min(Math.max(L + i * o + o / 2, 70), W - 70) + 'px';
+                tip.style.top = y(d.giaTri) + 'px';
+                tip.hidden = false;
+            }
+            svgEl.addEventListener('pointermove', hien);
+            svgEl.addEventListener('pointerdown', hien);
+            svgEl.addEventListener('pointerleave', () => { tip.hidden = true; svgEl.querySelectorAll('[data-cot]').forEach((c) => c.setAttribute('fill-opacity', '1')); });
+        }
+
+        function duLieu30Ngay(dsHocSinh) {
+            const kq = [];
+            for (let i = 29; i >= 0; i--) {
+                const d = new Date(Date.now() - i * MOT_NGAY), k = ngayKey(d);
+                let soHs = 0, luot = 0;
+                dsHocSinh.forEach((hs) => { const v = (hs.ngay || {})[k] || 0; if (v > 0) { soHs++; luot += v; } });
+                kq.push({ nhan: d.getDate() + '/' + (d.getMonth() + 1), giaTri: soHs, luot: luot });
+            }
+            return kq;
+        }
+
+        // ---------- Hộp thoại ----------
+        function moHopThoai(tieuDe, html) {
+            $('hop-thoai-tieu-de').textContent = tieuDe;
+            $('hop-thoai-noi-dung').innerHTML = html;
+            $('hop-thoai').hidden = false;
+            document.body.style.overflow = 'hidden';
+            return $('hop-thoai-noi-dung');
+        }
+        function dongHopThoai() {
+            $('hop-thoai').hidden = true;
+            document.body.style.overflow = '';
+        }
+        $('hop-thoai').addEventListener('click', (e) => {
+            if (e.target.id === 'hop-thoai' || e.target.closest('[data-dong]')) dongHopThoai();
+        });
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !$('hop-thoai').hidden) dongHopThoai(); });
+
+        // ---------- Tải dữ liệu ----------
+        async function taiDuLieu() {
+            const tenNguon = ['phan_quyen', 'hoc_sinh', 'bai_hoc_them'].concat(BAI_KIEM_TRA.map((b) => b.id));
+            const kq = await Promise.allSettled(tenNguon.map((t) => db.collection(t).get()));
+            const loi = [];
+            const lay = (i) => (kq[i].status === 'fulfilled' ? kq[i].value.docs : (loi.push(tenNguon[i]), []));
+
+            const theoEmail = new Map();
+            const layHs = (email) => {
+                email = String(email || '').toLowerCase();
+                if (!theoEmail.has(email)) theoEmail.set(email, { email: email, quyen: {}, ngay: {}, khoa: {}, bai: {} });
+                return theoEmail.get(email);
+            };
+            lay(0).forEach((d) => { layHs(d.id).quyen = d.data(); });
+            S.theoUid = new Map();
+            lay(1).forEach((d) => {
+                const v = d.data();
+                if (!v.email) return;
+                const hs = Object.assign(layHs(v.email), {
+                    uid: d.id, luotVao: v.luotVao || 0, soLanMoBai: v.soLanMoBai || 0, thoiGianHoc: v.thoiGianHoc || 0,
+                    lanCuoi: thanhDate(v.lanCuoi), ngay: v.ngay || {}, khoa: v.khoa || {}, bai: v.bai || {}, baiCuoi: v.baiCuoi || null
+                });
+                S.theoUid.set(d.id, hs);
+            });
+            theoEmail.delete(ADMIN_EMAIL);
+            theoEmail.delete('');
+            S.hocSinh = Array.from(theoEmail.values());
+            S.hocSinh.forEach((hs) => { hs.coKhoa = Object.keys(KHOA).some((k) => hs.quyen[k] === true); hs.ngayHoc30 = soNgayHoc(hs, 30); });
+
+            S.baiThem = lay(2).map((d) => Object.assign({ id: d.id }, d.data()));
+            BAI_KIEM_TRA.forEach((b, i) => { S.bxh[b.id] = lay(3 + i).map((d) => Object.assign({ uid: d.id }, d.data())); });
+
+            const cb = $('canh-bao');
+            cb.hidden = !loi.length;
+            if (loi.length) {
+                cb.innerHTML = '<i class="fa-solid fa-triangle-exclamation mr-1.5"></i><b>Chưa đọc được:</b> ' + loi.map(esc).join(', ') +
+                    '. Thường là do Firestore Rules chưa cho phép tài khoản Admin đọc các mục này.';
+            }
+            veTatCa();
+        }
+
+        function veTatCa() {
+            veTongQuan();
+            veBangHocSinh();
+            veBaiHoc();
+            veKiemTra();
+            tlNapDs();
+        }
+
+        // ---------- TAB TỔNG QUAN ----------
+        function oSoLieu(nhan, giaTri, phu, gon) {
+            return '<div class="bg-white rounded-2xl border border-gray-100 shadow-sm ' + (gon ? 'p-3' : 'p-4 md:p-5') + '">' +
+                '<div class="text-sm text-gray-500">' + esc(nhan) + '</div>' +
+                '<div class="' + (gon ? 'text-lg' : 'text-2xl md:text-3xl') + ' font-bold text-gray-900 mt-1 so">' + esc(giaTri) + '</div>' +
+                (phu ? '<div class="text-xs text-gray-400 mt-1">' + esc(phu) + '</div>' : '') + '</div>';
+        }
+
+        function veTongQuan() {
+            const ds = S.hocSinh;
+            const homNay = ngayKey(new Date());
+            const hocHomNay = ds.filter((hs) => (hs.ngay || {})[homNay] > 0).length;
+            const hoc7 = ds.filter((hs) => soNgayHoc(hs, 7) > 0).length;
+            const tongGiay = ds.reduce((s, hs) => s + (hs.thoiGianHoc || 0), 0);
+            $('o-so-lieu').innerHTML =
+                oSoLieu('Học sinh', ds.length, ds.filter((h) => h.coKhoa).length + ' em đang có khóa học') +
+                oSoLieu('Vào học hôm nay', hocHomNay, 'học sinh') +
+                oSoLieu('Vào học 7 ngày qua', hoc7, 'học sinh') +
+                oSoLieu('Tổng thời gian học', thoiLuong(tongGiay), 'ước tính, mọi học sinh');
+
+            veBieuDoCot($('bieu-do-tong'), duLieu30Ngay(ds).map((d) => Object.assign(d, { chiTiet: d.luot + ' lượt vào khóa / mở bài' })), 'học sinh');
+
+            const ganDay = ds.filter((h) => h.lanCuoi).sort((a, b) => b.lanCuoi - a.lanCuoi).slice(0, 8);
+            $('ds-gan-day').innerHTML = ganDay.length ? ganDay.map((hs) =>
+                '<li class="py-3 flex items-start gap-3 cursor-pointer hover:bg-gray-50 -mx-2 px-2 rounded-xl" data-mo-hs="' + esc(hs.email) + '">' +
+                '<span class="w-9 h-9 rounded-full bg-teal-50 text-teal-700 font-bold flex items-center justify-center shrink-0 uppercase">' + esc(hs.email[0]) + '</span>' +
+                '<div class="min-w-0 flex-1"><div class="flex justify-between gap-2"><span class="font-medium text-gray-900 truncate">' + esc(hs.email) + '</span>' +
+                '<span class="text-xs text-gray-400 shrink-0">' + truocDay(hs.lanCuoi) + '</span></div>' +
+                '<div class="text-sm text-gray-500 truncate">' + (hs.baiCuoi ? esc(KHOA[hs.baiCuoi.khoa] || '') + ' · ' + esc(hs.baiCuoi.ten) : 'Vào trang khóa học') + '</div></div></li>'
+            ).join('') : '<li class="py-6 text-center text-gray-400 text-sm">Chưa có hoạt động nào được ghi lại.</li>';
+
+            const gop = new Map();
+            ds.forEach((hs) => Object.values(hs.bai || {}).forEach((b) => {
+                if (!b || !b.url) return;
+                const k = b.khoa + '|' + b.url;
+                const g = gop.get(k) || { ten: b.ten, khoa: b.khoa, soHs: 0, luot: 0, giay: 0 };
+                g.soHs++; g.luot += b.luotMo || 0; g.giay += b.giay || 0;
+                gop.set(k, g);
+            }));
+            const top = Array.from(gop.values()).sort((a, b) => b.soHs - a.soHs || b.luot - a.luot).slice(0, 8);
+            const maxHs = top.length ? top[0].soHs : 1;
+            $('ds-bai-nhieu').innerHTML = top.length ? top.map((b) =>
+                '<li><div class="flex justify-between gap-3 text-sm mb-1"><span class="text-gray-800 truncate"><span class="text-gray-400">' + esc(KHOA[b.khoa] || '') + ' · </span>' + esc(b.ten) + '</span>' +
+                '<span class="text-gray-600 shrink-0 so">' + b.soHs + ' HS · ' + thoiLuong(b.giay) + '</span></div>' +
+                '<div class="h-2 bg-teal-50 rounded-full overflow-hidden"><div class="h-full bg-primary rounded-full" style="width:' + Math.max(4, (b.soHs / maxHs) * 100) + '%"></div></div></li>'
+            ).join('') : '<li class="py-6 text-center text-gray-400 text-sm">Chưa có dữ liệu.</li>';
+
+            const chuY = ds.filter((hs) => hs.coKhoa && (!hs.lanCuoi || Date.now() - hs.lanCuoi > 7 * MOT_NGAY))
+                .sort((a, b) => (a.lanCuoi || 0) - (b.lanCuoi || 0));
+            $('ds-chu-y').innerHTML = chuY.length ? chuY.map((hs) =>
+                '<button type="button" data-mo-hs="' + esc(hs.email) + '" class="text-sm bg-red-50 hover:bg-red-100 text-red-800 border border-red-100 rounded-full px-3 py-1.5">' +
+                '<i class="fa-solid fa-triangle-exclamation mr-1"></i>' + esc(hs.email) + ' <span class="text-red-600/80">· ' + truocDay(hs.lanCuoi) + '</span></button>'
+            ).join('') : '<p class="text-sm text-gray-400"><i class="fa-solid fa-circle-check text-emerald-600 mr-1"></i>Tất cả học sinh đều vào học trong 7 ngày qua.</p>';
+        }
+
+        // ---------- TAB HỌC SINH ----------
+        function veBangHocSinh() {
+            const tu = $('tim-hs').value.trim().toLowerCase();
+            const khoa = $('loc-khoa').value;
+            const sx = $('sap-xep-hs').value;
+            const ds = S.hocSinh.filter((hs) => {
+                if (tu && !hs.email.includes(tu)) return false;
+                if (khoa === 'khong') return !hs.coKhoa;
+                if (khoa) return hs.quyen[khoa] === true;
+                return true;
+            }).sort((a, b) => {
+                if (sx === 'email') return a.email.localeCompare(b.email);
+                if (sx === 'thoiGianHoc') return (b.thoiGianHoc || 0) - (a.thoiGianHoc || 0);
+                if (sx === 'ngayHoc') return b.ngayHoc30 - a.ngayHoc30;
+                return (b.lanCuoi || 0) - (a.lanCuoi || 0);
+            });
+            $('bang-hs').innerHTML = ds.length ? ds.map((hs) => {
+                const tt = tinhTrang(hs);
+                return '<tr class="co-the-bam" data-mo-hs="' + esc(hs.email) + '">' +
+                    '<td class="font-medium text-gray-900">' + esc(hs.email) + '</td>' +
+                    '<td>' + huyHieuKhoa(hs.quyen) + '</td>' +
+                    '<td><span class="inline-flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full ' + tt.lop + '"><i class="fa-solid ' + tt.icon + '"></i>' + tt.nhan + '</span></td>' +
+                    '<td class="text-gray-600 whitespace-nowrap">' + (hs.lanCuoi ? truocDay(hs.lanCuoi) : '—') + '</td>' +
+                    '<td class="text-right so">' + hs.ngayHoc30 + '</td>' +
+                    '<td class="text-right so">' + (hs.soLanMoBai || 0) + '</td>' +
+                    '<td class="text-right so whitespace-nowrap">' + thoiLuong(hs.thoiGianHoc) + '</td></tr>';
+            }).join('') : '<tr><td colspan="7" class="text-center text-gray-400 py-10">Không có học sinh phù hợp.</td></tr>';
+        }
+        ['tim-hs', 'loc-khoa', 'sap-xep-hs'].forEach((id) => $(id).addEventListener('input', veBangHocSinh));
+
+        document.addEventListener('click', (e) => {
+            const o = e.target.closest('[data-mo-hs]');
+            if (o) moChiTietHocSinh(o.getAttribute('data-mo-hs'));
+        });
+
+        function moChiTietHocSinh(email) {
+            const hs = S.hocSinh.find((h) => h.email === email);
+            if (!hs) return;
+            const tt = tinhTrang(hs);
+            const dsBai = Object.values(hs.bai || {}).filter((b) => b && b.url)
+                .sort((a, b) => (thanhDate(b.lanCuoi) || 0) - (thanhDate(a.lanCuoi) || 0));
+            const ketQua = BAI_KIEM_TRA.map((bkt) => {
+                const r = hs.uid && S.bxh[bkt.id].find((x) => x.uid === hs.uid);
+                return r ? '<li class="flex justify-between gap-3 py-2"><span>' + esc(bkt.ten) + '</span><span class="so text-gray-700">' +
+                    esc(r.diem) + '/' + esc(r.tong) + ' · ' + phutGiay(r.thoiGian) + ' · ' + esc(r.soLan || 0) + ' lần</span></li>' : '';
+            }).join('');
+
+            const noiDung = moHopThoai(email,
+                '<div class="flex flex-wrap items-center gap-2 mb-5"><span class="inline-flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full ' + tt.lop + '"><i class="fa-solid ' + tt.icon + '"></i>' + tt.nhan + '</span>' +
+                '<span class="text-sm text-gray-500">Lần cuối: ' + ngayGio(hs.lanCuoi) + '</span></div>' +
+                '<div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">' +
+                oSoLieu('Lượt vào khóa', hs.luotVao || 0, '', true) + oSoLieu('Lượt mở bài', hs.soLanMoBai || 0, '', true) +
+                oSoLieu('Ngày học / 30', hs.ngayHoc30, '', true) + oSoLieu('Thời gian học', thoiLuong(hs.thoiGianHoc), '', true) + '</div>' +
+
+                '<h3 class="font-bold text-gray-900 mb-1">Quyền khóa học</h3><p class="text-sm text-gray-500 mb-3">Bật/tắt là có hiệu lực ngay.</p>' +
+                '<div class="flex flex-wrap gap-3 mb-6">' + Object.keys(KHOA).map((k) =>
+                    '<label class="flex items-center gap-3 bg-gray-50 border border-gray-100 rounded-xl px-4 py-2.5 cursor-pointer"><button type="button" role="switch" class="cong-tac" data-quyen="' + k + '" aria-checked="' + (hs.quyen[k] === true) + '"></button><span class="text-sm font-medium">' + KHOA[k] + '</span></label>'
+                ).join('') + '</div>' +
+
+                '<h3 class="font-bold text-gray-900 mb-3">Số lần vào học 30 ngày qua</h3><div id="bieu-do-hs" class="mb-6"></div>' +
+
+                '<h3 class="font-bold text-gray-900 mb-3">Bài đã xem (' + dsBai.length + ')</h3>' +
+                (dsBai.length ? '<div class="overflow-x-auto border border-gray-100 rounded-xl mb-6"><table class="bang w-full text-sm min-w-[560px]"><thead><tr><th>Bài</th><th class="text-right">Lượt</th><th class="text-right">Thời gian</th><th>Lần cuối</th></tr></thead><tbody>' +
+                    dsBai.map((b) => '<tr><td><div class="text-gray-900">' + esc(b.ten) + '</div><div class="text-xs text-gray-400">' + esc(KHOA[b.khoa] || '') + (b.chuong ? ' · ' + esc(b.chuong) : '') + '</div></td>' +
+                        '<td class="text-right so">' + (b.luotMo || 0) + '</td><td class="text-right so whitespace-nowrap">' + thoiLuong(b.giay) + '</td><td class="text-gray-500 whitespace-nowrap">' + truocDay(thanhDate(b.lanCuoi)) + '</td></tr>').join('') +
+                    '</tbody></table></div>' : '<p class="text-sm text-gray-400 mb-6">Chưa mở bài nào.</p>') +
+
+                (ketQua ? '<h3 class="font-bold text-gray-900 mb-2">Kết quả kiểm tra</h3><ul class="divide-y divide-gray-100 text-sm mb-6">' + ketQua + '</ul>' : '') +
+
+                '<h3 class="font-bold text-gray-900 mb-3">Nhật ký gần nhất</h3><ul id="nhat-ky-hs" class="text-sm space-y-2"><li class="text-gray-400"><i class="fa-solid fa-circle-notch fa-spin mr-1"></i>Đang tải...</li></ul>'
+            );
+
+            const theoNgay = [];
+            for (let i = 29; i >= 0; i--) {
+                const d = new Date(Date.now() - i * MOT_NGAY);
+                theoNgay.push({ nhan: d.getDate() + '/' + (d.getMonth() + 1), giaTri: (hs.ngay || {})[ngayKey(d)] || 0 });
+            }
+            veBieuDoCot(noiDung.querySelector('#bieu-do-hs'), theoNgay, 'lượt');
+
+            noiDung.querySelectorAll('[data-quyen]').forEach((nut) => nut.addEventListener('click', async (e) => {
+                e.preventDefault();
+                const k = nut.getAttribute('data-quyen');
+                const moi = nut.getAttribute('aria-checked') !== 'true';
+                nut.disabled = true;
+                try {
+                    await db.collection('phan_quyen').doc(hs.email).set({ [k]: moi }, { merge: true });
+                    hs.quyen[k] = moi;
+                    hs.coKhoa = Object.keys(KHOA).some((x) => hs.quyen[x] === true);
+                    nut.setAttribute('aria-checked', String(moi));
+                    thongBao((moi ? 'Đã cấp ' : 'Đã thu hồi ') + KHOA[k] + ' cho ' + hs.email);
+                    veBangHocSinh(); veTongQuan();
+                } catch (err) {
+                    thongBao('Không lưu được: ' + err.message);
+                }
+                nut.disabled = false;
+            }));
+
+            const ul = noiDung.querySelector('#nhat-ky-hs');
+            if (!hs.uid) { ul.innerHTML = '<li class="text-gray-400">Chưa có hoạt động.</li>'; return; }
+            db.collection('hoc_sinh').doc(hs.uid).collection('hoat_dong').orderBy('luc', 'desc').limit(50).get().then((snap) => {
+                if (!snap.size) { ul.innerHTML = '<li class="text-gray-400">Chưa có hoạt động.</li>'; return; }
+                ul.innerHTML = snap.docs.map((d) => {
+                    const v = d.data();
+                    const moBai = v.loai === 'mo_bai';
+                    return '<li class="flex gap-3"><span class="text-gray-400 whitespace-nowrap so w-[120px] shrink-0">' + ngayGio(thanhDate(v.luc)) + '</span>' +
+                        '<span><i class="fa-solid ' + (moBai ? 'fa-book-open' : 'fa-right-to-bracket') + ' text-gray-400 mr-1.5"></i>' +
+                        (moBai ? 'Mở <b class="font-medium">' + esc(v.ten) + '</b>' : 'Vào khóa') + ' <span class="text-gray-400">· ' + esc(KHOA[v.khoa] || v.khoa || '') + '</span></span></li>';
+                }).join('');
+            }).catch(() => { ul.innerHTML = '<li class="text-red-600">Không tải được nhật ký (kiểm tra Firestore Rules).</li>'; });
+        }
+
+        // Thêm học sinh: tạo tài khoản mới (hoặc cấp quyền cho email đã có tài khoản)
+        function matKhauNgauNhien() {
+            const kt = 'abcdefghjkmnpqrstuvwxyz23456789';
+            const a = new Uint32Array(8);
+            crypto.getRandomValues(a);
+            return Array.from(a, (n) => kt[n % kt.length]).join('');
+        }
+        let appPhu = null;
+        $('nut-them-hs').addEventListener('click', () => {
+            const f = moHopThoai('Thêm học sinh',
+                '<form id="form-hs" class="space-y-4">' +
+                '<div><label class="block text-sm font-medium mb-1.5" for="hs-email">Email đăng nhập</label>' +
+                '<input id="hs-email" type="email" required autocomplete="off" placeholder="hocsinh@dfm.com" class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-base focus:outline-none focus:ring-4 focus:ring-teal-100 focus:border-teal-400"></div>' +
+                '<div><label class="block text-sm font-medium mb-1.5" for="hs-mk">Mật khẩu (ít nhất 6 ký tự)</label><div class="flex gap-2">' +
+                '<input id="hs-mk" type="text" required minlength="6" autocomplete="off" class="flex-1 px-3 py-2.5 rounded-xl border border-gray-200 text-base font-mono focus:outline-none focus:ring-4 focus:ring-teal-100 focus:border-teal-400">' +
+                '<button type="button" id="hs-mk-moi" class="px-3 rounded-xl border border-gray-200 text-sm hover:bg-gray-50 whitespace-nowrap"><i class="fa-solid fa-dice mr-1"></i>Tạo ngẫu nhiên</button></div>' +
+                '<p class="text-xs text-gray-400 mt-1">Nếu email đã có tài khoản thì mật khẩu được giữ nguyên, chỉ cấp thêm khóa học.</p></div>' +
+                '<fieldset><legend class="text-sm font-medium mb-1.5">Cấp khóa học</legend><div class="flex flex-wrap gap-3">' +
+                Object.keys(KHOA).map((k) => '<label class="flex items-center gap-2 bg-gray-50 border border-gray-100 rounded-xl px-3 py-2 text-sm cursor-pointer"><input type="checkbox" name="khoa" value="' + k + '" class="accent-teal-600 w-4 h-4">' + KHOA[k] + '</label>').join('') +
+                '</div></fieldset>' +
+                '<div id="hs-kq" class="text-sm"></div>' +
+                '<div class="flex justify-end gap-2 pt-2"><button type="button" data-dong class="px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-100">Đóng</button>' +
+                '<button type="submit" class="bg-primary hover:bg-teal-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold">Tạo / cấp quyền</button></div></form>');
+            f.querySelector('#hs-mk').value = matKhauNgauNhien();
+            f.querySelector('#hs-mk-moi').addEventListener('click', () => { f.querySelector('#hs-mk').value = matKhauNgauNhien(); });
+            f.querySelector('#form-hs').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = f.querySelector('#hs-email').value.trim().toLowerCase();
+                const mk = f.querySelector('#hs-mk').value;
+                const khoaChon = Array.from(f.querySelectorAll('input[name="khoa"]:checked'), (x) => x.value);
+                const kq = f.querySelector('#hs-kq');
+                const nut = f.querySelector('button[type="submit"]');
+                nut.disabled = true;
+                kq.innerHTML = '<span class="text-gray-500"><i class="fa-solid fa-circle-notch fa-spin mr-1"></i>Đang xử lý...</span>';
+                let daCo = false;
+                try {
+                    // Tạo bằng một app Firebase phụ để Admin không bị đăng xuất khỏi phiên hiện tại
+                    appPhu = appPhu || firebase.initializeApp(firebaseConfig, 'tao-tai-khoan');
+                    try {
+                        await appPhu.auth().createUserWithEmailAndPassword(email, mk);
+                        await appPhu.auth().signOut();
+                    } catch (err) {
+                        if (err.code !== 'auth/email-already-in-use') throw err;
+                        daCo = true;
+                    }
+                    const quyen = {};
+                    khoaChon.forEach((k) => { quyen[k] = true; });
+                    await db.collection('phan_quyen').doc(email).set(quyen, { merge: true });
+                    kq.innerHTML = daCo
+                        ? '<div class="bg-amber-50 text-amber-800 rounded-xl p-3"><i class="fa-solid fa-circle-info mr-1"></i>Email này đã có tài khoản (mật khẩu giữ nguyên). Đã cấp: ' + (khoaChon.map((k) => KHOA[k]).join(', ') || 'không có khóa nào') + '.</div>'
+                        : '<div class="bg-emerald-50 text-emerald-800 rounded-xl p-3"><i class="fa-solid fa-circle-check mr-1"></i>Đã tạo tài khoản. Gửi cho học sinh:<br><b class="font-mono select-all">' + esc(email) + ' / ' + esc(mk) + '</b></div>';
+                    await taiDuLieu();
+                } catch (err) {
+                    const loi = { 'auth/invalid-email': 'Email không hợp lệ.', 'auth/weak-password': 'Mật khẩu quá ngắn (ít nhất 6 ký tự).' };
+                    kq.innerHTML = '<div class="bg-red-50 text-red-700 rounded-xl p-3">' + esc(loi[err.code] || err.message) + '</div>';
+                }
+                nut.disabled = false;
+            });
+        });
+
+        // ---------- TAB BÀI HỌC ----------
+        const LOAI_MUC = {
+            video: { ten: 'Video YouTube', macDinh: 'Video bài giảng', goiY: 'Dán link YouTube (vd: https://youtu.be/abc123XYZ_0) hoặc mã video' },
+            'tai-lieu': { ten: 'Tài liệu (Cloudinary)', macDinh: 'Lời giải', goiY: 'Tên thư mục ảnh trên Cloudinary, vd: 12-Chuong1-Bai1-Loigiai (ảnh đặt tên ...-1.png, ...-2.png)' },
+            link: { ten: 'Đường link', macDinh: 'Lý thuyết', goiY: 'Link https://... hoặc đường dẫn trong site tính từ thư mục courses/' }
+        };
+        function maYoutube(v) {
+            v = String(v || '').trim();
+            const m = v.match(/(?:youtu\.be\/|[?&]v=|\/embed\/|\/shorts\/|\/live\/)([\w-]{6,20})/);
+            if (m) return m[1];
+            return /^[\w-]{6,20}$/.test(v) ? v : null;
+        }
+        function chuanHoaMuc(loai, giaTri) {
+            giaTri = String(giaTri || '').trim();
+            if (loai === 'video') return maYoutube(giaTri);
+            if (loai === 'tai-lieu') return /^[\w-]+$/.test(giaTri) ? giaTri : null;
+            if (/^https:\/\//i.test(giaTri) || /^[\w\-./]+(\?[^:]*)?$/.test(giaTri)) return giaTri;
+            return null;
+        }
+        function linkXemThu(muc, ten) {
+            const t = encodeURIComponent(ten || '');
+            if (muc.loai === 'video') return 'courses/xem-video.html?id=' + encodeURIComponent(muc.giaTri) + '&title=' + t;
+            if (muc.loai === 'tai-lieu') return 'courses/xem-tai-lieu.html?folder=' + encodeURIComponent(muc.giaTri) + '&title=' + t;
+            return /^https:\/\//i.test(muc.giaTri) ? muc.giaTri : 'courses/' + muc.giaTri;
+        }
+
+        // Đọc chính các trang khóa học (cùng domain) để lấy danh sách chương và lời giải đang có
+        function layTrangKhoa(khoa) {
+            if (!S.trangKhoa[khoa]) {
+                S.trangKhoa[khoa] = fetch('courses/' + khoa + '.html', { cache: 'no-cache' })
+                    .then((r) => { if (!r.ok) throw new Error(r.status); return r.text(); })
+                    .then((html) => new DOMParser().parseFromString(html, 'text/html'))
+                    .catch(() => { S.trangKhoa[khoa] = null; return null; });
+            }
+            return S.trangKhoa[khoa];
+        }
+
+        async function layChuong(khoa) {
+            if (S.chuong[khoa]) return S.chuong[khoa];
+            const doc = await layTrangKhoa(khoa);
+            // Không đọc được trang thì vẫn cho nhập chương mới
+            let ds = doc ? Array.from(doc.querySelectorAll('[x-data*="openChapter"] h4 span'), (s) => s.textContent.replace(/\s+/g, ' ').trim()).filter(Boolean) : [];
+            S.baiThem.filter((b) => b.khoa === khoa && b.chuong).forEach((b) => ds.push(b.chuong));
+            ds = Array.from(new Set(ds));
+            S.chuong[khoa] = ds;
+            return ds;
+        }
+
+        // Danh sách lời giải (thư mục Cloudinary) theo khóa / chương, gồm cả bài thêm từ Admin
+        async function layDsLoiGiai() {
+            const nhom = [];
+            for (const k of Object.keys(KHOA)) {
+                const doc = await layTrangKhoa(k);
+                if (doc) {
+                    const moc = Array.from(doc.querySelectorAll('h3')).find((h) => /nâng cao/i.test(h.textContent));
+                    doc.querySelectorAll('[x-data*="openChapter"]').forEach((ch) => {
+                        const nangCao = moc && (moc.compareDocumentPosition(ch) & Node.DOCUMENT_POSITION_FOLLOWING);
+                        const tenChuong = ((ch.querySelector('h4 span') || ch.querySelector('h4') || {}).textContent || '').replace(/\s+/g, ' ').trim();
+                        const items = Array.from(ch.querySelectorAll('a[href*="folder="]'), (a) => {
+                            const q = new URLSearchParams(a.getAttribute('href').split('?')[1] || '');
+                            return [q.get('folder'), q.get('title') || q.get('folder')];
+                        }).filter((x) => x[0]);
+                        if (items.length) nhom.push({ label: KHOA[k] + (nangCao ? ' nâng cao' : '') + ' · ' + tenChuong, items: items });
+                    });
+                }
+                const them = new Map();
+                S.baiThem.filter((b) => b.khoa === k).forEach((b) => (b.muc || []).forEach((m) => {
+                    if (m.loai !== 'tai-lieu') return;
+                    const label = KHOA[k] + ' · ' + b.chuong + ' (bài thêm)';
+                    if (!them.has(label)) them.set(label, []);
+                    them.get(label).push([m.giaTri, b.ten]);
+                }));
+                them.forEach((items, label) => nhom.push({ label: label, items: items }));
+            }
+            // Mỗi thư mục chỉ hiện một lần; thư mục dùng cho nhiều bài thì hiện tên thư mục
+            const dem = {};
+            nhom.forEach((g) => g.items.forEach(([f]) => { dem[f] = (dem[f] || 0) + 1; }));
+            const daCo = new Set();
+            return nhom.map((g) => ({
+                label: g.label,
+                items: g.items.filter(([f]) => !daCo.has(f) && daCo.add(f)).map(([f, t]) => ({ folder: f, title: dem[f] > 1 ? f : t }))
+            })).filter((g) => g.items.length);
+        }
+
+        // ---------- Đưa PDF lời giải lên Cloudinary ----------
+        // Mỗi trang PDF thành một ảnh webp tên <ten>-1, <ten>-2, ... (trang xem-tai-lieu.html đọc đúng kiểu tên này)
+        const PDFJS = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/';
+        const RONG_ANH = 2200;     // độ rộng ảnh (px), khớp với trang xem-tai-lieu
+        const CHAT_LUONG = 0.85;   // chất lượng webp
+        const TL_MAC_DINH = { cloud: 'vrhp60zs', preset: 'Cloudinary', cha: '' };
+        Object.keys(TL_MAC_DINH).forEach((k) => {
+            const o = $('tl-' + k);
+            let v = TL_MAC_DINH[k];
+            try { v = localStorage.getItem('ulg2_' + k) ?? v; } catch (e) {}
+            o.value = v;
+            o.addEventListener('input', () => { try { localStorage.setItem('ulg2_' + k, o.value.trim()); } catch (e) {} });
+        });
+        const tenHopLe = (t) => /^[A-Za-z0-9_-]+$/.test(t);
+        function thuMucCloud(ten) {
+            const cha = $('tl-cha').value.trim().replace(/^\/+|\/+$/g, '');
+            return cha ? cha + '/' + ten : ten;
+        }
+        function khongDau(s) {
+            return s.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D')
+                .replace(/[^A-Za-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 50);
+        }
+
+        // Thư viện đọc PDF chỉ tải khi cần
+        let napPdfJs = null;
+        function docPdf(file) {
+            napPdfJs = napPdfJs || new Promise((ok, loi) => {
+                const s = document.createElement('script');
+                s.src = PDFJS + 'pdf.min.js';
+                s.onload = () => { pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJS + 'pdf.worker.min.js'; ok(); };
+                s.onerror = () => { napPdfJs = null; loi(new Error('Không tải được thư viện đọc PDF, kiểm tra mạng rồi thử lại.')); };
+                document.head.appendChild(s);
+            });
+            return napPdfJs.then(() => file.arrayBuffer()).then((buf) => pdfjsLib.getDocument({ data: buf }).promise);
+        }
+
+        async function taiPdfLenCloud(pdf, ten, tienDo) {
+            const cloud = $('tl-cloud').value.trim(), preset = $('tl-preset').value.trim();
+            const n = pdf.numPages;
+            let trung = 0;
+            for (let p = 1; p <= n; p++) {
+                tienDo('Đang xử lý trang ' + p + '/' + n + '…');
+                const page = await pdf.getPage(p);
+                const vp = page.getViewport({ scale: Math.min(4, RONG_ANH / page.getViewport({ scale: 1 }).width) });
+                const cv = document.createElement('canvas');
+                cv.width = Math.round(vp.width); cv.height = Math.round(vp.height);
+                const ctx = cv.getContext('2d');
+                ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, cv.width, cv.height);
+                await page.render({ canvasContext: ctx, viewport: vp }).promise;
+                const blob = await new Promise((r) => cv.toBlob(r, 'image/webp', CHAT_LUONG));
+                if (!blob || blob.type !== 'image/webp') throw new Error('Trình duyệt này không tạo được ảnh webp. Hãy mở trang bằng Chrome hoặc Edge trên máy tính.');
+                const fd = new FormData();
+                fd.append('file', blob, ten + '-' + p + '.webp');
+                fd.append('upload_preset', preset);
+                fd.append('public_id', ten + '-' + p);
+                fd.append('asset_folder', thuMucCloud(ten));
+                const res = await fetch('https://api.cloudinary.com/v1_1/' + encodeURIComponent(cloud) + '/image/upload', { method: 'POST', body: fd });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) throw new Error('Cloudinary báo lỗi: ' + ((data.error && data.error.message) || res.status));
+                if (data.existing) trung++;
+                page.cleanup();
+            }
+            return { n: n, trung: trung };
+        }
+
+        // Thử tải ảnh trang 1: tải được nghĩa là bài đã có lời giải trên web
+        function kiemTraDaCo(ten, khiCo) {
+            const img = new Image();
+            img.onload = khiCo;
+            img.src = 'https://res.cloudinary.com/' + encodeURIComponent($('tl-cloud').value.trim()) + '/image/upload/c_limit,w_40/' + ten + '-1.png';
+        }
+
+        // Khung "Đưa lời giải lên": nhiều file một lúc, mỗi file chọn một bài
+        let tlDs = [], tlNhom = [];
+        async function tlNapDs() {
+            tlNhom = await layDsLoiGiai();
+            tlDs.forEach(tlDienChon);
+        }
+        const tlTimBai = (folder) => tlNhom.flatMap((g) => g.items).find((x) => x.folder === folder);
+        function tlDienChon(it) {
+            const sel = it.el.querySelector('select'), cu = sel.value || it.folder;
+            sel.innerHTML = '<option value="">— Chọn bài —</option>' +
+                tlNhom.map((g) => '<optgroup label="' + esc(g.label) + '">' + g.items.map((x) => '<option value="' + esc(x.folder) + '">' + esc(x.title) + '</option>').join('') + '</optgroup>').join('') +
+                '<option value="__khac">Bài mới / bài khác (tự gõ tên)…</option>';
+            sel.value = cu;
+            if (sel.value !== cu) sel.value = '';
+        }
+        function tlTen(it) {
+            const sel = it.el.querySelector('select');
+            return sel.value === '__khac' ? it.el.querySelector('.tl-khac').value.trim() : sel.value;
+        }
+        function tlTrangThai(it, html, loai) {
+            const s = it.el.querySelector('[data-st]');
+            s.innerHTML = html;
+            s.className = 'text-sm ' + (loai === 'ok' ? 'text-emerald-700' : loai === 'err' ? 'text-red-600' : 'text-gray-500');
+        }
+        function tlXem(it) {
+            const xem = it.el.querySelector('[data-xem]'), ten = tlTen(it);
+            if (!ten) { xem.innerHTML = ''; return; }
+            if (!tenHopLe(ten)) { xem.innerHTML = '<span class="text-amber-700">Tên chỉ được có chữ không dấu, số, dấu gạch ngang (-) và gạch dưới (_).</span>'; return; }
+            const n = it.pdf && it.pdf.numPages;
+            const c = (s) => '<code class="text-teal-700 font-semibold">' + esc(s) + '</code>';
+            xem.innerHTML = 'Ảnh sẽ có tên ' + (n ? (n === 1 ? c(ten + '-1') : c(ten + '-1') + ' đến ' + c(ten + '-' + n)) : c(ten + '-1') + ', …') +
+                ', nằm trong thư mục ' + c(thuMucCloud(ten)) + '.';
+            const ma = (it.kt = {});
+            kiemTraDaCo(ten, () => {
+                if (it.kt !== ma || it.xong) return;
+                xem.insertAdjacentHTML('beforeend', '<br><span class="text-amber-700"><i class="fa-solid fa-triangle-exclamation mr-1"></i>Bài này đã có lời giải trên web. Ảnh trùng tên sẽ không bị thay; muốn thay bản mới, hãy xóa thư mục cũ trên Cloudinary trước.</span>');
+            });
+        }
+        function tlCapNhatNut() { $('tl-nut').hidden = !tlDs.length; }
+        function tlVeHang(it) {
+            const r = document.createElement('div');
+            r.className = 'py-4 space-y-2';
+            r.innerHTML = '<div class="flex justify-between items-baseline gap-3"><b class="font-semibold text-gray-900 break-all"></b>' +
+                '<span class="shrink-0 text-sm text-gray-400"><span data-trang>đang đọc…</span><button type="button" data-bo class="ml-3 text-gray-500 hover:text-red-600">Bỏ</button></span></div>' +
+                '<label class="block text-sm font-medium text-gray-700">Đây là lời giải của' +
+                '<select class="mt-1 w-full px-3 py-2.5 rounded-xl border border-gray-200 bg-white text-sm font-normal"></select></label>' +
+                '<input class="tl-khac w-full px-3 py-2.5 rounded-xl border border-gray-200 text-base" placeholder="Gõ tên, vd: 12-Chuong6-Bai3-Loigiai" hidden>' +
+                '<div data-xem class="text-sm text-gray-500 break-all"></div><div data-st class="text-sm"></div>';
+            r.querySelector('b').textContent = it.file.name;
+            it.el = r;
+            tlDienChon(it);
+            const sel = r.querySelector('select'), khac = r.querySelector('.tl-khac');
+            if (it.tuGo) { sel.value = '__khac'; khac.hidden = false; khac.value = it.tuGo; }
+            sel.addEventListener('change', () => { khac.hidden = sel.value !== '__khac'; if (!khac.hidden) khac.focus(); tlXem(it); });
+            khac.addEventListener('input', () => tlXem(it));
+            r.querySelector('[data-bo]').addEventListener('click', () => {
+                if (it.pdf) it.pdf.destroy();
+                tlDs = tlDs.filter((x) => x !== it);
+                r.remove();
+                tlCapNhatNut();
+            });
+            $('tl-ds').appendChild(r);
+        }
+        async function tlThemFile(files) {
+            for (const file of files) {
+                if (!/\.pdf$/i.test(file.name)) continue;
+                const goc = file.name.replace(/\.pdf$/i, '').trim();
+                const khop = tlNhom.flatMap((g) => g.items).find((x) => x.folder.toLowerCase() === goc.toLowerCase());
+                const it = { file: file, folder: khop ? khop.folder : '', tuGo: !khop && tenHopLe(goc) && /\d/.test(goc) ? goc : '', xong: false };
+                tlDs.push(it);
+                tlVeHang(it);
+                tlCapNhatNut();
+                try {
+                    it.pdf = await docPdf(file);
+                    it.el.querySelector('[data-trang]').textContent = it.pdf.numPages + ' trang';
+                    tlXem(it);
+                } catch (err) {
+                    it.el.querySelector('[data-trang]').textContent = '';
+                    tlTrangThai(it, esc(/thư viện/.test(err.message) ? err.message : 'Không đọc được file PDF này.'), 'err');
+                }
+            }
+        }
+        $('tl-chon').addEventListener('change', (e) => { tlThemFile(Array.from(e.target.files)); e.target.value = ''; });
+        const tlDrop = $('tl-drop');
+        tlDrop.addEventListener('dragover', (e) => { e.preventDefault(); tlDrop.classList.add('border-teal-500', 'bg-teal-50'); });
+        tlDrop.addEventListener('dragleave', () => tlDrop.classList.remove('border-teal-500', 'bg-teal-50'));
+        tlDrop.addEventListener('drop', (e) => {
+            e.preventDefault();
+            tlDrop.classList.remove('border-teal-500', 'bg-teal-50');
+            tlThemFile(Array.from(e.dataTransfer.files));
+        });
+        $('tl-xoa').addEventListener('click', () => {
+            tlDs.forEach((it) => { if (it.pdf) it.pdf.destroy(); });
+            tlDs = [];
+            $('tl-ds').innerHTML = '';
+            tlCapNhatNut();
+        });
+        $('tl-tai').addEventListener('click', async () => {
+            const canLam = tlDs.filter((it) => !it.xong && it.pdf);
+            if (!canLam.length) { thongBao('Chưa có file PDF mới để tải lên.'); return; }
+            for (const it of canLam) {
+                const ten = tlTen(it);
+                if (!ten) { tlTrangThai(it, 'Chọn bài cho file này.', 'err'); it.el.querySelector('select').focus(); return; }
+                if (!tenHopLe(ten)) { tlTrangThai(it, 'Tên chỉ được có chữ không dấu, số và dấu gạch ngang.', 'err'); return; }
+            }
+            $('tl-tai').disabled = true;
+            for (const it of canLam) {
+                const ten = tlTen(it);
+                try {
+                    const kq = await taiPdfLenCloud(it.pdf, ten, (s) => tlTrangThai(it, esc(s)));
+                    it.xong = true;
+                    const bai = tlTimBai(ten);
+                    const xem = 'courses/xem-tai-lieu.html?folder=' + encodeURIComponent(ten) + '&title=' + encodeURIComponent(bai ? bai.title : ten);
+                    let msg = '<i class="fa-solid fa-circle-check mr-1"></i>Đã tải lên ' + kq.n + ' trang. <a class="font-semibold underline" target="_blank" rel="noopener" href="' + esc(xem) + '">Xem thử</a>';
+                    if (kq.trung) msg += '<br><span class="text-amber-700">' + kq.trung + ' trang đã có sẵn trên Cloudinary nên vẫn giữ ảnh cũ.</span>';
+                    if (!bai) msg += '<br><span class="text-gray-600">Bài này chưa có trong khóa học.</span> <button type="button" data-them-bai="' + esc(ten) + '" class="ml-1 text-primary font-semibold hover:underline"><i class="fa-solid fa-plus mr-1"></i>Thêm thành bài học</button>';
+                    tlTrangThai(it, msg, kq.trung ? '' : 'ok');
+                } catch (err) {
+                    tlTrangThai(it, esc(err.message), 'err');
+                }
+            }
+            $('tl-tai').disabled = false;
+        });
+        // Lời giải của bài mới: mở form Thêm bài học, điền sẵn mục tài liệu
+        $('tl-ds').addEventListener('click', (e) => {
+            const b = e.target.closest('[data-them-bai]');
+            if (!b) return;
+            const ten = b.getAttribute('data-them-bai');
+            const so = (ten.match(/^(10|11|12)-/) || [])[1];
+            moFormBai(null, { khoa: so ? 'toan-' + so : S.khoaBai, muc: [{ loai: 'tai-lieu', ten: LOAI_MUC['tai-lieu'].macDinh, giaTri: ten }] });
+        });
+
+        function veBaiHoc() {
+            document.querySelectorAll('#chon-khoa-bai [data-khoa]').forEach((b) => {
+                const chon = b.getAttribute('data-khoa') === S.khoaBai;
+                b.className = 'px-4 py-1.5 rounded-lg text-sm font-medium ' + (chon ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-100');
+            });
+            const ds = S.baiThem.filter((b) => b.khoa === S.khoaBai).sort((a, b) => (a.thuTu || 0) - (b.thuTu || 0));
+            if (!ds.length) {
+                $('ds-bai-them').innerHTML = '<div class="bg-white rounded-2xl border border-dashed border-gray-200 p-10 text-center text-gray-400">' +
+                    '<i class="fa-solid fa-book-medical text-3xl mb-3 block"></i>Chưa có bài học thêm nào cho ' + KHOA[S.khoaBai] + '.</div>';
+                return;
+            }
+            const nhom = new Map();
+            ds.forEach((b) => { if (!nhom.has(b.chuong)) nhom.set(b.chuong, []); nhom.get(b.chuong).push(b); });
+            $('ds-bai-them').innerHTML = Array.from(nhom.entries()).map(([chuong, dsBai]) =>
+                '<div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5"><h3 class="font-bold text-teal-800 mb-3"><i class="fa-solid fa-cube mr-2 text-teal-500"></i>' + esc(chuong) + '</h3><ul class="space-y-3">' +
+                dsBai.map((b) => '<li class="border border-gray-100 rounded-xl p-4 ' + (b.an ? 'bg-gray-50 opacity-70' : '') + '">' +
+                    '<div class="flex flex-wrap items-start justify-between gap-3"><div class="min-w-0"><div class="font-semibold text-gray-900">' + esc(b.ten) +
+                    (b.an ? ' <span class="text-xs font-medium bg-gray-200 text-gray-600 px-2 py-0.5 rounded-full ml-1">Đang ẩn</span>' : '') + '</div>' +
+                    '<div class="text-xs text-gray-400 mt-0.5">Thứ tự ' + esc(b.thuTu || 0) + '</div></div>' +
+                    '<div class="flex gap-1 shrink-0"><button type="button" data-sua-bai="' + esc(b.id) + '" class="px-3 py-1.5 rounded-lg text-sm hover:bg-gray-100"><i class="fa-solid fa-pen mr-1"></i>Sửa</button>' +
+                    '<button type="button" data-an-bai="' + esc(b.id) + '" class="px-3 py-1.5 rounded-lg text-sm hover:bg-gray-100"><i class="fa-solid ' + (b.an ? 'fa-eye' : 'fa-eye-slash') + ' mr-1"></i>' + (b.an ? 'Hiện' : 'Ẩn') + '</button>' +
+                    '<button type="button" data-xoa-bai="' + esc(b.id) + '" class="px-3 py-1.5 rounded-lg text-sm text-red-600 hover:bg-red-50"><i class="fa-solid fa-trash mr-1"></i>Xóa</button></div></div>' +
+                    '<ul class="mt-3 flex flex-wrap gap-2">' + (b.muc || []).map((m) =>
+                        '<li><a href="' + esc(linkXemThu(m, b.ten)) + '" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 text-sm bg-teal-50 text-teal-800 hover:bg-teal-100 px-3 py-1 rounded-full">' +
+                        '<i class="fa-solid ' + (m.loai === 'video' ? 'fa-circle-play' : m.loai === 'tai-lieu' ? 'fa-folder' : 'fa-link') + '"></i>' + esc(m.ten) + '</a></li>').join('') + '</ul></li>'
+                ).join('') + '</ul></div>'
+            ).join('');
+        }
+
+        $('chon-khoa-bai').addEventListener('click', (e) => {
+            const b = e.target.closest('[data-khoa]');
+            if (!b) return;
+            S.khoaBai = b.getAttribute('data-khoa');
+            veBaiHoc();
+        });
+        $('nut-them-bai').addEventListener('click', () => moFormBai(null));
+        $('ds-bai-them').addEventListener('click', async (e) => {
+            const sua = e.target.closest('[data-sua-bai]'), an = e.target.closest('[data-an-bai]'), xoa = e.target.closest('[data-xoa-bai]');
+            if (sua) moFormBai(S.baiThem.find((b) => b.id === sua.getAttribute('data-sua-bai')));
+            if (an) {
+                const b = S.baiThem.find((x) => x.id === an.getAttribute('data-an-bai'));
+                try {
+                    await db.collection('bai_hoc_them').doc(b.id).update({ an: !b.an, capNhatLuc: FV.serverTimestamp() });
+                    b.an = !b.an; veBaiHoc();
+                    thongBao(b.an ? 'Đã ẩn bài khỏi khóa học' : 'Bài đã hiện lại trong khóa học');
+                } catch (err) { thongBao('Lỗi: ' + err.message); }
+            }
+            if (xoa) {
+                const b = S.baiThem.find((x) => x.id === xoa.getAttribute('data-xoa-bai'));
+                if (!confirm('Xóa hẳn bài "' + b.ten + '"? Không thể hoàn tác (có thể chọn Ẩn thay vì Xóa).')) return;
+                try {
+                    await db.collection('bai_hoc_them').doc(b.id).delete();
+                    S.baiThem = S.baiThem.filter((x) => x.id !== b.id); veBaiHoc();
+                    thongBao('Đã xóa bài');
+                } catch (err) { thongBao('Lỗi: ' + err.message); }
+            }
+        });
+
+        function hangMuc(m) {
+            m = m || { loai: 'video', ten: LOAI_MUC.video.macDinh, giaTri: '' };
+            return '<div class="hang-muc border border-gray-100 bg-gray-50 rounded-xl p-3 space-y-2">' +
+                '<div class="flex gap-2"><select class="muc-loai flex-1 px-2 py-2 rounded-lg border border-gray-200 bg-white text-sm">' +
+                Object.keys(LOAI_MUC).map((k) => '<option value="' + k + '"' + (k === m.loai ? ' selected' : '') + '>' + LOAI_MUC[k].ten + '</option>').join('') + '</select>' +
+                '<input class="muc-ten flex-1 px-3 py-2 rounded-lg border border-gray-200 text-base" placeholder="Tên hiển thị" value="' + esc(m.ten) + '">' +
+                '<button type="button" class="muc-xoa w-9 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 shrink-0" aria-label="Bỏ mục này"><i class="fa-solid fa-xmark"></i></button></div>' +
+                '<div class="flex gap-2"><input class="muc-gia-tri flex-1 min-w-0 px-3 py-2 rounded-lg border border-gray-200 text-base" value="' + esc(m.giaTri) + '" placeholder="' + esc(LOAI_MUC[m.loai].goiY) + '">' +
+                '<label class="muc-tai shrink-0 inline-flex items-center gap-1.5 px-3 rounded-lg border border-teal-200 bg-white text-teal-700 text-sm font-medium hover:bg-teal-50 cursor-pointer whitespace-nowrap"' + (m.loai === 'tai-lieu' ? '' : ' hidden') + '>' +
+                '<i class="fa-solid fa-file-arrow-up"></i>Tải PDF lên<input type="file" accept=".pdf,application/pdf" class="muc-file sr-only"></label></div>' +
+                '<p class="muc-goi-y text-xs text-gray-400">' + esc(LOAI_MUC[m.loai].goiY) + '</p></div>';
+        }
+
+        // macDinh: điền sẵn khi thêm bài mới (vd: từ lời giải vừa tải lên) — { khoa, muc }
+        async function moFormBai(bai, macDinh) {
+            const khoa = bai ? bai.khoa : (macDinh && macDinh.khoa) || S.khoaBai;
+            const mucBanDau = bai && bai.muc && bai.muc.length ? bai.muc : (macDinh && macDinh.muc) || [null];
+            const f = moHopThoai(bai ? 'Sửa bài học' : 'Thêm bài học', '<p class="text-gray-400"><i class="fa-solid fa-circle-notch fa-spin mr-1"></i>Đang tải danh sách chương...</p>');
+            const dsChuong = await layChuong(khoa);
+            const thuTuMoi = Math.max(0, ...S.baiThem.filter((b) => b.khoa === khoa).map((b) => b.thuTu || 0)) + 10;
+            f.innerHTML =
+                '<form id="form-bai" class="space-y-4">' +
+                '<div class="grid sm:grid-cols-2 gap-4"><div><label class="block text-sm font-medium mb-1.5">Khóa học</label>' +
+                '<select id="bai-khoa" class="w-full px-3 py-2.5 rounded-xl border border-gray-200 bg-white text-sm">' +
+                Object.keys(KHOA).map((k) => '<option value="' + k + '"' + (k === khoa ? ' selected' : '') + '>' + KHOA[k] + '</option>').join('') + '</select></div>' +
+                '<div><label class="block text-sm font-medium mb-1.5" for="bai-thu-tu">Thứ tự (số nhỏ hiện trước)</label>' +
+                '<input id="bai-thu-tu" type="number" class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-base" value="' + esc(bai ? bai.thuTu || 0 : thuTuMoi) + '"></div></div>' +
+                '<div><label class="block text-sm font-medium mb-1.5" for="bai-chuong">Chương</label>' +
+                '<select id="bai-chuong" class="w-full px-3 py-2.5 rounded-xl border border-gray-200 bg-white text-sm"></select>' +
+                '<input id="bai-chuong-moi" class="w-full mt-2 px-3 py-2.5 rounded-xl border border-gray-200 text-base" placeholder="Tên chương mới, vd: Chương 9: Ôn thi THPT" hidden></div>' +
+                '<div><label class="block text-sm font-medium mb-1.5" for="bai-ten">Tên bài</label>' +
+                '<input id="bai-ten" required class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-base" placeholder="vd: Bài 6. Luyện đề tổng hợp" value="' + esc(bai ? bai.ten : '') + '"></div>' +
+                '<div><div class="flex items-center justify-between mb-1.5"><span class="text-sm font-medium">Các mục trong bài</span>' +
+                '<button type="button" id="them-muc" class="text-sm text-primary font-medium hover:underline"><i class="fa-solid fa-plus mr-1"></i>Thêm mục</button></div>' +
+                '<div id="ds-muc" class="space-y-2">' + mucBanDau.map(hangMuc).join('') + '</div></div>' +
+                '<label class="flex items-center gap-2 text-sm"><input id="bai-an" type="checkbox" class="accent-teal-600 w-4 h-4"' + (bai && bai.an ? ' checked' : '') + '> Tạm ẩn (học sinh chưa thấy)</label>' +
+                '<div id="bai-loi" class="text-sm text-red-600"></div>' +
+                '<div class="flex justify-end gap-2 pt-2"><button type="button" data-dong class="px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-100">Hủy</button>' +
+                '<button type="submit" class="bg-primary hover:bg-teal-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold">' + (bai ? 'Lưu thay đổi' : 'Thêm bài') + '</button></div></form>';
+
+            const selChuong = f.querySelector('#bai-chuong'), oChuongMoi = f.querySelector('#bai-chuong-moi');
+            async function napChuong(k, chon) {
+                const ds = await layChuong(k);
+                selChuong.innerHTML = ds.map((c) => '<option' + (c === chon ? ' selected' : '') + '>' + esc(c) + '</option>').join('') + '<option value="__moi__">+ Chương mới...</option>';
+                if (!ds.length) selChuong.value = '__moi__';
+                oChuongMoi.hidden = selChuong.value !== '__moi__';
+            }
+            await napChuong(khoa, bai ? bai.chuong : dsChuong[dsChuong.length - 1]);
+            selChuong.addEventListener('change', () => { oChuongMoi.hidden = selChuong.value !== '__moi__'; if (!oChuongMoi.hidden) oChuongMoi.focus(); });
+            f.querySelector('#bai-khoa').addEventListener('change', (e) => napChuong(e.target.value));
+
+            const dsMuc = f.querySelector('#ds-muc');
+            f.querySelector('#them-muc').addEventListener('click', () => dsMuc.insertAdjacentHTML('beforeend', hangMuc({ loai: 'tai-lieu', ten: LOAI_MUC['tai-lieu'].macDinh, giaTri: '' })));
+            dsMuc.addEventListener('click', (e) => { if (e.target.closest('.muc-xoa')) e.target.closest('.hang-muc').remove(); });
+            dsMuc.addEventListener('change', (e) => {
+                if (e.target.classList.contains('muc-file')) { taiPdfChoMuc(e.target); return; }
+                if (!e.target.classList.contains('muc-loai')) return;
+                const hang = e.target.closest('.hang-muc'), loai = LOAI_MUC[e.target.value];
+                const ten = hang.querySelector('.muc-ten');
+                if (Object.values(LOAI_MUC).some((l) => l.macDinh === ten.value) || !ten.value) ten.value = loai.macDinh;
+                hang.querySelector('.muc-gia-tri').placeholder = loai.goiY;
+                hang.querySelector('.muc-goi-y').className = 'muc-goi-y text-xs text-gray-400';
+                hang.querySelector('.muc-goi-y').textContent = loai.goiY;
+                hang.querySelector('.muc-tai').hidden = e.target.value !== 'tai-lieu';
+            });
+
+            // Tải PDF ngay trong mục tài liệu: dùng tên đã gõ, nếu trống thì tự đặt theo khóa + tên bài
+            async function taiPdfChoMuc(input) {
+                const file = input.files[0];
+                input.value = '';
+                if (!file) return;
+                const hang = input.closest('.hang-muc'), oGiaTri = hang.querySelector('.muc-gia-tri');
+                const goiY = hang.querySelector('.muc-goi-y'), nut = hang.querySelector('.muc-tai');
+                const hien = (html, lop) => { goiY.className = 'muc-goi-y text-xs ' + (lop || 'text-gray-500'); goiY.innerHTML = html; };
+                let ten = oGiaTri.value.trim();
+                if (!tenHopLe(ten)) {
+                    const tenBai = f.querySelector('#bai-ten').value.trim();
+                    if (!tenBai) { hien('Nhập tên bài trước để tự đặt tên thư mục, hoặc tự gõ tên thư mục vào ô bên trái.', 'text-red-600'); return; }
+                    ten = f.querySelector('#bai-khoa').value.replace('toan-', '') + '-' + khongDau(tenBai) + '-Loigiai';
+                }
+                nut.classList.add('pointer-events-none', 'opacity-50');
+                try {
+                    hien('Đang đọc PDF…');
+                    const pdf = await docPdf(file);
+                    const kq = await taiPdfLenCloud(pdf, ten, (s) => hien(esc(s)));
+                    pdf.destroy();
+                    oGiaTri.value = ten;
+                    hien('<i class="fa-solid fa-circle-check mr-1"></i>Đã tải lên ' + kq.n + ' trang vào thư mục ' + esc(ten) +
+                        (kq.trung ? ' (' + kq.trung + ' trang đã có sẵn nên giữ ảnh cũ)' : '') + '.', 'text-emerald-700');
+                } catch (err) {
+                    hien(esc(err.message), 'text-red-600');
+                }
+                nut.classList.remove('pointer-events-none', 'opacity-50');
+            }
+
+            f.querySelector('#form-bai').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const loiEl = f.querySelector('#bai-loi');
+                const chuong = selChuong.value === '__moi__' ? oChuongMoi.value.trim() : selChuong.value;
+                const ten = f.querySelector('#bai-ten').value.trim();
+                const muc = [];
+                let loi = '';
+                dsMuc.querySelectorAll('.hang-muc').forEach((h, i) => {
+                    const loai = h.querySelector('.muc-loai').value;
+                    const giaTri = chuanHoaMuc(loai, h.querySelector('.muc-gia-tri').value);
+                    if (!giaTri) { loi = loi || 'Mục thứ ' + (i + 1) + ' chưa đúng: ' + LOAI_MUC[loai].goiY; return; }
+                    muc.push({ loai: loai, ten: h.querySelector('.muc-ten').value.trim() || LOAI_MUC[loai].macDinh, giaTri: giaTri });
+                });
+                if (!chuong) loi = 'Chưa nhập tên chương.';
+                if (!muc.length) loi = loi || 'Bài cần ít nhất một mục (video, tài liệu hoặc link).';
+                if (loi) { loiEl.textContent = loi; return; }
+                const duLieu = {
+                    khoa: f.querySelector('#bai-khoa').value, chuong: chuong, ten: ten,
+                    thuTu: Number(f.querySelector('#bai-thu-tu').value) || 0, muc: muc,
+                    an: f.querySelector('#bai-an').checked, capNhatLuc: FV.serverTimestamp()
+                };
+                const nut = f.querySelector('button[type="submit"]');
+                nut.disabled = true;
+                try {
+                    if (bai) await db.collection('bai_hoc_them').doc(bai.id).update(duLieu);
+                    else { duLieu.taoLuc = FV.serverTimestamp(); await db.collection('bai_hoc_them').add(duLieu); }
+                    S.chuong = {};
+                    S.khoaBai = duLieu.khoa;
+                    dongHopThoai();
+                    thongBao(bai ? 'Đã lưu bài học' : 'Đã thêm bài vào ' + KHOA[duLieu.khoa]);
+                    await taiDuLieu();
+                } catch (err) {
+                    loiEl.textContent = 'Không lưu được: ' + err.message;
+                    nut.disabled = false;
+                }
+            });
+        }
+
+        // ---------- TAB KIỂM TRA ----------
+        $('chon-bai-kt').innerHTML = BAI_KIEM_TRA.map((b) => '<option value="' + b.id + '">' + esc(b.ten) + '</option>').join('');
+        $('chon-bai-kt').addEventListener('change', veKiemTra);
+        function veKiemTra() {
+            const id = $('chon-bai-kt').value;
+            const ds = (S.bxh[id] || []).filter((r) => Number.isFinite(r.diem))
+                .sort((a, b) => b.diem - a.diem || (a.thoiGian || 0) - (b.thoiGian || 0));
+            const tb = ds.length ? ds.reduce((s, r) => s + r.diem / (r.tong || 1), 0) / ds.length : 0;
+            $('tom-tat-kt').textContent = ds.length ? ds.length + ' học sinh đã làm · điểm tốt nhất trung bình ' + Math.round(tb * 100) + '%' : '';
+            $('bang-kt').innerHTML = ds.length ? ds.map((r, i) => {
+                const hs = S.theoUid.get(r.uid);
+                const lichSu = Array.isArray(r.lichSu) ? r.lichSu.slice().reverse() : [];
+                return '<tr class="co-the-bam" data-mo-ls="' + i + '"><td class="text-gray-400 so">' + (i + 1) + '</td>' +
+                    '<td><div class="font-medium text-gray-900">' + esc(r.ten || 'Không tên') + '</div><div class="text-xs text-gray-400">' + esc(hs ? hs.email : 'Chưa vào khóa học nào') + '</div></td>' +
+                    '<td class="text-right so font-semibold">' + esc(r.diem) + '/' + esc(r.tong) + '</td>' +
+                    '<td class="text-right so">' + phutGiay(r.thoiGian) + '</td>' +
+                    '<td class="text-right so">' + esc(r.soLan || 0) + '</td>' +
+                    '<td class="text-right so">' + (Number(r.viPham) > 0 ? '<span class="text-red-700 font-medium"><i class="fa-solid fa-triangle-exclamation mr-1"></i>' + esc(r.viPham) + '</span>' : '0') + '</td>' +
+                    '<td class="text-gray-500 whitespace-nowrap">' + truocDay(thanhDate(r.lanCuoi)) + '</td></tr>' +
+                    '<tr data-ls="' + i + '" hidden><td></td><td colspan="6" class="bg-gray-50"><ul class="text-sm space-y-1">' +
+                    (lichSu.length ? lichSu.map((l) => '<li class="flex gap-4 so"><span class="text-gray-400 w-[130px]">' + ngayGio(thanhDate(l.luc)) + '</span><span>' + esc(l.diem) + '/' + esc(l.tong) + '</span><span>' + phutGiay(l.thoiGian) + '</span>' +
+                        (Number(l.viPham) > 0 ? '<span class="text-red-700">' + esc(l.viPham) + ' vi phạm</span>' : '') + '</li>').join('') : '<li class="text-gray-400">Không có lịch sử.</li>') +
+                    '</ul></td></tr>';
+            }).join('') : '<tr><td colspan="7" class="text-center text-gray-400 py-10">Chưa có ai làm bài này.</td></tr>';
+        }
+        $('bang-kt').addEventListener('click', (e) => {
+            const r = e.target.closest('[data-mo-ls]');
+            if (!r) return;
+            const ls = $('bang-kt').querySelector('[data-ls="' + r.getAttribute('data-mo-ls') + '"]');
+            ls.hidden = !ls.hidden;
+        });
+
+        // ---------- Tab & khởi động ----------
+        function chonTab(ten) {
+            document.querySelectorAll('.tab-btn').forEach((b) => b.setAttribute('aria-selected', String(b.getAttribute('data-tab') === ten)));
+            document.querySelectorAll('[data-panel]').forEach((p) => { p.hidden = p.id !== 'tab-' + ten; });
+            try { sessionStorage.setItem('dfm-admin-tab', ten); } catch (e) {}
+        }
+        $('thanh-tab').addEventListener('click', (e) => { const b = e.target.closest('.tab-btn'); if (b) chonTab(b.getAttribute('data-tab')); });
+        $('nut-tai-lai').addEventListener('click', async () => { S.chuong = {}; S.trangKhoa = {}; await taiDuLieu(); thongBao('Đã tải lại dữ liệu'); });
+
+        firebase.auth().onAuthStateChanged(async (user) => {
+            if (!user) { window.location.replace('login.html'); return; }
+            if (user.email !== ADMIN_EMAIL) {
+                $('trang-thai').innerHTML = '<i class="fa-solid fa-lock text-4xl text-gray-300"></i><p class="mt-4 font-medium text-gray-700">Trang này chỉ dành cho quản trị viên.</p>' +
+                    '<a href="index.html" class="inline-block mt-6 bg-primary text-white px-5 py-2.5 rounded-full font-medium">Về trang chủ</a>';
+                return;
+            }
+            $('trang-thai').innerHTML = '<i class="fa-solid fa-circle-notch fa-spin text-3xl text-primary"></i><p class="mt-4">Đang tải dữ liệu học sinh...</p>';
+            await taiDuLieu();
+            $('trang-thai').hidden = true;
+            $('thanh-tab').hidden = false;
+            let tab = 'tong-quan';
+            try { tab = sessionStorage.getItem('dfm-admin-tab') || tab; } catch (e) {}
+            chonTab(tab);
+        });
+    })();
+    </script>
+</body>
+</html>
