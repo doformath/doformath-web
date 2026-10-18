@@ -4,7 +4,7 @@
 // - Firebase (đăng nhập, Firestore), YouTube, Cloudinary... không bị can thiệp.
 // Khi đổi danh sách PRECACHE hoặc logic trong file này, tăng VERSION để xoá cache cũ.
 
-const VERSION = 'v3';
+const VERSION = 'v7';
 const PAGE_CACHE = `doformath-pages-${VERSION}`;
 const ASSET_CACHE = `doformath-assets-${VERSION}`;
 const OFFLINE_URL = 'offline.html';
@@ -23,7 +23,6 @@ const PRECACHE = [
 
 // Thư viện ngoài được phép lưu cache (đều là file tĩnh có phiên bản cố định)
 const CDN_RULES = [
-  (u) => u.hostname === 'cdn.tailwindcss.com',
   (u) => u.hostname === 'cdn.jsdelivr.net',
   (u) => u.hostname === 'cdnjs.cloudflare.com',
   (u) => u.hostname === 'fonts.googleapis.com',

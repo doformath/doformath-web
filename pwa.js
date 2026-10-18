@@ -27,6 +27,7 @@
     function showBanner(message, actionLabel, onAction) {
         if (wasDismissed() || document.getElementById('dfm-install')) return;
 
+        const toi = document.documentElement.classList.contains('dark');   // giao diện tối (dfm-giao-dien.js)
         const box = document.createElement('div');
         box.id = 'dfm-install';
         box.setAttribute('role', 'dialog');
@@ -34,8 +35,8 @@
         box.style.cssText = [
             'position:fixed', 'right:16px', 'bottom:16px', 'z-index:9999',
             'max-width:min(340px, calc(100vw - 32px))', 'display:flex', 'align-items:center', 'gap:12px',
-            'padding:12px 14px', 'background:#fff', 'color:#1f2937', 'border-radius:16px',
-            'box-shadow:0 10px 30px rgba(0,0,0,.15)', 'border:1px solid #ccfbf1',
+            'padding:12px 14px', 'background:' + (toi ? '#1e293b' : '#fff'), 'color:' + (toi ? '#e2e8f0' : '#1f2937'), 'border-radius:16px',
+            'box-shadow:0 10px 30px rgba(0,0,0,' + (toi ? '.45' : '.15') + ')', 'border:1px solid ' + (toi ? '#334155' : '#ccfbf1'),
             'font:500 14px/1.4 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif'
         ].join(';');
 

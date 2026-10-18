@@ -6,6 +6,13 @@
     <title>Mất kết nối | DoforMath</title>
     <meta name="theme-color" content="#0d9488">
     <link rel="icon" type="image/png" href="assets/icons/favicon-32.png">
+    <!-- Giao diện tối giống cả site (trang này phải chạy khi mất mạng nên viết gọn tại chỗ) -->
+    <script>
+        try {
+            var chon = localStorage.getItem('dfm-giao-dien');
+            if (chon === 'toi' || (!chon && matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.classList.add('dark');
+        } catch (e) {}
+    </script>
     <style>
         * { box-sizing: border-box; }
         body {
@@ -42,6 +49,11 @@
         }
         button { background: #0d9488; color: #fff; }
         a { background: #f0fdfa; color: #0d9488; }
+        .dark body { background: #0f172a; color: #e2e8f0; }
+        .dark .card { background: #1e293b; box-shadow: 0 10px 30px rgba(0, 0, 0, .4); }
+        .dark h1 { color: #2dd4bf; }
+        .dark p { color: #94a3b8; }
+        .dark a { background: #1a3640; color: #5eead4; }
     </style>
 </head>
 <body>

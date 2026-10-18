@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Làm bài thi - DoforMath</title>
+    <!-- Trang làm bài dùng chung cho mọi đề tải lên từ trang Quản trị: exam/lam-bai.html?de=<mã đề> -->
+
+    <!-- Giao diện sáng / tối: chạy trước CSS để không bị nháy màu -->
+    <script src="../assets/js/dfm-giao-dien.js"></script>
+    <!-- CSS Tailwind dựng sẵn cho cả site (sửa class xong chạy: npm run build:css) -->
+    <link rel="stylesheet" href="../assets/css/tailwind.css?v=08097a6e">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <!-- Font cho chữ trong hình TikZ đã vẽ sẵn (SVG) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@rod2ik/tikzjax@1.6.0/dist/fonts.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <style>
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        [x-cloak] { display: none !important; }
+    </style>
+    <!-- PWA: cho phép cài DoforMath như ứng dụng -->
+    <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+    <link rel="manifest" href="../manifest.webmanifest">
+    <meta name="theme-color" content="#0d9488">
+    <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="DoforMath">
+    <script defer src="../pwa.js"></script>
+</head>
+<body class="bg-[#EAF4F8] text-slate-800 antialiased font-sans min-h-screen flex flex-col" x-data="lamBai()">
+    <!-- Không cần x-init: Alpine tự gọi init() của component (gọi thêm sẽ chạy 2 lần) -->
+
+    <!-- HEADER DOFORMATH -->
+    <header class="fixed top-0 right-0 left-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200/60 h-14 shadow-sm">
+        <div class="flex items-center justify-between h-full px-4 lg:px-6 max-w-7xl mx-auto">
+            <a href="../phong-thi.html" class="flex items-center text-gray-500 hover:text-primary font-medium gap-2 transition">
+                <i class="fa-solid fa-arrow-left"></i> Thoát
+            </a>
+            <a href="../index.html" class="hover:opacity-80 transition-opacity">
+                <span class="text-xl tracking-tight text-slate-900 font-bold">
+                    $\textcolor{#0d9488}{\textsf{\textbf{Dofor}}{\sum}\textsf{\textbf{ath}}}$
+                </span>
+            </a>
+            <button type="button" data-doi-giao-dien aria-label="Đổi giao diện sáng / tối" class="w-9 h-9 rounded-full flex items-center justify-center text-gray-500 hover:text-primary hover:bg-gray-100 transition-colors shrink-0"><span class="dark:hidden"><i class="fa-solid fa-moon"></i></span><span class="hidden dark:inline"><i class="fa-solid fa-sun text-amber-300"></i></span></button>
+        </div>
+    </header>
+
+    <main class="flex-1 pt-14 relative">
+
+        <!-- ĐANG TẢI / LỖI -->
+        <div x-show="phase === 'dang-tai' || phase === 'loi'" class="max-w-xl mx-auto px-4 py-24 text-center">
+            <template x-if="phase === 'dang-tai'">
+                <div class="text-slate-500"><i class="fa-solid fa-circle-notch fa-spin text-3xl text-primary"></i><p class="mt-4">Đang tải đề thi...</p></div>
+            </template>
+            <template x-if="phase === 'loi'">
+                <div class="bg-white rounded-2xl border border-slate-200 p-8">
+                    <i class="fa-solid fa-triangle-exclamation text-4xl text-amber-500"></i>
+                    <p class="mt-4 font-semibold text-slate-800" x-text="loi"></p>
+                    <a href="../phong-thi.html" class="inline-block mt-6 px-6 py-2.5 rounded-full bg-primary text-white font-semibold">Về Phòng thi</a>
+                </div>
+            </template>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- MÀN HÌNH 1: GIỚI THIỆU (INTRO)             -->
+        <!-- ========================================== -->
+        <div class="max-w-3xl mx-auto px-4 py-8" x-show="phase === 'intro'" x-cloak x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0">
+            <nav class="flex items-center gap-1.5 text-sm text-slate-500 mb-6">
+                <span class="font-semibold">Phòng thi thử</span>
+                <i class="fa-solid fa-chevron-right text-[9px]"></i>
+                <span class="text-slate-700 font-bold">Bài kiểm tra</span>
+            </nav>
+
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="bg-gradient-to-r from-teal-500 to-emerald-500 px-5 sm:px-8 py-7 sm:py-10 text-center text-white">
+                    <div class="w-16 h-16 rounded-2xl bg-white/20 flex items-center justify-center mx-auto mb-4 backdrop-blur-sm">
+                        <i class="fa-solid fa-clipboard-check text-3xl"></i>
+                    </div>
+                    <h1 class="text-2xl font-extrabold mb-2" x-text="quiz.title"></h1>
+                    <p class="text-teal-50 text-sm" x-text="quiz.description"></p>
+                </div>
+
+                <div class="grid grid-cols-3 divide-x divide-slate-100 border-b border-slate-100">
+                    <div class="flex flex-col items-center py-5 gap-1">
+                        <i class="fa-solid fa-circle-question text-teal-500 text-xl"></i>
+                        <span class="text-2xl font-extrabold text-slate-800" x-text="questions.length"></span>
+                        <span class="text-xs text-slate-500">Câu hỏi</span>
+                    </div>
+                    <div class="flex flex-col items-center py-5 gap-1">
+                        <i class="fa-regular fa-clock text-amber-500 text-xl"></i>
+                        <span class="text-2xl font-extrabold text-slate-800" x-text="quiz.time_limit + ' phút'"></span>
+                        <span class="text-xs text-slate-500">Thời gian</span>
+                    </div>
+                    <div class="flex flex-col items-center py-5 gap-1">
+                        <i class="fa-solid fa-trophy text-blue-500 text-xl"></i>
+                        <span class="text-2xl font-extrabold text-slate-800">10</span>
+                        <span class="text-xs text-slate-500">Thang điểm</span>
+                    </div>
+                </div>
+
+                <div class="px-4 sm:px-8 py-4 sm:py-5">
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Cấu trúc đề</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span x-show="sectionI.length" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-50 text-blue-600 text-xs font-semibold">
+                            <i class="fa-solid fa-list-check"></i> Trắc nghiệm (Phần I) · <span x-text="sectionI.length"></span> câu
+                        </span>
+                        <span x-show="sectionII.length" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-violet-50 text-violet-600 text-xs font-semibold">
+                            <i class="fa-solid fa-toggle-on"></i> Đúng/Sai (Phần II) · <span x-text="sectionII.length"></span> câu
+                        </span>
+                        <span x-show="sectionIII.length" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-50 text-amber-600 text-xs font-semibold">
+                            <i class="fa-solid fa-pen-to-square"></i> Điền số (Phần III) · <span x-text="sectionIII.length"></span> câu
+                        </span>
+                    </div>
+                    <ul class="mt-4 text-sm text-slate-500 space-y-1.5">
+                        <li><i class="fa-solid fa-circle-info text-teal-500 mr-1.5"></i>Mỗi học sinh chỉ được nộp bài <b class="text-slate-700">một lần</b>. Hết giờ bài sẽ tự nộp.</li>
+                        <li><i class="fa-solid fa-floppy-disk text-teal-500 mr-1.5"></i>Bài làm được lưu tạm trên máy: lỡ tải lại trang vẫn làm tiếp được, đồng hồ vẫn chạy.</li>
+                        <li><i class="fa-solid fa-eye text-teal-500 mr-1.5"></i>Số lần rời khỏi trang trong lúc làm bài sẽ được ghi lại.</li>
+                    </ul>
+                </div>
+
+                <div class="px-4 sm:px-8 pb-6 sm:pb-8 flex flex-col gap-3">
+                    <button @click="start()" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-bold text-lg shadow-lg shadow-teal-500/25 hover:scale-[1.02] transition-all flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-play"></i> <span x-text="coBaiDangLam ? 'Tiếp tục làm bài' : 'Bắt đầu làm bài'"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- MÀN HÌNH 2: GIAO DIỆN THI (PLAYING)        -->
+        <!-- ========================================== -->
+        <div class="max-w-6xl mx-auto px-3 sm:px-4 py-4 sm:py-8" x-show="phase === 'playing'" x-cloak x-transition>
+
+            <!-- Cảnh báo rời trang -->
+            <div x-show="canhBaoRoiTrang" x-transition class="mb-3 bg-amber-50 border border-amber-200 text-amber-800 rounded-2xl px-4 py-2.5 text-sm flex items-center gap-2">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <span>Bạn vừa rời khỏi trang làm bài (<b x-text="viPham"></b> lần). Số lần này sẽ được ghi vào kết quả.</span>
+                <button @click="canhBaoRoiTrang = false" class="ml-auto text-amber-700"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <!-- THANH TOP BAR (ĐỒNG HỒ) -->
+            <div class="mb-4 sm:mb-6 space-y-2 relative z-20">
+                <div class="bg-white/90 backdrop-blur-md border border-slate-200 rounded-2xl px-3 sm:px-5 py-2.5 flex items-center justify-between gap-2 shadow-sm">
+                    <span class="text-xs sm:text-sm font-bold text-slate-700 truncate" x-text="quiz.title"></span>
+                    <div class="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
+                        <span class="text-xs text-slate-500 whitespace-nowrap">
+                            <span class="font-bold text-slate-800" x-text="answeredCount"></span>/<span x-text="totalCommands"></span> đã làm
+                        </span>
+                        <div class="flex items-center rounded-xl border border-slate-200 overflow-hidden text-[10px] font-black">
+                            <button @click="clockDisplayMode = 'clock_timeline'" class="px-2 py-1.5 transition-colors" :class="clockDisplayMode === 'clock_timeline' ? 'bg-teal-500 text-white' : 'text-slate-500 hover:bg-slate-100'"><i class="fa-regular fa-clock"></i></button>
+                            <button @click="clockDisplayMode = 'countdown_timeline'" class="px-2 py-1.5 border-l border-slate-200 transition-colors" :class="clockDisplayMode === 'countdown_timeline' ? 'bg-violet-500 text-white' : 'text-slate-500 hover:bg-slate-100'"><i class="fa-solid fa-hourglass-half"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ĐỒNG HỒ CHI TIẾT -->
+                <div class="bg-white/95 backdrop-blur-md border border-slate-200 rounded-2xl shadow-sm overflow-hidden px-4 pt-3 pb-2">
+                    <div class="flex items-center gap-4 mb-3">
+                        <div x-show="clockDisplayMode === 'clock_timeline' && analogClockFace === 'analog'" class="flex-shrink-0">
+                            <div class="relative w-16 h-16">
+                                <svg viewBox="0 0 100 100" class="w-full h-full">
+                                    <circle cx="50" cy="50" r="46" fill="none" stroke="currentColor" stroke-width="3" class="text-slate-300"/>
+                                    <text x="68.0" y="19.5" text-anchor="middle" font-size="8" font-weight="bold" class="fill-slate-500">1</text>
+                                    <text x="81.1" y="39.5" text-anchor="middle" font-size="8" font-weight="bold" class="fill-slate-500">2</text>
+                                    <text x="86.0" y="53.5" text-anchor="middle" font-size="8" font-weight="bold" class="fill-slate-500">3</text>
+                                    <text x="81.1" y="67.5" text-anchor="middle" font-size="8" font-weight="bold" class="fill-slate-500">4</text>
+                                    <text x="68.0" y="84.5" text-anchor="middle" font-size="8" font-weight="bold" class="fill-slate-500">5</text>
+                                    <text x="50.0" y="89.5" text-anchor="middle" font-size="8" font-weight="bold" class="fill-slate-500">6</text>
+                                    <text x="32.0" y="84.5" text-anchor="middle" font-size="8" font-weight="bold" class="fill-slate-500">7</text>
+                                    <text x="18.9" y="67.5" text-anchor="middle" font-size="8" font-weight="bold" class="fill-slate-500">8</text>
+                                    <text x="14.0" y="53.5" text-anchor="middle" font-size="8" font-weight="bold" class="fill-slate-500">9</text>
+                                    <text x="18.9" y="39.5" text-anchor="middle" font-size="8" font-weight="bold" class="fill-slate-500">10</text>
+                                    <text x="32.0" y="19.5" text-anchor="middle" font-size="8" font-weight="bold" class="fill-slate-500">11</text>
+                                    <text x="50.0" y="16.5" text-anchor="middle" font-size="8" font-weight="bold" class="fill-slate-500">12</text>
+                                    <line x1="50" y1="50" :x2="50 + 22 * Math.sin(analogHourDeg * Math.PI / 180)" :y2="50 - 22 * Math.cos(analogHourDeg * Math.PI / 180)" stroke="currentColor" stroke-width="4" stroke-linecap="round" class="text-slate-800"/>
+                                    <line x1="50" y1="50" :x2="50 + 30 * Math.sin(analogMinDeg * Math.PI / 180)" :y2="50 - 30 * Math.cos(analogMinDeg * Math.PI / 180)" stroke="currentColor" stroke-width="3" stroke-linecap="round" class="text-slate-700"/>
+                                    <line x1="50" y1="50" :x2="50 + 34 * Math.sin(analogSecDeg * Math.PI / 180)" :y2="50 - 34 * Math.cos(analogSecDeg * Math.PI / 180)" stroke="#ef4444" stroke-width="1.5" stroke-linecap="round"/>
+                                    <circle cx="50" cy="50" r="3" class="fill-slate-800"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="flex-shrink-0">
+                            <div x-show="clockDisplayMode === 'clock_timeline'">
+                                <div class="font-mono font-black text-2xl tracking-widest text-slate-800" x-text="realClockStr"></div>
+                                <div class="text-[10px] text-slate-400 mt-0.5">Giờ thực tế</div>
+                            </div>
+                            <div x-show="clockDisplayMode === 'countdown_timeline'">
+                                <div class="font-mono font-black text-2xl tracking-widest" :class="timeLeft <= 300 ? 'text-red-500 animate-pulse' : 'text-slate-800'" x-text="formattedTime()"></div>
+                                <div class="text-[10px] text-slate-400 mt-0.5">Thời gian còn lại</div>
+                            </div>
+                        </div>
+                        <div x-show="clockDisplayMode === 'clock_timeline'" class="ml-auto flex-shrink-0 flex flex-col gap-1">
+                            <button @click="analogClockFace = 'analog'" class="text-[10px] font-bold px-2 py-1 rounded-lg transition" :class="analogClockFace === 'analog' ? 'bg-teal-500 text-white' : 'bg-slate-100 text-slate-500'">Kim</button>
+                            <button @click="analogClockFace = 'digital'" class="text-[10px] font-bold px-2 py-1 rounded-lg transition" :class="analogClockFace === 'digital' ? 'bg-teal-500 text-white' : 'bg-slate-100 text-slate-500'">Số</button>
+                        </div>
+                    </div>
+                    <div class="relative pt-6 pb-7">
+                        <span class="absolute left-0 top-0 text-[10px] font-bold text-slate-500">Bắt đầu</span>
+                        <span class="absolute right-3 top-0 text-[10px] font-bold text-slate-500">Kết thúc</span>
+                        <div class="relative h-2 bg-slate-100 rounded-full">
+                            <div class="absolute left-0 top-0 bg-gradient-to-r from-blue-400 to-teal-400 rounded-full" :style="{ width: timelineProgress + '%', height: '100%', transition: 'width 1s linear' }"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid lg:grid-cols-[1fr_400px] gap-5">
+
+                <!-- CỘT TRÁI: DANH SÁCH CÂU HỎI -->
+                <div class="min-w-0">
+                    <div id="ds-cau-hoi" class="space-y-5 pb-20">
+                        <template x-for="q in questions" :key="q.id">
+                            <div>
+                                <!-- Tiêu đề phần -->
+                                <template x-if="q.dauPhan">
+                                    <div class="mb-4 mt-2 flex items-center gap-3">
+                                        <span class="text-xs font-black uppercase tracking-wider px-3 py-1.5 rounded-full"
+                                              :class="{'bg-blue-100 text-blue-700': q.loai === 'mc', 'bg-violet-100 text-violet-700': q.loai === 'tf', 'bg-amber-100 text-amber-700': q.loai === 'sa'}"
+                                              x-text="'Phần ' + q.phan"></span>
+                                        <span class="text-sm font-bold text-slate-600" x-text="tenPhan[q.loai]"></span>
+                                        <span class="flex-1 h-px bg-slate-200"></span>
+                                    </div>
+                                </template>
+
+                                <div :id="'cau-' + q.id" class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden scroll-mt-28">
+                                    <div class="flex items-start gap-3 px-5 pt-5 pb-3">
+                                        <span class="flex-shrink-0 w-7 h-7 rounded-full text-xs font-extrabold flex items-center justify-center"
+                                              :class="{'bg-blue-100 text-blue-600': q.loai === 'mc', 'bg-violet-100 text-violet-600': q.loai === 'tf', 'bg-amber-100 text-amber-600': q.loai === 'sa'}"
+                                              x-text="q.so"></span>
+                                        <div class="flex-1 min-w-0">
+                                            <div class="flex items-center gap-2 mb-2">
+                                                <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full"
+                                                      :class="{'text-blue-500 bg-blue-50': q.loai === 'mc', 'text-violet-500 bg-violet-50': q.loai === 'tf', 'text-amber-500 bg-amber-50': q.loai === 'sa'}"
+                                                      x-text="q.loai === 'mc' ? 'Trắc nghiệm' : q.loai === 'tf' ? 'Đúng/Sai' : 'Điền số'"></span>
+                                                <span class="text-[11px] text-slate-400" x-text="q.loai === 'mc' ? '0,25 điểm' : q.loai === 'tf' ? 'Tối đa 1 điểm' : '0,5 điểm'"></span>
+                                            </div>
+                                            <div class="dfm-noi-dung text-sm font-normal text-slate-800 leading-relaxed max-w-none" x-html="q.noiDung"></div>
+                                        </div>
+                                    </div>
+
+                                    <div class="px-5 pb-5">
+                                        <!-- Phần I: Trắc nghiệm -->
+                                        <template x-if="q.loai === 'mc'">
+                                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-1">
+                                                <template x-for="opt in q.luaChon" :key="opt.key">
+                                                    <button @click="setAnswer(q.id, opt.key)"
+                                                            class="flex items-center gap-3 px-4 py-3 rounded-xl border text-sm font-medium text-left transition-all"
+                                                            :class="getAnswer(q.id) === opt.key ? 'border-blue-400 bg-blue-50 text-blue-700 ring-2 ring-blue-400/40' : 'border-slate-200 hover:border-blue-300 hover:bg-blue-50/50 text-slate-700'">
+                                                        <span class="w-6 h-6 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-extrabold"
+                                                              :class="getAnswer(q.id) === opt.key ? 'bg-blue-500 text-white' : 'bg-slate-100 text-slate-500'"
+                                                              x-text="opt.key"></span>
+                                                        <span class="dfm-noi-dung min-w-0" x-html="opt.html"></span>
+                                                    </button>
+                                                </template>
+                                            </div>
+                                        </template>
+
+                                        <!-- Phần II: Đúng/Sai -->
+                                        <template x-if="q.loai === 'tf'">
+                                            <div class="mt-2 space-y-2">
+                                                <div class="flex items-center gap-2 pb-1 border-b border-slate-100">
+                                                    <span class="flex-1 text-xs font-bold text-slate-400 uppercase tracking-wide">Phát biểu</span>
+                                                    <span class="w-16 sm:w-20 text-center text-xs font-bold text-emerald-500 uppercase">Đúng</span>
+                                                    <span class="w-16 sm:w-20 text-center text-xs font-bold text-red-400 uppercase">Sai</span>
+                                                </div>
+                                                <template x-for="(opt, i) in q.luaChon" :key="opt.key">
+                                                    <div class="flex items-center gap-2 py-1.5 px-1 rounded-lg hover:bg-slate-50 transition">
+                                                        <span class="flex-1 min-w-0 text-sm text-slate-700 leading-snug">
+                                                            <span class="font-bold text-slate-500" x-text="opt.key + ')'"></span>
+                                                            <span class="dfm-noi-dung" x-html="opt.html"></span>
+                                                        </span>
+                                                        <button @click="tfSet(q.id, i, true)" class="w-16 sm:w-20 py-2 rounded-lg border-2 text-sm font-extrabold transition-all shrink-0" :class="tfGet(q.id, i) === true ? 'bg-emerald-500 border-emerald-500 text-white shadow-md scale-105' : 'border-slate-200 text-slate-500 hover:border-emerald-400 hover:text-emerald-500'">Đ</button>
+                                                        <button @click="tfSet(q.id, i, false)" class="w-16 sm:w-20 py-2 rounded-lg border-2 text-sm font-extrabold transition-all shrink-0" :class="tfGet(q.id, i) === false ? 'bg-red-500 border-red-500 text-white shadow-md scale-105' : 'border-slate-200 text-slate-500 hover:border-red-400 hover:text-red-500'">S</button>
+                                                    </div>
+                                                </template>
+                                            </div>
+                                        </template>
+
+                                        <!-- Phần III: Điền số (bàn phím tô ô như phiếu thật) -->
+                                        <template x-if="q.loai === 'sa'">
+                                            <div class="mt-2 space-y-1.5">
+                                                <div class="rounded-xl border-2 overflow-hidden transition-all" :class="openFill === q.id ? 'border-amber-300 shadow-md' : 'border-slate-200'">
+                                                    <div class="flex items-center gap-2 px-2 py-2 cursor-pointer select-none bg-slate-50" @click="openFill = (openFill === q.id ? null : q.id)">
+                                                        <span class="text-[10px] font-black flex-shrink-0 w-8 text-center text-amber-600">BẤM VÀO</span>
+                                                        <div class="flex gap-0.5 flex-1">
+                                                            <template x-for="ci in [0,1,2,3]" :key="ci">
+                                                                <div class="flex-1 h-8 rounded border flex items-center justify-center text-sm font-mono font-black transition-all"
+                                                                     :class="ci < (getAnswer(q.id) || '').length ? 'border-amber-400 bg-amber-100 text-amber-700' : 'border-slate-300 bg-white text-slate-300'"
+                                                                     x-text="(getAnswer(q.id) || '')[ci] || '_'"></div>
+                                                            </template>
+                                                        </div>
+                                                        <button x-show="getAnswer(q.id)" @click.stop="setAnswer(q.id, '')" class="w-6 h-6 rounded-full bg-red-100 text-red-500 flex items-center justify-center hover:bg-red-200 transition shrink-0"><i class="fa-solid fa-xmark text-xs"></i></button>
+                                                    </div>
+                                                    <div x-show="openFill === q.id" x-transition class="border-t border-amber-100 bg-white px-2 pt-2 pb-3">
+                                                        <div class="flex items-center gap-1.5 mb-1.5">
+                                                            <span class="w-7 text-right text-sm font-mono font-black text-slate-700 flex-shrink-0">-</span>
+                                                            <div class="flex gap-1.5">
+                                                                <button @click="fnSetChar(q.id, 0, '-')" class="w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all hover:scale-110" :class="fnGetChar(q.id, 0) === '-' ? 'bg-slate-800 border-slate-800 text-white' : 'border-slate-400 bg-white text-slate-700 hover:border-amber-400'"></button>
+                                                                <div class="w-8 h-8"></div><div class="w-8 h-8"></div><div class="w-8 h-8"></div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="flex items-center gap-1.5 mb-1.5">
+                                                            <span class="w-7 text-right text-sm font-mono font-black text-slate-700 flex-shrink-0">,</span>
+                                                            <div class="flex gap-1.5">
+                                                                <div class="w-8 h-8"></div>
+                                                                <button @click="fnSetChar(q.id, 1, ',')" class="w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all hover:scale-110" :class="fnGetChar(q.id, 1) === ',' ? 'bg-slate-800 border-slate-800 text-white' : 'border-slate-400 bg-white hover:border-amber-400'"></button>
+                                                                <button @click="fnSetChar(q.id, 2, ',')" class="w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all hover:scale-110" :class="fnGetChar(q.id, 2) === ',' ? 'bg-slate-800 border-slate-800 text-white' : 'border-slate-400 bg-white hover:border-amber-400'"></button>
+                                                                <div class="w-8 h-8"></div>
+                                                            </div>
+                                                        </div>
+                                                        <template x-for="ch in ['0','1','2','3','4','5','6','7','8','9']" :key="ch">
+                                                            <div class="flex items-center gap-1.5 mb-1.5">
+                                                                <span class="w-7 text-right text-sm font-mono font-black text-slate-700 flex-shrink-0" x-text="ch"></span>
+                                                                <div class="flex gap-1.5">
+                                                                    <template x-for="ci in [0,1,2,3]" :key="ci">
+                                                                        <button @click="fnSetChar(q.id, ci, ch)" class="w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all hover:scale-110" :class="fnGetChar(q.id, ci) === ch ? 'bg-slate-800 border-slate-800 text-white' : 'border-slate-400 bg-white hover:border-amber-400'"></button>
+                                                                    </template>
+                                                                </div>
+                                                            </div>
+                                                        </template>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- CỘT PHẢI: PHIẾU TÔ TRẮC NGHIỆM -->
+                <div class="hidden lg:block">
+                    <div class="sticky top-14 flex flex-col overflow-hidden rounded-2xl border border-slate-200 shadow-lg bg-white" style="max-height: calc(100vh - 72px)">
+                        <div class="bg-gradient-to-br from-teal-600 to-emerald-600 px-4 py-3 text-white flex-shrink-0">
+                            <div class="flex items-start justify-between gap-2">
+                                <div>
+                                    <p class="text-[10px] font-black uppercase tracking-widest opacity-75">Phiếu trả lời trắc nghiệm</p>
+                                    <p class="text-sm font-black uppercase mt-0.5">MÔN TOÁN HỌC</p>
+                                </div>
+                                <div class="text-right flex-shrink-0">
+                                    <p class="text-[9px] opacity-70 uppercase tracking-wide">Đã làm</p>
+                                    <p class="font-mono font-black text-lg leading-none"><span x-text="answeredCount"></span>/<span x-text="totalCommands"></span></p>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between mt-2.5 pt-2.5 border-t border-white/20">
+                                <button @click="nopBai(false)" :disabled="dangNop" class="px-4 py-1.5 rounded-lg bg-white text-teal-700 font-black text-xs hover:bg-teal-50 transition shadow-md w-full text-center">
+                                    <i class="fa-solid mr-1" :class="dangNop ? 'fa-circle-notch fa-spin' : 'fa-paper-plane'"></i> <span x-text="dangNop ? 'Đang nộp...' : 'Nộp bài'"></span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-shrink-0 bg-slate-50 border-b border-slate-200">
+                            <template x-for="sec in cacPhan" :key="sec">
+                                <button @click="activeSection = sec" class="flex-1 py-2.5 text-xs font-black uppercase tracking-wide transition-all relative" :class="activeSection === sec ? 'text-teal-600 bg-white' : 'text-slate-500 hover:text-slate-700 hover:bg-white/60'">
+                                    <span x-text="'Phần ' + sec"></span>
+                                    <span x-show="activeSection === sec" class="absolute bottom-0 left-2 right-2 h-0.5 rounded-full bg-teal-500"></span>
+                                </button>
+                            </template>
+                        </div>
+
+                        <div class="flex-1 overflow-y-auto p-3 custom-scrollbar">
+                            <div x-show="activeSection === 'I'">
+                                <table class="w-full border-collapse">
+                                    <thead>
+                                        <tr class="border-b-2 border-slate-200">
+                                            <th class="pb-2 text-[10px] font-bold text-slate-400 text-left pl-1 w-8">Câu</th>
+                                            <template x-for="opt in ['A','B','C','D']"><th class="pb-2 text-center text-xs font-black text-slate-700 w-12" x-text="opt"></th></template>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-100">
+                                        <template x-for="q in sectionI" :key="q.id">
+                                            <tr class="hover:bg-teal-50/60 cursor-pointer transition-colors" @click="scrollToQ(q)">
+                                                <td class="py-1.5 pl-1"><span class="text-[11px] font-bold" :class="getAnswer(q.id) ? 'text-teal-700 font-black' : 'text-slate-400'" x-text="q.so"></span></td>
+                                                <template x-for="opt in ['A','B','C','D']" :key="opt">
+                                                    <td class="py-1.5 text-center">
+                                                        <button @click.stop="setAnswer(q.id, opt)" class="w-7 h-7 rounded-full border-2 mx-auto flex items-center justify-center transition-all hover:scale-110" :class="getAnswer(q.id) === opt ? 'bg-slate-800 border-slate-800 text-white shadow-md' : 'border-slate-300 bg-white hover:border-teal-400 hover:shadow-sm'"></button>
+                                                    </td>
+                                                </template>
+                                            </tr>
+                                        </template>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div x-show="activeSection === 'II'" class="grid grid-cols-2 gap-2.5">
+                                <template x-for="q in sectionII" :key="q.id">
+                                    <div class="rounded-xl border-2 p-2.5 transition-all cursor-pointer border-slate-200 hover:border-teal-300" @click="scrollToQ(q)">
+                                        <p class="text-[11px] font-black text-center mb-2 text-slate-600" x-text="'Câu ' + q.so"></p>
+                                        <div class="grid grid-cols-3 mb-1.5 text-[11px] text-center font-bold">
+                                            <span></span><span class="text-emerald-500">Đ</span><span class="text-red-400">S</span>
+                                        </div>
+                                        <template x-for="(opt, i) in q.luaChon" :key="opt.key">
+                                            <div class="grid grid-cols-3 items-center py-0.5">
+                                                <span class="text-[10px] font-bold text-slate-500 pl-1" x-text="opt.key + ')'"></span>
+                                                <div class="flex justify-center"><button @click.stop="tfSet(q.id, i, true)" class="w-5 h-5 rounded-full border-2 mx-auto transition-all" :class="tfGet(q.id, i) === true ? 'bg-slate-800 border-slate-800' : 'border-slate-300 bg-white'"></button></div>
+                                                <div class="flex justify-center"><button @click.stop="tfSet(q.id, i, false)" class="w-5 h-5 rounded-full border-2 mx-auto transition-all" :class="tfGet(q.id, i) === false ? 'bg-slate-800 border-slate-800' : 'border-slate-300 bg-white'"></button></div>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </template>
+                            </div>
+
+                            <div x-show="activeSection === 'III'" class="space-y-2">
+                                <template x-for="q in sectionIII" :key="q.id">
+                                    <div class="rounded-xl border-2 border-slate-200 bg-slate-50 flex items-center p-2 cursor-pointer" @click="scrollToQ(q)">
+                                        <span class="text-[11px] font-black w-8 text-center text-slate-500" x-text="'C' + q.so"></span>
+                                        <div class="flex gap-0.5 flex-1">
+                                            <template x-for="ci in [0,1,2,3]" :key="ci">
+                                                <div class="flex-1 h-6 rounded border border-slate-300 bg-white flex items-center justify-center text-[11px] font-mono font-black" :class="ci < (getAnswer(q.id) || '').length ? 'text-teal-700 bg-teal-50 border-teal-400' : ''" x-text="(getAnswer(q.id) || '')[ci] || '_'"></div>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- THANH NỘP BÀI CỐ ĐỊNH CHO MOBILE/TABLET -->
+            <div class="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-slate-200 shadow-[0_-4px_16px_rgba(0,0,0,0.08)] px-4 pt-3 flex items-center justify-between gap-3"
+                 style="padding-bottom: max(0.75rem, env(safe-area-inset-bottom));">
+                <div class="text-sm text-slate-600 flex-shrink-0">
+                    <span class="font-bold text-slate-800" x-text="answeredCount"></span>/<span x-text="totalCommands"></span> đã làm
+                    <span class="ml-2 font-mono font-bold" :class="timeLeft <= 300 ? 'text-red-500' : 'text-slate-500'" x-text="formattedTime()"></span>
+                </div>
+                <button @click="nopBai(false)" :disabled="dangNop" class="flex-1 max-w-[220px] py-3 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-bold text-sm shadow-md shadow-teal-500/25 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+                    <i class="fa-solid" :class="dangNop ? 'fa-circle-notch fa-spin' : 'fa-paper-plane'"></i> <span x-text="dangNop ? 'Đang nộp...' : 'Nộp bài'"></span>
+                </button>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- MÀN HÌNH 3: KẾT QUẢ                         -->
+        <!-- ========================================== -->
+        <div x-show="phase === 'result'" x-transition x-cloak class="max-w-3xl mx-auto px-4 py-8">
+            <div class="bg-white rounded-3xl p-6 sm:p-10 shadow-sm border border-slate-200 text-center">
+                <i class="fa-solid fa-trophy text-5xl text-amber-400 mb-3"></i>
+                <h2 class="text-2xl sm:text-3xl font-black text-slate-800 mb-1" x-text="daNopTruoc ? 'Bạn đã làm đề này' : 'Đã nộp bài thành công!'"></h2>
+                <p class="text-slate-500 font-medium mb-6" x-text="quiz.title"></p>
+
+                <div class="bg-teal-50 border border-teal-100 rounded-2xl p-6 text-teal-800">
+                    <p class="text-sm font-bold uppercase tracking-widest text-teal-600 mb-1">Điểm của bạn</p>
+                    <p class="text-5xl font-black"><span x-text="dinhDangDiem(ketQua.thang10)"></span><span class="text-xl text-teal-500"> / 10</span></p>
+                    <p class="text-sm text-teal-700 mt-2" x-show="ketQua.toiDa && ketQua.toiDa !== 10">Điểm thô: <span x-text="dinhDangDiem(ketQua.tong)"></span> / <span x-text="dinhDangDiem(ketQua.toiDa)"></span> (quy về thang 10)</p>
+                </div>
+
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4 text-left">
+                    <div x-show="sectionI.length" class="bg-blue-50 rounded-xl p-3"><p class="text-xs text-blue-600 font-semibold">Phần I</p><p class="font-black text-blue-800"><span x-text="ketQua.phan ? ketQua.phan.mc.dung : 0"></span>/<span x-text="sectionI.length"></span> câu đúng</p></div>
+                    <div x-show="sectionII.length" class="bg-violet-50 rounded-xl p-3"><p class="text-xs text-violet-600 font-semibold">Phần II</p><p class="font-black text-violet-800"><span x-text="ketQua.phan ? dinhDangDiem(ketQua.phan.tf.diem) : 0"></span>/<span x-text="sectionII.length"></span> điểm</p></div>
+                    <div x-show="sectionIII.length" class="bg-amber-50 rounded-xl p-3"><p class="text-xs text-amber-600 font-semibold">Phần III</p><p class="font-black text-amber-800"><span x-text="ketQua.phan ? ketQua.phan.sa.dung : 0"></span>/<span x-text="sectionIII.length"></span> câu đúng</p></div>
+                    <div class="bg-slate-50 rounded-xl p-3"><p class="text-xs text-slate-500 font-semibold">Thời gian làm</p><p class="font-black text-slate-800" x-text="thoiGianLamStr"></p></div>
+                </div>
+
+                <p x-show="!quiz.hienLoiGiai" class="mt-6 text-sm text-slate-500"><i class="fa-solid fa-lock mr-1"></i>Đề này không hiển thị đáp án và lời giải sau khi nộp.</p>
+
+                <div class="mt-8 flex flex-wrap justify-center gap-3">
+                    <a href="../phong-thi.html" class="px-8 py-3 rounded-full bg-slate-800 text-white font-bold hover:bg-slate-700 transition-colors shadow-md">Trở về Phòng thi</a>
+                </div>
+            </div>
+
+            <!-- XEM LẠI TỪNG CÂU (nếu đề cho phép) -->
+            <div x-show="quiz.hienLoiGiai" id="xem-lai" class="mt-8 space-y-4">
+                <h3 class="text-lg font-black text-slate-800">Xem lại bài làm</h3>
+                <template x-for="q in questions" :key="'xl-' + q.id">
+                    <div class="bg-white rounded-2xl border shadow-sm overflow-hidden" :class="(ketQua.chiTiet && ketQua.chiTiet[q.id] && ketQua.chiTiet[q.id].dung) ? 'border-emerald-200' : 'border-red-200'">
+                        <div class="flex items-start gap-3 px-5 pt-5 pb-3">
+                            <span class="flex-shrink-0 w-7 h-7 rounded-full text-xs font-extrabold flex items-center justify-center text-white"
+                                  :class="(ketQua.chiTiet && ketQua.chiTiet[q.id] && ketQua.chiTiet[q.id].dung) ? 'bg-emerald-500' : 'bg-red-500'" x-text="q.so"></span>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex flex-wrap items-center gap-2 mb-2">
+                                    <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-500" x-text="'Phần ' + q.phan"></span>
+                                    <span class="text-[11px] font-bold" :class="(ketQua.chiTiet && ketQua.chiTiet[q.id] && ketQua.chiTiet[q.id].diem > 0) ? 'text-emerald-600' : 'text-red-500'"
+                                          x-text="ketQua.chiTiet && ketQua.chiTiet[q.id] ? dinhDangDiem(ketQua.chiTiet[q.id].diem) + ' / ' + dinhDangDiem(ketQua.chiTiet[q.id].toiDa) + ' điểm' : ''"></span>
+                                </div>
+                                <div class="dfm-noi-dung text-sm text-slate-800" x-html="q.noiDung"></div>
+                            </div>
+                        </div>
+                        <div class="px-5 pb-5">
+                            <template x-if="q.loai === 'mc'">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                    <template x-for="opt in q.luaChon" :key="opt.key">
+                                        <div class="flex items-center gap-3 px-4 py-2.5 rounded-xl border text-sm"
+                                             :class="dungCua(q) === opt.key ? 'border-emerald-400 bg-emerald-50' : (getAnswer(q.id) === opt.key ? 'border-red-300 bg-red-50' : 'border-slate-200')">
+                                            <span class="w-6 h-6 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-extrabold"
+                                                  :class="dungCua(q) === opt.key ? 'bg-emerald-500 text-white' : (getAnswer(q.id) === opt.key ? 'bg-red-500 text-white' : 'bg-slate-100 text-slate-500')" x-text="opt.key"></span>
+                                            <span class="dfm-noi-dung min-w-0" x-html="opt.html"></span>
+                                            <i x-show="getAnswer(q.id) === opt.key" class="fa-solid fa-user ml-auto text-xs text-slate-400" title="Bạn chọn"></i>
+                                        </div>
+                                    </template>
+                                </div>
+                            </template>
+                            <template x-if="q.loai === 'tf'">
+                                <div class="space-y-1.5">
+                                    <template x-for="(opt, i) in q.luaChon" :key="opt.key">
+                                        <div class="flex items-center gap-2 text-sm py-1 border-b border-slate-100">
+                                            <span class="flex-1 min-w-0"><b class="text-slate-500" x-text="opt.key + ')'"></b> <span class="dfm-noi-dung" x-html="opt.html"></span></span>
+                                            <span class="w-20 text-center text-xs font-bold rounded-md py-1" :class="tfGet(q.id, i) === null ? 'text-slate-400' : (tfGet(q.id, i) === (dungCua(q) || [])[i] ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-600')"
+                                                  x-text="tfGet(q.id, i) === null ? 'Bỏ trống' : (tfGet(q.id, i) ? 'Bạn: Đúng' : 'Bạn: Sai')"></span>
+                                            <span class="w-20 text-center text-xs font-bold text-emerald-700" x-text="'Đáp án: ' + ((dungCua(q) || [])[i] ? 'Đ' : 'S')"></span>
+                                        </div>
+                                    </template>
+                                </div>
+                            </template>
+                            <template x-if="q.loai === 'sa'">
+                                <div class="flex flex-wrap gap-3 text-sm">
+                                    <span class="px-3 py-1.5 rounded-lg" :class="(ketQua.chiTiet && ketQua.chiTiet[q.id] && ketQua.chiTiet[q.id].dung) ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-600'">Bạn trả lời: <b x-text="getAnswer(q.id) || '(bỏ trống)'"></b></span>
+                                    <span class="px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700">Đáp án: <b x-text="dungCua(q)"></b></span>
+                                </div>
+                            </template>
+                            <details x-show="loiGiaiCua(q)" class="mt-3 bg-slate-50 rounded-xl px-4 py-3">
+                                <summary class="cursor-pointer text-sm font-bold text-teal-700"><i class="fa-solid fa-lightbulb mr-1"></i>Lời giải</summary>
+                                <div class="dfm-noi-dung text-sm text-slate-700 mt-2" x-html="loiGiaiCua(q)"></div>
+                            </details>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script src="../assets/js/dfm-de-thi.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyD-NDo43O3Q_9GVii6pDOM7D6SQ5pxmo5g",
+            authDomain: "doformath-bac70.firebaseapp.com",
+            projectId: "doformath-bac70",
+            storageBucket: "doformath-bac70.firebasestorage.app",
+            messagingSenderId: "329095418163",
+            appId: "1:329095418163:web:226636d40b5c2960cdee46"
+        };
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        function lamBai() {
+            const D = window.dfmDeThi;
+            return {
+                phase: 'dang-tai', loi: '',
+                deId: new URLSearchParams(location.search).get('de') || '',
+                user: null,
+                quiz: { title: '', description: '', time_limit: 0, hienLoiGiai: false },
+                questions: [], hinh: [],
+                tenPhan: { mc: 'Trắc nghiệm nhiều phương án lựa chọn', tf: 'Trắc nghiệm đúng sai', sa: 'Trắc nghiệm trả lời ngắn' },
+                activeSection: 'I', openFill: null,
+                clockDisplayMode: 'countdown_timeline', analogClockFace: 'analog',
+                realClockStr: '--:--:--', analogHourDeg: 0, analogMinDeg: 0, analogSecDeg: 0,
+                timeLeft: 0, timer: null,
+                answers: {}, batDau: 0, viPham: 0, canhBaoRoiTrang: false,
+                coBaiDangLam: false, dangNop: false, daNopTruoc: false,
+                dapAn: {}, ketQua: {}, thoiGianLamStr: '',
+
+                get sectionI() { return this.questions.filter((q) => q.loai === 'mc'); },
+                get sectionII() { return this.questions.filter((q) => q.loai === 'tf'); },
+                get sectionIII() { return this.questions.filter((q) => q.loai === 'sa'); },
+                get cacPhan() { return ['I', 'II', 'III'].filter((p, i) => [this.sectionI, this.sectionII, this.sectionIII][i].length); },
+                get answeredCount() {
+                    let n = 0;
+                    this.questions.forEach((q) => {
+                        const a = this.answers[q.id];
+                        if (q.loai === 'tf') n += (Array.isArray(a) ? a : []).filter((v) => v === true || v === false).length;
+                        else if (a) n++;
+                    });
+                    return n;
+                },
+                get totalCommands() {
+                    return this.sectionI.length + this.sectionII.reduce((s, q) => s + q.luaChon.length, 0) + this.sectionIII.length;
+                },
+                get timelineProgress() {
+                    const tong = this.quiz.time_limit * 60;
+                    return tong ? Math.min(100, ((tong - this.timeLeft) / tong) * 100) : 0;
+                },
+                get khoaLuuTam() { return 'dfm-bai-lam:' + this.deId + ':' + (this.user ? this.user.uid : ''); },
+
+                init() {
+                    this.$nextTick(() => D.veToan(document.querySelector('header')));
+                    if (!this.deId) { this.baoLoi('Thiếu mã đề thi trong đường dẫn.'); return; }
+                    firebase.auth().onAuthStateChanged((user) => {
+                        if (!user) { window.location.replace('../login.html'); return; }
+                        if (this.user) return;
+                        this.user = user;
+                        this.taiDe();
+                    });
+                    // Đếm "rời trang" khi học sinh rời đi rồi QUAY LẠI (chuyển tab, mở ứng dụng khác).
+                    // Không đếm lúc tải lại trang: khi đó trang bị ẩn nhưng không bao giờ hiện lại.
+                    let daRoi = false;
+                    document.addEventListener('visibilitychange', () => {
+                        if (this.phase !== 'playing') return;
+                        if (document.visibilityState === 'hidden') { daRoi = true; return; }
+                        if (daRoi) {
+                            daRoi = false;
+                            this.viPham++;
+                            this.canhBaoRoiTrang = true;
+                            this.luuTam();
+                        }
+                    });
+                },
+                baoLoi(msg) { this.loi = msg; this.phase = 'loi'; },
+
+                async taiDe() {
+                    try {
+                        const snap = await db.collection('de_thi').doc(this.deId).get();
+                        if (!snap.exists) { this.baoLoi('Không tìm thấy đề thi, hoặc đề đã đóng.'); return; }
+                        const de = snap.data();
+                        this.quiz = { title: de.tieuDe || 'Đề thi', description: de.moTa || '', time_limit: de.thoiGian || 90, hienLoiGiai: !!de.hienLoiGiai };
+                        document.title = this.quiz.title + ' - DoforMath';
+                        this.hinh = de.hinh || [];
+                        // Đánh số câu theo từng phần như đề THPT
+                        const dem = { mc: 0, tf: 0, sa: 0 };
+                        this.questions = (de.cauHoi || []).map((q, i, ds) => Object.assign({}, q, {
+                            phan: D.PHAN[q.loai], so: ++dem[q.loai], dauPhan: i === 0 || ds[i - 1].loai !== q.loai
+                        }));
+                        this.activeSection = this.cacPhan[0] || 'I';
+                    } catch (err) {
+                        this.baoLoi(err.code === 'permission-denied' ? 'Không tìm thấy đề thi, hoặc đề đã đóng.' : 'Không tải được đề thi. Kiểm tra mạng rồi tải lại trang.');
+                        return;
+                    }
+                    // Đã nộp rồi → xem kết quả
+                    try {
+                        const bai = await db.collection('bai_lam').doc(this.deId + '__' + this.user.uid).get();
+                        if (bai.exists) {
+                            const v = bai.data();
+                            this.answers = v.traLoi || {};
+                            this.daNopTruoc = true;
+                            this.thoiGianLamStr = this.dinhDangThoiGian(v.thoiGianLam || 0);
+                            await this.hienKetQua();
+                            return;
+                        }
+                    } catch (err) { /* chưa có bài làm */ }
+                    // Bài đang làm dở trên máy này
+                    try {
+                        const tam = JSON.parse(localStorage.getItem(this.khoaLuuTam) || 'null');
+                        if (tam && tam.batDau && Date.now() - tam.batDau < this.quiz.time_limit * 60000 + 60000) {
+                            this.answers = tam.traLoi || {}; this.batDau = tam.batDau; this.viPham = tam.viPham || 0;
+                            this.coBaiDangLam = true;
+                        }
+                    } catch (e) {}
+                    this.phase = 'intro';
+                    this.$nextTick(() => this.veNoiDung(document.getElementById('ds-cau-hoi')));
+                },
+
+                veNoiDung(el) {
+                    D.ganHinh(el, this.hinh);
+                    D.veToan(el);
+                },
+
+                start() {
+                    if (!this.batDau) this.batDau = Date.now();
+                    this.phase = 'playing';
+                    this.luuTam();
+                    this.dongHo();
+                    this.timer = setInterval(() => this.dongHo(), 1000);
+                    window.scrollTo({ top: 0 });
+                },
+                dongHo() {
+                    const now = new Date();
+                    this.timeLeft = Math.max(0, this.quiz.time_limit * 60 - Math.floor((Date.now() - this.batDau) / 1000));
+                    const h = now.getHours(), m = now.getMinutes(), s = now.getSeconds();
+                    this.realClockStr = String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+                    this.analogHourDeg = (h % 12) * 30 + m * 0.5 + s * (0.5 / 60);
+                    this.analogMinDeg = m * 6 + s * 0.1;
+                    this.analogSecDeg = s * 6;
+                    if (this.timeLeft <= 0 && this.phase === 'playing') this.nopBai(true);
+                },
+                formattedTime() {
+                    return String(Math.floor(this.timeLeft / 60)).padStart(2, '0') + ':' + String(this.timeLeft % 60).padStart(2, '0');
+                },
+                luuTam() {
+                    try { localStorage.setItem(this.khoaLuuTam, JSON.stringify({ batDau: this.batDau, traLoi: this.answers, viPham: this.viPham })); } catch (e) {}
+                },
+
+                // ----- Ghi nhận đáp án -----
+                setAnswer(id, val) { this.answers[id] = val; this.luuTam(); },
+                getAnswer(id) { return this.answers[id] || null; },
+                tfGet(id, i) { const a = this.answers[id]; return Array.isArray(a) && (a[i] === true || a[i] === false) ? a[i] : null; },
+                tfSet(id, i, val) {
+                    const q = this.questions.find((x) => x.id === id);
+                    const a = Array.isArray(this.answers[id]) ? this.answers[id].slice() : q.luaChon.map(() => null);
+                    a[i] = a[i] === val ? null : val;     // bấm lại để bỏ chọn
+                    this.answers[id] = a;
+                    this.luuTam();
+                },
+                fnGetChar(id, col) { const v = this.answers[id] || ''; return v[col] !== undefined ? v[col] : null; },
+                fnSetChar(id, col, ch) {
+                    const arr = (this.answers[id] || '').padEnd(4, ' ').split('');
+                    arr[col] = arr[col] === ch ? ' ' : ch;
+                    this.answers[id] = arr.join('').replace(/ +$/, '');
+                    this.luuTam();
+                },
+                scrollToQ(q) {
+                    const el = document.getElementById('cau-' + q.id);
+                    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                },
+
+                // ----- Nộp bài -----
+                async nopBai(tuDong) {
+                    if (this.dangNop || this.phase !== 'playing') return;
+                    if (!tuDong && this.answeredCount < this.totalCommands && !confirm('Bạn chưa trả lời hết các lệnh hỏi. Chắc chắn nộp bài?')) return;
+                    this.dangNop = true;
+                    const traLoi = {};
+                    this.questions.forEach((q) => {
+                        const a = this.answers[q.id];
+                        if (q.loai === 'tf') { if (Array.isArray(a)) traLoi[q.id] = q.luaChon.map((_, i) => (a[i] === true || a[i] === false ? a[i] : null)); }
+                        else if (a) traLoi[q.id] = String(a).trim();
+                    });
+                    const giay = Math.min(this.quiz.time_limit * 60, Math.round((Date.now() - this.batDau) / 1000));
+                    try {
+                        await db.collection('bai_lam').doc(this.deId + '__' + this.user.uid).set({
+                            deId: this.deId, uid: this.user.uid, email: this.user.email, traLoi: traLoi,
+                            batDau: this.batDau, thoiGianLam: giay, viPham: this.viPham, tuDongNop: !!tuDong,
+                            nopLuc: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                    } catch (err) {
+                        this.dangNop = false;
+                        alert(err.code === 'permission-denied' ? 'Bài này đã được nộp trước đó.' : 'Chưa nộp được bài, kiểm tra mạng rồi bấm Nộp bài lại. Bài làm vẫn được lưu trên máy.');
+                        return;
+                    }
+                    clearInterval(this.timer);
+                    try { localStorage.removeItem(this.khoaLuuTam); } catch (e) {}
+                    this.answers = traLoi;
+                    this.thoiGianLamStr = this.dinhDangThoiGian(giay);
+                    await this.hienKetQua();
+                    this.dangNop = false;
+                },
+                async hienKetQua() {
+                    try {
+                        const da = await db.collection('dap_an').doc(this.deId).get();
+                        this.dapAn = (da.exists && da.data().cauHoi) || {};
+                    } catch (err) { this.dapAn = {}; }
+                    this.ketQua = D.chamDiem(this.questions, this.dapAn, this.answers);
+                    this.phase = 'result';
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    this.$nextTick(() => this.veNoiDung(document.getElementById('xem-lai')));
+                },
+                dungCua(q) { return (this.dapAn[q.id] || {}).dung; },
+                loiGiaiCua(q) { return (this.dapAn[q.id] || {}).loiGiai || ''; },
+                dinhDangDiem(x) { return (Math.round((x || 0) * 100) / 100).toString().replace('.', ','); },
+                dinhDangThoiGian(giay) { const p = Math.floor(giay / 60), s = giay % 60; return p + ' phút ' + String(s).padStart(2, '0') + ' giây'; }
+            };
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+{
+  "name": "doformath-web",
+  "private": true,
+  "description": "Website DoforMath (trang tĩnh). Chỉ dùng npm để build CSS Tailwind.",
+  "scripts": {
+    "build:css": "node scripts/build-css.mjs"
+  }
+}

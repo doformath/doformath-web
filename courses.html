@@ -10,25 +10,10 @@
     <!-- Font chữ Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        primary: '#0d9488', /* Xanh dương đậm chuyên nghiệp */
-                        secondary: '#facc15', /* Vàng tạo điểm nhấn */
-                    }
-                }
-            }
-        }
-    </script> 
-    <!-- CSS Giao diện siêu tốc -->
-    <!-- <link rel="stylesheet" href="/assets/css/style.css"> -->
+    <!-- Giao diện sáng / tối: chạy trước CSS để không bị nháy màu -->
+    <script src="assets/js/dfm-giao-dien.js"></script>
+    <!-- CSS Tailwind dựng sẵn cho cả site (sửa class xong chạy: npm run build:css) -->
+    <link rel="stylesheet" href="assets/css/tailwind.css?v=08097a6e">
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -80,6 +65,8 @@
 
                 <!-- Nút Hành động -->
                 <!-- Bọc toàn bộ vào auth-container, đặt opacity = 0 để tàng hình ban đầu -->
+                <div class="flex items-center gap-1 md:gap-2">
+                    <button type="button" data-doi-giao-dien aria-label="Đổi giao diện sáng / tối" class="w-9 h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center text-gray-500 hover:text-primary hover:bg-gray-100 transition-colors shrink-0"><span class="dark:hidden"><i class="fa-solid fa-moon"></i></span><span class="hidden dark:inline"><i class="fa-solid fa-sun text-amber-300"></i></span></button>
                 <div id="auth-container" class="flex items-center transition-opacity duration-300 ease-in-out" style="opacity: 0;">
                     
                     <!-- 1. Khu vực hiển thị khi CHƯA đăng nhập (Ban đầu ẩn) -->
@@ -98,6 +85,7 @@
                             <span class="hidden md:inline">Đăng xuất</span>
                         </button>
                     </div>
+                </div>
                 </div>
             </div>
         </div>

@@ -16,25 +16,10 @@
     <!-- Font chữ Inter sắc nét -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- Tailwind CSS-->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        primary: '#0d9488', /* Xanh dương đậm chuyên nghiệp */
-                        secondary: '#facc15', /* Vàng tạo điểm nhấn */
-                    }
-                }
-            }
-        }
-    </script> 
-    <!-- CSS Giao diện siêu tốc -->
-    <!-- <link rel="stylesheet" href="/assets/css/style.css"> -->
+    <!-- Giao diện sáng / tối: chạy trước CSS để không bị nháy màu -->
+    <script src="assets/js/dfm-giao-dien.js"></script>
+    <!-- CSS Tailwind dựng sẵn cho cả site (sửa class xong chạy: npm run build:css) -->
+    <link rel="stylesheet" href="assets/css/tailwind.css?v=08097a6e">
 
     <!-- Font Awesome cho các Icon (tải kiểu media="print" để không chặn render, rồi tự chuyển sang "all") -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
@@ -46,6 +31,12 @@
 
     <!-- Ẩn các phần tử điều khiển bởi Alpine.js trước khi Alpine kịp khởi tạo, tránh nháy giao diện (FOUC) -->
     <style>[x-cloak] { display: none !important; }</style>
+    <!-- Hiệu ứng xuất hiện của thẻ "Tiếp tục học" -->
+    <style>
+        .hoc-tiep { animation: hocTiepHien .5s cubic-bezier(.2, .8, .3, 1) both; }
+        @keyframes hocTiepHien { from { opacity: 0; transform: translateY(10px); } }
+        @media (prefers-reduced-motion: reduce) { .hoc-tiep, .hoc-tiep * { animation: none !important; } }
+    </style>
     
 <!-- Ngăn trình duyệt cache trang, đảm bảo luôn tải phiên bản mới nhất -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -94,6 +85,8 @@
 
                 <!-- Nút Hành động -->
                 <!-- Bọc toàn bộ vào auth-container, đặt opacity = 0 để tàng hình ban đầu -->
+                <div class="flex items-center gap-1 md:gap-2">
+                    <button type="button" data-doi-giao-dien aria-label="Đổi giao diện sáng / tối" class="w-9 h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center text-gray-500 hover:text-primary hover:bg-gray-100 transition-colors shrink-0"><span class="dark:hidden"><i class="fa-solid fa-moon"></i></span><span class="hidden dark:inline"><i class="fa-solid fa-sun text-amber-300"></i></span></button>
                 <div id="auth-container" class="flex items-center transition-opacity duration-300 ease-in-out" style="opacity: 0;">
                     
                     <!-- 1. Khu vực hiển thị khi CHƯA đăng nhập (Ban đầu ẩn) -->
@@ -113,6 +106,7 @@
                             <span class="hidden md:inline">Đăng xuất</span>
                         </button>
                     </div>
+                </div>
                 </div>
             </div>
         </div>
@@ -231,6 +225,28 @@
                         Khám phá khóa học
                     </a>
                 </div>
+
+                <!-- Thẻ "Tiếp tục học": chỉ hiện khi đã đăng nhập và đã mở bài trên máy này (trang khóa học lưu lại) -->
+                <a id="hoc-tiep" href="courses.html" style="display: none;" aria-label="Tiếp tục học bài đang học dở"
+                   class="hoc-tiep group mt-8 mx-auto flex items-center gap-3 sm:gap-4 w-full max-w-lg text-left bg-white border border-teal-100 rounded-2xl p-3 pr-4 sm:pr-5 shadow-lg shadow-teal-100/70 hover:shadow-xl hover:border-teal-200 hover:-translate-y-0.5 transition-all">
+                    <span class="relative w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-gradient-to-br from-primary to-teal-400 text-white flex items-center justify-center shrink-0 shadow-md shadow-teal-200">
+                        <i class="fa-solid fa-play text-lg ml-0.5"></i>
+                        <span class="absolute -top-1 -right-1 flex h-3.5 w-3.5">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                            <span class="relative inline-flex h-3.5 w-3.5 rounded-full bg-amber-400 ring-2 ring-white"></span>
+                        </span>
+                    </span>
+                    <span class="min-w-0 flex-1">
+                        <span class="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-primary whitespace-nowrap">
+                            Tiếp tục học <span class="w-1 h-1 rounded-full bg-teal-300"></span> <span id="hoc-tiep-khoa"></span>
+                        </span>
+                        <span id="hoc-tiep-bai" class="font-semibold text-gray-900 mt-0.5 leading-snug line-clamp-2 sm:line-clamp-1"></span>
+                        <span id="hoc-tiep-phu" class="block text-sm text-gray-500 truncate"></span>
+                    </span>
+                    <span class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-teal-50 text-primary flex items-center justify-center shrink-0 group-hover:bg-primary group-hover:text-white transition-colors">
+                        <i class="fa-solid fa-arrow-right text-sm transition-transform group-hover:translate-x-0.5"></i>
+                    </span>
+                </a>
             </div>
         </div>
     </section>
@@ -693,7 +709,39 @@
         }
 
         // 3. Hàm theo dõi trạng thái đăng nhập
+        // Thẻ "Tiếp tục học" ở hero: bài mở gần nhất trên máy này (do trang khóa học lưu, xem assets/js/dfm-khoa-hoc.js)
+        const TEN_KHOA = { 'toan-10': 'Toán 10', 'toan-11': 'Toán 11', 'toan-12': 'Toán 12' };
+        function truocDay(luc) {
+            const giay = (Date.now() - luc) / 1000;
+            if (!(giay >= 0)) return '';
+            if (giay < 60) return 'Vừa xong';
+            if (giay < 3600) return Math.floor(giay / 60) + ' phút trước';
+            if (giay < 86400) return Math.floor(giay / 3600) + ' giờ trước';
+            const ngay = Math.floor(giay / 86400);
+            if (ngay === 1) return 'Hôm qua';
+            if (ngay < 30) return ngay + ' ngày trước';
+            return new Date(luc).toLocaleDateString('vi-VN');
+        }
+        function hienHocTiep(user) {
+            const the = document.getElementById('hoc-tiep');
+            if (!the) return;
+            let ghi = null;
+            try { ghi = JSON.parse(localStorage.getItem('dfm_hocTiep')); } catch (e) {}
+            // Chỉ hiện bài của đúng tài khoản đang đăng nhập (máy dùng chung không lộ bài của người khác)
+            if (!user || !ghi || ghi.email !== user.email || !TEN_KHOA[ghi.khoa] || typeof ghi.url !== 'string') {
+                the.style.display = 'none';
+                return;
+            }
+            // Trang khóa học chỉ mở link có thật trong mục lục nên không lo link lạ
+            the.href = 'courses/' + ghi.khoa + '.html?bai=' + encodeURIComponent(ghi.url);
+            document.getElementById('hoc-tiep-khoa').textContent = TEN_KHOA[ghi.khoa];
+            document.getElementById('hoc-tiep-bai').textContent = ghi.tenBai || ghi.muc || 'Bài đang học';
+            document.getElementById('hoc-tiep-phu').textContent = [ghi.tenBai ? ghi.muc : '', truocDay(ghi.luc)].filter(Boolean).join(' · ');
+            the.style.display = '';
+        }
+
         firebase.auth().onAuthStateChanged((user) => {
+            hienHocTiep(user);
             const khuVucDangNhap = document.getElementById('khu-vuc-dang-nhap');
             const khuVucUser = document.getElementById('khu-vuc-user');
             const nutDangXuatMobile = document.getElementById('nutDangXuatMobile');

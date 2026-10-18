@@ -30,6 +30,35 @@ service cloud.firestore {
       allow write: if laAdmin();
     }
 
+    // ===== Đề thi trực tuyến (tải lên từ file TeX ở trang Quản trị) =====
+    // Đề: học sinh đọc đề đang mở, hoặc đề mình đã nộp (để xem lại kết quả); chỉ Admin sửa
+    match /de_thi/{deId} {
+      allow get: if laAdmin() || (request.auth != null && (resource.data.trangThai == 'mo'
+                  || exists(/databases/$(database)/documents/bai_lam/$(deId + '__' + request.auth.uid))));
+      allow list: if laAdmin() || (request.auth != null && resource.data.trangThai == 'mo');
+      allow write: if laAdmin();
+    }
+
+    // Đáp án + lời giải: học sinh chỉ đọc được SAU KHI đã nộp bài đề đó
+    match /dap_an/{deId} {
+      allow get: if laAdmin() || (request.auth != null
+                  && exists(/databases/$(database)/documents/bai_lam/$(deId + '__' + request.auth.uid)));
+      allow list, write: if laAdmin();
+    }
+
+    // Bài làm: mỗi học sinh nộp 1 lần cho mỗi đề (mã = <mã đề>__<uid>), chỉ khi đề đang mở; nộp rồi không sửa được
+    match /bai_lam/{baiId} {
+      allow get: if laAdmin() || (request.auth != null && baiId.split('__')[1] == request.auth.uid);
+      allow list: if laAdmin();
+      allow create: if request.auth != null
+        && baiId == request.resource.data.deId + '__' + request.auth.uid
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.nopLuc == request.time
+        && get(/databases/$(database)/documents/de_thi/$(request.resource.data.deId)).data.trangThai == 'mo';
+      allow update: if false;
+      allow delete: if laAdmin();
+    }
+
     // Bảng xếp hạng các bài kiểm tra: mỗi học sinh chỉ đọc/ghi dòng của mình; Admin xem tất cả
     match /bxh_luong_giac/{uid} {
       allow get: if request.auth != null

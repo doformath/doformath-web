@@ -9,15 +9,15 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] }, colors: { primary: '#0d9488', secondary: '#facc15' } } }
-        }
-    </script>
+    <!-- Giao diện sáng / tối: chạy trước CSS để không bị nháy màu -->
+    <script src="assets/js/dfm-giao-dien.js"></script>
+    <!-- CSS Tailwind dựng sẵn cho cả site (sửa class xong chạy: npm run build:css) -->
+    <link rel="stylesheet" href="assets/css/tailwind.css?v=08097a6e">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- KaTeX: vẽ logo DoforMath giống các trang khác -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <!-- Font cho chữ trong hình TikZ (SVG) của đề thi -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@rod2ik/tikzjax@1.6.0/dist/fonts.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
 
@@ -44,6 +44,13 @@
         .cong-tac[aria-checked="true"] { background: #0d9488; }
         .cong-tac[aria-checked="true"]::after { transform: translateX(18px); }
         .cong-tac:disabled { opacity: .5; }
+        /* Chế độ tối cho phần CSS riêng của trang (bảng, công tắc, biểu đồ SVG) */
+        .dark .bang td { border-top-color: #334155; }
+        .dark .bang tbody tr.co-the-bam:hover { background: #334155; }
+        .dark .cong-tac { background: #475569; }
+        .dark [data-khung-svg] line[stroke="#eef2f6"] { stroke: #334155; }
+        .dark [data-khung-svg] line[stroke="#cbd5e1"] { stroke: #475569; }
+        .dark [data-khung-svg] text[fill="#334155"] { fill: #e2e8f0; }
     </style>
 </head>
 <body class="font-sans text-gray-800 bg-gray-50 antialiased min-h-screen">
@@ -60,15 +67,19 @@
                     $\textcolor{#0d9488}{\textsf{\textbf{Dofor}}{\sum}\textsf{\textbf{ath}}}$
                 </span>
             </a>
-            <button id="nut-tai-lai" type="button" class="flex items-center gap-2 text-sm text-gray-500 hover:text-primary font-medium transition-colors shrink-0" title="Tải lại dữ liệu">
+            <div class="flex items-center gap-1 shrink-0">
+                <button type="button" data-doi-giao-dien aria-label="Đổi giao diện sáng / tối" class="w-9 h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center text-gray-500 hover:text-primary hover:bg-gray-100 transition-colors shrink-0"><span class="dark:hidden"><i class="fa-solid fa-moon"></i></span><span class="hidden dark:inline"><i class="fa-solid fa-sun text-amber-300"></i></span></button>
+                <button id="nut-tai-lai" type="button" class="flex items-center gap-2 text-sm text-gray-500 hover:text-primary font-medium transition-colors shrink-0" title="Tải lại dữ liệu">
                 <i class="fa-solid fa-rotate"></i><span class="hidden sm:inline">Tải lại</span>
             </button>
+            </div>
         </div>
         <nav id="thanh-tab" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex gap-1 overflow-x-auto pb-2" role="tablist" hidden>
             <button class="tab-btn px-4 py-2 rounded-full text-sm text-gray-600 hover:bg-gray-100 whitespace-nowrap" role="tab" data-tab="tong-quan" aria-selected="true"><i class="fa-solid fa-gauge-high mr-1.5"></i>Tổng quan</button>
             <button class="tab-btn px-4 py-2 rounded-full text-sm text-gray-600 hover:bg-gray-100 whitespace-nowrap" role="tab" data-tab="hoc-sinh" aria-selected="false"><i class="fa-solid fa-user-graduate mr-1.5"></i>Học sinh</button>
             <button class="tab-btn px-4 py-2 rounded-full text-sm text-gray-600 hover:bg-gray-100 whitespace-nowrap" role="tab" data-tab="bai-hoc" aria-selected="false"><i class="fa-solid fa-book-open mr-1.5"></i>Bài học</button>
             <button class="tab-btn px-4 py-2 rounded-full text-sm text-gray-600 hover:bg-gray-100 whitespace-nowrap" role="tab" data-tab="kiem-tra" aria-selected="false"><i class="fa-solid fa-clipboard-check mr-1.5"></i>Kiểm tra</button>
+            <button class="tab-btn px-4 py-2 rounded-full text-sm text-gray-600 hover:bg-gray-100 whitespace-nowrap" role="tab" data-tab="de-thi" aria-selected="false"><i class="fa-solid fa-file-signature mr-1.5"></i>Đề thi</button>
         </nav>
     </header>
 
@@ -215,6 +226,20 @@
             </div>
             <p class="text-xs text-gray-400 mt-3">Bấm vào một dòng để xem lịch sử các lần làm bài.</p>
         </section>
+
+        <!-- ========== TAB ĐỀ THI (tải đề từ file TeX) ========== -->
+        <section id="tab-de-thi" data-panel hidden>
+            <div class="flex flex-wrap gap-3 items-center justify-between mb-4">
+                <div>
+                    <h2 class="font-bold text-gray-900">Đề thi trực tuyến</h2>
+                    <p class="text-sm text-gray-500">Dán hoặc tải file .tex (gói ex_test: \choice, \choiceTF, \shortans) lên, hệ thống tự chuyển thành đề thi trên web.</p>
+                </div>
+                <button id="nut-tao-de" type="button" class="bg-primary hover:bg-teal-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold shadow-sm transition-colors">
+                    <i class="fa-solid fa-plus mr-1.5"></i>Tạo đề thi
+                </button>
+            </div>
+            <div id="ds-de-thi" class="grid gap-4 md:grid-cols-2"></div>
+        </section>
     </main>
 
     <!-- ========== HỘP THOẠI (dùng chung) ========== -->
@@ -239,6 +264,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script src="assets/js/dfm-de-thi.js"></script>
     <script>
     (function () {
         const firebaseConfig = {
@@ -414,7 +440,10 @@
         }
 
         // ---------- Hộp thoại ----------
-        function moHopThoai(tieuDe, html) {
+        function moHopThoai(tieuDe, html, rong) {
+            const khung = $('hop-thoai').firstElementChild;
+            khung.classList.toggle('sm:max-w-5xl', !!rong);
+            khung.classList.toggle('sm:max-w-3xl', !rong);
             $('hop-thoai-tieu-de').textContent = tieuDe;
             $('hop-thoai-noi-dung').innerHTML = html;
             $('hop-thoai').hidden = false;
@@ -432,7 +461,7 @@
 
         // ---------- Tải dữ liệu ----------
         async function taiDuLieu() {
-            const tenNguon = ['phan_quyen', 'hoc_sinh', 'bai_hoc_them'].concat(BAI_KIEM_TRA.map((b) => b.id));
+            const tenNguon = ['phan_quyen', 'hoc_sinh', 'bai_hoc_them'].concat(BAI_KIEM_TRA.map((b) => b.id), ['de_thi', 'bai_lam']);
             const kq = await Promise.allSettled(tenNguon.map((t) => db.collection(t).get()));
             const loi = [];
             const lay = (i) => (kq[i].status === 'fulfilled' ? kq[i].value.docs : (loi.push(tenNguon[i]), []));
@@ -461,6 +490,8 @@
 
             S.baiThem = lay(2).map((d) => Object.assign({ id: d.id }, d.data()));
             BAI_KIEM_TRA.forEach((b, i) => { S.bxh[b.id] = lay(3 + i).map((d) => Object.assign({ uid: d.id }, d.data())); });
+            S.deThi = lay(3 + BAI_KIEM_TRA.length).map((d) => Object.assign({ id: d.id }, d.data()));
+            S.baiLam = lay(4 + BAI_KIEM_TRA.length).map((d) => Object.assign({ id: d.id }, d.data()));
 
             const cb = $('canh-bao');
             cb.hidden = !loi.length;
@@ -476,6 +507,7 @@
             veBangHocSinh();
             veBaiHoc();
             veKiemTra();
+            veDeThi();
             tlNapDs();
         }
 
@@ -1215,6 +1247,390 @@
             const ls = $('bang-kt').querySelector('[data-ls="' + r.getAttribute('data-mo-ls') + '"]');
             ls.hidden = !ls.hidden;
         });
+
+        // ---------- TAB ĐỀ THI (tải đề từ file TeX) ----------
+        // Đề lưu ở 2 nơi: de_thi/{id} (câu hỏi, hình — học sinh đọc được khi đề đang mở)
+        // và dap_an/{id} (đáp án, lời giải, TeX gốc — học sinh chỉ đọc được SAU khi đã nộp bài).
+        const DT = window.dfmDeThi;
+        const TRANG_THAI_DE = {
+            nhap: { ten: 'Nháp', lop: 'bg-gray-100 text-gray-600', icon: 'fa-pen' },
+            mo: { ten: 'Đang mở', lop: 'bg-emerald-50 text-emerald-700', icon: 'fa-circle-play' },
+            dong: { ten: 'Đã đóng', lop: 'bg-red-50 text-red-700', icon: 'fa-lock' }
+        };
+        const linkDe = (id) => new URL('exam/lam-bai.html?de=' + encodeURIComponent(id), location.href).href;
+        const tomTatSoCau = (cauHoi) => {
+            const d = DT.soCauTheoLoai(cauHoi);
+            return [d.mc && d.mc + ' trắc nghiệm', d.tf && d.tf + ' đúng/sai', d.sa && d.sa + ' trả lời ngắn'].filter(Boolean).join(' · ') || 'Chưa có câu hỏi';
+        };
+
+        function veDeThi() {
+            const ds = (S.deThi || []).slice().sort((a, b) => (thanhDate(b.capNhatLuc) || 0) - (thanhDate(a.capNhatLuc) || 0));
+            if (!ds.length) {
+                $('ds-de-thi').innerHTML = '<div class="md:col-span-2 bg-white rounded-2xl border border-dashed border-gray-200 p-10 text-center text-gray-400">' +
+                    '<i class="fa-solid fa-file-circle-plus text-3xl mb-3 block"></i>Chưa có đề thi nào. Bấm “Tạo đề thi” rồi dán file .tex vào.</div>';
+                return;
+            }
+            $('ds-de-thi').innerHTML = ds.map((de) => {
+                const tt = TRANG_THAI_DE[de.trangThai] || TRANG_THAI_DE.nhap;
+                const soBai = (S.baiLam || []).filter((b) => b.deId === de.id).length;
+                return '<div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex flex-col gap-3">' +
+                    '<div class="flex items-start justify-between gap-3"><div class="min-w-0"><h3 class="font-bold text-gray-900">' + esc(de.tieuDe) + '</h3>' +
+                    '<p class="text-sm text-gray-500 mt-0.5">' + esc(tomTatSoCau(de.cauHoi)) + ' · ' + esc(de.thoiGian) + ' phút</p></div>' +
+                    '<span class="shrink-0 inline-flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full ' + tt.lop + '"><i class="fa-solid ' + tt.icon + '"></i>' + tt.ten + '</span></div>' +
+                    '<div class="flex flex-wrap gap-2 text-xs text-gray-500">' +
+                    '<span class="bg-gray-50 rounded-full px-2.5 py-1"><i class="fa-solid fa-users mr-1"></i>' + soBai + ' bài nộp</span>' +
+                    '<span class="bg-gray-50 rounded-full px-2.5 py-1"><i class="fa-solid ' + (de.hienLoiGiai ? 'fa-lightbulb' : 'fa-eye-slash') + ' mr-1"></i>' + (de.hienLoiGiai ? 'Hiện lời giải sau khi nộp' : 'Chỉ hiện điểm') + '</span>' +
+                    '<span class="bg-gray-50 rounded-full px-2.5 py-1"><i class="fa-regular fa-clock mr-1"></i>Sửa ' + truocDay(thanhDate(de.capNhatLuc)).toLowerCase() + '</span></div>' +
+                    '<div class="flex flex-wrap gap-1 pt-2 border-t border-gray-100">' +
+                    '<button type="button" data-de-ket-qua="' + esc(de.id) + '" class="px-3 py-1.5 rounded-lg text-sm hover:bg-gray-100"><i class="fa-solid fa-square-poll-vertical mr-1"></i>Kết quả</button>' +
+                    '<button type="button" data-de-sua="' + esc(de.id) + '" class="px-3 py-1.5 rounded-lg text-sm hover:bg-gray-100"><i class="fa-solid fa-pen mr-1"></i>Sửa</button>' +
+                    '<button type="button" data-de-trang-thai="' + esc(de.id) + '" class="px-3 py-1.5 rounded-lg text-sm hover:bg-gray-100"><i class="fa-solid ' + (de.trangThai === 'mo' ? 'fa-lock' : 'fa-lock-open') + ' mr-1"></i>' + (de.trangThai === 'mo' ? 'Đóng đề' : 'Mở đề') + '</button>' +
+                    '<button type="button" data-de-link="' + esc(de.id) + '" class="px-3 py-1.5 rounded-lg text-sm hover:bg-gray-100"><i class="fa-solid fa-link mr-1"></i>Sao chép link</button>' +
+                    '<a href="' + esc(linkDe(de.id)) + '" target="_blank" rel="noopener" class="px-3 py-1.5 rounded-lg text-sm hover:bg-gray-100"><i class="fa-solid fa-arrow-up-right-from-square mr-1"></i>Mở thử</a>' +
+                    '<button type="button" data-de-xoa="' + esc(de.id) + '" class="px-3 py-1.5 rounded-lg text-sm text-red-600 hover:bg-red-50 ml-auto"><i class="fa-solid fa-trash mr-1"></i>Xóa</button>' +
+                    '</div></div>';
+            }).join('');
+        }
+
+        $('nut-tao-de').addEventListener('click', () => moFormDe(null));
+        $('ds-de-thi').addEventListener('click', async (e) => {
+            const nut = e.target.closest('button[data-de-ket-qua], button[data-de-sua], button[data-de-trang-thai], button[data-de-link], button[data-de-xoa]');
+            if (!nut) return;
+            const id = nut.getAttribute('data-de-ket-qua') || nut.getAttribute('data-de-sua') || nut.getAttribute('data-de-trang-thai') || nut.getAttribute('data-de-link') || nut.getAttribute('data-de-xoa');
+            const de = (S.deThi || []).find((d) => d.id === id);
+            if (!de) return;
+            if (nut.hasAttribute('data-de-ket-qua')) xemKetQuaDe(de);
+            if (nut.hasAttribute('data-de-sua')) moFormDe(de);
+            if (nut.hasAttribute('data-de-link')) {
+                try { await navigator.clipboard.writeText(linkDe(id)); thongBao('Đã sao chép link làm bài'); }
+                catch (err) { prompt('Link làm bài:', linkDe(id)); }
+            }
+            if (nut.hasAttribute('data-de-trang-thai')) {
+                const moi = de.trangThai === 'mo' ? 'dong' : 'mo';
+                try {
+                    await db.collection('de_thi').doc(id).update({ trangThai: moi, capNhatLuc: FV.serverTimestamp() });
+                    de.trangThai = moi; veDeThi();
+                    thongBao(moi === 'mo' ? 'Đề đã mở, học sinh vào làm được' : 'Đã đóng đề');
+                } catch (err) { thongBao('Lỗi: ' + err.message); }
+            }
+            if (nut.hasAttribute('data-de-xoa')) {
+                const baiCuaDe = (S.baiLam || []).filter((b) => b.deId === id);
+                if (!confirm('Xóa hẳn đề "' + de.tieuDe + '"' + (baiCuaDe.length ? ' cùng ' + baiCuaDe.length + ' bài làm của học sinh' : '') + '? Không thể hoàn tác.')) return;
+                try {
+                    const lo = db.batch();
+                    lo.delete(db.collection('de_thi').doc(id));
+                    lo.delete(db.collection('dap_an').doc(id));
+                    baiCuaDe.forEach((b) => lo.delete(db.collection('bai_lam').doc(b.id)));
+                    await lo.commit();
+                    thongBao('Đã xóa đề');
+                    await taiDuLieu();
+                } catch (err) { thongBao('Lỗi: ' + err.message); }
+            }
+        });
+
+        // ----- Vẽ TikZ trên trình duyệt (TikZJax), chỉ tải khi cần -----
+        const TIKZJAX = 'https://cdn.jsdelivr.net/npm/@rod2ik/tikzjax@1.6.0/dist/';
+        const THU_VIEN_TIKZ = 'patterns,calc,arrows.meta,angles,quotes,intersections';
+        let napTikz = null, lanVeDau = true;
+        function taiTikzJax() {
+            napTikz = napTikz || new Promise((ok, loi) => {
+                const s = document.createElement('script');
+                s.src = TIKZJAX + 'tikzjax.min.js';
+                s.onload = ok;
+                s.onerror = () => { napTikz = null; loi(new Error('Không tải được bộ vẽ TikZ, kiểm tra mạng.')); };
+                document.head.appendChild(s);
+            });
+            return napTikz;
+        }
+        // Vẽ 1 hình: TikZJax thay <script type="text/tikz"> bằng span.tikzjax-wrapper,
+        // vẽ xong thì trong đó có svg.tikzjax, lỗi thì có ảnh .tikzjax-broken-image
+        async function veTikz(ma) {
+            await taiTikzJax();
+            const hop = document.createElement('div');
+            hop.style.cssText = 'position:absolute;left:-10000px;top:0;width:1200px';
+            const sc = document.createElement('script');
+            sc.type = 'text/tikz';
+            sc.setAttribute('data-tikz-libraries', THU_VIEN_TIKZ);
+            if (/\\tkzTab/.test(ma)) sc.setAttribute('data-tex-packages', '{"tkz-tab":""}');
+            sc.setAttribute('data-disable-cache', 'true');
+            sc.textContent = ma;
+            hop.appendChild(sc);
+            document.body.appendChild(hop);
+            const thoiHan = lanVeDau ? 150000 : 60000;   // lần đầu phải tải bộ TeX (~3 MB)
+            try {
+                return await new Promise((ok, loi) => {
+                    const bd = Date.now();
+                    const kiem = setInterval(() => {
+                        const svg = hop.querySelector('svg.tikzjax:not(.tikzjax-loader)');
+                        const hong = hop.querySelector('.tikzjax-broken-image, .tikzjax-broken-wrapper');
+                        if (svg) { clearInterval(kiem); ok(svg.outerHTML); }
+                        else if (hong) { clearInterval(kiem); loi(new Error('TikZ báo lỗi')); }
+                        else if (Date.now() - bd > thoiHan) { clearInterval(kiem); loi(new Error('Quá thời gian')); }
+                    }, 300);
+                });
+            } finally {
+                lanVeDau = false;
+                hop.remove();
+            }
+        }
+
+        async function taiAnhLenCloud(file) {
+            const fd = new FormData();
+            fd.append('file', file);
+            fd.append('upload_preset', $('tl-preset').value.trim());
+            fd.append('asset_folder', thuMucCloud('de-thi'));
+            const res = await fetch('https://api.cloudinary.com/v1_1/' + encodeURIComponent($('tl-cloud').value.trim()) + '/image/upload', { method: 'POST', body: fd });
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok || !data.secure_url) throw new Error('Cloudinary báo lỗi: ' + ((data.error && data.error.message) || res.status));
+            return data.secure_url;
+        }
+
+        // Xem trước như học sinh thấy, kèm đáp án đúng và lời giải
+        function htmlXemTruoc(kq) {
+            const ten = { mc: 'Trắc nghiệm nhiều phương án', tf: 'Trắc nghiệm đúng sai', sa: 'Trả lời ngắn' };
+            const dem = { mc: 0, tf: 0, sa: 0 };
+            let truoc = '';
+            return kq.cauHoi.map((q) => {
+                const da = kq.dapAn[q.id] || {};
+                let h = '';
+                if (q.loai !== truoc) { h += '<h4 class="font-black text-gray-800 mt-6 mb-3">Phần ' + DT.PHAN[q.loai] + '. ' + ten[q.loai] + '</h4>'; truoc = q.loai; }
+                h += '<div class="border border-gray-100 rounded-xl p-4 mb-3"><div class="text-xs font-bold text-gray-400 mb-1">Câu ' + (++dem[q.loai]) + '</div>' +
+                    '<div class="dfm-noi-dung text-sm text-gray-800">' + q.noiDung + '</div>';
+                if (q.loai === 'mc') {
+                    h += '<div class="grid sm:grid-cols-2 gap-2 mt-3">' + q.luaChon.map((o) =>
+                        '<div class="flex gap-2 items-start text-sm rounded-lg px-3 py-2 border ' + (da.dung === o.key ? 'border-emerald-300 bg-emerald-50' : 'border-gray-100') + '">' +
+                        '<b class="' + (da.dung === o.key ? 'text-emerald-700' : 'text-gray-400') + '">' + o.key + '.</b><span class="dfm-noi-dung min-w-0">' + o.html + '</span></div>').join('') + '</div>';
+                } else if (q.loai === 'tf') {
+                    h += '<div class="mt-3 space-y-1">' + q.luaChon.map((o, i) =>
+                        '<div class="flex gap-2 items-start text-sm"><b class="text-gray-400">' + o.key + ')</b><span class="dfm-noi-dung flex-1 min-w-0">' + o.html + '</span>' +
+                        '<span class="shrink-0 text-xs font-bold px-2 py-0.5 rounded ' + ((da.dung || [])[i] ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-600') + '">' + ((da.dung || [])[i] ? 'Đúng' : 'Sai') + '</span></div>').join('') + '</div>';
+                } else {
+                    h += '<p class="mt-3 text-sm">Đáp án: <b class="text-emerald-700">' + esc(da.dung || '(chưa có)') + '</b></p>';
+                }
+                if (da.loiGiai) h += '<details class="mt-3 bg-gray-50 rounded-lg px-3 py-2"><summary class="cursor-pointer text-sm font-semibold text-teal-700">Lời giải</summary><div class="dfm-noi-dung text-sm text-gray-700 mt-2">' + da.loiGiai + '</div></details>';
+                return h + '</div>';
+            }).join('');
+        }
+
+        const boDauTikz = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D');
+
+        async function moFormDe(de) {
+            const f = moHopThoai(de ? 'Sửa đề thi' : 'Tạo đề thi', '<p class="text-gray-400"><i class="fa-solid fa-circle-notch fa-spin mr-1"></i>Đang tải...</p>', true);
+            let goc = null;
+            if (de) {
+                try { const s = await db.collection('dap_an').doc(de.id).get(); goc = s.exists ? s.data() : null; } catch (err) {}
+            }
+            const soBaiNop = de ? (S.baiLam || []).filter((b) => b.deId === de.id).length : 0;
+            f.innerHTML =
+                '<div class="grid sm:grid-cols-2 gap-4">' +
+                '<div class="sm:col-span-2"><label class="block text-sm font-medium mb-1.5" for="de-tieu-de">Tên đề</label>' +
+                '<input id="de-tieu-de" class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-base" placeholder="vd: Đề ôn tập chương 1 - Toán 10" value="' + esc(de ? de.tieuDe : '') + '"></div>' +
+                '<div class="sm:col-span-2"><label class="block text-sm font-medium mb-1.5" for="de-mo-ta">Mô tả ngắn</label>' +
+                '<input id="de-mo-ta" class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-base" placeholder="vd: Mệnh đề, tập hợp, hệ thức lượng" value="' + esc(de ? de.moTa || '' : '') + '"></div>' +
+                '<div><label class="block text-sm font-medium mb-1.5" for="de-thoi-gian">Thời gian làm bài (phút)</label>' +
+                '<input id="de-thoi-gian" type="number" min="1" class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-base" value="' + esc(de ? de.thoiGian : 90) + '"></div>' +
+                '<div><label class="block text-sm font-medium mb-1.5" for="de-trang-thai">Trạng thái</label>' +
+                '<select id="de-trang-thai" class="w-full px-3 py-2.5 rounded-xl border border-gray-200 bg-white text-sm">' +
+                Object.keys(TRANG_THAI_DE).map((k) => '<option value="' + k + '"' + ((de ? de.trangThai : 'nhap') === k ? ' selected' : '') + '>' + TRANG_THAI_DE[k].ten + (k === 'mo' ? ' (học sinh vào làm được)' : '') + '</option>').join('') + '</select></div>' +
+                '<label class="sm:col-span-2 flex items-center gap-2 text-sm"><input id="de-loi-giai" type="checkbox" class="accent-teal-600 w-4 h-4"' + (de && de.hienLoiGiai ? ' checked' : '') + '> Sau khi nộp bài, cho học sinh xem đáp án và lời giải (bỏ chọn: chỉ hiện điểm)</label>' +
+                '</div>' +
+                '<div class="mt-5"><div class="flex flex-wrap items-center justify-between gap-2 mb-1.5"><span class="text-sm font-medium">Nội dung đề (TeX)</span>' +
+                '<label class="text-sm text-primary font-medium cursor-pointer hover:underline"><i class="fa-solid fa-file-import mr-1"></i>Chọn file .tex<input id="de-file" type="file" accept=".tex,text/x-tex,text/plain" class="sr-only"></label></div>' +
+                '<textarea id="de-tex" spellcheck="false" class="w-full h-56 px-3 py-2.5 rounded-xl border border-gray-200 font-mono text-xs leading-relaxed" placeholder="Dán các câu \\begin{ex} ... \\end{ex} vào đây (có thể dán cả file .tex)">' + esc(goc ? goc.texGoc || '' : '') + '</textarea>' +
+                (soBaiNop ? '<p class="text-xs text-amber-700 mt-1"><i class="fa-solid fa-triangle-exclamation mr-1"></i>Đề này đã có ' + soBaiNop + ' bài nộp. Đổi thứ tự/số câu sẽ làm sai kết quả cũ.</p>' : '') +
+                '<button id="de-chuyen" type="button" class="mt-3 bg-gray-900 hover:bg-gray-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold"><i class="fa-solid fa-wand-magic-sparkles mr-1.5"></i>Chuyển đổi &amp; xem trước</button></div>' +
+                '<div id="de-ket-qua-chuyen" class="mt-5"></div>' +
+                '<div id="de-loi" class="text-sm text-red-600 mt-3"></div>' +
+                '<div class="flex justify-end gap-2 pt-4 mt-4 border-t border-gray-100"><button type="button" data-dong class="px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-100">Hủy</button>' +
+                '<button id="de-luu" type="button" disabled class="bg-primary hover:bg-teal-700 disabled:opacity-40 text-white px-5 py-2.5 rounded-xl text-sm font-semibold">' + (de ? 'Lưu thay đổi' : 'Lưu đề thi') + '</button></div>';
+
+            // Hình đã vẽ lần trước: dùng lại nếu mã TikZ không đổi
+            const hinhCu = new Map();
+            if (de && goc && Array.isArray(goc.hinhNguon)) goc.hinhNguon.forEach((ma, i) => { const h = (de.hinh || [])[i]; if (ma && h) hinhCu.set(ma, h); });
+
+            let ban = null;
+            const vung = f.querySelector('#de-ket-qua-chuyen');
+            const nutLuu = f.querySelector('#de-luu');
+
+            f.querySelector('#de-file').addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                f.querySelector('#de-tex').value = await file.text();
+                if (!f.querySelector('#de-tieu-de').value.trim()) f.querySelector('#de-tieu-de').value = file.name.replace(/\.tex$/i, '').replace(/[-_]+/g, ' ');
+                e.target.value = '';
+            });
+
+            function veHinhPanel() {
+                const p = vung.querySelector('#de-ds-hinh');
+                if (!p || !ban) return;
+                p.innerHTML = ban.hinh.map((h, i) => {
+                    const nhan = {
+                        cho: ['bg-gray-100 text-gray-500', 'fa-hourglass', 'Đang chờ'],
+                        'dang-ve': ['bg-blue-50 text-blue-700', 'fa-circle-notch fa-spin', 'Đang vẽ...'],
+                        xong: ['bg-emerald-50 text-emerald-700', 'fa-circle-check', 'Đã vẽ'],
+                        'bo-dau': ['bg-amber-50 text-amber-700', 'fa-triangle-exclamation', 'Đã vẽ (bỏ dấu tiếng Việt)'],
+                        anh: ['bg-emerald-50 text-emerald-700', 'fa-image', 'Dùng ảnh tải lên'],
+                        loi: ['bg-red-50 text-red-700', 'fa-circle-xmark', 'Chưa có hình']
+                    }[h.trangThai] || ['', '', ''];
+                    return '<div class="border border-gray-100 rounded-xl p-3 flex flex-col gap-2">' +
+                        '<div class="flex items-center justify-between gap-2"><b class="text-sm">Hình ' + (i + 1) + '</b>' +
+                        '<span class="text-xs font-medium px-2 py-0.5 rounded-full ' + nhan[0] + '"><i class="fa-solid ' + nhan[1] + ' mr-1"></i>' + nhan[2] + '</span></div>' +
+                        '<div class="dfm-hinh min-h-[60px] flex items-center justify-center" data-hinh="' + i + '"></div>' +
+                        (h.ghiChu ? '<p class="text-xs text-gray-500">' + esc(h.ghiChu) + '</p>' : '') +
+                        '<div class="flex flex-wrap gap-2"><label class="text-xs font-medium text-primary cursor-pointer hover:underline"><i class="fa-solid fa-upload mr-1"></i>Tải ảnh thay thế' +
+                        '<input type="file" accept="image/*" data-anh-hinh="' + i + '" class="sr-only"></label>' +
+                        (h.tikz && h.trangThai !== 'dang-ve' ? '<button type="button" data-ve-lai="' + i + '" class="text-xs font-medium text-gray-500 hover:underline"><i class="fa-solid fa-rotate mr-1"></i>Vẽ lại từ TikZ</button>' : '') +
+                        '</div></div>';
+                }).join('');
+                DT.ganHinh(p, ban.hinh.map((h) => (h.trangThai === 'dang-ve' || h.trangThai === 'cho' ? null : h)));
+                p.querySelectorAll('.dfm-hinh-phai').forEach((x) => x.classList.remove('dfm-hinh-phai'));   // trong khung xem hình: không nổi sang phải
+                DT.ganHinh(vung.querySelector('#de-xem-truoc'), ban.hinh);
+                const xong = ban.hinh.every((h) => h.trangThai !== 'cho' && h.trangThai !== 'dang-ve');
+                nutLuu.disabled = !xong || !ban.kq.cauHoi.length;
+            }
+
+            async function veMotHinh(h) {
+                h.trangThai = 'dang-ve'; h.ghiChu = ''; veHinhPanel();
+                try {
+                    h.svg = await veTikz(h.tikz); h.url = ''; h.trangThai = 'xong';
+                } catch (err) {
+                    h.svg = '';
+                    if (/[^\x00-\x7F]/.test(h.tikz)) {
+                        try { h.svg = await veTikz(boDauTikz(h.tikz)); h.trangThai = 'bo-dau'; h.ghiChu = 'Chữ tiếng Việt trong hình không vẽ được có dấu nên đã bỏ dấu. Nếu cần đúng chính tả, hãy tải ảnh thay thế.'; } catch (e2) {}
+                    }
+                    if (!h.svg) { h.trangThai = 'loi'; h.ghiChu = 'Không vẽ được hình này trên trình duyệt (' + err.message + '). Hãy chụp hình từ PDF rồi bấm “Tải ảnh thay thế”.'; }
+                }
+                veHinhPanel();
+            }
+
+            vung.addEventListener('click', (e) => {
+                const n = e.target.closest('[data-ve-lai]');
+                if (n) veMotHinh(ban.hinh[+n.getAttribute('data-ve-lai')]);
+            });
+            vung.addEventListener('change', async (e) => {
+                const inp = e.target.closest('[data-anh-hinh]');
+                if (!inp || !inp.files[0]) return;
+                const h = ban.hinh[+inp.getAttribute('data-anh-hinh')];
+                h.trangThai = 'dang-ve'; veHinhPanel();
+                try { h.url = await taiAnhLenCloud(inp.files[0]); h.svg = ''; h.trangThai = 'anh'; h.ghiChu = ''; }
+                catch (err) { h.trangThai = h.svg ? 'xong' : 'loi'; h.ghiChu = err.message; }
+                veHinhPanel();
+            });
+
+            f.querySelector('#de-chuyen').addEventListener('click', async () => {
+                const tex = f.querySelector('#de-tex').value;
+                f.querySelector('#de-loi').textContent = '';
+                const kq = DT.phanTich(tex);
+                ban = {
+                    kq: kq, tex: tex,
+                    hinh: kq.hinh.map((h) => {
+                        const cu = h.tikz && hinhCu.get(h.tikz);
+                        if (cu && (cu.svg || cu.url)) return Object.assign({}, h, { svg: cu.svg || '', url: cu.url || '', trangThai: cu.url ? 'anh' : 'xong', ghiChu: '' });
+                        if (!h.tikz) return Object.assign({}, h, { svg: '', url: '', trangThai: 'loi', ghiChu: 'Hình dùng ảnh ngoài (' + h.tenAnh + '): hãy tải ảnh này lên.' });
+                        return Object.assign({}, h, { svg: '', url: '', trangThai: 'cho', ghiChu: '' });
+                    })
+                };
+                vung.innerHTML =
+                    '<div class="bg-gray-50 rounded-2xl p-4">' +
+                    '<p class="font-semibold text-gray-900"><i class="fa-solid fa-circle-check text-emerald-600 mr-1.5"></i>' + kq.cauHoi.length + ' câu: ' + esc(tomTatSoCau(kq.cauHoi)) + '</p>' +
+                    '<p class="text-sm text-gray-500 mt-1">' + (kq.boQua ? 'Bỏ qua ' + kq.boQua + ' câu tự luận (không có \\choice, \\choiceTF hay \\shortans). ' : '') + (kq.hinh.length ? kq.hinh.length + ' hình.' : 'Không có hình.') + '</p>' +
+                    (kq.canhBao.length ? '<ul class="mt-2 text-sm text-amber-800 bg-amber-50 rounded-xl px-4 py-2 space-y-1">' + kq.canhBao.map((c) => '<li><i class="fa-solid fa-triangle-exclamation mr-1"></i>' + esc(c) + '</li>').join('') + '</ul>' : '') +
+                    '</div>' +
+                    (kq.hinh.length ? '<h4 class="font-bold text-gray-900 mt-5 mb-2">Hình vẽ</h4><p class="text-xs text-gray-500 mb-3">Hình TikZ được vẽ ngay trên trình duyệt (lần đầu mất khoảng 1 phút để tải bộ vẽ). Hình nào không vẽ được thì tải ảnh thay thế.</p><div id="de-ds-hinh" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>' : '') +
+                    '<h4 class="font-bold text-gray-900 mt-5 mb-1">Xem trước</h4><div id="de-xem-truoc">' + htmlXemTruoc(kq) + '</div>';
+                DT.veToan(vung.querySelector('#de-xem-truoc'));
+                veHinhPanel();
+                for (const h of ban.hinh) if (h.trangThai === 'cho') await veMotHinh(h);
+            });
+
+            nutLuu.addEventListener('click', async () => {
+                const loiEl = f.querySelector('#de-loi');
+                const tieuDe = f.querySelector('#de-tieu-de').value.trim();
+                const thoiGian = Math.max(1, Math.round(Number(f.querySelector('#de-thoi-gian').value) || 0));
+                if (!tieuDe) { loiEl.textContent = 'Chưa nhập tên đề.'; return; }
+                if (!ban || !ban.kq.cauHoi.length) { loiEl.textContent = 'Chưa có câu hỏi nào: bấm “Chuyển đổi & xem trước” trước.'; return; }
+                if (ban.tex !== f.querySelector('#de-tex').value) { loiEl.textContent = 'Nội dung TeX đã thay đổi sau lần chuyển đổi: bấm “Chuyển đổi & xem trước” lại.'; return; }
+                const thieu = ban.hinh.filter((h) => h.trangThai === 'loi').length;
+                if (thieu && !confirm('Còn ' + thieu + ' hình chưa có (học sinh sẽ thấy ô “Hình chưa có”). Vẫn lưu?')) return;
+                const deDoc = {
+                    tieuDe: tieuDe, moTa: f.querySelector('#de-mo-ta').value.trim(), thoiGian: thoiGian,
+                    trangThai: f.querySelector('#de-trang-thai').value, hienLoiGiai: f.querySelector('#de-loi-giai').checked,
+                    cauHoi: ban.kq.cauHoi, soCau: DT.soCauTheoLoai(ban.kq.cauHoi),
+                    hinh: ban.hinh.map((h) => ({ svg: h.url ? '' : (h.svg || ''), url: h.url || '', benPhai: !!h.benPhai })),
+                    capNhatLuc: FV.serverTimestamp()
+                };
+                const kichThuoc = new Blob([JSON.stringify(deDoc)]).size;
+                if (kichThuoc > 950000) { loiEl.textContent = 'Đề quá lớn (' + Math.round(kichThuoc / 1024) + ' KB, tối đa ~930 KB): hãy thay vài hình TikZ phức tạp bằng ảnh tải lên.'; return; }
+                nutLuu.disabled = true;
+                try {
+                    const ref = de ? db.collection('de_thi').doc(de.id) : db.collection('de_thi').doc();
+                    if (!de) deDoc.taoLuc = FV.serverTimestamp();
+                    const lo = db.batch();
+                    lo.set(ref, deDoc, { merge: !!de });
+                    lo.set(db.collection('dap_an').doc(ref.id), { cauHoi: ban.kq.dapAn, texGoc: ban.tex, hinhNguon: ban.hinh.map((h) => h.tikz || '') });
+                    await lo.commit();
+                    dongHopThoai();
+                    thongBao(de ? 'Đã lưu đề thi' : 'Đã tạo đề thi' + (deDoc.trangThai === 'mo' ? ' và mở cho học sinh' : ' (đang ở dạng nháp)'));
+                    await taiDuLieu();
+                } catch (err) {
+                    loiEl.textContent = 'Không lưu được: ' + err.message;
+                    nutLuu.disabled = false;
+                }
+            });
+        }
+
+        // ----- Kết quả một đề -----
+        async function xemKetQuaDe(de) {
+            const f = moHopThoai('Kết quả: ' + de.tieuDe, '<p class="text-gray-400"><i class="fa-solid fa-circle-notch fa-spin mr-1"></i>Đang tải...</p>', true);
+            let dapAn = {}, ds = [];
+            try {
+                const [da, bl] = await Promise.all([
+                    db.collection('dap_an').doc(de.id).get(),
+                    db.collection('bai_lam').where('deId', '==', de.id).get()
+                ]);
+                dapAn = (da.exists && da.data().cauHoi) || {};
+                ds = bl.docs.map((d) => Object.assign({ id: d.id }, d.data()));
+            } catch (err) { f.innerHTML = '<p class="text-red-600">Không tải được kết quả: ' + esc(err.message) + '</p>'; return; }
+            if (!ds.length) { f.innerHTML = '<p class="text-gray-500">Chưa có học sinh nào nộp bài.</p>'; return; }
+
+            ds.forEach((b) => { b.kq = DT.chamDiem(de.cauHoi || [], dapAn, b.traLoi); });
+            ds.sort((a, b) => b.kq.thang10 - a.kq.thang10 || (a.thoiGianLam || 0) - (b.thoiGianLam || 0));
+            const diem = ds.map((b) => b.kq.thang10);
+            const tb = diem.reduce((s, x) => s + x, 0) / diem.length;
+            const so = (x) => (Math.round(x * 100) / 100).toString().replace('.', ',');
+            const dem = { mc: 0, tf: 0, sa: 0 };
+            const tiLe = (de.cauHoi || []).map((q) => ({
+                nhan: DT.PHAN[q.loai] + '.' + (++dem[q.loai]),
+                pt: Math.round(ds.filter((b) => b.kq.chiTiet[q.id] && b.kq.chiTiet[q.id].dung).length / ds.length * 100)
+            }));
+
+            f.innerHTML =
+                '<div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">' +
+                oSoLieu('Bài nộp', ds.length, '', true) + oSoLieu('Điểm trung bình', so(tb), '', true) +
+                oSoLieu('Cao nhất', so(Math.max(...diem)), '', true) + oSoLieu('Thấp nhất', so(Math.min(...diem)), '', true) + '</div>' +
+                '<h3 class="font-bold text-gray-900 mb-1">Tỉ lệ làm đúng từng câu</h3><p class="text-xs text-gray-500 mb-3">I.3 = Phần I câu 3. Câu đỏ là câu nhiều học sinh làm sai (Phần II tính là đúng khi đúng cả 4 ý).</p>' +
+                '<div class="flex flex-wrap gap-1.5 mb-6">' + tiLe.map((x) =>
+                    '<span class="text-xs font-medium px-2 py-1 rounded-lg ' + (x.pt < 40 ? 'bg-red-50 text-red-700' : x.pt < 70 ? 'bg-amber-50 text-amber-700' : 'bg-emerald-50 text-emerald-700') + '">' + x.nhan + ': ' + x.pt + '%</span>').join('') + '</div>' +
+                '<div class="overflow-x-auto border border-gray-100 rounded-xl"><table class="bang w-full text-sm min-w-[720px]"><thead><tr>' +
+                '<th>#</th><th>Học sinh</th><th class="text-right">Điểm</th><th class="text-right">Phần I</th><th class="text-right">Phần II</th><th class="text-right">Phần III</th><th class="text-right">Thời gian</th><th class="text-right">Rời trang</th><th>Nộp lúc</th><th></th></tr></thead><tbody>' +
+                ds.map((b, i) => '<tr><td class="text-gray-400 so">' + (i + 1) + '</td><td class="font-medium text-gray-900">' + esc(b.email || b.uid) + '</td>' +
+                    '<td class="text-right so font-bold">' + so(b.kq.thang10) + '</td>' +
+                    '<td class="text-right so">' + b.kq.phan.mc.dung + '/' + b.kq.phan.mc.so + '</td>' +
+                    '<td class="text-right so">' + so(b.kq.phan.tf.diem) + '</td>' +
+                    '<td class="text-right so">' + b.kq.phan.sa.dung + '/' + b.kq.phan.sa.so + '</td>' +
+                    '<td class="text-right so whitespace-nowrap">' + phutGiay((b.thoiGianLam || 0) * 1000) + '</td>' +
+                    '<td class="text-right so">' + (b.viPham ? '<span class="text-red-700 font-medium"><i class="fa-solid fa-triangle-exclamation mr-1"></i>' + esc(b.viPham) + '</span>' : '0') + '</td>' +
+                    '<td class="text-gray-500 whitespace-nowrap">' + ngayGio(thanhDate(b.nopLuc)) + '</td>' +
+                    '<td><button type="button" data-lam-lai="' + esc(b.id) + '" class="text-xs text-gray-500 hover:text-red-600 whitespace-nowrap" title="Xóa bài này để học sinh làm lại"><i class="fa-solid fa-rotate-left mr-1"></i>Cho làm lại</button></td></tr>').join('') +
+                '</tbody></table></div>';
+
+            f.querySelectorAll('[data-lam-lai]').forEach((n) => n.addEventListener('click', async () => {
+                const b = ds.find((x) => x.id === n.getAttribute('data-lam-lai'));
+                if (!confirm('Xóa bài làm của ' + (b.email || b.uid) + ' để học sinh làm lại đề này?')) return;
+                try { await db.collection('bai_lam').doc(b.id).delete(); thongBao('Đã xóa bài làm, học sinh có thể làm lại'); await taiDuLieu(); xemKetQuaDe(de); }
+                catch (err) { thongBao('Lỗi: ' + err.message); }
+            }));
+        }
 
         // ---------- Tab & khởi động ----------
         function chonTab(ten) {

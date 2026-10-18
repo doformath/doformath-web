@@ -1,0 +1,32 @@
+/* File nguồn: KHÔNG nhúng file này vào trang. Chạy  npm run build:css  để tạo assets/css/tailwind.css */
+@tailwind base;
+@tailwind components;
+
+/* Mốc: script build chèn bản màu tối của các class màu vào đúng chỗ này
+   (sau base/components, trước utilities, để các class dark: viết tay vẫn được ưu tiên) */
+.dfm-moc-che-do-toi { --dfm-moc: 1; }
+
+@tailwind utilities;
+
+/* ===== Chế độ tối: phần nền chung ===== */
+html.dark { color-scheme: dark; background-color: #0f172a; color: #e2e8f0; }
+/* Hình SVG trong bài giảng vẽ nét đen trên nền trong suốt: lót nền trắng để vẫn đọc được */
+html.dark img[src$=".svg"] { background-color: #fff; border-radius: .5rem; }
+
+/* ===== Nội dung đề thi chuyển từ TeX (assets/js/dfm-de-thi.js) ===== */
+.dfm-noi-dung { line-height: 1.7; }
+.dfm-noi-dung::after { content: ""; display: table; clear: both; }
+.dfm-ds { list-style: disc; padding-left: 1.5rem; margin: .25rem 0; }
+.dfm-ds-so { list-style: decimal; padding-left: 1.5rem; margin: .25rem 0; }
+.dfm-ds-so.dfm-ds-chu { list-style: lower-alpha; }
+.dfm-bang { border-collapse: collapse; margin: .5rem auto; }
+.dfm-bang td { border: 1px solid #cbd5e1; padding: .3rem .7rem; text-align: center; }
+html.dark .dfm-bang td { border-color: #475569; }
+.dfm-hinh { display: block; margin: .75rem auto; text-align: center; max-width: 100%; overflow-x: auto; }
+.dfm-hinh svg, .dfm-hinh img { display: inline-block; max-width: 100%; height: auto; }
+/* SVG của TikZ vẽ nét bằng màu chữ hiện tại (currentColor): luôn dùng đen, kể cả ở chế độ tối */
+.dfm-hinh svg { color: #000 !important; }   /* SVG có sẵn style="color: currentcolor" nên cần !important */
+@media (min-width: 640px) { .dfm-hinh.dfm-hinh-phai { float: right; margin: 0 0 .5rem 1.25rem; max-width: 45%; } }
+.dfm-hinh-thieu { display: inline-block; padding: .5rem 1rem; border: 1px dashed #f59e0b; border-radius: .5rem; color: #b45309; font-size: .85rem; }
+/* Hình TikZ / ảnh vẽ nét đen trên nền trong suốt: lót nền trắng ở chế độ tối */
+html.dark .dfm-hinh svg, html.dark .dfm-hinh img { background: #fff; border-radius: .5rem; padding: .35rem; }

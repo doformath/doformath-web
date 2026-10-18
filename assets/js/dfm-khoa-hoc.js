@@ -1,7 +1,8 @@
 // Dùng chung cho các trang khóa học (toan-10/11/12.html), gọi sau khi học sinh được xác nhận có quyền:
 //     dfmKhoaHoc.batDau(db, user, currentCourse);
 // 1. Chèn các bài học thêm từ trang Admin (Firestore: bai_hoc_them) vào đúng chương trong mục lục.
-// 2. Ghi lại hoạt động học tập (Firestore: hoc_sinh/{uid} và hoc_sinh/{uid}/hoat_dong) để Admin theo dõi.
+// 2. Nhớ bài đang học (cho thẻ "Tiếp tục học" ở trang chủ) và mở thẳng bài qua địa chỉ ?bai=...
+// 3. Ghi lại hoạt động học tập (Firestore: hoc_sinh/{uid} và hoc_sinh/{uid}/hoat_dong) để Admin theo dõi.
 window.dfmKhoaHoc = (function () {
     const ADMIN_EMAIL = 'thanhdo@dfm.com';
     const GIAY_TOI_DA_MOI_DOAN = 60 * 60;   // Tab để mở quá lâu (quên tắt) chỉ tính tối đa 1 giờ mỗi lần
@@ -26,17 +27,25 @@ window.dfmKhoaHoc = (function () {
         return el ? el.textContent.replace(/\s+/g, ' ').trim() : '';
     }
 
+    // Chữ hiển thị của một tiêu đề: bỏ bản MathML ẩn của KaTeX (tránh lặp ký tự) và nhãn "Mới"
+    function chuHienThi(el) {
+        if (!el) return '';
+        const ban = el.cloneNode(true);
+        ban.querySelectorAll('.katex-mathml, [data-nhan-moi]').forEach((n) => n.remove());
+        return chu(ban).replace(/∘/g, '°');   // ^\circ của KaTeX khi thành chữ thường: 0∘ → 0°
+    }
+
     function thongTinBai(link) {
         const khoiBai = link.closest('[x-data*="openLesson"]');
         const khoiChuong = link.closest('[x-data*="openChapter"]');
-        const h5 = khoiBai && khoiBai.querySelector('h5');
-        // Bỏ nhãn "Mới" (nếu có) khỏi tên bài
-        const tenBai = h5 ? Array.from(h5.childNodes).filter((n) => n.nodeType === 3).map((n) => n.textContent).join(' ').replace(/\s+/g, ' ').trim() || chu(h5) : '';
-        const muc = chu(link);
+        const tenBai = chuHienThi(khoiBai && khoiBai.querySelector('h5'));
+        const muc = chuHienThi(link);
         return {
             url: link.getAttribute('href'),
             ten: tenBai ? tenBai + ' — ' + muc : muc,
-            chuong: chu(khoiChuong && khoiChuong.querySelector('h4 span'))
+            tenBai: tenBai,
+            muc: muc,
+            chuong: chuHienThi(khoiChuong && khoiChuong.querySelector('h4 span'))
         };
     }
 
@@ -83,7 +92,7 @@ window.dfmKhoaHoc = (function () {
         h5.textContent = bai.ten;
         const taoLuc = bai.taoLuc && bai.taoLuc.toMillis ? bai.taoLuc.toMillis() : 0;
         if (taoLuc && Date.now() - taoLuc < NGAY_LA_BAI_MOI * 86400000) {
-            const moi = el('span', 'ml-2 align-middle text-[10px] font-bold uppercase tracking-wide text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded');
+            const moi = el('span', 'ml-2 align-middle text-[10px] font-bold uppercase tracking-wide text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded', { 'data-nhan-moi': '' });
             moi.textContent = 'Mới';
             h5.appendChild(moi);
         }
@@ -170,7 +179,53 @@ window.dfmKhoaHoc = (function () {
         });
     }
 
-    // ---------- 2. Theo dõi học tập ----------
+    // ---------- 2. Học tiếp ----------
+    // Nhớ bài đang học trên máy này để trang chủ hiện thẻ "Tiếp tục học"
+    const KHOA_HOC_TIEP = 'dfm_hocTiep';
+    function luuHocTiep(user, khoa, link) {
+        const info = thongTinBai(link);
+        try {
+            localStorage.setItem(KHOA_HOC_TIEP, JSON.stringify({
+                email: user.email, khoa: khoa, url: info.url, tenBai: info.tenBai, muc: info.muc, chuong: info.chuong, luc: Date.now()
+            }));
+        } catch (e) {}
+    }
+    function ghiNhoHocTiep(user, khoa) {
+        const iframe = document.getElementById('lesson-frame');
+        if (iframe) {
+            const src = boTitle(iframe.getAttribute('src'));
+            const linkDau = Array.from(document.querySelectorAll('a[target="lesson-frame"]'))
+                .find(function (a) { return boTitle(a.getAttribute('href')) === src; });
+            if (laLinkBai(linkDau)) luuHocTiep(user, khoa, linkDau);
+        }
+        document.addEventListener('click', function (e) {
+            const link = e.target.closest && e.target.closest('a[target="lesson-frame"]');
+            if (laLinkBai(link)) luuHocTiep(user, khoa, link);
+        }, true);
+    }
+
+    // Mở thẳng một bài khi vào trang bằng địa chỉ ...toan-12.html?bai=<link bài> (từ nút "Tiếp tục học")
+    function moBaiTheoDiaChi(khoa) {
+        const bai = new URLSearchParams(location.search).get('bai');
+        if (!bai) return;
+        history.replaceState(null, '', location.pathname);   // giữ địa chỉ gọn; tải lại trang thì mở như bình thường
+        const iframe = document.getElementById('lesson-frame');
+        // Chỉ mở link có thật trong mục lục (không mở link lạ chèn vào địa chỉ)
+        const link = Array.from(document.querySelectorAll('a[target="lesson-frame"]')).find(function (a) { return a.getAttribute('href') === bai; });
+        if (!iframe || !laLinkBai(link)) return;
+        iframe.src = bai;
+        try { localStorage.setItem('doforMath_lastLesson_' + khoa.replace('-', ''), bai); } catch (e) {}
+        // Mở chương + bài chứa mục này trong mục lục, tô sáng và cuộn tới
+        try {
+            const chuong = link.closest('[x-data*="openChapter"]'), khoiBai = link.closest('[x-data*="openLesson"]');
+            if (window.Alpine && chuong) Alpine.$data(chuong).openChapter = true;
+            if (window.Alpine && khoiBai) Alpine.$data(khoiBai).openLesson = true;
+        } catch (e) {}
+        link.classList.add('text-teal-600', 'font-semibold');
+        setTimeout(function () { link.scrollIntoView({ block: 'center', behavior: 'smooth' }); }, 400);
+    }
+
+    // ---------- 3. Theo dõi học tập ----------
     function batDauTheoDoi(db, user, khoa) {
         const FV = firebase.firestore.FieldValue;
         const ref = db.collection('hoc_sinh').doc(user.uid);
@@ -258,6 +313,8 @@ window.dfmKhoaHoc = (function () {
             try {
                 if (!db || !user) return;
                 chenBaiHocThem(db, khoa).then(function () {
+                    moBaiTheoDiaChi(khoa);
+                    ghiNhoHocTiep(user, khoa);
                     if (user.email !== ADMIN_EMAIL) batDauTheoDoi(db, user, khoa);
                 }).catch(function (err) { console.warn('Lỗi theo dõi học tập:', err); });
             } catch (err) {
