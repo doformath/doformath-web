@@ -16,6 +16,10 @@
         }
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- KaTeX: vẽ logo DoforMath giống các trang khác -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
 
     <!-- PWA: cho phép cài DoforMath như ứng dụng -->
     <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png">
@@ -46,14 +50,16 @@
 
     <!-- HEADER -->
     <header class="bg-white shadow-sm sticky top-0 z-40">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
             <a href="index.html" class="flex items-center gap-2 text-gray-500 hover:text-primary font-medium transition-colors shrink-0">
                 <i class="fa-solid fa-arrow-left"></i><span class="hidden sm:inline">Trang chủ</span>
             </a>
-            <div class="flex items-center gap-2 min-w-0">
-                <span class="w-9 h-9 rounded-xl bg-teal-50 text-primary flex items-center justify-center shrink-0"><i class="fa-solid fa-chart-line"></i></span>
-                <h1 class="text-lg md:text-xl font-bold text-gray-900 truncate">Quản trị DoforMath</h1>
-            </div>
+            <h1 class="sr-only">Quản trị DoforMath</h1>
+            <a href="index.html" class="hover:opacity-80 transition-opacity absolute left-1/2 -translate-x-1/2">
+                <span class="text-xl md:text-2xl tracking-tight text-gray-900">
+                    $\textcolor{#0d9488}{\textsf{\textbf{Dofor}}{\sum}\textsf{\textbf{ath}}}$
+                </span>
+            </a>
             <button id="nut-tai-lai" type="button" class="flex items-center gap-2 text-sm text-gray-500 hover:text-primary font-medium transition-colors shrink-0" title="Tải lại dữ liệu">
                 <i class="fa-solid fa-rotate"></i><span class="hidden sm:inline">Tải lại</span>
             </button>
@@ -225,6 +231,11 @@
     <!-- Thông báo nhỏ -->
     <div id="thong-bao" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-[60] bg-gray-900 text-white text-sm px-4 py-2.5 rounded-xl shadow-lg max-w-[calc(100vw-32px)]" role="status" hidden></div>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            renderMathInElement(document.querySelector('header'), { delimiters: [{ left: '$', right: '$', display: false }], throwOnError: false });
+        });
+    </script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
