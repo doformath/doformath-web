@@ -288,7 +288,8 @@ window.dfmDeThi = (function () {
 
     // ----- Chia điểm (Admin chỉnh cho từng đề) -----
     // thangDiem = { mc, tf, sa: tổng điểm của mỗi loại câu (chia đều cho các câu cùng loại),
-    //               ds: [% điểm khi đúng 1, 2, 3, 4 ý] của câu đúng/sai }
+    //               ds: [% điểm khi đúng 1, 2, 3, 4 ý] của câu đúng/sai,
+    //               tl: điểm tối đa phần tự luận (làm trên giấy, thầy nhập điểm tay; 0 = không có) }
     // Đề chưa chia điểm dùng mặc định THPT 2025: 0,25 / 1 / 0,5 điểm mỗi câu; đúng/sai 10-25-50-100%.
     const DIEM_CAU_THPT = { mc: 0.25, tf: 1, sa: 0.5 };
     const DS_THPT = [10, 25, 50, 100];
@@ -302,14 +303,21 @@ window.dfmDeThi = (function () {
             tong[l] = n ? (Number.isFinite(v) && v >= 0 ? v : lamTron(DIEM_CAU_THPT[l] * n, 4)) : 0;
             moiCau[l] = n ? tong[l] / n : 0;
         });
+        const tl = Number(td.tl);
+        tong.tl = Number.isFinite(tl) && tl > 0 ? tl : 0;
         const ds = Array.isArray(td.ds) && td.ds.length === 4 && td.ds.every(function (x) { return Number.isFinite(Number(x)); })
             ? td.ds.map(Number) : DS_THPT.slice();
-        return { tong: tong, moiCau: moiCau, ds: ds, toiDa: lamTron(tong.mc + tong.tf + tong.sa, 4) };
+        return { tong: tong, moiCau: moiCau, ds: ds, toiDa: lamTron(tong.mc + tong.tf + tong.sa + tong.tl, 4) };
     }
     // Số kiểu Việt Nam: 0,25 ; tối đa n chữ số thập phân
     function dinhDangSo(x, n) { return lamTron(x, n == null ? 2 : n).toString().replace('.', ','); }
 
-    function chamDiem(cauHoi, dapAn, traLoi, thangDiem) {
+    // Điểm tự luận thầy nhập (trường diemTuLuan của bài làm): chỉ nhận số hợp lệ, không vượt quá điểm tối đa
+    function diemTuLuanHopLe(v, toiDa) {
+        return toiDa > 0 && typeof v === 'number' && Number.isFinite(v) ? Math.max(0, Math.min(toiDa, v)) : null;
+    }
+
+    function chamDiem(cauHoi, dapAn, traLoi, thangDiem, diemTuLuan) {
         traLoi = traLoi || {};
         const td = chuanThangDiem(thangDiem, soCauTheoLoai(cauHoi));
         const kq = { tong: 0, toiDa: td.toiDa, chiTiet: {}, phan: {} };
@@ -336,6 +344,9 @@ window.dfmDeThi = (function () {
             kq.chiTiet[q.id] = { diem: diem, toiDa: toiDa, dung: dung, soYDung: soYDung, soY: soY };
         });
         ['mc', 'tf', 'sa'].forEach(function (l) { kq.phan[l].diem = lamTron(kq.phan[l].diem, 4); });
+        const tl = diemTuLuanHopLe(diemTuLuan, td.tong.tl);
+        kq.phan.tl = { daCham: tl !== null, diem: tl || 0, toiDa: td.tong.tl };
+        kq.tong += tl || 0;
         kq.tong = lamTron(kq.tong, 2);
         kq.thang10 = kq.toiDa ? lamTron(kq.tong / kq.toiDa * 10, 2) : 0;
         return kq;
@@ -367,6 +378,7 @@ window.dfmDeThi = (function () {
         chuanThangDiem: chuanThangDiem, dinhDangSo: dinhDangSo, lamTron: lamTron, DIEM_CAU_THPT: DIEM_CAU_THPT, DS_THPT: DS_THPT,
         phanTich: phanTich, texSangHtml: texSangHtml, chamDiem: chamDiem, tlnDung: tlnDung, soChuan: soChuan,
         veToan: veToan, ganHinh: ganHinh, soCauTheoLoai: soCauTheoLoai, MACRO: MACRO,
+        diemTuLuanHopLe: diemTuLuanHopLe,
         TEN_LOAI: { mc: 'Trắc nghiệm', tf: 'Đúng/Sai', sa: 'Trả lời ngắn' },
         PHAN: { mc: 'I', tf: 'II', sa: 'III' }
     };

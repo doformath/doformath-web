@@ -12,7 +12,7 @@
     <!-- Giao diện sáng / tối: chạy trước CSS để không bị nháy màu -->
     <script src="assets/js/dfm-giao-dien.js"></script>
     <!-- CSS Tailwind dựng sẵn cho cả site (sửa class xong chạy: npm run build:css) -->
-    <link rel="stylesheet" href="assets/css/tailwind.css?v=a5530322">
+    <link rel="stylesheet" href="assets/css/tailwind.css?v=4d1f765f">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- KaTeX: vẽ logo DoforMath giống các trang khác -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
@@ -76,7 +76,7 @@
         </div>
         <nav id="thanh-tab" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex gap-1 overflow-x-auto pb-2" role="tablist" hidden>
             <button class="tab-btn px-4 py-2 rounded-full text-sm text-gray-600 hover:bg-gray-100 whitespace-nowrap" role="tab" data-tab="tong-quan" aria-selected="true"><i class="fa-solid fa-gauge-high mr-1.5"></i>Tổng quan</button>
-            <button class="tab-btn px-4 py-2 rounded-full text-sm text-gray-600 hover:bg-gray-100 whitespace-nowrap" role="tab" data-tab="hoc-sinh" aria-selected="false"><i class="fa-solid fa-user-graduate mr-1.5"></i>Học sinh</button>
+            <button class="tab-btn px-4 py-2 rounded-full text-sm text-gray-600 hover:bg-gray-100 whitespace-nowrap" role="tab" data-tab="hoc-sinh" aria-selected="false"><i class="fa-solid fa-user-graduate mr-1.5"></i>Học sinh<span id="so-cho-duyet" class="hidden ml-1.5 text-[11px] font-bold bg-amber-400 text-white rounded-full px-1.5 py-0.5"></span></button>
             <button class="tab-btn px-4 py-2 rounded-full text-sm text-gray-600 hover:bg-gray-100 whitespace-nowrap" role="tab" data-tab="bai-hoc" aria-selected="false"><i class="fa-solid fa-book-open mr-1.5"></i>Bài học</button>
             <button class="tab-btn px-4 py-2 rounded-full text-sm text-gray-600 hover:bg-gray-100 whitespace-nowrap" role="tab" data-tab="kiem-tra" aria-selected="false"><i class="fa-solid fa-clipboard-check mr-1.5"></i>Kiểm tra</button>
             <button class="tab-btn px-4 py-2 rounded-full text-sm text-gray-600 hover:bg-gray-100 whitespace-nowrap" role="tab" data-tab="de-thi" aria-selected="false"><i class="fa-solid fa-file-signature mr-1.5"></i>Đề thi</button>
@@ -145,10 +145,15 @@
                     <option value="ngayHoc">Nhiều ngày học nhất</option>
                     <option value="email">Theo email (A-Z)</option>
                 </select>
+                <button id="nut-ma-lop" type="button" class="bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 px-4 py-2.5 rounded-xl text-sm font-semibold shadow-sm transition-colors">
+                    <i class="fa-solid fa-key mr-1.5"></i>Mã lớp
+                </button>
                 <button id="nut-them-hs" type="button" class="bg-primary hover:bg-teal-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold shadow-sm transition-colors">
                     <i class="fa-solid fa-user-plus mr-1.5"></i>Thêm học sinh
                 </button>
             </div>
+            <!-- Học sinh tự đăng ký bằng mã lớp, chờ duyệt -->
+            <div id="khung-cho-duyet" class="hidden mb-5 bg-amber-50/60 border border-amber-200 rounded-2xl p-4 md:p-5"></div>
             <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-x-auto">
                 <table class="bang w-full text-sm min-w-[760px]">
                     <thead><tr>
@@ -458,7 +463,7 @@
         // ---------- Tải dữ liệu ----------
         async function taiDuLieu() {
             S.dapAn = {};
-            const tenNguon = ['phan_quyen', 'hoc_sinh', 'bai_hoc_them'].concat(BAI_KIEM_TRA.map((b) => b.id), ['de_thi', 'bai_lam']);
+            const tenNguon = ['phan_quyen', 'hoc_sinh', 'bai_hoc_them'].concat(BAI_KIEM_TRA.map((b) => b.id), ['de_thi', 'bai_lam', 'lop', 'dang_ky']);
             const kq = await Promise.allSettled(tenNguon.map((t) => db.collection(t).get()));
             const loi = [];
             const lay = (i) => (kq[i].status === 'fulfilled' ? kq[i].value.docs : (loi.push(tenNguon[i]), []));
@@ -480,6 +485,24 @@
                 });
                 S.theoUid.set(d.id, hs);
             });
+            // Hoàn thành đề thi trực tuyến / kiểm tra công thức cũng tính là một lượt truy cập + ngày vào học
+            // (các trang này không ghi vào hoc_sinh)
+            const ghiLamBai = (hs, luc, viec) => {
+                if (!hs || !luc) return;
+                const k = ngayKey(luc);
+                hs.ngay[k] = (hs.ngay[k] || 0) + 1;
+                hs.luotVao = (hs.luotVao || 0) + 1;
+                hs.soLanLamBai = (hs.soLanLamBai || 0) + 1;
+                if (!hs.lanCuoi || luc > hs.lanCuoi) { hs.lanCuoi = luc; hs.viecCuoi = viec; }
+            };
+            lay(4 + BAI_KIEM_TRA.length).forEach((d) => {
+                const v = d.data();
+                ghiLamBai(theoEmail.get(String(v.email || '').toLowerCase()), thanhDate(v.nopLuc), 'Đề thi · ' + (v.tieuDe || 'Đề thi trực tuyến'));
+            });
+            BAI_KIEM_TRA.forEach((b, i) => lay(3 + i).forEach((d) => {
+                const ls = d.data().lichSu;
+                if (Array.isArray(ls)) ls.forEach((l) => ghiLamBai(S.theoUid.get(d.id), l && thanhDate(l.luc), 'Kiểm tra · ' + b.ten));
+            }));
             theoEmail.delete(ADMIN_EMAIL);
             theoEmail.delete('');
             S.hocSinh = Array.from(theoEmail.values());
@@ -489,6 +512,8 @@
             BAI_KIEM_TRA.forEach((b, i) => { S.bxh[b.id] = lay(3 + i).map((d) => Object.assign({ uid: d.id }, d.data())); });
             S.deThi = lay(3 + BAI_KIEM_TRA.length).map((d) => Object.assign({ id: d.id }, d.data()));
             S.baiLam = lay(4 + BAI_KIEM_TRA.length).map((d) => Object.assign({ id: d.id }, d.data()));
+            S.lop = lay(5 + BAI_KIEM_TRA.length).map((d) => Object.assign({ id: d.id }, d.data()));
+            S.dangKy = lay(6 + BAI_KIEM_TRA.length).map((d) => Object.assign({ uid: d.id }, d.data()));
 
             const cb = $('canh-bao');
             cb.hidden = !loi.length;
@@ -500,6 +525,7 @@
         }
 
         function veTatCa() {
+            veChoDuyet();
             veTongQuan();
             veBangHocSinh();
             veBaiHoc();
@@ -528,7 +554,7 @@
                 oSoLieu('Vào học 7 ngày qua', hoc7, 'học sinh') +
                 oSoLieu('Tổng thời gian học', thoiLuong(tongGiay), 'ước tính, mọi học sinh');
 
-            veBieuDoCot($('bieu-do-tong'), duLieu30Ngay(ds).map((d) => Object.assign(d, { chiTiet: d.luot + ' lượt vào khóa / mở bài' })), 'học sinh');
+            veBieuDoCot($('bieu-do-tong'), duLieu30Ngay(ds).map((d) => Object.assign(d, { chiTiet: d.luot + ' lượt vào khóa / mở bài / làm bài'})), 'học sinh');
 
             const ganDay = ds.filter((h) => h.lanCuoi).sort((a, b) => b.lanCuoi - a.lanCuoi).slice(0, 8);
             $('ds-gan-day').innerHTML = ganDay.length ? ganDay.map((hs) =>
@@ -536,7 +562,7 @@
                 '<span class="w-9 h-9 rounded-full bg-teal-50 text-teal-700 font-bold flex items-center justify-center shrink-0 uppercase">' + esc(hs.email[0]) + '</span>' +
                 '<div class="min-w-0 flex-1"><div class="flex justify-between gap-2"><span class="font-medium text-gray-900 truncate">' + esc(hs.email) + '</span>' +
                 '<span class="text-xs text-gray-400 shrink-0">' + truocDay(hs.lanCuoi) + '</span></div>' +
-                '<div class="text-sm text-gray-500 truncate">' + (hs.baiCuoi ? esc(KHOA[hs.baiCuoi.khoa] || '') + ' · ' + esc(hs.baiCuoi.ten) : 'Vào trang khóa học') + '</div></div></li>'
+                '<div class="text-sm text-gray-500 truncate">' + (hs.viecCuoi ? esc(hs.viecCuoi) : hs.baiCuoi ? esc(KHOA[hs.baiCuoi.khoa] || '') + ' · ' + esc(hs.baiCuoi.ten) : 'Vào trang khóa học') + '</div></div></li>'
             ).join('') : '<li class="py-6 text-center text-gray-400 text-sm">Chưa có hoạt động nào được ghi lại.</li>';
 
             const gop = new Map();
@@ -564,6 +590,114 @@
         }
 
         // ---------- TAB HỌC SINH ----------
+        // ---------- Đăng ký bằng mã lớp: duyệt đơn + quản lý mã lớp ----------
+        function veChoDuyet() {
+            const cho = (S.dangKy || []).filter((d) => d.trangThai === 'cho').sort((a, b) => (thanhDate(a.luc) || 0) - (thanhDate(b.luc) || 0));
+            $('so-cho-duyet').textContent = cho.length;
+            $('so-cho-duyet').classList.toggle('hidden', !cho.length);
+            const khung = $('khung-cho-duyet');
+            khung.classList.toggle('hidden', !cho.length);
+            if (!cho.length) { khung.innerHTML = ''; return; }
+            khung.innerHTML = '<h3 class="font-bold text-gray-900 mb-1"><i class="fa-solid fa-hourglass-half text-amber-500 mr-1.5"></i>Chờ duyệt (' + cho.length + ')</h3>' +
+                '<p class="text-xs text-gray-500 mb-3">Học sinh tự đăng ký bằng mã lớp. Chọn khóa học rồi bấm Duyệt; học sinh vào học được ngay.</p><div class="space-y-2">' +
+                cho.map((d) => {
+                    const lop = (S.lop || []).find((l) => l.id === d.maLop);
+                    const khoaLop = (lop && lop.khoa) || {};
+                    return '<div class="bg-white rounded-xl border border-amber-100 p-3 flex flex-wrap items-center gap-x-4 gap-y-2" data-don="' + esc(d.uid) + '">' +
+                        '<div class="min-w-[180px] flex-1"><p class="font-semibold text-gray-900">' + esc(d.ten) + '</p>' +
+                        '<p class="text-xs text-gray-500">' + esc(d.email) + ' · ' + (d.cach === 'google' ? '<i class="fa-brands fa-google mr-0.5"></i>Google' : 'Email') + ' · lớp <b>' + esc(d.tenLop || d.maLop) + '</b> · ' + truocDay(thanhDate(d.luc)).toLowerCase() + '</p></div>' +
+                        '<div class="flex flex-wrap gap-2">' + Object.keys(KHOA).map((k) => '<label class="flex items-center gap-1.5 text-sm bg-gray-50 border border-gray-100 rounded-lg px-2.5 py-1.5 cursor-pointer"><input type="checkbox" value="' + k + '" class="accent-teal-600 w-4 h-4"' + (khoaLop[k] ? ' checked' : '') + '>' + KHOA[k] + '</label>').join('') + '</div>' +
+                        '<div class="flex gap-1.5 ml-auto"><button type="button" data-duyet class="bg-primary hover:bg-teal-700 text-white px-3.5 py-2 rounded-lg text-sm font-semibold"><i class="fa-solid fa-check mr-1"></i>Duyệt</button>' +
+                        '<button type="button" data-tu-choi class="px-3 py-2 rounded-lg text-sm text-red-600 hover:bg-red-50">Từ chối</button></div></div>';
+                }).join('') + '</div>';
+        }
+        $('khung-cho-duyet').addEventListener('click', async (e) => {
+            const nut = e.target.closest('[data-duyet], [data-tu-choi]');
+            if (!nut) return;
+            const o = nut.closest('[data-don]');
+            const don = (S.dangKy || []).find((d) => d.uid === o.getAttribute('data-don'));
+            if (!don) return;
+            const duyet = nut.hasAttribute('data-duyet');
+            const khoaChon = Array.from(o.querySelectorAll('input:checked'), (x) => x.value);
+            if (duyet && !khoaChon.length) { thongBao('Chọn ít nhất một khóa học để duyệt'); return; }
+            if (!duyet && !confirm('Từ chối đơn của ' + don.ten + ' (' + don.email + ')?')) return;
+            o.querySelectorAll('button').forEach((b) => { b.disabled = true; });
+            try {
+                const lo = db.batch();
+                if (duyet) {
+                    const quyen = {}; khoaChon.forEach((k) => { quyen[k] = true; });
+                    lo.set(db.collection('phan_quyen').doc(don.email), quyen, { merge: true });
+                }
+                lo.update(db.collection('dang_ky').doc(don.uid), { trangThai: duyet ? 'duyet' : 'tu-choi', xuLyLuc: FV.serverTimestamp(), khoa: khoaChon });
+                await lo.commit();
+                thongBao(duyet ? 'Đã duyệt ' + don.ten + ': ' + khoaChon.map((k) => KHOA[k]).join(', ') : 'Đã từ chối ' + don.ten);
+                await taiDuLieu();
+            } catch (err) { thongBao('Lỗi: ' + err.message); o.querySelectorAll('button').forEach((b) => { b.disabled = false; }); }
+        });
+
+        $('nut-ma-lop').addEventListener('click', moMaLop);
+        function moMaLop() {
+            // Khung hộp thoại dùng chung cho mọi hộp: gắn sự kiện vào một khung con mới để không bị chồng khi mở lại
+            const f = moHopThoai('Mã lớp', '<div></div>').firstElementChild;
+            const ve = () => {
+                const ds = (S.lop || []).slice().sort((a, b) => a.id.localeCompare(b.id));
+                const soDon = (ma) => (S.dangKy || []).filter((d) => d.maLop === ma).length;
+                f.innerHTML = '<p class="text-sm text-gray-500 mb-4">Gửi mã lớp cho học sinh. Học sinh vào <b>Đăng nhập → Đăng ký ngay</b>, nhập mã, rồi chờ bạn duyệt ở tab Học sinh. Đóng mã khi lớp đã đủ để không ai đăng ký thêm.</p>' +
+                    (ds.length ? '<div class="space-y-2 mb-5">' + ds.map((l) =>
+                        '<div class="flex flex-wrap items-center gap-3 border border-gray-100 rounded-xl px-4 py-3" data-ma="' + esc(l.id) + '">' +
+                        '<span class="font-mono font-bold text-gray-900 bg-gray-50 rounded-lg px-2.5 py-1 select-all">' + esc(l.id) + '</span>' +
+                        '<div class="flex-1 min-w-[150px]"><p class="text-sm font-medium text-gray-900">' + esc(l.ten || '') + '</p><p class="text-xs text-gray-500">' +
+                        [Object.keys(KHOA).filter((k) => l.khoa && l.khoa[k]).map((k) => KHOA[k]).join(', '), soDon(l.id) + ' đơn đăng ký'].filter(Boolean).join(' · ') + '</p></div>' +
+                        '<button type="button" role="switch" class="cong-tac" data-mo-ma aria-checked="' + (l.mo === true) + '" title="Mở / đóng đăng ký"></button>' +
+                        '<span class="text-xs w-16 ' + (l.mo ? 'text-emerald-700' : 'text-gray-400') + '">' + (l.mo ? 'Đang mở' : 'Đã đóng') + '</span>' +
+                        '<button type="button" data-xoa-ma class="text-sm text-red-600 hover:bg-red-50 px-2 py-1 rounded-lg"><i class="fa-solid fa-trash"></i></button></div>').join('') + '</div>'
+                        : '<p class="text-sm text-gray-400 mb-5">Chưa có mã lớp nào.</p>') +
+                    '<form id="form-ma-lop" class="bg-gray-50 rounded-2xl p-4 grid sm:grid-cols-2 gap-3">' +
+                    '<h3 class="sm:col-span-2 font-bold text-gray-900">Tạo mã lớp mới</h3>' +
+                    '<div><label class="block text-sm font-medium mb-1" for="ml-ma">Mã (chữ in hoa, số)</label><input id="ml-ma" maxlength="20" placeholder="vd: TOAN12A" class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-base font-mono uppercase"></div>' +
+                    '<div><label class="block text-sm font-medium mb-1" for="ml-ten">Tên lớp</label><input id="ml-ten" maxlength="60" placeholder="vd: Lớp Toán 12 tối thứ 3" class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-base"></div>' +
+                    '<fieldset class="sm:col-span-2"><legend class="text-sm font-medium mb-1.5">Khóa học gợi ý khi duyệt</legend><div class="flex flex-wrap gap-2">' +
+                    Object.keys(KHOA).map((k) => '<label class="flex items-center gap-2 bg-white border border-gray-100 rounded-xl px-3 py-2 text-sm cursor-pointer"><input type="checkbox" name="ml-khoa" value="' + k + '" class="accent-teal-600 w-4 h-4">' + KHOA[k] + '</label>').join('') + '</div></fieldset>' +
+                    '<p id="ml-loi" class="sm:col-span-2 text-sm text-red-600"></p>' +
+                    '<div class="sm:col-span-2 flex justify-end"><button type="submit" class="bg-primary hover:bg-teal-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold">Tạo mã lớp</button></div></form>';
+                f.querySelector('#ml-ma').value = 'LOP' + Math.random().toString(36).slice(2, 6).toUpperCase();
+            };
+            ve();
+            f.addEventListener('submit', async (e) => {
+                if (e.target.id !== 'form-ma-lop') return;
+                e.preventDefault();
+                const ma = f.querySelector('#ml-ma').value.trim().toUpperCase().replace(/\s+/g, '');
+                const ten = f.querySelector('#ml-ten').value.trim();
+                const khoa = {}; f.querySelectorAll('input[name="ml-khoa"]:checked').forEach((x) => { khoa[x.value] = true; });
+                const loi = f.querySelector('#ml-loi');
+                if (!/^[A-Z0-9_-]{3,20}$/.test(ma)) { loi.textContent = 'Mã dài 3–20 ký tự, chỉ gồm chữ in hoa không dấu, số, gạch.'; return; }
+                if ((S.lop || []).some((l) => l.id === ma)) { loi.textContent = 'Mã này đã có.'; return; }
+                if (!ten) { loi.textContent = 'Nhập tên lớp.'; return; }
+                try {
+                    await db.collection('lop').doc(ma).set({ ten: ten, khoa: khoa, mo: true, taoLuc: FV.serverTimestamp() });
+                    thongBao('Đã tạo mã lớp ' + ma);
+                    await taiDuLieu(); ve();
+                } catch (err) { loi.textContent = 'Lỗi: ' + err.message; }
+            });
+            f.addEventListener('click', async (e) => {
+                const o = e.target.closest('[data-ma]');
+                if (!o) return;
+                const ma = o.getAttribute('data-ma');
+                try {
+                    if (e.target.closest('[data-mo-ma]')) {
+                        const l = (S.lop || []).find((x) => x.id === ma);
+                        await db.collection('lop').doc(ma).update({ mo: !l.mo });
+                        thongBao(l.mo ? 'Đã đóng mã ' + ma : 'Đã mở mã ' + ma);
+                    } else if (e.target.closest('[data-xoa-ma]')) {
+                        if (!confirm('Xóa mã lớp ' + ma + '? Học sinh đã duyệt vẫn giữ quyền học.')) return;
+                        await db.collection('lop').doc(ma).delete();
+                        thongBao('Đã xóa mã ' + ma);
+                    } else return;
+                    await taiDuLieu(); ve();
+                } catch (err) { thongBao('Lỗi: ' + err.message); }
+            });
+        }
+
         function veBangHocSinh() {
             const tu = $('tim-hs').value.trim().toLowerCase();
             const khoa = $('loc-khoa').value;
@@ -621,7 +755,7 @@
                 '<div class="flex flex-wrap items-center gap-2 mb-5"><span class="inline-flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full ' + tt.lop + '"><i class="fa-solid ' + tt.icon + '"></i>' + tt.nhan + '</span>' +
                 '<span class="text-sm text-gray-500">Lần cuối: ' + ngayGio(hs.lanCuoi) + '</span></div>' +
                 '<div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">' +
-                oSoLieu('Lượt vào khóa', hs.luotVao || 0, '', true) + oSoLieu('Lượt mở bài', hs.soLanMoBai || 0, '', true) +
+                oSoLieu('Lượt truy cập', hs.luotVao || 0, hs.soLanLamBai ? 'gồm ' + hs.soLanLamBai + ' lần làm bài' : '', true) + oSoLieu('Lượt mở bài', hs.soLanMoBai || 0, '', true) +
                 oSoLieu('Ngày học / 30', hs.ngayHoc30, '', true) + oSoLieu('Thời gian học', thoiLuong(hs.thoiGianHoc), '', true) + '</div>' +
 
                 '<h3 class="font-bold text-gray-900 mb-1">Quyền khóa học</h3><p class="text-sm text-gray-500 mb-3">Bật/tắt là có hiệu lực ngay.</p>' +
@@ -653,7 +787,7 @@
                 const o = noiDung.querySelector('[data-diem-bai="' + b.id + '"]');
                 if (!de || !o) return;
                 try {
-                    const kq = DT.chamDiem(de.cauHoi || [], await layDapAn(de.id), b.traLoi, de.thangDiem);
+                    const kq = DT.chamDiem(de.cauHoi || [], await layDapAn(de.id), b.traLoi, de.thangDiem, b.diemTuLuan);
                     o.textContent = DT.dinhDangSo(kq.tong, 2) + '/' + DT.dinhDangSo(kq.toiDa, 2) + ' · ' + phutGiay((b.thoiGianLam || 0) * 1000) + (b.viPham ? ' · rời bài ' + b.viPham + ' lần' : '');
                 } catch (err) { o.textContent = 'Lỗi tải đáp án'; }
             });
@@ -1267,9 +1401,10 @@
             const de = (S.deThi || []).find((d) => d.id === deId);
             if (!de) return;
             const toiDa = tongDiemDe(de);
+            const tlMax = DT.chuanThangDiem(de.thangDiem, DT.soCauTheoLoai(de.cauHoi)).tong.tl;
             $('dau-kt').innerHTML = '<tr><th>#</th><th>Học sinh</th><th class="text-right whitespace-nowrap">Điểm (/' + soVN(toiDa) + ')</th><th class="text-right">Phần I</th><th class="text-right">Phần II</th><th class="text-right">Phần III</th>' +
-                '<th class="text-right">Thời gian</th><th class="text-right">Rời bài</th><th>Nộp lúc</th></tr>';
-            $('chu-kt').textContent = 'Bấm vào một dòng để xem từng câu đúng/sai. Đổi mức công bố, chia điểm hay cho làm lại ở nút “Chi tiết đề”.';
+                (tlMax ? '<th class="text-right whitespace-nowrap">Tự luận</th>' : '') + '<th class="text-right">Thời gian</th><th class="text-right">Rời bài</th><th>Nộp lúc</th></tr>';
+            $('chu-kt').textContent = 'Bấm vào một dòng để xem từng câu đúng/sai. Đổi mức công bố, chia điểm, nhập điểm tự luận hay cho làm lại ở nút “Chi tiết đề”.';
             const tt = TRANG_THAI_DE[de.trangThai] || TRANG_THAI_DE.nhap;
             const nutChiTiet = '<span class="inline-flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full ' + tt.lop + '"><i class="fa-solid ' + tt.icon + '"></i>' + tt.ten + '</span>' +
                 '<span class="text-xs text-gray-500"><i class="fa-solid ' + DT.CONG_BO[DT.congBoCua(de)].icon + ' mr-1"></i>' + DT.CONG_BO[DT.congBoCua(de)].ten + '</span>' +
@@ -1288,7 +1423,7 @@
             if ($('chon-bai-kt').value !== 'de:' + deId) return;   // đã chọn bài khác trong lúc tải
 
             const cauHoi = de.cauHoi || [];
-            const ds = bai.map((b) => Object.assign({ kq: DT.chamDiem(cauHoi, dapAn, b.traLoi, de.thangDiem) }, b))
+            const ds = bai.map((b) => Object.assign({ kq: DT.chamDiem(cauHoi, dapAn, b.traLoi, de.thangDiem, b.diemTuLuan) }, b))
                 .sort((a, b) => b.kq.tong - a.kq.tong || (a.thoiGianLam || 0) - (b.thoiGianLam || 0));
             const diem = ds.map((b) => b.kq.tong);
             $('tom-tat-kt').innerHTML = '<span>' + ds.length + ' bài nộp · điểm TB ' + soVN(diem.reduce((x, y) => x + y, 0) / diem.length) +
@@ -1303,10 +1438,11 @@
                     (b.lyDoNop === 'vi-pham' ? '<div class="text-xs text-red-600">Tự nộp do rời bài</div>' : b.lyDoNop === 'het-gio' ? '<div class="text-xs text-amber-700">Tự nộp khi hết giờ</div>' : '') + '</td>' +
                     '<td class="text-right so font-semibold">' + soVN(b.kq.tong) + '</td>' +
                     ['mc', 'tf', 'sa'].map((l) => '<td class="text-right so whitespace-nowrap">' + (p[l].so ? soVN(p[l].diem) + ' <span class="text-xs text-gray-400">(' + p[l].dung + '/' + p[l].so + ')</span>' : '—') + '</td>').join('') +
+                    (tlMax ? '<td class="text-right so whitespace-nowrap">' + (p.tl.daCham ? soVN(p.tl.diem) : '<span class="text-xs text-amber-700">Chưa chấm</span>') + '</td>' : '') +
                     '<td class="text-right so whitespace-nowrap">' + phutGiay((b.thoiGianLam || 0) * 1000) + '</td>' +
                     '<td class="text-right so">' + (b.viPham ? '<span class="text-red-700 font-medium"><i class="fa-solid fa-triangle-exclamation mr-1"></i>' + esc(b.viPham) + '</span>' : '0') + '</td>' +
                     '<td class="text-gray-500 whitespace-nowrap">' + ngayGio(thanhDate(b.nopLuc)) + '</td></tr>' +
-                    '<tr data-ls="' + i + '" hidden><td></td><td colspan="8" class="bg-gray-50"><div class="flex flex-wrap gap-1 py-1">' +
+                    '<tr data-ls="' + i + '" hidden><td></td><td colspan="' + (tlMax ? 9 : 8) + '" class="bg-gray-50"><div class="flex flex-wrap gap-1 py-1">' +
                     cauHoi.map((q, j) => {
                         const t = trangThaiCauBai(q, b.kq, b.traLoi), c = b.kq.chiTiet[q.id];
                         return '<span title="' + TEN_TT[t] + ' · ' + soVN(c.diem) + '/' + DT.dinhDangSo(c.toiDa, 3) + ' điểm" class="text-[11px] font-semibold px-1.5 py-1 rounded-md so ' + MAU_TT[t] + '">' + nhan[j] + '</span>';
@@ -1377,6 +1513,7 @@
         function ganChiaDiem(khung, soCau, thangDiem) {
             const td = DT.chuanThangDiem(thangDiem, soCau);
             const loai = ['mc', 'tf', 'sa'].filter((l) => soCau[l]);
+            const tatCa = loai.concat('tl');   // tl = phần tự luận chấm tay
             const oNhap = 'w-24 px-3 py-2 rounded-xl border border-gray-200 text-base text-center so';
             khung.innerHTML =
                 '<div class="flex items-center justify-between bg-teal-50 border border-teal-100 rounded-xl px-4 py-3 mb-2">' +
@@ -1385,7 +1522,11 @@
                     '<label class="flex items-center gap-3 border border-gray-100 rounded-xl px-4 py-3 bg-white">' +
                     '<span class="flex-1 min-w-0"><span class="block font-medium text-gray-900">Tổng điểm câu ' + TEN_TONG_DIEM[l].toLowerCase() + ' <span class="text-gray-400 font-normal">(' + soCau[l] + ' câu)</span></span>' +
                     '<span data-cd-moi="' + l + '" class="block text-xs text-gray-500 mt-0.5"></span></span>' +
-                    '<input data-cd="' + l + '" inputmode="decimal" class="' + oNhap + '" value="' + esc(DT.dinhDangSo(td.tong[l], 4)) + '"></label>').join('') + '</div>' +
+                    '<input data-cd="' + l + '" inputmode="decimal" class="' + oNhap + '" value="' + esc(DT.dinhDangSo(td.tong[l], 4)) + '"></label>').join('') +
+                    '<label class="flex items-center gap-3 border border-dashed border-gray-200 rounded-xl px-4 py-3 bg-white">' +
+                    '<span class="flex-1 min-w-0"><span class="block font-medium text-gray-900">Tự luận <span class="text-gray-400 font-normal">(chấm tay)</span></span>' +
+                    '<span class="block text-xs text-gray-500 mt-0.5">Học sinh làm trên giấy, thầy nhập điểm từng em ở bảng Kết quả. Nhập 0 nếu đề không có tự luận.</span></span>' +
+                    '<input data-cd="tl" inputmode="decimal" class="' + oNhap + '" value="' + esc(DT.dinhDangSo(td.tong.tl, 4)) + '"></label></div>' +
                 '<div class="flex flex-wrap items-center gap-2 mt-2">' +
                 '<button type="button" data-cd-quy10 class="text-xs font-medium px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200"><i class="fa-solid fa-scale-balanced mr-1"></i>Quy về tổng 10 điểm</button>' +
                 '<button type="button" data-cd-thpt class="text-xs font-medium px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200"><i class="fa-solid fa-rotate-left mr-1"></i>Mặc định THPT (0,25 · 1 · 0,5 điểm/câu)</button></div>' +
@@ -1400,12 +1541,13 @@
             const o = (sel) => khung.querySelector(sel);
             const doc = () => {
                 const t = {}; loai.forEach((l) => { t[l] = docSo(o('[data-cd="' + l + '"]').value); });
+                t.tl = o('[data-cd="tl"]').value.trim() === '' ? 0 : docSo(o('[data-cd="tl"]').value);
                 const ds = soCau.tf ? [0, 1, 2, 3].map((i) => docSo(o('[data-cd-ds="' + i + '"]').value)) : td.ds;
                 return { t: t, ds: ds };
             };
             const capNhat = () => {
                 const { t, ds } = doc();
-                const tong = loai.reduce((x, l) => x + (Number.isFinite(t[l]) ? t[l] : 0), 0);
+                const tong = tatCa.reduce((x, l) => x + (Number.isFinite(t[l]) ? t[l] : 0), 0);
                 o('[data-cd-tong]').textContent = DT.dinhDangSo(tong, 2);
                 loai.forEach((l) => {
                     o('[data-cd-moi="' + l + '"]').textContent = Number.isFinite(t[l]) ? '= ' + DT.dinhDangSo(t[l] / soCau[l], 3) + ' điểm/câu' : 'Nhập số điểm';
@@ -1414,7 +1556,7 @@
                     o('[data-cd-ds-diem="' + i + '"]').textContent = Number.isFinite(t.tf) && Number.isFinite(ds[i]) ? '= ' + DT.dinhDangSo(t.tf / soCau.tf * ds[i] / 100, 3) + ' điểm' : '';
                 });
             };
-            const dat = (gt) => { loai.forEach((l) => { o('[data-cd="' + l + '"]').value = DT.dinhDangSo(gt[l], 4); }); capNhat(); };
+            const dat = (gt) => { tatCa.forEach((l) => { if (l in gt) o('[data-cd="' + l + '"]').value = DT.dinhDangSo(gt[l], 4); }); capNhat(); };
             khung.addEventListener('input', capNhat);
             o('[data-cd-thpt]').addEventListener('click', () => {
                 const gt = {}; loai.forEach((l) => { gt[l] = DT.DIEM_CAU_THPT[l] * soCau[l]; }); dat(gt);
@@ -1423,11 +1565,11 @@
             });
             o('[data-cd-quy10]').addEventListener('click', () => {
                 const { t } = doc();
-                const tong = loai.reduce((x, l) => x + (Number.isFinite(t[l]) ? t[l] : 0), 0);
+                const tong = tatCa.reduce((x, l) => x + (Number.isFinite(t[l]) ? t[l] : 0), 0);
                 if (!(tong > 0)) return;
                 const gt = {}; let du = 10;
-                loai.forEach((l) => { gt[l] = DT.lamTron((Number.isFinite(t[l]) ? t[l] : 0) * 10 / tong, 2); du -= gt[l]; });
-                const lon = loai.reduce((a, b) => (gt[b] > gt[a] ? b : a), loai[0]);
+                tatCa.forEach((l) => { gt[l] = DT.lamTron((Number.isFinite(t[l]) ? t[l] : 0) * 10 / tong, 2); du -= gt[l]; });
+                const lon = tatCa.reduce((a, b) => (gt[b] > gt[a] ? b : a), tatCa[0]);
                 gt[lon] = DT.lamTron(gt[lon] + du, 2);   // dồn phần lẻ làm tròn vào loại nhiều điểm nhất để tổng đúng 10
                 dat(gt);
             });
@@ -1437,11 +1579,13 @@
                     const { t, ds } = doc();
                     const loi = (m) => { o('[data-cd-loi]').textContent = m; return { loi: m }; };
                     if (loai.some((l) => !Number.isFinite(t[l]) || t[l] < 0)) return loi('Điểm từng loại câu phải là số không âm (vd: 2,5).');
-                    if (!(loai.reduce((x, l) => x + t[l], 0) > 0)) return loi('Tổng điểm phải lớn hơn 0.');
+                    if (!Number.isFinite(t.tl) || t.tl < 0) return loi('Điểm tự luận phải là số không âm (nhập 0 nếu không có tự luận).');
+                    if (!(tatCa.reduce((x, l) => x + t[l], 0) > 0)) return loi('Tổng điểm phải lớn hơn 0.');
                     if (ds.some((x) => !Number.isFinite(x) || x < 0 || x > 100)) return loi('Thang điểm câu đúng/sai phải từ 0 đến 100%.');
                     o('[data-cd-loi]').textContent = '';
                     const kq = { ds: ds.map((x) => DT.lamTron(x, 2)) };
                     ['mc', 'tf', 'sa'].forEach((l) => { kq[l] = soCau[l] ? DT.lamTron(t[l], 4) : 0; });
+                    kq.tl = DT.lamTron(t.tl, 4);
                     return { thangDiem: kq };
                 }
             };
@@ -1842,11 +1986,14 @@
             } catch (err) { f.innerHTML = '<p class="text-red-600">Không tải được kết quả: ' + esc(err.message) + '</p>'; return; }
             if (!ds.length) { f.innerHTML = '<p class="text-gray-500">Chưa có học sinh nào nộp bài.</p>'; return; }
 
-            ds.forEach((b) => { b.kq = DT.chamDiem(de.cauHoi || [], dapAn, b.traLoi, de.thangDiem); });
+            const cham = (b) => { b.kq = DT.chamDiem(de.cauHoi || [], dapAn, b.traLoi, de.thangDiem, b.diemTuLuan); };
+            ds.forEach(cham);
             ds.sort((a, b) => b.kq.tong - a.kq.tong || (a.thoiGianLam || 0) - (b.thoiGianLam || 0));
             const diem = ds.map((b) => b.kq.tong);
             const tb = diem.reduce((s, x) => s + x, 0) / diem.length;
             const so = (x) => (Math.round(x * 100) / 100).toString().replace('.', ',');
+            const tlMax = ds[0].kq.phan.tl.toiDa;   // > 0: đề có phần tự luận chấm tay
+            const soChuaCham = () => ds.filter((b) => !b.kq.phan.tl.daCham).length;
             const dem = { mc: 0, tf: 0, sa: 0 };
             const tiLe = (de.cauHoi || []).map((q) => ({
                 nhan: DT.PHAN[q.loai] + '.' + (++dem[q.loai]),
@@ -1858,16 +2005,21 @@
                 '<div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">' +
                 oSoLieu('Bài nộp', ds.length, '', true) + oSoLieu('Điểm trung bình', so(tb), '', true) +
                 oSoLieu('Cao nhất', so(Math.max(...diem)), '', true) + oSoLieu('Thấp nhất', so(Math.min(...diem)), '', true) + '</div>' +
+                (tlMax ? '<div class="mb-5 p-3 rounded-xl bg-amber-50/70 border border-amber-100 text-sm text-amber-900"><i class="fa-solid fa-pen-nib mr-1.5"></i>' +
+                    'Phần tự luận ' + so(tlMax) + ' điểm: nhập điểm từng em ở cột <b>Tự luận</b>, tự lưu khi rời ô (Enter để sang em kế tiếp). ' +
+                    '<span data-tl-con class="font-semibold"></span></div>' : '') +
                 '<h3 class="font-bold text-gray-900 mb-1">Tỉ lệ làm đúng từng câu</h3><p class="text-xs text-gray-500 mb-3">I.3 = Phần I câu 3. Câu đỏ là câu nhiều học sinh làm sai (Phần II tính là đúng khi đúng cả 4 ý).</p>' +
                 '<div class="flex flex-wrap gap-1.5 mb-6">' + tiLe.map((x) =>
                     '<span class="text-xs font-medium px-2 py-1 rounded-lg ' + (x.pt < 40 ? 'bg-red-50 text-red-700' : x.pt < 70 ? 'bg-amber-50 text-amber-700' : 'bg-emerald-50 text-emerald-700') + '">' + x.nhan + ': ' + x.pt + '%</span>').join('') + '</div>' +
                 '<div class="overflow-x-auto border border-gray-100 rounded-xl"><table class="bang w-full text-sm min-w-[720px]"><thead><tr>' +
-                '<th>#</th><th>Học sinh</th><th class="text-right whitespace-nowrap">Điểm (/' + so(ds[0].kq.toiDa) + ')</th><th class="text-right">Phần I</th><th class="text-right">Phần II</th><th class="text-right">Phần III</th><th class="text-right">Thời gian</th><th class="text-right">Rời trang</th><th>Nộp lúc</th><th></th></tr></thead><tbody>' +
+                '<th>#</th><th>Học sinh</th><th class="text-right whitespace-nowrap">Điểm (/' + so(ds[0].kq.toiDa) + ')</th><th class="text-right">Phần I</th><th class="text-right">Phần II</th><th class="text-right">Phần III</th>' + (tlMax ? '<th class="text-right whitespace-nowrap">Tự luận (/' + so(tlMax) + ')</th>' : '') + '<th class="text-right">Thời gian</th><th class="text-right">Rời trang</th><th>Nộp lúc</th><th></th></tr></thead><tbody>' +
                 ds.map((b, i) => '<tr><td class="text-gray-400 so">' + (i + 1) + '</td><td class="font-medium text-gray-900">' + esc(b.email || b.uid) + '</td>' +
-                    '<td class="text-right so font-bold">' + so(b.kq.tong) + '</td>' +
+                    '<td class="text-right so font-bold" data-tong="' + esc(b.id) + '">' + so(b.kq.tong) + '</td>' +
                     '<td class="text-right so">' + b.kq.phan.mc.dung + '/' + b.kq.phan.mc.so + '</td>' +
                     '<td class="text-right so">' + so(b.kq.phan.tf.diem) + '</td>' +
                     '<td class="text-right so">' + b.kq.phan.sa.dung + '/' + b.kq.phan.sa.so + '</td>' +
+                    (tlMax ? '<td class="text-right"><input data-tu-luan="' + esc(b.id) + '" inputmode="decimal" placeholder="—" aria-label="Điểm tự luận của ' + esc(b.email || b.uid) + '" ' +
+                        'class="w-16 px-2 py-1 rounded-lg border border-gray-200 text-right so bg-white" value="' + (b.kq.phan.tl.daCham ? esc(so(b.kq.phan.tl.diem)) : '') + '"></td>' : '') +
                     '<td class="text-right so whitespace-nowrap">' + phutGiay((b.thoiGianLam || 0) * 1000) + '</td>' +
                     '<td class="text-right so">' + (b.viPham ? '<span class="text-red-700 font-medium"><i class="fa-solid fa-triangle-exclamation mr-1"></i>' + esc(b.viPham) + '</span>' : '0') + '</td>' +
                     '<td class="text-gray-500 whitespace-nowrap">' + ngayGio(thanhDate(b.nopLuc)) +
@@ -1879,9 +2031,52 @@
                 const n = e.target.closest('button[data-cong-bo]');
                 if (n && await doiCongBo(de.id, n.getAttribute('data-cong-bo'))) f.querySelector('#kq-cong-bo').innerHTML = thanhCongBo((S.deThi || []).find((d) => d.id === de.id) || de);
             });
+            // Nhập điểm tự luận: lưu vào bài làm (trường diemTuLuan), ô trống = chưa chấm
+            const oTlCon = f.querySelector('[data-tl-con]');
+            const capNhatTlCon = () => { if (oTlCon) oTlCon.textContent = soChuaCham() ? 'Còn ' + soChuaCham() + ' bài chưa chấm.' : 'Đã chấm xong tất cả bài.'; };
+            capNhatTlCon();
+            const dsOTl = Array.from(f.querySelectorAll('[data-tu-luan]'));
+            dsOTl.forEach((o, i) => {
+                o.addEventListener('keydown', (e) => {
+                    if (e.key !== 'Enter') return;
+                    e.preventDefault();
+                    (dsOTl[i + 1] || o).focus();
+                    if (!dsOTl[i + 1]) o.blur();
+                });
+                o.addEventListener('focus', () => o.select());
+                o.addEventListener('change', async () => {
+                    const b = ds.find((x) => x.id === o.getAttribute('data-tu-luan'));
+                    const chu = o.value.trim();
+                    const v = chu === '' ? null : docSo(chu);
+                    if (v !== null && !(Number.isFinite(v) && v >= 0 && v <= tlMax)) {
+                        o.classList.add('border-red-400', 'bg-red-50');
+                        thongBao('Điểm tự luận phải từ 0 đến ' + so(tlMax));
+                        return;
+                    }
+                    o.classList.remove('border-red-400', 'bg-red-50', 'border-emerald-400');
+                    o.disabled = true;
+                    try {
+                        await db.collection('bai_lam').doc(b.id).update(v === null
+                            ? { diemTuLuan: FV.delete(), chamTuLuanLuc: FV.delete() }
+                            : { diemTuLuan: DT.lamTron(v, 2), chamTuLuanLuc: FV.serverTimestamp() });
+                        if (v === null) delete b.diemTuLuan; else b.diemTuLuan = DT.lamTron(v, 2);
+                        const goc = (S.baiLam || []).find((x) => x.id === b.id);
+                        if (goc) { if (v === null) delete goc.diemTuLuan; else goc.diemTuLuan = b.diemTuLuan; }
+                        cham(b);
+                        o.value = b.kq.phan.tl.daCham ? so(b.kq.phan.tl.diem) : '';
+                        f.querySelector('[data-tong="' + b.id + '"]').textContent = so(b.kq.tong);
+                        o.classList.add('border-emerald-400');
+                        capNhatTlCon();
+                    } catch (err) {
+                        o.classList.add('border-red-400', 'bg-red-50');
+                        thongBao('Chưa lưu được điểm tự luận: ' + (err.code === 'permission-denied' ? 'Firestore Rules chưa cho phép (cần cập nhật Rules)' : err.message));
+                    }
+                    o.disabled = false;
+                });
+            });
             f.querySelectorAll('[data-lam-lai]').forEach((n) => n.addEventListener('click', async () => {
                 const b = ds.find((x) => x.id === n.getAttribute('data-lam-lai'));
-                if (!confirm('Xóa bài làm của ' + (b.email || b.uid) + ' để học sinh làm lại đề này?')) return;
+                if (!confirm('Xóa bài làm của ' + (b.email || b.uid) + ' để học sinh làm lại đề này?' + (b.kq.phan.tl.daCham ? ' Điểm tự luận đã nhập cũng bị xóa.' : ''))) return;
                 try { await db.collection('bai_lam').doc(b.id).delete(); thongBao('Đã xóa bài làm, học sinh có thể làm lại'); await taiDuLieu(); xemKetQuaDe(de); }
                 catch (err) { thongBao('Lỗi: ' + err.message); }
             }));

@@ -9,7 +9,7 @@
     <!-- Giao diện sáng / tối: chạy trước CSS để không bị nháy màu -->
     <script src="../assets/js/dfm-giao-dien.js"></script>
     <!-- CSS Tailwind dựng sẵn cho cả site (sửa class xong chạy: npm run build:css) -->
-    <link rel="stylesheet" href="../assets/css/tailwind.css?v=a5530322">
+    <link rel="stylesheet" href="../assets/css/tailwind.css?v=4d1f765f">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
@@ -120,6 +120,9 @@
                         </span>
                         <span x-show="sectionIII.length" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-50 text-amber-600 text-xs font-semibold">
                             <i class="fa-solid fa-pen-to-square"></i> Điền số (Phần III) · <span x-text="sectionIII.length"></span> câu
+                        </span>
+                        <span x-show="thang.tong.tl" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-rose-50 text-rose-600 text-xs font-semibold">
+                            <i class="fa-solid fa-pen-nib"></i> Tự luận · <span x-text="dinhDangDiem(thang.tong.tl) + ' điểm'"></span> (làm trên giấy)
                         </span>
                     </div>
                     <ul class="mt-4 text-sm text-slate-500 space-y-1.5">
@@ -462,7 +465,7 @@
                         <p class="text-5xl font-black"><span x-text="dinhDangDiem(ketQua.tong)"></span><span class="text-xl text-teal-500" x-text="' / ' + dinhDangDiem(ketQua.toiDa)"></span></p>
                         <p class="text-sm text-teal-700 mt-2" x-show="ketQua.toiDa && Math.abs(ketQua.toiDa - 10) > 0.001">Quy về thang 10: <b x-text="dinhDangDiem(ketQua.thang10)"></b></p>
                     </div>
-                    <div class="grid grid-cols-3 gap-3 mt-4 text-left">
+                    <div class="grid gap-3 mt-4 text-left" :class="ketQua.phan && ketQua.phan.tl.toiDa ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-3'">
                         <template x-for="p in [['mc', 'I', 'blue'], ['tf', 'II', 'violet'], ['sa', 'III', 'amber']]" :key="p[0]">
                             <div x-show="ketQua.phan && ketQua.phan[p[0]].so" class="rounded-xl p-3" :class="{ blue: 'bg-blue-50', violet: 'bg-violet-50', amber: 'bg-amber-50' }[p[2]]">
                                 <p class="text-xs font-semibold" :class="{ blue: 'text-blue-600', violet: 'text-violet-600', amber: 'text-amber-600' }[p[2]]" x-text="'Phần ' + p[1]"></p>
@@ -470,6 +473,11 @@
                                 <p class="text-xs text-slate-500 mt-0.5" x-text="ketQua.phan ? (p[0] === 'tf' ? 'Đúng hết ' : 'Đúng ') + ketQua.phan[p[0]].dung + '/' + ketQua.phan[p[0]].so + ' câu' : ''"></p>
                             </div>
                         </template>
+                        <div x-show="ketQua.phan && ketQua.phan.tl.toiDa" class="rounded-xl p-3 bg-rose-50">
+                            <p class="text-xs font-semibold text-rose-600">Tự luận</p>
+                            <p class="font-black text-rose-800" x-text="ketQua.phan && ketQua.phan.tl.daCham ? dinhDangDiem(ketQua.phan.tl.diem) + ' / ' + dinhDangDiem(ketQua.phan.tl.toiDa) + ' điểm' : 'Chưa chấm'"></p>
+                            <p class="text-xs text-slate-500 mt-0.5" x-text="ketQua.phan && ketQua.phan.tl.daCham ? 'Thầy chấm bài trên giấy' : 'Tối đa ' + (ketQua.phan ? dinhDangDiem(ketQua.phan.tl.toiDa) : '') + ' điểm'"></p>
+                        </div>
                     </div>
                 </div>
 
@@ -626,7 +634,7 @@
                 answers: {}, batDau: 0, viPham: 0, mocViPham: 0, lyDoNop: '',
                 coBaiDangLam: false, dangNop: false, loiNop: false, daNopTruoc: false,
                 hop: { hien: false, tieuDe: '', noiDung: '', nut: '', nutPhu: '', mau: 'do', icon: '', khiDong: null },
-                dapAn: {}, daCoDapAn: false, ketQua: {}, thoiGianLamStr: '', vuaCongBo: false, huyNghe: null,
+                dapAn: {}, daCoDapAn: false, ketQua: {}, diemTuLuan: null, thoiGianLamStr: '', vuaCongBo: false, huyNghe: null,
 
                 get sectionI() { return this.questions.filter((q) => q.loai === 'mc'); },
                 get sectionII() { return this.questions.filter((q) => q.loai === 'tf'); },
@@ -769,7 +777,7 @@
                         }));
                         this.activeSection = this.cacPhan[0] || 'I';
                     } catch (err) {
-                        this.baoLoi(err.code === 'permission-denied' ? 'Không tìm thấy đề thi, hoặc đề đã đóng.' : 'Không tải được đề thi. Kiểm tra mạng rồi tải lại trang.');
+                        this.baoLoi(err.code === 'permission-denied' ? 'Không mở được đề: đề đã đóng, hoặc tài khoản của bạn chưa được thầy duyệt vào lớp.' : 'Không tải được đề thi. Kiểm tra mạng rồi tải lại trang.');
                         return;
                     }
                     // Đã nộp rồi → xem kết quả
@@ -780,6 +788,7 @@
                             this.answers = v.traLoi || {};
                             this.viPham = v.viPham || 0;
                             this.lyDoNop = v.lyDoNop || '';
+                            this.diemTuLuan = v.diemTuLuan;
                             this.daNopTruoc = true;
                             this.thoiGianLamStr = this.dinhDangThoiGian(v.thoiGianLam || 0);
                             await this.hienKetQua();
@@ -933,8 +942,15 @@
                             this.dapAn = (da.exists && da.data().cauHoi) || {};
                             this.daCoDapAn = da.exists;
                         } catch (err) { /* chưa được phép đọc */ }
+                        // Điểm tự luận thầy chấm tay (lưu trong bài làm): lấy bản mới nhất
+                        if (this.thang.tong.tl) {
+                            try {
+                                const bai = await db.collection('bai_lam').doc(this.deId + '__' + this.user.uid).get();
+                                if (bai.exists) this.diemTuLuan = bai.data().diemTuLuan;
+                            } catch (err) {}
+                        }
                     }
-                    this.ketQua = this.daCoDapAn ? D.chamDiem(this.questions, this.dapAn, this.answers, this.thangDiem) : {};
+                    this.ketQua = this.daCoDapAn ? D.chamDiem(this.questions, this.dapAn, this.answers, this.thangDiem, this.diemTuLuan) : {};
                     this.$nextTick(() => this.veNoiDung(document.getElementById('xem-lai')));
                 },
                 // Thầy đổi mức công bố lúc nào thì trang kết quả cập nhật ngay lúc đó
@@ -946,7 +962,7 @@
                         // Thầy chia lại điểm: tính lại ngay
                         if (JSON.stringify(de.thangDiem || null) !== JSON.stringify(this.thangDiem)) {
                             this.thangDiem = de.thangDiem || null;
-                            if (this.daCoDapAn) this.ketQua = D.chamDiem(this.questions, this.dapAn, this.answers, this.thangDiem);
+                            if (this.daCoDapAn) this.ketQua = D.chamDiem(this.questions, this.dapAn, this.answers, this.thangDiem, this.diemTuLuan);
                         }
                         const moi = D.congBoCua(de);
                         if (moi === this.congBo) return;

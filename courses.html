@@ -13,7 +13,7 @@
     <!-- Giao diện sáng / tối: chạy trước CSS để không bị nháy màu -->
     <script src="assets/js/dfm-giao-dien.js"></script>
     <!-- CSS Tailwind dựng sẵn cho cả site (sửa class xong chạy: npm run build:css) -->
-    <link rel="stylesheet" href="assets/css/tailwind.css?v=a5530322">
+    <link rel="stylesheet" href="assets/css/tailwind.css?v=4d1f765f">
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -233,8 +233,11 @@
                     <i class="fa-solid fa-folder-open"></i>
                 </div>
                 <h3 class="text-2xl font-bold text-slate-800 mb-3">Trống trơn!</h3>
-                <p class="text-slate-500 mb-8">Tài khoản của bạn hiện chưa được cấp quyền truy cập khóa học nào. Vui lòng liên hệ Thầy Đô để đăng ký nhé.</p>
-                <a href="index.html" class="bg-gray-800 hover:bg-gray-700 text-white px-8 py-3 rounded-full font-bold transition-colors inline-block shadow-md">Xem tất cả khóa học</a>
+                <p class="text-slate-500 mb-8">Tài khoản của bạn hiện chưa được cấp quyền truy cập khóa học nào. Nếu đã đăng ký bằng mã lớp, hãy chờ thầy duyệt; nếu chưa, liên hệ Thầy Đô để đăng ký nhé.</p>
+                <div class="flex flex-wrap justify-center gap-3">
+                    <a href="goc-hoc-tap.html" class="bg-primary hover:bg-teal-700 text-white px-8 py-3 rounded-full font-bold transition-colors inline-block shadow-md">Xem trạng thái duyệt</a>
+                    <a href="index.html" class="bg-gray-800 hover:bg-gray-700 text-white px-8 py-3 rounded-full font-bold transition-colors inline-block shadow-md">Xem tất cả khóa học</a>
+                </div>
             </div>
 
             <!-- TRẠNG THÁI 4: Hiển thị lưới khóa học -->
@@ -394,6 +397,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script src="assets/js/dfm-tai-khoan.js"></script>
 <script>
         const firebaseConfig = {
             apiKey: "AIzaSyD-NDo43O3Q_9GVii6pDOM7D6SQ5pxmo5g",
@@ -452,17 +456,14 @@
                 
                 coursesGrid.style.display = 'grid';
 
-                // Quét phân quyền khóa học
-                db.collection("phan_quyen").doc(user.email).get()
-                .then((doc) => {
+                // Quét phân quyền khóa học (kèm chuyển quyền nếu học sinh vừa đổi sang email thật)
+                dfmTaiKhoan.docQuyen(db, user)
+                .then((data) => {
                     let hasCourse = false;
 
-                    if (doc.exists) {
-                        const data = doc.data();
-                        if (data['toan-10'] === true) { card10.style.display = 'flex'; hasCourse = true; }
-                        if (data['toan-11'] === true) { card11.style.display = 'flex'; hasCourse = true; }
-                        if (data['toan-12'] === true) { card12.style.display = 'flex'; hasCourse = true; }
-                    }
+                    if (data['toan-10'] === true) { card10.style.display = 'flex'; hasCourse = true; }
+                    if (data['toan-11'] === true) { card11.style.display = 'flex'; hasCourse = true; }
+                    if (data['toan-12'] === true) { card12.style.display = 'flex'; hasCourse = true; }
 
                     if (!hasCourse) {
                         coursesGrid.style.display = 'none';

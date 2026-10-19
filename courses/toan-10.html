@@ -10,7 +10,7 @@
     <!-- Giao diện sáng / tối: chạy trước CSS để không bị nháy màu -->
     <script src="../assets/js/dfm-giao-dien.js"></script>
     <!-- CSS Tailwind dựng sẵn cho cả site (sửa class xong chạy: npm run build:css) -->
-    <link rel="stylesheet" href="../assets/css/tailwind.css?v=a5530322">
+    <link rel="stylesheet" href="../assets/css/tailwind.css?v=4d1f765f">
     <!-- Sidebar mục lục kéo đổi độ rộng (dùng chung toan-10/11/12) -->
     <script src="../assets/js/dfm-sidebar.js"></script>
     
@@ -1247,6 +1247,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script src="../assets/js/dfm-tai-khoan.js"></script>
     <!-- Theo dõi học tập + bài học thêm từ trang Admin -->
     <script src="../assets/js/dfm-khoa-hoc.js"></script>
 
@@ -1284,9 +1285,10 @@
             if (!user) {
                 window.location.replace("/login.html");
             } else {
-                db.collection("phan_quyen").doc(user.email).get()
-                .then((doc) => {
-                    if (doc.exists && doc.data()[currentCourse] === true) {
+                // Đọc quyền khóa học (kèm chuyển quyền nếu học sinh vừa đổi sang email thật)
+                dfmTaiKhoan.docQuyen(db, user)
+                .then((quyen) => {
+                    if (quyen[currentCourse] === true) {
                         handleAccessGranted();
                         dfmKhoaHoc.batDau(db, user, currentCourse);
                     }

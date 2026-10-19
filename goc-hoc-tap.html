@@ -13,7 +13,7 @@
     <!-- Giao diện sáng / tối: chạy trước CSS để không bị nháy màu -->
     <script src="assets/js/dfm-giao-dien.js"></script>
     <!-- CSS Tailwind dựng sẵn cho cả site (sửa class xong chạy: npm run build:css) -->
-    <link rel="stylesheet" href="assets/css/tailwind.css?v=a5530322">
+    <link rel="stylesheet" href="assets/css/tailwind.css?v=4d1f765f">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -185,14 +185,24 @@
     <section class="relative bg-slate-900 overflow-hidden">
         <div class="absolute inset-0 opacity-30" style="background: radial-gradient(circle at 15% 20%, rgba(20,184,166,.45), transparent 45%), radial-gradient(circle at 85% 80%, rgba(16,185,129,.3), transparent 40%);"></div>
         <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-14">
-            <p class="text-teal-300 text-sm font-semibold uppercase tracking-wider"><i class="fa-solid fa-user-graduate mr-1.5"></i>Góc học tập của tôi</p>
-            <h1 id="loi-chao" class="text-3xl md:text-4xl font-extrabold text-white mt-2">Xin chào!</h1>
+            <div class="flex flex-wrap items-start justify-between gap-4">
+                <div>
+                    <p class="text-teal-300 text-sm font-semibold uppercase tracking-wider"><i class="fa-solid fa-user-graduate mr-1.5"></i>Góc học tập của tôi</p>
+                    <h1 id="loi-chao" class="text-3xl md:text-4xl font-extrabold text-white mt-2">Xin chào!</h1>
+                </div>
+                <button id="nut-tai-khoan" type="button" class="hidden items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/15 text-white text-sm font-semibold px-4 py-2.5 rounded-full transition-colors">
+                    <i class="fa-solid fa-shield-halved text-teal-300"></i>Tài khoản &amp; mật khẩu
+                </button>
+            </div>
             <p class="text-slate-300 mt-2 max-w-2xl">Nơi tổng hợp điểm số và quá trình học của riêng bạn. Xem lại chỗ còn yếu để cải thiện mỗi ngày.</p>
             <div id="o-tong-quan" class="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-8"></div>
         </div>
     </section>
 
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-10">
+        <!-- Trạng thái tài khoản: chờ duyệt, xác minh email, gợi ý liên kết -->
+        <div id="thong-bao-tk" class="space-y-3 mb-6 empty:hidden"></div>
+
         <!-- Đang tải / chưa đăng nhập -->
         <div id="trang-thai" class="text-center text-slate-500 py-16"><i class="fa-solid fa-circle-notch fa-spin text-2xl text-primary"></i><p class="mt-3">Đang tải dữ liệu của bạn...</p></div>
 
@@ -256,6 +266,53 @@
         </div>
     </main>
 
+    <!-- HỘP TÀI KHOẢN & ĐỔI MẬT KHẨU -->
+    <div id="hop-tai-khoan" class="hidden fixed inset-0 z-[10000] bg-slate-900/60 backdrop-blur-sm items-end sm:items-center justify-center sm:p-4" role="dialog" aria-modal="true" aria-labelledby="tk-tieu-de">
+        <div class="bg-white w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl shadow-2xl max-h-[92vh] overflow-y-auto" style="padding-bottom: env(safe-area-inset-bottom);">
+            <div class="flex items-center justify-between px-6 pt-5 pb-3 border-b border-slate-100">
+                <h2 id="tk-tieu-de" class="text-lg font-bold text-slate-900"><i class="fa-solid fa-shield-halved text-teal-600 mr-2"></i>Tài khoản &amp; mật khẩu</h2>
+                <button type="button" data-dong-tk class="w-9 h-9 rounded-full hover:bg-slate-100 text-slate-500" aria-label="Đóng"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="px-6 py-5">
+                <dl class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 text-sm bg-slate-50 rounded-2xl px-4 py-3">
+                    <dt class="text-slate-500">Tài khoản</dt><dd id="tk-email" class="font-semibold text-slate-800 truncate"></dd>
+                    <dt class="text-slate-500">Đăng nhập gần nhất</dt><dd id="tk-dang-nhap" class="text-slate-700"></dd>
+                </dl>
+
+                <!-- Cách đăng nhập: liên kết Google / đổi sang email thật để tự lấy lại mật khẩu khi quên -->
+                <div class="mt-5">
+                    <h3 class="font-bold text-slate-900">Cách đăng nhập &amp; lấy lại tài khoản</h3>
+                    <p class="text-xs text-slate-500 mt-0.5">Liên kết thêm cách đăng nhập không làm mất kết quả học tập.</p>
+                    <div id="tk-cach" class="mt-3 space-y-3"></div>
+                </div>
+
+                <form id="form-doi-mk" class="mt-6 pt-5 border-t border-slate-100 space-y-3" novalidate>
+                    <h3 class="font-bold text-slate-900">Đổi mật khẩu</h3>
+                    <p id="mk-chi-google" class="hidden text-sm text-slate-600 bg-slate-50 rounded-xl px-4 py-3"><i class="fa-brands fa-google text-teal-600 mr-1"></i>Bạn đăng nhập bằng Google nên không cần mật khẩu riêng.</p>
+                    <p class="text-xs text-slate-500 -mt-1">Sau khi đổi, các máy khác đang đăng nhập tài khoản này sẽ tự bị đăng xuất (chậm nhất khoảng 1 giờ).</p>
+                    <!-- autocomplete giúp trình duyệt / iPhone gợi ý và lưu mật khẩu mới -->
+                    <input type="email" autocomplete="username" id="tk-username" class="hidden" tabindex="-1" aria-hidden="true">
+                    <label class="block"><span class="block text-sm font-medium text-slate-700 mb-1">Mật khẩu hiện tại</span>
+                        <span class="relative block"><input id="mk-cu" type="password" autocomplete="current-password" required class="w-full pl-4 pr-11 py-3 rounded-xl bg-slate-50 border border-slate-200 text-base focus:ring-4 focus:ring-teal-500/10 focus:border-teal-500 outline-none">
+                        <button type="button" data-hien-mk="mk-cu" class="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 text-slate-400 hover:text-slate-600" aria-label="Hiện mật khẩu"><i class="fa-solid fa-eye"></i></button></span></label>
+                    <label class="block"><span class="block text-sm font-medium text-slate-700 mb-1">Mật khẩu mới</span>
+                        <span class="relative block"><input id="mk-moi" type="password" autocomplete="new-password" required minlength="8" class="w-full pl-4 pr-11 py-3 rounded-xl bg-slate-50 border border-slate-200 text-base focus:ring-4 focus:ring-teal-500/10 focus:border-teal-500 outline-none">
+                        <button type="button" data-hien-mk="mk-moi" class="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 text-slate-400 hover:text-slate-600" aria-label="Hiện mật khẩu"><i class="fa-solid fa-eye"></i></button></span>
+                        <span class="flex items-center gap-2 mt-1.5"><span class="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden"><span id="mk-do-manh" class="block h-full w-0 rounded-full transition-all"></span></span><span id="mk-do-manh-chu" class="text-xs text-slate-500 w-20 text-right"></span></span></label>
+                    <label class="block"><span class="block text-sm font-medium text-slate-700 mb-1">Nhập lại mật khẩu mới</span>
+                        <input id="mk-moi-2" type="password" autocomplete="new-password" required class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-base focus:ring-4 focus:ring-teal-500/10 focus:border-teal-500 outline-none"></label>
+                    <ul class="text-xs text-slate-500 space-y-0.5">
+                        <li><i class="fa-solid fa-circle-info text-teal-500 mr-1"></i>Ít nhất 8 ký tự, nên có cả chữ và số.</li>
+                        <li><i class="fa-solid fa-circle-info text-teal-500 mr-1"></i>Không dùng ngày sinh, tên mình hay mật khẩu thầy cấp ban đầu.</li>
+                    </ul>
+                    <p id="mk-loi" class="text-sm text-red-600 font-medium" role="alert"></p>
+                    <p id="mk-xong" class="hidden text-sm text-emerald-700 font-semibold bg-emerald-50 rounded-xl px-4 py-3"><i class="fa-solid fa-circle-check mr-1"></i>Đã đổi mật khẩu. Lần sau đăng nhập bằng mật khẩu mới nhé!</p>
+                    <button id="nut-doi-mk" type="submit" class="w-full py-3 rounded-xl bg-primary hover:bg-teal-700 disabled:opacity-50 text-white font-bold transition-colors">Đổi mật khẩu</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Chú thích khi rê chuột / chạm vào biểu đồ -->
     <div id="chu-thich" role="tooltip" class="hidden fixed z-[80] pointer-events-none bg-slate-900 text-white text-xs font-medium rounded-lg px-2.5 py-1.5 shadow-lg whitespace-nowrap"></div>
 
@@ -263,6 +320,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
     <script src="assets/js/dfm-de-thi.js"></script>
+    <script src="assets/js/dfm-tai-khoan.js"></script>
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyD-NDo43O3Q_9GVii6pDOM7D6SQ5pxmo5g",
@@ -331,7 +389,7 @@
                 if (r.de && r.congBo !== 'an') {
                     try {
                         const s = await db.collection('dap_an').doc(b.deId).get();
-                        if (s.exists) r.kq = D.chamDiem(r.de.cauHoi || [], s.data().cauHoi || {}, b.traLoi, r.de.thangDiem);
+                        if (s.exists) r.kq = D.chamDiem(r.de.cauHoi || [], s.data().cauHoi || {}, b.traLoi, r.de.thangDiem, b.diemTuLuan);
                     } catch (e) { /* chưa được phép xem */ }
                 }
                 return r;
@@ -603,6 +661,175 @@
             window.addEventListener('scroll', an, { passive: true });
         })();
 
+        const TK = window.dfmTaiKhoan;
+        function thongBaoTk(loai, msg) {
+            return '<p class="text-sm font-medium rounded-xl px-4 py-3 ' + (loai === 'ok' ? 'bg-emerald-50 text-emerald-800' : 'bg-red-50 text-red-700') + '" role="' + (loai === 'ok' ? 'status' : 'alert') + '">' +
+                '<i class="fa-solid ' + (loai === 'ok' ? 'fa-circle-check' : 'fa-circle-exclamation') + ' mr-1"></i>' + esc(msg) + '</p>';
+        }
+        // Thanh trạng thái đầu trang: đơn đăng ký, xác minh email, gợi ý liên kết cho tài khoản thầy cấp
+        let DON_DANG_KY = null, CO_KHOA = false;
+        function veThongBaoTaiKhoan() {
+            const u = firebase.auth().currentUser;
+            if (!u) return;
+            const the = (mau, icon, html, nut) => '<div class="flex flex-wrap items-center gap-3 rounded-2xl border px-4 py-3 ' + mau + '"><i class="fa-solid ' + icon + '"></i><p class="flex-1 min-w-[200px] text-sm">' + html + '</p>' + (nut || '') + '</div>';
+            const nutTk = (chu) => '<button type="button" data-mo-tk class="text-sm font-semibold px-3.5 py-2 rounded-xl bg-white/80 hover:bg-white border border-current/10 whitespace-nowrap">' + chu + '</button>';
+            const ds = [];
+            if (DON_DANG_KY && !CO_KHOA) {
+                if (DON_DANG_KY.trangThai === 'cho') ds.push(the('bg-amber-50 border-amber-200 text-amber-800', 'fa-hourglass-half', 'Đơn đăng ký lớp <b>' + esc(DON_DANG_KY.tenLop || DON_DANG_KY.maLop) + '</b> đang chờ thầy duyệt. Duyệt xong bạn sẽ vào học được trong <b>Khóa học</b>.'));
+                else if (DON_DANG_KY.trangThai === 'tu-choi') ds.push(the('bg-red-50 border-red-200 text-red-700', 'fa-circle-xmark', 'Đơn đăng ký lớp <b>' + esc(DON_DANG_KY.tenLop || DON_DANG_KY.maLop) + '</b> chưa được duyệt. Hãy liên hệ thầy.'));
+            }
+            if (!TK.laEmailCap(u.email) && TK.coMatKhau(u) && !u.emailVerified) ds.push(the('bg-sky-50 border-sky-200 text-sky-800', 'fa-envelope', 'Hãy mở thư DoforMath gửi tới <b>' + esc(u.email) + '</b> để xác minh email, nhờ vậy khi quên mật khẩu bạn tự lấy lại được.', nutTk('Gửi lại thư')));
+            if (TK.laEmailCap(u.email) && !TK.coGoogle(u)) ds.push(the('bg-teal-50 border-teal-200 text-teal-800', 'fa-shield-halved', 'Tài khoản thầy cấp chưa tự lấy lại được mật khẩu khi quên. Hãy <b>liên kết Google</b> hoặc <b>đổi sang email thật</b> (kết quả học tập giữ nguyên).', nutTk('Liên kết ngay')));
+            $('thong-bao-tk').innerHTML = ds.join('');
+        }
+        $('thong-bao-tk').addEventListener('click', (e) => { if (e.target.closest('[data-mo-tk]')) $('nut-tai-khoan').click(); });
+
+        // ---------- Tài khoản & đổi mật khẩu ----------
+        // Firebase yêu cầu xác nhận lại mật khẩu hiện tại trước khi đổi; đổi xong, phiên đăng nhập ở máy khác bị thu hồi.
+        (function () {
+            const hop = $('hop-tai-khoan');
+            const mo = () => {
+                const u = firebase.auth().currentUser;
+                if (!u) return;
+                $('tk-email').textContent = u.email;
+                $('tk-username').value = u.email;
+                const lan = u.metadata && u.metadata.lastSignInTime ? new Date(u.metadata.lastSignInTime) : null;
+                $('tk-dang-nhap').textContent = lan ? lan.toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric' }) : '—';
+                $('form-doi-mk').reset(); $('mk-loi').textContent = ''; $('mk-xong').classList.add('hidden'); doManh();
+                const coMk = TK.coMatKhau(u);
+                $('mk-chi-google').classList.toggle('hidden', coMk);
+                $('form-doi-mk').querySelectorAll('label, ul, #nut-doi-mk, p.text-xs').forEach((el) => el.classList.toggle('hidden', !coMk));
+                veCachDangNhap();
+                hop.classList.remove('hidden'); hop.classList.add('flex');
+                document.body.style.overflow = 'hidden';
+            };
+            const dong = () => { hop.classList.add('hidden'); hop.classList.remove('flex'); document.body.style.overflow = ''; };
+            $('nut-tai-khoan').addEventListener('click', mo);
+            hop.addEventListener('click', (e) => { if (e.target === hop || e.target.closest('[data-dong-tk]')) dong(); });
+            document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !hop.classList.contains('hidden')) dong(); });
+            hop.querySelectorAll('[data-hien-mk]').forEach((n) => n.addEventListener('click', () => {
+                const o = $(n.getAttribute('data-hien-mk')), hien = o.type === 'password';
+                o.type = hien ? 'text' : 'password';
+                n.innerHTML = '<i class="fa-solid ' + (hien ? 'fa-eye-slash' : 'fa-eye') + '"></i>';
+                n.setAttribute('aria-label', hien ? 'Ẩn mật khẩu' : 'Hiện mật khẩu');
+            }));
+            // Độ mạnh mật khẩu (ước lượng đơn giản, kèm chữ để không chỉ dựa vào màu)
+            function doManh() {
+                const v = $('mk-moi').value;
+                let d = 0;
+                if (v.length >= 8) d++;
+                if (v.length >= 12) d++;
+                if (/[a-zA-Z]/.test(v) && /\d/.test(v)) d++;
+                if (/[^a-zA-Z0-9]/.test(v) || (/[a-z]/.test(v) && /[A-Z]/.test(v))) d++;
+                const muc = !v ? ['0%', '', ''] : v.length < 8 ? ['20%', 'bg-red-500', 'Quá ngắn'] : d <= 1 ? ['40%', 'bg-amber-400', 'Yếu'] : d === 2 ? ['70%', 'bg-teal-500', 'Khá'] : ['100%', 'bg-emerald-500', 'Mạnh'];
+                const thanh = $('mk-do-manh');
+                thanh.className = 'block h-full rounded-full transition-all ' + muc[1];
+                thanh.style.width = muc[0];
+                $('mk-do-manh-chu').textContent = muc[2];
+            }
+            $('mk-moi').addEventListener('input', doManh);
+
+            // ----- Liên kết Google / đổi sang email thật -----
+            const O_NHAP = 'w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-base focus:ring-4 focus:ring-teal-500/10 focus:border-teal-500 outline-none';
+            function veCachDangNhap(thongBao) {
+                const u = firebase.auth().currentUser;
+                if (!u) return;
+                const coGg = TK.coGoogle(u), emailCap = TK.laEmailCap(u.email);
+                const dong = (icon, tieuDe, noiDung) => '<div class="flex gap-3 border border-slate-100 rounded-2xl p-3.5">' +
+                    '<span class="w-9 h-9 shrink-0 rounded-xl bg-slate-50 flex items-center justify-center">' + icon + '</span>' +
+                    '<div class="flex-1 min-w-0"><p class="text-sm font-semibold text-slate-800">' + tieuDe + '</p>' + noiDung + '</div></div>';
+                const google = dong('<i class="fa-brands fa-google text-[#4285F4]"></i>', 'Google',
+                    coGg ? '<p class="text-xs text-emerald-700 mt-0.5"><i class="fa-solid fa-circle-check mr-1"></i>Đã liên kết: ' + esc(TK.emailGoogle(u)) + '. Quên mật khẩu thì bấm "Đăng nhập bằng Google".</p>'
+                         : '<p class="text-xs text-slate-500 mt-0.5">Đăng nhập một chạm, không lo quên mật khẩu.</p>' +
+                           '<button type="button" id="nut-lien-ket-gg" class="mt-2 text-sm font-semibold text-white bg-slate-800 hover:bg-slate-700 px-3.5 py-2 rounded-xl"><i class="fa-brands fa-google mr-1.5"></i>Liên kết Google</button>');
+                const email = dong('<i class="fa-regular fa-envelope text-teal-600"></i>', 'Email',
+                    emailCap
+                        ? '<p class="text-xs text-slate-500 mt-0.5"><b>' + esc(u.email) + '</b> là email thầy cấp, không nhận được thư nên chưa tự lấy lại mật khẩu được. Đổi sang email thật của bạn:</p>' +
+                          '<form id="form-doi-email" class="mt-2 space-y-2" novalidate>' +
+                          '<input id="de-email" type="email" autocomplete="email" placeholder="email@gmail.com" class="' + O_NHAP + '">' +
+                          '<input id="de-mk" type="password" autocomplete="current-password" placeholder="Mật khẩu hiện tại" class="' + O_NHAP + '">' +
+                          '<button type="submit" class="w-full py-2.5 rounded-xl bg-primary hover:bg-teal-700 disabled:opacity-50 text-white text-sm font-bold">Gửi email xác nhận</button></form>' +
+                          '<p class="text-xs text-slate-500 mt-2">Bấm link trong thư để xác nhận, rồi đăng nhập lại bằng email mới (mật khẩu giữ nguyên). Khóa học và kết quả học tập vẫn giữ nguyên.</p>'
+                        : '<p class="text-xs mt-0.5 ' + (u.emailVerified ? 'text-emerald-700' : 'text-amber-700') + '">' + esc(u.email) + ' · ' +
+                          (u.emailVerified ? '<i class="fa-solid fa-circle-check mr-1"></i>Đã xác minh, quên mật khẩu thì lấy lại qua email này.'
+                                           : 'Chưa xác minh. <button type="button" id="nut-gui-xac-minh" class="font-semibold underline">Gửi lại email xác minh</button>') + '</p>');
+                $('tk-cach').innerHTML = (thongBao || '') + google + email;
+                const nutGg = $('nut-lien-ket-gg');
+                if (nutGg) nutGg.addEventListener('click', async () => {
+                    nutGg.disabled = true; nutGg.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin mr-1"></i>Đang mở Google...';
+                    try {
+                        const kq = await TK.lienKetGoogle(firebase.auth().currentUser);
+                        if (kq) { await firebase.auth().currentUser.reload(); veCachDangNhap(thongBaoTk('ok', 'Đã liên kết Google. Lần sau có thể bấm "Đăng nhập bằng Google".')); veThongBaoTaiKhoan(); }
+                    } catch (err) {
+                        veCachDangNhap(thongBaoTk('loi', TK.loiGoogle(err) || 'Đã hủy liên kết.'));
+                    }
+                });
+                const nutXm = $('nut-gui-xac-minh');
+                if (nutXm) nutXm.addEventListener('click', async () => {
+                    try { await firebase.auth().currentUser.sendEmailVerification(); veCachDangNhap(thongBaoTk('ok', 'Đã gửi email xác minh tới ' + u.email + '. Xem cả mục Thư rác / Spam.')); }
+                    catch (err) { veCachDangNhap(thongBaoTk('loi', err.code === 'auth/too-many-requests' ? 'Gửi quá nhiều lần, đợi vài phút rồi thử lại.' : 'Chưa gửi được (' + err.code + ').')); }
+                });
+                const fEmail = $('form-doi-email');
+                if (fEmail) fEmail.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const moi = $('de-email').value.trim().toLowerCase(), mk = $('de-mk').value;
+                    const cur = firebase.auth().currentUser;
+                    const baoLoi = (m) => veCachDangNhap(thongBaoTk('loi', m));
+                    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(moi) || TK.laEmailCap(moi)) return baoLoi('Nhập email thật của bạn (vd: ten@gmail.com).');
+                    if (!mk) return baoLoi('Nhập mật khẩu hiện tại để xác nhận.');
+                    const nut = fEmail.querySelector('button'); nut.disabled = true; nut.textContent = 'Đang gửi...';
+                    try {
+                        await cur.reauthenticateWithCredential(firebase.auth.EmailAuthProvider.credential(cur.email, mk));
+                        // Ghi lại yêu cầu đổi email TRƯỚC, để sau khi xác nhận được tự chuyển quyền khóa học sang email mới
+                        await firebase.firestore().collection('doi_email').doc(cur.uid).set({ emailCu: cur.email, emailMoi: moi, luc: firebase.firestore.FieldValue.serverTimestamp() });
+                        firebase.auth().languageCode = 'vi';
+                        await cur.verifyBeforeUpdateEmail(moi);
+                        veCachDangNhap(thongBaoTk('ok', 'Đã gửi thư xác nhận tới ' + moi + '. Mở thư (xem cả Thư rác / Spam), bấm link xác nhận, rồi đăng nhập lại bằng email mới với mật khẩu cũ.'));
+                    } catch (err) {
+                        const ma = err.code;
+                        baoLoi(ma === 'auth/wrong-password' || ma === 'auth/invalid-credential' || ma === 'auth/invalid-login-credentials' ? 'Mật khẩu hiện tại không đúng.'
+                            : ma === 'auth/email-already-in-use' ? 'Email này đã có tài khoản DoforMath khác.'
+                            : ma === 'auth/invalid-email' || ma === 'auth/invalid-new-email' ? 'Email không hợp lệ.'
+                            : ma === 'auth/too-many-requests' ? 'Thử quá nhiều lần, đợi vài phút rồi thử lại.'
+                            : ma === 'permission-denied' ? 'Chưa ghi được yêu cầu đổi email (thầy cần cập nhật Firestore Rules).'
+                            : 'Chưa đổi được email (' + (ma || err.message) + ').');
+                    }
+                });
+            }
+            window.veCachDangNhap = veCachDangNhap;
+
+            $('form-doi-mk').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const loi = (m) => { $('mk-loi').textContent = m; };
+                const cu = $('mk-cu').value, moi = $('mk-moi').value, moi2 = $('mk-moi-2').value;
+                loi(''); $('mk-xong').classList.add('hidden');
+                if (!cu) return loi('Nhập mật khẩu hiện tại.');
+                if (moi.length < 8) return loi('Mật khẩu mới cần ít nhất 8 ký tự.');
+                if (moi === cu) return loi('Mật khẩu mới phải khác mật khẩu hiện tại.');
+                if (moi !== moi2) return loi('Hai lần nhập mật khẩu mới chưa giống nhau.');
+                const u = firebase.auth().currentUser;
+                if (!u) return loi('Phiên đăng nhập đã hết, hãy đăng nhập lại.');
+                const nut = $('nut-doi-mk');
+                nut.disabled = true; nut.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin mr-1"></i>Đang đổi...';
+                try {
+                    await u.reauthenticateWithCredential(firebase.auth.EmailAuthProvider.credential(u.email, cu));
+                    await u.updatePassword(moi);
+                    $('form-doi-mk').reset(); doManh();
+                    $('mk-xong').classList.remove('hidden');
+                } catch (err) {
+                    const ma = err && err.code;
+                    loi(ma === 'auth/wrong-password' || ma === 'auth/invalid-credential' || ma === 'auth/invalid-login-credentials' ? 'Mật khẩu hiện tại không đúng.'
+                        : ma === 'auth/too-many-requests' ? 'Nhập sai quá nhiều lần. Đợi vài phút rồi thử lại.'
+                        : ma === 'auth/weak-password' ? 'Mật khẩu mới quá yếu, hãy chọn mật khẩu dài hơn.'
+                        : ma === 'auth/network-request-failed' ? 'Không có mạng. Kiểm tra kết nối rồi thử lại.'
+                        : ma === 'auth/requires-recent-login' ? 'Hãy đăng xuất, đăng nhập lại rồi đổi mật khẩu.'
+                        : 'Chưa đổi được mật khẩu (' + (ma || err.message) + ').');
+                } finally {
+                    nut.disabled = false; nut.textContent = 'Đổi mật khẩu';
+                }
+            });
+        })();
+
         firebase.auth().onAuthStateChanged(async (user) => {
             const khuVucDangNhap = $('khu-vuc-dang-nhap'), khuVucUser = $('khu-vuc-user'), nutDangXuatMobile = $('nutDangXuatMobile');
             if (user) {
@@ -621,6 +848,15 @@
                 return;
             }
             $('loi-chao').textContent = 'Xin chào, ' + user.email.split('@')[0] + '!';
+            $('nut-tai-khoan').classList.remove('hidden'); $('nut-tai-khoan').classList.add('inline-flex');
+            try {
+                const db = firebase.firestore();
+                const [quyen, don] = await Promise.all([TK.docQuyen(db, user).catch(() => ({})), db.collection('dang_ky').doc(user.uid).get().catch(() => null)]);
+                CO_KHOA = Object.keys(quyen).some((k) => quyen[k] === true);
+                DON_DANG_KY = don && don.exists ? don.data() : null;
+            } catch (e) {}
+            veThongBaoTaiKhoan();
+            if (location.hash === '#doi-mat-khau') $('nut-tai-khoan').click();
             try {
                 const du = await taiDuLieu(user);
                 const pt = phanTich(du), nh = ngayHoc(du.hocSinh);

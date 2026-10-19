@@ -18,7 +18,7 @@
     <!-- Giao diện sáng / tối: chạy trước CSS để không bị nháy màu -->
     <script src="assets/js/dfm-giao-dien.js"></script>
     <!-- CSS Tailwind dựng sẵn cho cả site (sửa class xong chạy: npm run build:css) -->
-    <link rel="stylesheet" href="assets/css/tailwind.css?v=a5530322">
+    <link rel="stylesheet" href="assets/css/tailwind.css?v=4d1f765f">
 
     <!-- Thêm Alpine.js để xử lý Ẩn/Hiện mật khẩu -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -39,6 +39,8 @@
     <!-- Nhúng thư viện Firebase -->
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script src="assets/js/dfm-tai-khoan.js"></script>
     
     <style>
         body { font-family: 'Inter', system-ui, sans-serif; }
@@ -122,56 +124,49 @@
         <div class="bg-white p-10 lg:p-14 flex flex-col justify-center min-h-screen overflow-y-auto z-10 relative shadow-[-10px_0_30px_rgba(0,0,0,0.03)]">
 
             <div class="animate-fade-in" style="animation-delay: 0.1s;">
+                <!-- Khu vực hiển thị lỗi / thông báo (dùng chung cho mọi màn hình) -->
+                <div id="error-message" class="hidden mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm font-medium flex items-center gap-2 shadow-sm" role="alert">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    <span id="error-text"></span>
+                </div>
+
+                <!-- ===== MÀN HÌNH: ĐĂNG NHẬP ===== -->
+                <section data-man="dang-nhap">
                 <div class="mb-8">
                     <h2 class="text-3xl font-extrabold text-slate-900 mb-2 tracking-tight">Đăng nhập</h2>
                     <p class="text-sm text-slate-500 font-medium">Vui lòng đăng nhập để tiếp tục hành trình học tập.</p>
-                </div>
-                
-                <!-- Khu vực hiển thị lỗi -->
-                <div id="error-message" class="hidden mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm font-medium flex items-center gap-2 shadow-sm">
-                    <i class="fa-solid fa-circle-exclamation"></i>
-                    <span id="error-text">Sai tài khoản hoặc mật khẩu!</span>
                 </div>
 
                 <div class="space-y-5" x-data="{ showPassword: false }">
                     
                     <!-- Nhập Email -->
                     <div>
-                        <label class="block text-sm font-bold text-slate-700 mb-2">Tài khoản Email</label>
+                        <label class="block text-sm font-bold text-slate-700 mb-2" for="email">Tài khoản Email</label>
                         <div class="relative group">
                             <i class="fa-regular fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm transition-colors group-focus-within:text-teal-500 pointer-events-none"></i>
-                            <input type="email" id="email" placeholder="hocsinh@dfm.com"
+                            <input type="email" id="email" placeholder="email@gmail.com" autocomplete="username"
                                 class="w-full pl-11 pr-4 py-3.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 text-base font-medium placeholder:text-slate-400 focus:ring-4 focus:ring-teal-500/10 focus:border-teal-500 outline-none transition-all focus:bg-white">
                         </div>
                     </div>
 
                     <!-- Nhập Mật khẩu -->
                     <div>
-                        <label class="block text-sm font-bold text-slate-700 mb-2">Mật khẩu</label>
+                        <label class="block text-sm font-bold text-slate-700 mb-2" for="password">Mật khẩu</label>
                         <div class="relative group">
                             <i class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm transition-colors group-focus-within:text-teal-500 pointer-events-none"></i>
                             
-                            <input id="password" :type="showPassword ? 'text' : 'password'" placeholder="••••••••"
+                            <input id="password" :type="showPassword ? 'text' : 'password'" placeholder="••••••••" autocomplete="current-password"
                                 class="w-full pl-11 pr-12 py-3.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 text-base font-medium placeholder:text-slate-400 focus:ring-4 focus:ring-teal-500/10 focus:border-teal-500 outline-none transition-all focus:bg-white">
                             
                             <!-- Nút ẩn/hiện mật khẩu (Alpine.js) -->
-                            <button type="button" @click="showPassword = !showPassword" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition">
+                            <button type="button" @click="showPassword = !showPassword" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition" aria-label="Hiện / ẩn mật khẩu">
                                 <i class="text-sm" :class="showPassword ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye'"></i>
                             </button>
                         </div>
                     </div>
 
-                    <!-- Ghi nhớ & Quên mật khẩu -->
-                    <div class="flex items-center justify-between mt-2">
-                        <label class="flex items-center gap-2 cursor-pointer group">
-                            <!-- Custom checkbox -->
-                            <div class="relative flex items-center justify-center w-5 h-5 rounded border border-slate-300 bg-white group-hover:border-teal-500 transition-colors">
-                                <input type="checkbox" class="peer opacity-0 absolute inset-0 cursor-pointer">
-                                <i class="fa-solid fa-check text-[10px] text-teal-600 opacity-0 peer-checked:opacity-100 transition-opacity"></i>
-                            </div>
-                            <span class="text-sm font-semibold text-slate-600 group-hover:text-slate-900 transition">Ghi nhớ đăng nhập</span>
-                        </label>
-                        <a href="#" class="text-sm font-bold text-teal-600 hover:text-teal-700 transition">Quên mật khẩu?</a>
+                    <div class="flex items-center justify-end mt-2">
+                        <button type="button" data-den="quen-mk" class="text-sm font-bold text-teal-600 hover:text-teal-700 transition">Quên mật khẩu?</button>
                     </div>
 
                     <!-- Nút Đăng nhập -->
@@ -189,8 +184,8 @@
                     </div>
 
                     <!-- Nút Google -->
-                    <button class="flex items-center justify-center gap-3 w-full py-3.5 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 hover:border-slate-300 text-sm font-bold text-slate-700 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-sm">
-                        <svg class="w-5 h-5" viewBox="0 0 24 24">
+                    <button type="button" data-google class="flex items-center justify-center gap-3 w-full py-3.5 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 hover:border-slate-300 text-sm font-bold text-slate-700 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-sm">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" aria-hidden="true">
                             <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
                             <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
                             <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
@@ -198,12 +193,124 @@
                         </svg>
                         Đăng nhập bằng Google
                     </button>
+                    <p data-goi-y-iphone class="hidden text-xs text-slate-500 text-center">Trên app iPhone, nếu đăng nhập Google không quay lại được, hãy mở web bằng Safari.</p>
                 </div>
 
                 <p class="text-center mt-8 text-sm text-slate-500 font-medium">
                     Chưa có tài khoản?
-                    <a href="#" class="text-teal-600 hover:text-teal-700 font-bold transition">Đăng ký ngay</a>
+                    <button type="button" data-den="dang-ky" class="text-teal-600 hover:text-teal-700 font-bold transition">Đăng ký ngay</button>
                 </p>
+                </section>
+
+                <!-- ===== MÀN HÌNH: QUÊN MẬT KHẨU ===== -->
+                <section data-man="quen-mk" class="hidden">
+                    <button type="button" data-den="dang-nhap" class="text-sm font-semibold text-slate-500 hover:text-teal-600 mb-6"><i class="fa-solid fa-arrow-left mr-1.5"></i>Quay lại đăng nhập</button>
+                    <div class="mb-8">
+                        <h2 class="text-3xl font-extrabold text-slate-900 mb-2 tracking-tight">Quên mật khẩu</h2>
+                        <p class="text-sm text-slate-500 font-medium">Nhập email đã đăng ký, DoforMath sẽ gửi link để bạn đặt mật khẩu mới.</p>
+                    </div>
+                    <form id="form-quen-mk" class="space-y-5" novalidate>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2" for="qm-email">Email</label>
+                        <div class="relative group">
+                            <i class="fa-regular fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm transition-colors group-focus-within:text-teal-500 pointer-events-none"></i>
+                            <input id="qm-email" type="email" placeholder="email@gmail.com" autocomplete="username" class="w-full pl-11 pr-4 py-3.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 text-base font-medium placeholder:text-slate-400 focus:ring-4 focus:ring-teal-500/10 focus:border-teal-500 outline-none transition-all focus:bg-white">
+                        </div>
+                    </div>
+                        <button type="submit" class="w-full py-4 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-600 text-white text-base font-bold shadow-lg shadow-teal-500/30 hover:shadow-teal-500/50 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-60">Gửi link đặt lại mật khẩu</button>
+                    </form>
+                    <div id="qm-kq" class="mt-5"></div>
+                </section>
+
+                <!-- ===== MÀN HÌNH: ĐĂNG KÝ ===== -->
+                <section data-man="dang-ky" class="hidden">
+                    <button type="button" data-den="dang-nhap" class="text-sm font-semibold text-slate-500 hover:text-teal-600 mb-6"><i class="fa-solid fa-arrow-left mr-1.5"></i>Đã có tài khoản? Đăng nhập</button>
+                    <div class="mb-6">
+                        <h2 class="text-3xl font-extrabold text-slate-900 mb-2 tracking-tight">Đăng ký</h2>
+                        <p class="text-sm text-slate-500 font-medium">Cần <b>mã lớp</b> thầy gửi. Đăng ký xong, thầy duyệt là bạn vào học được.</p>
+                    </div>
+                    <button type="button" data-google class="flex items-center justify-center gap-3 w-full py-3.5 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 hover:border-slate-300 text-sm font-bold text-slate-700 active:scale-[0.98] transition-all shadow-sm">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
+                            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                        </svg>
+                        Đăng ký nhanh bằng Google
+                    </button>
+                    <div class="flex items-center gap-3 my-6">
+                        <div class="flex-1 h-px bg-slate-200"></div>
+                        <span class="text-xs uppercase tracking-wider font-bold text-slate-400">Hoặc dùng email</span>
+                        <div class="flex-1 h-px bg-slate-200"></div>
+                    </div>
+                    <form id="form-dang-ky" class="space-y-4" novalidate>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2" for="dk-ten">Họ và tên</label>
+                        <div class="relative group">
+                            <i class="fa-regular fa-user absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm transition-colors group-focus-within:text-teal-500 pointer-events-none"></i>
+                            <input id="dk-ten" type="text" placeholder="Nguyễn Văn A" autocomplete="name" maxlength="60" class="w-full pl-11 pr-4 py-3.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 text-base font-medium placeholder:text-slate-400 focus:ring-4 focus:ring-teal-500/10 focus:border-teal-500 outline-none transition-all focus:bg-white">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2" for="dk-email">Email (dùng email thật để lấy lại mật khẩu khi quên)</label>
+                        <div class="relative group">
+                            <i class="fa-regular fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm transition-colors group-focus-within:text-teal-500 pointer-events-none"></i>
+                            <input id="dk-email" type="email" placeholder="email@gmail.com" autocomplete="username" class="w-full pl-11 pr-4 py-3.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 text-base font-medium placeholder:text-slate-400 focus:ring-4 focus:ring-teal-500/10 focus:border-teal-500 outline-none transition-all focus:bg-white">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2" for="dk-mk">Mật khẩu (ít nhất 8 ký tự)</label>
+                        <div class="relative group">
+                            <i class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm transition-colors group-focus-within:text-teal-500 pointer-events-none"></i>
+                            <input id="dk-mk" type="password" placeholder="••••••••" autocomplete="new-password" class="w-full pl-11 pr-4 py-3.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 text-base font-medium placeholder:text-slate-400 focus:ring-4 focus:ring-teal-500/10 focus:border-teal-500 outline-none transition-all focus:bg-white">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2" for="dk-mk2">Nhập lại mật khẩu</label>
+                        <div class="relative group">
+                            <i class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm transition-colors group-focus-within:text-teal-500 pointer-events-none"></i>
+                            <input id="dk-mk2" type="password" placeholder="••••••••" autocomplete="new-password" class="w-full pl-11 pr-4 py-3.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 text-base font-medium placeholder:text-slate-400 focus:ring-4 focus:ring-teal-500/10 focus:border-teal-500 outline-none transition-all focus:bg-white">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2" for="dk-lop">Mã lớp</label>
+                        <div class="relative group">
+                            <i class="fa-solid fa-users absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm transition-colors group-focus-within:text-teal-500 pointer-events-none"></i>
+                            <input id="dk-lop" type="text" placeholder="VD: TOAN12A" autocomplete="off" autocapitalize="characters" maxlength="20" class="w-full pl-11 pr-4 py-3.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 text-base font-medium placeholder:text-slate-400 focus:ring-4 focus:ring-teal-500/10 focus:border-teal-500 outline-none transition-all focus:bg-white">
+                        </div>
+                    </div>
+                        <button type="submit" class="w-full py-4 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-600 text-white text-base font-bold shadow-lg shadow-teal-500/30 hover:shadow-teal-500/50 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-60">Đăng ký</button>
+                    </form>
+                </section>
+
+                <!-- ===== MÀN HÌNH: HOÀN TẤT ĐĂNG KÝ (vừa vào bằng Google, chưa có lớp) ===== -->
+                <section data-man="hoan-tat" class="hidden">
+                    <div class="mb-6">
+                        <h2 class="text-3xl font-extrabold text-slate-900 mb-2 tracking-tight">Hoàn tất đăng ký</h2>
+                        <p class="text-sm text-slate-500 font-medium">Bạn đã đăng nhập bằng <b id="ht-email"></b>. Nhập tên và mã lớp để gửi thầy duyệt.</p>
+                    </div>
+                    <form id="form-hoan-tat" class="space-y-4" novalidate>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2" for="ht-ten">Họ và tên</label>
+                        <div class="relative group">
+                            <i class="fa-regular fa-user absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm transition-colors group-focus-within:text-teal-500 pointer-events-none"></i>
+                            <input id="ht-ten" type="text" placeholder="Nguyễn Văn A" autocomplete="name" maxlength="60" class="w-full pl-11 pr-4 py-3.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 text-base font-medium placeholder:text-slate-400 focus:ring-4 focus:ring-teal-500/10 focus:border-teal-500 outline-none transition-all focus:bg-white">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2" for="ht-lop">Mã lớp</label>
+                        <div class="relative group">
+                            <i class="fa-solid fa-users absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm transition-colors group-focus-within:text-teal-500 pointer-events-none"></i>
+                            <input id="ht-lop" type="text" placeholder="VD: TOAN12A" autocomplete="off" autocapitalize="characters" maxlength="20" class="w-full pl-11 pr-4 py-3.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 text-base font-medium placeholder:text-slate-400 focus:ring-4 focus:ring-teal-500/10 focus:border-teal-500 outline-none transition-all focus:bg-white">
+                        </div>
+                    </div>
+                        <button type="submit" class="w-full py-4 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-600 text-white text-base font-bold shadow-lg shadow-teal-500/30 hover:shadow-teal-500/50 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-60">Gửi thầy duyệt</button>
+                    </form>
+                    <p class="text-center mt-6 text-sm text-slate-500">
+                        <a href="goc-hoc-tap.html" class="font-semibold text-slate-500 hover:text-teal-600">Để sau</a> ·
+                        <button type="button" onclick="firebase.auth().signOut().then(() => location.reload())" class="font-semibold text-slate-500 hover:text-red-500">Đăng xuất</button>
+                    </p>
+                </section>
             </div>
         </div>
 
@@ -222,53 +329,185 @@
         };
         
         firebase.initializeApp(firebaseConfig);
+        firebase.auth().languageCode = 'vi';   // email đặt lại mật khẩu / xác minh gửi bằng tiếng Việt
+        const db = firebase.firestore();
+        const TK = window.dfmTaiKhoan;
+        const ADMIN_EMAIL = 'thanhdo@dfm.com';
+        const $ = (id) => document.getElementById(id);
+        const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+        function hienLoi(msg) {
+            $('error-message').classList.toggle('hidden', !msg);
+            $('error-text').innerText = msg || '';
+        }
+        function hienMan(ten) {
+            document.querySelectorAll('[data-man]').forEach((m) => m.classList.toggle('hidden', m.getAttribute('data-man') !== ten));
+            hienLoi('');
+            window.scrollTo(0, 0);
+        }
+        document.querySelectorAll('[data-den]').forEach((n) => n.addEventListener('click', () => {
+            const ten = n.getAttribute('data-den');
+            if (ten === 'quen-mk') $('qm-email').value = $('email').value.trim();
+            hienMan(ten);
+        }));
+        if (TK.laAppIphone()) document.querySelectorAll('[data-goi-y-iphone]').forEach((p) => p.classList.remove('hidden'));
+        function dangXuLy(nut, dang, chu) {
+            nut.disabled = dang;
+            if (dang) { nut.dataset.chu = nut.innerHTML; nut.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> ' + (chu || 'Đang xử lý...'); }
+            else if (nut.dataset.chu) nut.innerHTML = nut.dataset.chu;
+        }
+        const chuanMaLop = (v) => String(v || '').trim().toUpperCase().replace(/\s+/g, '');
+
+        // Sau khi đăng nhập: có khóa học → vào học; đã gửi đơn → Góc học tập (xem trạng thái duyệt); chưa có → hoàn tất đăng ký
+        async function sauDangNhap(user) {
+            if (!user) return;
+            if (user.email === ADMIN_EMAIL) { location.href = 'index.html'; return; }
+            let quyen = {};
+            try { quyen = await TK.docQuyen(db, user); } catch (e) {}
+            if (Object.keys(quyen).some((k) => quyen[k] === true)) { location.href = 'index.html'; return; }
+            let coDon = false;
+            try { coDon = (await db.collection('dang_ky').doc(user.uid).get()).exists; } catch (e) {}
+            if (coDon || TK.laEmailCap(user.email)) { location.href = 'goc-hoc-tap.html'; return; }
+            $('ht-email').textContent = user.email;
+            $('ht-ten').value = user.displayName || '';
+            hienMan('hoan-tat');
+        }
 
         function xuLyDangNhap() {
-            const emailNhapVao = document.getElementById('email').value;
+            const emailNhapVao = document.getElementById('email').value.trim();
             const matKhauNhapVao = document.getElementById('password').value;
-            const thongBaoLoiBox = document.getElementById('error-message');
-            const thongBaoLoiText = document.getElementById('error-text');
-            
             const nutDangNhap = document.querySelector('.login-btn');
             const btnText = document.getElementById('btn-text');
             const btnIcon = document.getElementById('btn-icon');
             const btnSpinner = document.getElementById('btn-spinner');
-
-            // Hiển thị trạng thái đang xử lý (Spinner)
-            nutDangNhap.disabled = true;
-            nutDangNhap.classList.add('opacity-70', 'cursor-not-allowed');
-            btnText.innerText = "Đang xử lý...";
-            btnIcon.classList.add('hidden');
-            btnSpinner.classList.remove('hidden');
-            thongBaoLoiBox.classList.add('hidden'); // Ẩn lỗi cũ nếu có
-
+            const datNut = (dang) => {
+                nutDangNhap.disabled = dang;
+                nutDangNhap.classList.toggle('opacity-70', dang);
+                nutDangNhap.classList.toggle('cursor-not-allowed', dang);
+                btnText.innerText = dang ? 'Đang xử lý...' : 'Đăng nhập';
+                btnIcon.classList.toggle('hidden', dang);
+                btnSpinner.classList.toggle('hidden', !dang);
+            };
+            datNut(true);
+            hienLoi('');
             firebase.auth().signInWithEmailAndPassword(emailNhapVao, matKhauNhapVao)
-            .then((userCredential) => {
-                thongBaoLoiBox.classList.add('hidden');
-                
-                // Đổi thành tên file HTML bạn muốn học sinh nhìn thấy sau khi đăng nhập
-                window.location.href = "index.html"; 
-            })
+            .then((cred) => sauDangNhap(cred.user))
             .catch((error) => {
-                // Khôi phục nút bấm khi lỗi
-                nutDangNhap.disabled = false;
-                nutDangNhap.classList.remove('opacity-70', 'cursor-not-allowed');
-                btnText.innerText = "Đăng nhập";
-                btnIcon.classList.remove('hidden');
-                btnSpinner.classList.add('hidden');
-                
-                // Hiển thị thông báo lỗi
-                thongBaoLoiBox.classList.remove('hidden');
-
-                if(error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
-                    thongBaoLoiText.innerText = "Sai email hoặc mật khẩu. Vui lòng thử lại!";
-                } else if(error.code === 'auth/invalid-email') {
-                    thongBaoLoiText.innerText = "Định dạng email không hợp lệ!";
+                datNut(false);
+                if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-login-credentials') {
+                    hienLoi('Sai email hoặc mật khẩu. Nếu bạn đăng ký bằng Google, hãy bấm "Đăng nhập bằng Google".');
+                } else if (error.code === 'auth/invalid-email') {
+                    hienLoi('Định dạng email không hợp lệ!');
+                } else if (error.code === 'auth/too-many-requests') {
+                    hienLoi('Nhập sai quá nhiều lần. Đợi vài phút hoặc dùng "Quên mật khẩu?".');
                 } else {
-                    thongBaoLoiText.innerText = "Lỗi kết nối. Vui lòng kiểm tra mạng!";
+                    hienLoi('Lỗi kết nối. Vui lòng kiểm tra mạng!');
                 }
             });
         }
+        $('password').addEventListener('keydown', (e) => { if (e.key === 'Enter') xuLyDangNhap(); });
+
+        // Đăng nhập / đăng ký bằng Google
+        document.querySelectorAll('[data-google]').forEach((n) => n.addEventListener('click', async () => {
+            hienLoi('');
+            dangXuLy(n, true, 'Đang mở Google...');
+            try {
+                const kq = await TK.dangNhapGoogle();
+                if (kq && kq.user) await sauDangNhap(kq.user);
+            } catch (err) { hienLoi(TK.loiGoogle(err)); }
+            dangXuLy(n, false);
+        }));
+        // Quay về từ trang Google (kiểu chuyển trang)
+        firebase.auth().getRedirectResult().then((kq) => { if (kq && kq.user) sauDangNhap(kq.user); })
+            .catch((err) => hienLoi(TK.loiGoogle(err)));
+
+        // Quên mật khẩu: gửi link đặt lại qua email (tài khoản thầy cấp @dfm.com không có hộp thư thật)
+        $('form-quen-mk').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = $('qm-email').value.trim().toLowerCase();
+            const kq = $('qm-kq');
+            hienLoi(''); kq.innerHTML = '';
+            if (!email) { hienLoi('Nhập email đã đăng ký.'); return; }
+            if (TK.laEmailCap(email)) {
+                kq.innerHTML = '<div class="text-sm text-slate-700 bg-teal-50 border border-teal-100 rounded-xl px-4 py-3 space-y-1.5">' +
+                    '<p><i class="fa-solid fa-circle-info text-teal-600 mr-1"></i><b>' + esc(email) + '</b> là tài khoản do thầy cấp, không nhận được email.</p>' +
+                    '<p>• Nếu đã liên kết Google: quay lại và bấm <b>Đăng nhập bằng Google</b>.</p>' +
+                    '<p>• Nếu chưa: nhắn thầy để được cấp lại mật khẩu. Vào được rồi, hãy vào <b>Góc học tập → Tài khoản</b> để liên kết Google hoặc email thật, lần sau tự lấy lại được.</p></div>';
+                return;
+            }
+            const nut = e.target.querySelector('button[type="submit"]');
+            dangXuLy(nut, true, 'Đang gửi...');
+            try {
+                await firebase.auth().sendPasswordResetEmail(email);
+                kq.innerHTML = '<div class="text-sm text-emerald-800 bg-emerald-50 border border-emerald-100 rounded-xl px-4 py-3"><i class="fa-solid fa-envelope-circle-check mr-1"></i>' +
+                    'Nếu <b>' + esc(email) + '</b> đã đăng ký, thư đặt lại mật khẩu đã được gửi. Mở thư (xem cả mục <b>Thư rác / Spam</b>) và bấm vào link để đặt mật khẩu mới.</div>';
+            } catch (err) {
+                hienLoi(err.code === 'auth/invalid-email' ? 'Email không hợp lệ.' : err.code === 'auth/too-many-requests' ? 'Gửi quá nhiều lần. Đợi vài phút rồi thử lại.' : 'Chưa gửi được (' + err.code + '). Kiểm tra mạng rồi thử lại.');
+            }
+            dangXuLy(nut, false);
+        });
+
+        // Kiểm tra mã lớp (mã đang mở mới đọc được)
+        async function layLop(ma) {
+            if (!/^[A-Z0-9_-]{3,20}$/.test(ma)) return null;
+            try { const s = await db.collection('lop').doc(ma).get(); return s.exists && s.data().mo === true ? s.data() : null; } catch (e) { return null; }
+        }
+        async function guiDon(user, ten, ma, lop) {
+            await db.collection('dang_ky').doc(user.uid).set({
+                email: user.email, ten: ten, maLop: ma, tenLop: lop.ten || ma, trangThai: 'cho',
+                cach: TK.coGoogle(user) ? 'google' : 'email', luc: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        }
+
+        // Đăng ký bằng email + mật khẩu
+        $('form-dang-ky').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const ten = $('dk-ten').value.trim(), email = $('dk-email').value.trim().toLowerCase();
+            const mk = $('dk-mk').value, mk2 = $('dk-mk2').value, ma = chuanMaLop($('dk-lop').value);
+            hienLoi('');
+            if (!ten) return hienLoi('Nhập họ và tên.');
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return hienLoi('Email không hợp lệ.');
+            if (TK.laEmailCap(email)) return hienLoi('Hãy dùng email thật của bạn (vd: Gmail) để có thể tự lấy lại mật khẩu.');
+            if (mk.length < 8) return hienLoi('Mật khẩu cần ít nhất 8 ký tự.');
+            if (mk !== mk2) return hienLoi('Hai lần nhập mật khẩu chưa giống nhau.');
+            const nut = e.target.querySelector('button[type="submit"]');
+            dangXuLy(nut, true, 'Đang đăng ký...');
+            try {
+                const lop = await layLop(ma);
+                if (!lop) { hienLoi('Mã lớp không đúng hoặc lớp đã đóng đăng ký. Hỏi lại thầy mã lớp nhé.'); dangXuLy(nut, false); return; }
+                const cred = await firebase.auth().createUserWithEmailAndPassword(email, mk);
+                try { await cred.user.updateProfile({ displayName: ten }); } catch (e2) {}
+                try { await cred.user.sendEmailVerification(); } catch (e2) {}
+                await guiDon(cred.user, ten, ma, lop);
+                location.href = 'goc-hoc-tap.html';
+            } catch (err) {
+                dangXuLy(nut, false);
+                hienLoi(err.code === 'auth/email-already-in-use' ? 'Email này đã có tài khoản. Hãy đăng nhập, hoặc dùng "Quên mật khẩu?".'
+                    : err.code === 'auth/weak-password' ? 'Mật khẩu quá yếu.' : err.code === 'auth/invalid-email' ? 'Email không hợp lệ.'
+                    : 'Chưa đăng ký được (' + (err.code || err.message) + '). Thử lại sau.');
+            }
+        });
+
+        // Hoàn tất đăng ký sau khi vào bằng Google
+        $('form-hoan-tat').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const user = firebase.auth().currentUser;
+            const ten = $('ht-ten').value.trim(), ma = chuanMaLop($('ht-lop').value);
+            hienLoi('');
+            if (!user) return hienLoi('Phiên đăng nhập đã hết, hãy đăng nhập lại.');
+            if (!ten) return hienLoi('Nhập họ và tên.');
+            const nut = e.target.querySelector('button[type="submit"]');
+            dangXuLy(nut, true, 'Đang gửi...');
+            try {
+                const lop = await layLop(ma);
+                if (!lop) { hienLoi('Mã lớp không đúng hoặc lớp đã đóng đăng ký. Hỏi lại thầy mã lớp nhé.'); dangXuLy(nut, false); return; }
+                await guiDon(user, ten, ma, lop);
+                location.href = 'goc-hoc-tap.html';
+            } catch (err) {
+                dangXuLy(nut, false);
+                hienLoi('Chưa gửi được (' + (err.code || err.message) + '). Thử lại sau.');
+            }
+        });
     </script>
     <script>
     // 1. Chặn chuột phải và bôi đen
