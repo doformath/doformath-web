@@ -13,7 +13,7 @@
     <!-- Giao diện sáng / tối: chạy trước CSS để không bị nháy màu -->
     <script src="assets/js/dfm-giao-dien.js"></script>
     <!-- CSS Tailwind dựng sẵn cho cả site (sửa class xong chạy: npm run build:css) -->
-    <link rel="stylesheet" href="assets/css/tailwind.css?v=08097a6e">
+    <link rel="stylesheet" href="assets/css/tailwind.css?v=a5530322">
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -43,24 +43,25 @@
                 <div class="flex items-center gap-2 md:gap-4">
                     <!-- Logo Toán học: Xóa class pb-1 để trả logo về đúng trọng tâm -->
                     <a href="index.html" class="flex-shrink-0 flex items-center hover:opacity-80 transition-opacity">
-                        <span class="text-xl md:text-2xl tracking-tight text-gray-900">
+                        <span class="text-xl lg:text-2xl tracking-tight text-gray-900">
                             $\textcolor{#0d9488}{\textsf{\textbf{Dofor}}{\sum}\textsf{\textbf{ath}}}$
                         </span>
                     </a>
                 </div>
                 
                 <!-- Menu ngang (Desktop) -->
-                <nav class="hidden md:flex items-center gap-1.5">
+                <nav class="hidden md:flex items-center gap-0.5 lg:gap-1.5">
                     <!-- Nút đang chọn (Active): Nền màu xanh ngọc nhạt, chữ đậm -->
-                    <a href="index.html" class="ext-gray-600 hover:text-primary hover:bg-gray-100 font-medium px-4 py-2 rounded-full transition-all">Trang chủ</a>
+                    <a href="index.html" class="ext-gray-600 hover:text-primary hover:bg-gray-100 font-medium px-2.5 lg:px-3 xl:px-4 py-2 rounded-full transition-all whitespace-nowrap text-sm lg:text-base">Trang chủ</a>
                     
                     <!-- Các nút bình thường: Di chuột vào sẽ hiện nền xám nhạt bo tròn -->
-                    <a href="courses.html" class="text-primary bg-teal-50 font-semibold px-4 py-2 rounded-full transition-all">Khóa học của tôi</a>
+                    <a href="courses.html" class="text-primary bg-teal-50 font-semibold px-2.5 lg:px-3 xl:px-4 py-2 rounded-full transition-all whitespace-nowrap text-sm lg:text-base"><span class="lg:hidden">Khóa học</span><span class="hidden lg:inline">Khóa học của tôi</span></a>
                     
-                    <a href="tai-lieu-mien-phi.html" class="text-gray-600 hover:text-primary hover:bg-gray-100 font-medium px-4 py-2 rounded-full transition-all">Tài liệu</a>
+                    <a href="tai-lieu-mien-phi.html" class="text-gray-600 hover:text-primary hover:bg-gray-100 font-medium px-2.5 lg:px-3 xl:px-4 py-2 rounded-full transition-all whitespace-nowrap text-sm lg:text-base">Tài liệu</a>
                     
-                    <a href="phong-thi.html" class="text-gray-600 hover:text-primary hover:bg-gray-100 font-medium px-4 py-2 rounded-full transition-all">Phòng thi</a>
-                    <a href="admin.html" data-admin-link style="display: none;" class="text-primary hover:text-teal-700 hover:bg-teal-50 font-medium px-4 py-2 rounded-full transition-all"><i class="fa-solid fa-chart-line mr-1.5"></i>Quản trị</a>
+                    <a href="phong-thi.html" class="text-gray-600 hover:text-primary hover:bg-gray-100 font-medium px-2.5 lg:px-3 xl:px-4 py-2 rounded-full transition-all whitespace-nowrap text-sm lg:text-base">Phòng thi</a>
+                    <a href="goc-hoc-tap.html" class="text-gray-600 hover:text-primary hover:bg-gray-100 font-medium px-2.5 lg:px-3 xl:px-4 py-2 rounded-full transition-all whitespace-nowrap text-sm lg:text-base">Góc học tập</a>
+                    <a href="admin.html" data-admin-link style="display: none;" class="text-primary hover:text-teal-700 hover:bg-teal-50 font-medium px-2.5 lg:px-3 xl:px-4 py-2 rounded-full transition-all whitespace-nowrap text-sm lg:text-base"><i class="fa-solid fa-chart-line xl:mr-1.5" title="Quản trị"></i><span class="hidden xl:inline">Quản trị</span></a>
                 </nav>
 
                 <!-- Nút Hành động -->
@@ -71,18 +72,18 @@
                     
                     <!-- 1. Khu vực hiển thị khi CHƯA đăng nhập (Ban đầu ẩn) -->
                     <div id="khu-vuc-dang-nhap" style="display: none;">
-                        <a href="login.html" class="bg-primary hover:bg-teal-800 text-white px-4 py-2 md:px-6 md:py-2.5 rounded-full text-sm md:text-base font-medium transition-all shadow-md hover:shadow-lg inline-block whitespace-nowrap">
+                        <a href="login.html" class="bg-primary hover:bg-teal-800 text-white px-4 py-2 lg:px-6 md:py-2.5 rounded-full text-sm lg:text-base font-medium transition-all shadow-md hover:shadow-lg inline-block whitespace-nowrap">
                             Đăng nhập
                         </a>
                     </div>
 
                     <!-- 2. Khu vực hiển thị khi ĐÃ đăng nhập (Ban đầu ẩn) -->
-                    <div id="khu-vuc-user" style="display: none;" class="flex items-center gap-2 md:gap-4">
-                        <span id="ten-user" class="text-xs md:text-sm font-semibold text-teal-700 bg-teal-50 px-2 py-1.5 md:px-3 md:py-1 rounded-full border border-teal-100 max-w-[100px] md:max-w-[200px] truncate inline-block text-center"></span>
+                    <div id="khu-vuc-user" style="display: none;" class="flex items-center gap-2 xl:gap-4">
+                        <a id="ten-user" href="goc-hoc-tap.html" title="Góc học tập của tôi" class="text-xs md:text-sm font-semibold text-teal-700 bg-teal-50 px-2 py-1.5 md:px-3 md:py-1 rounded-full border border-teal-100 max-w-[100px] xl:max-w-[200px] truncate inline-block text-center hover:bg-teal-100 transition-colors"></a>
                         
                         <button onclick="dangXuat()" class="hidden md:flex items-center justify-center gap-1.5 text-xs md:text-sm text-gray-500 hover:text-red-500 font-medium transition-colors bg-gray-100 hover:bg-red-50 md:bg-transparent p-2 md:p-0 rounded-full md:rounded-none w-8 h-8 md:w-auto md:h-auto shrink-0">
                             <i class="fa-solid fa-arrow-right-from-bracket"></i>
-                            <span class="hidden md:inline">Đăng xuất</span>
+                            <span class="hidden xl:inline">Đăng xuất</span>
                         </button>
                     </div>
                 </div>
@@ -128,6 +129,10 @@
             <a href="phong-thi.html" title="Phòng thi" class="flex items-center h-12 whitespace-nowrap transition-colors text-teal-100 hover:bg-white/10 hover:text-white font-medium">
                 <i class="fa-solid fa-stopwatch w-14 shrink-0 text-center text-xl"></i>
                 <span class="pr-4">Phòng thi</span>
+            </a>
+            <a href="goc-hoc-tap.html" title="Góc học tập" class="flex items-center h-12 whitespace-nowrap transition-colors text-teal-100 hover:bg-white/10 hover:text-white font-medium">
+                <i class="fa-solid fa-user-graduate w-14 shrink-0 text-center text-xl"></i>
+                <span class="pr-4">Góc học tập</span>
             </a>
             <a href="admin.html" data-admin-link title="Quản trị" style="display: none;" class="flex items-center h-12 whitespace-nowrap transition-colors text-teal-100 hover:bg-white/10 hover:text-white font-medium">
                 <i class="fa-solid fa-chart-line w-14 shrink-0 text-center text-xl"></i>

@@ -13,7 +13,7 @@
     <!-- Giao diện sáng / tối: chạy trước CSS để không bị nháy màu -->
     <script src="assets/js/dfm-giao-dien.js"></script>
     <!-- CSS Tailwind dựng sẵn cho cả site (sửa class xong chạy: npm run build:css) -->
-    <link rel="stylesheet" href="assets/css/tailwind.css?v=08097a6e">
+    <link rel="stylesheet" href="assets/css/tailwind.css?v=a5530322">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -42,24 +42,25 @@
                 <div class="flex items-center gap-2 md:gap-4">
                     <!-- Logo Toán học: Xóa class pb-1 để trả logo về đúng trọng tâm -->
                     <a href="index.html" class="flex-shrink-0 flex items-center hover:opacity-80 transition-opacity">
-                        <span class="text-xl md:text-2xl tracking-tight text-gray-900">
+                        <span class="text-xl lg:text-2xl tracking-tight text-gray-900">
                             $\textcolor{#0d9488}{\textsf{\textbf{Dofor}}{\sum}\textsf{\textbf{ath}}}$
                         </span>
                     </a>
                 </div>
                 
                 <!-- Menu ngang (Desktop) -->
-                <nav class="hidden md:flex items-center gap-1.5">
+                <nav class="hidden md:flex items-center gap-0.5 lg:gap-1.5">
                     <!-- Nút đang chọn (Active): Nền màu xanh ngọc nhạt, chữ đậm -->
-                    <a href="index.html" class="text-gray-600 hover:text-primary hover:bg-gray-100 font-medium px-4 py-2 rounded-full transition-all">Trang chủ</a>
+                    <a href="index.html" class="text-gray-600 hover:text-primary hover:bg-gray-100 font-medium px-2.5 lg:px-3 xl:px-4 py-2 rounded-full transition-all whitespace-nowrap text-sm lg:text-base">Trang chủ</a>
                     
                     <!-- Các nút bình thường: Di chuột vào sẽ hiện nền xám nhạt bo tròn -->
-                    <a href="courses.html" class="text-gray-600 hover:text-primary hover:bg-gray-100 font-medium px-4 py-2 rounded-full transition-all">Khóa học của tôi</a>
+                    <a href="courses.html" class="text-gray-600 hover:text-primary hover:bg-gray-100 font-medium px-2.5 lg:px-3 xl:px-4 py-2 rounded-full transition-all whitespace-nowrap text-sm lg:text-base"><span class="lg:hidden">Khóa học</span><span class="hidden lg:inline">Khóa học của tôi</span></a>
                     
-                    <a href="tai-lieu-mien-phi.html" class="text-gray-600 hover:text-primary hover:bg-gray-100 font-medium px-4 py-2 rounded-full transition-all">Tài liệu</a>
+                    <a href="tai-lieu-mien-phi.html" class="text-gray-600 hover:text-primary hover:bg-gray-100 font-medium px-2.5 lg:px-3 xl:px-4 py-2 rounded-full transition-all whitespace-nowrap text-sm lg:text-base">Tài liệu</a>
                     
-                    <a href="phong-thi.html" class="text-primary bg-teal-50 font-semibold px-4 py-2 rounded-full transition-all">Phòng thi</a>
-                    <a href="admin.html" data-admin-link style="display: none;" class="text-primary hover:text-teal-700 hover:bg-teal-50 font-medium px-4 py-2 rounded-full transition-all"><i class="fa-solid fa-chart-line mr-1.5"></i>Quản trị</a>
+                    <a href="phong-thi.html" class="text-primary bg-teal-50 font-semibold px-2.5 lg:px-3 xl:px-4 py-2 rounded-full transition-all whitespace-nowrap text-sm lg:text-base">Phòng thi</a>
+                    <a href="goc-hoc-tap.html" class="text-gray-600 hover:text-primary hover:bg-gray-100 font-medium px-2.5 lg:px-3 xl:px-4 py-2 rounded-full transition-all whitespace-nowrap text-sm lg:text-base">Góc học tập</a>
+                    <a href="admin.html" data-admin-link style="display: none;" class="text-primary hover:text-teal-700 hover:bg-teal-50 font-medium px-2.5 lg:px-3 xl:px-4 py-2 rounded-full transition-all whitespace-nowrap text-sm lg:text-base"><i class="fa-solid fa-chart-line xl:mr-1.5" title="Quản trị"></i><span class="hidden xl:inline">Quản trị</span></a>
                 </nav>
 
                 <!-- Nút Hành động -->
@@ -70,18 +71,18 @@
                     
                     <!-- 1. Khu vực hiển thị khi CHƯA đăng nhập (Ban đầu ẩn) -->
                     <div id="khu-vuc-dang-nhap" style="display: none;">
-                        <a href="login.html" class="bg-primary hover:bg-teal-800 text-white px-4 py-2 md:px-6 md:py-2.5 rounded-full text-sm md:text-base font-medium transition-all shadow-md hover:shadow-lg">
+                        <a href="login.html" class="bg-primary hover:bg-teal-800 text-white px-4 py-2 lg:px-6 md:py-2.5 rounded-full text-sm lg:text-base font-medium transition-all shadow-md hover:shadow-lg whitespace-nowrap inline-block">
                             Đăng nhập
                         </a>
                     </div>
 
                     <!-- 2. Khu vực hiển thị khi ĐÃ đăng nhập (Ban đầu ẩn) -->
-                    <div id="khu-vuc-user" style="display: none;" class="flex items-center gap-2 md:gap-4">
-                        <span id="ten-user" class="text-xs md:text-sm font-semibold text-teal-700 bg-teal-50 px-2 py-1.5 md:px-3 md:py-1 rounded-full border border-teal-100 max-w-[100px] md:max-w-[200px] truncate inline-block text-center"></span>
+                    <div id="khu-vuc-user" style="display: none;" class="flex items-center gap-2 xl:gap-4">
+                        <a id="ten-user" href="goc-hoc-tap.html" title="Góc học tập của tôi" class="text-xs md:text-sm font-semibold text-teal-700 bg-teal-50 px-2 py-1.5 md:px-3 md:py-1 rounded-full border border-teal-100 max-w-[100px] xl:max-w-[200px] truncate inline-block text-center hover:bg-teal-100 transition-colors"></a>
                         
                         <button onclick="dangXuat()" class="hidden md:flex items-center justify-center gap-1.5 text-xs md:text-sm text-gray-500 hover:text-red-500 font-medium transition-colors bg-gray-100 hover:bg-red-50 md:bg-transparent p-2 md:p-0 rounded-full md:rounded-none w-8 h-8 md:w-auto md:h-auto">
                             <i class="fa-solid fa-arrow-right-from-bracket"></i>
-                            <span class="hidden md:inline">Đăng xuất</span>
+                            <span class="hidden xl:inline">Đăng xuất</span>
                         </button>
                     </div>
                 </div>
@@ -126,6 +127,10 @@
             <a href="phong-thi.html" title="Phòng thi" aria-current="page" class="flex items-center h-12 whitespace-nowrap transition-colors bg-white/20 text-white font-semibold">
                 <i class="fa-solid fa-stopwatch w-14 shrink-0 text-center text-xl"></i>
                 <span class="pr-4">Phòng thi</span>
+            </a>
+            <a href="goc-hoc-tap.html" title="Góc học tập" class="flex items-center h-12 whitespace-nowrap transition-colors text-teal-100 hover:bg-white/10 hover:text-white font-medium">
+                <i class="fa-solid fa-user-graduate w-14 shrink-0 text-center text-xl"></i>
+                <span class="pr-4">Góc học tập</span>
             </a>
             <a href="admin.html" data-admin-link title="Quản trị" style="display: none;" class="flex items-center h-12 whitespace-nowrap transition-colors text-teal-100 hover:bg-white/10 hover:text-white font-medium">
                 <i class="fa-solid fa-chart-line w-14 shrink-0 text-center text-xl"></i>
@@ -547,38 +552,65 @@
         // KIỂM TRA TRẠNG THÁI ĐĂNG NHẬP VÀ XỬ LÝ FOUC
         // Đề thi trực tuyến (tải từ file TeX ở trang Quản trị) đang mở: hiện ở đầu danh sách
         function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
-        function hienDeThiMoi() {
+        // Kèm các đề học sinh đã nộp (kể cả đề đã đóng) để quay lại xem điểm khi thầy công bố
+        function theDeThi(de, nop) {
+            const so = de.soCau || {};
+            const tong = (so.mc || 0) + (so.tf || 0) + (so.sa || 0);
+            const phan = [so.mc && 'Phần I', so.tf && 'Phần II', so.sa && 'Phần III'].filter(Boolean).join(' · ');
+            const congBo = de.congBo || (de.hienLoiGiai ? 'day-du' : 'diem');
+            const nhan = nop
+                ? '<div class="absolute top-4 right-4 bg-emerald-100 text-emerald-700 font-bold text-xs px-2.5 py-1 rounded-md z-10 border border-emerald-200 flex items-center gap-1"><i class="fa-solid fa-check"></i> Đã nộp</div>'
+                : '<div class="absolute top-4 right-4 bg-teal-100 text-teal-700 font-bold text-xs px-2.5 py-1 rounded-md z-10 border border-teal-200 flex items-center gap-1"><i class="fa-solid fa-bolt"></i> Mới</div>';
+            const thongTin = de.daDong
+                ? '<div class="bg-slate-50 border border-slate-100 rounded-xl p-3 mb-6 relative z-10 text-sm text-slate-600"><i class="fa-solid fa-circle-check text-emerald-500 mr-1"></i> Bạn đã nộp bài · điểm hiện khi thầy công bố</div>'
+                : '<div class="grid grid-cols-2 gap-3 mb-6 relative z-10">' +
+                  '<div class="bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col"><span class="text-xs text-slate-400 font-medium mb-1">Thời gian</span><span class="text-sm font-bold text-slate-700"><i class="fa-regular fa-clock text-teal-500 mr-1"></i> ' + esc(de.thoiGian) + ' phút</span></div>' +
+                  '<div class="bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col"><span class="text-xs text-slate-400 font-medium mb-1">Số lượng</span><span class="text-sm font-bold text-slate-700"><i class="fa-solid fa-list-ol text-teal-500 mr-1"></i> ' + tong + ' câu</span></div>' +
+                  '</div>';
+            const trai = nop
+                ? (de.daDong ? '<span class="text-sm font-medium text-slate-500"><i class="fa-solid fa-lock mr-1"></i>Đề đã đóng</span>'
+                    : '<span class="text-sm font-medium ' + (congBo === 'an' ? 'text-slate-500' : 'text-emerald-600') + '">' + (congBo === 'an' ? '<i class="fa-solid fa-hourglass-half mr-1"></i>Chờ công bố điểm' : '<i class="fa-solid fa-star mr-1"></i>Đã có điểm') + '</span>')
+                : '<span class="text-sm font-medium text-slate-500">' + esc(phan) + '</span>';
+            return '<a href="exam/lam-bai.html?de=' + encodeURIComponent(de.id) + '" class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 border ' + (nop ? 'border-emerald-200' : 'border-teal-200') + ' group flex flex-col cursor-pointer block relative">' +
+                nhan +
+                '<div class="p-6 md:p-8 flex-1 flex flex-col relative overflow-hidden">' +
+                '<i class="fa-solid fa-file-signature absolute -bottom-6 -right-6 text-9xl text-slate-50 opacity-50 transform -rotate-12 group-hover:scale-110 transition-transform duration-500"></i>' +
+                '<div class="flex items-center gap-2 mb-4 relative z-10"><span class="bg-teal-50 text-teal-700 font-semibold text-xs px-3 py-1 rounded-full uppercase tracking-wider">Đề trực tuyến</span></div>' +
+                '<h3 class="text-xl font-bold text-slate-900 mb-2 group-hover:text-teal-600 transition-colors leading-snug relative z-10">' + esc(de.tieuDe) + '</h3>' +
+                (de.moTa ? '<p class="text-sm text-slate-500 mb-4 relative z-10">' + esc(de.moTa) + '</p>' : '<div class="mb-2"></div>') +
+                thongTin +
+                '<div class="mt-auto pt-4 border-t border-slate-100 flex items-center justify-between gap-2 relative z-10">' + trai +
+                '<div class="bg-teal-50 text-teal-600 font-semibold px-4 py-2 rounded-full text-sm group-hover:bg-teal-600 group-hover:text-white transition-colors shadow-sm whitespace-nowrap">' +
+                (nop ? 'Xem kết quả <i class="fa-solid fa-chevron-right text-xs ml-1"></i>' : 'Bắt đầu <i class="fa-solid fa-play text-xs ml-1"></i>') + '</div>' +
+                '</div></div></a>';
+        }
+        function hienDeThiMoi(user) {
             const khung = document.getElementById('de-thi-moi');
             if (!khung || khung.dataset.daTai) return;
             khung.dataset.daTai = '1';
-            firebase.firestore().collection('de_thi').where('trangThai', '==', 'mo').get().then((snap) => {
-                const ds = snap.docs.map((d) => Object.assign({ id: d.id }, d.data()))
-                    .sort((a, b) => ((b.capNhatLuc && b.capNhatLuc.toMillis()) || 0) - ((a.capNhatLuc && a.capNhatLuc.toMillis()) || 0));
-                khung.innerHTML = ds.map((de) => {
-                    const so = de.soCau || {};
-                    const tong = (so.mc || 0) + (so.tf || 0) + (so.sa || 0);
-                    const phan = [so.mc && 'Phần I', so.tf && 'Phần II', so.sa && 'Phần III'].filter(Boolean).join(' · ');
-                    return '<a href="exam/lam-bai.html?de=' + encodeURIComponent(de.id) + '" class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 border border-teal-200 group flex flex-col cursor-pointer block relative">' +
-                        '<div class="absolute top-4 right-4 bg-teal-100 text-teal-700 font-bold text-xs px-2.5 py-1 rounded-md z-10 border border-teal-200 flex items-center gap-1"><i class="fa-solid fa-bolt"></i> Mới</div>' +
-                        '<div class="p-6 md:p-8 flex-1 flex flex-col relative overflow-hidden">' +
-                        '<i class="fa-solid fa-file-signature absolute -bottom-6 -right-6 text-9xl text-slate-50 opacity-50 transform -rotate-12 group-hover:scale-110 transition-transform duration-500"></i>' +
-                        '<div class="flex items-center gap-2 mb-4 relative z-10"><span class="bg-teal-50 text-teal-700 font-semibold text-xs px-3 py-1 rounded-full uppercase tracking-wider">Đề trực tuyến</span></div>' +
-                        '<h3 class="text-xl font-bold text-slate-900 mb-2 group-hover:text-teal-600 transition-colors leading-snug relative z-10">' + esc(de.tieuDe) + '</h3>' +
-                        (de.moTa ? '<p class="text-sm text-slate-500 mb-4 relative z-10">' + esc(de.moTa) + '</p>' : '<div class="mb-2"></div>') +
-                        '<div class="grid grid-cols-2 gap-3 mb-6 relative z-10">' +
-                        '<div class="bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col"><span class="text-xs text-slate-400 font-medium mb-1">Thời gian</span><span class="text-sm font-bold text-slate-700"><i class="fa-regular fa-clock text-teal-500 mr-1"></i> ' + esc(de.thoiGian) + ' phút</span></div>' +
-                        '<div class="bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col"><span class="text-xs text-slate-400 font-medium mb-1">Số lượng</span><span class="text-sm font-bold text-slate-700"><i class="fa-solid fa-list-ol text-teal-500 mr-1"></i> ' + tong + ' câu</span></div>' +
-                        '</div>' +
-                        '<div class="mt-auto pt-4 border-t border-slate-100 flex items-center justify-between relative z-10">' +
-                        '<span class="text-sm font-medium text-slate-500">' + esc(phan) + '</span>' +
-                        '<div class="bg-teal-50 text-teal-600 font-semibold px-4 py-2 rounded-full text-sm group-hover:bg-teal-600 group-hover:text-white transition-colors shadow-sm">Bắt đầu <i class="fa-solid fa-play text-xs ml-1"></i></div>' +
-                        '</div></div></a>';
-                }).join('');
+            const db = firebase.firestore();
+            const millis = (t) => (t && t.toMillis && t.toMillis()) || 0;
+            Promise.all([
+                db.collection('de_thi').where('trangThai', '==', 'mo').get(),
+                // Rules chưa cập nhật thì bỏ qua phần này, vẫn hiện đề đang mở
+                db.collection('bai_lam').where('uid', '==', user.uid).get().catch(() => null)
+            ]).then(([snap, bl]) => {
+                const daNop = {};
+                if (bl) bl.docs.forEach((d) => { const v = d.data(); if (v.deId) daNop[v.deId] = v; });
+                const dangMo = snap.docs.map((d) => Object.assign({ id: d.id }, d.data()))
+                    .sort((a, b) => millis(b.capNhatLuc) - millis(a.capNhatLuc));
+                // Đề đang mở chưa làm lên trước, rồi tới đề đã nộp (mới nộp lên trước)
+                const chuaLam = dangMo.filter((de) => !daNop[de.id]);
+                const daLam = dangMo.filter((de) => daNop[de.id]).map((de) => Object.assign(de, { nopLuc: daNop[de.id].nopLuc }))
+                    .concat(Object.keys(daNop).filter((id) => !dangMo.some((de) => de.id === id))
+                        .map((id) => ({ id: id, tieuDe: daNop[id].tieuDe || 'Đề thi đã làm', daDong: true, nopLuc: daNop[id].nopLuc })))
+                    .sort((a, b) => millis(b.nopLuc) - millis(a.nopLuc));
+                khung.innerHTML = chuaLam.map((de) => theDeThi(de, false)).join('') + daLam.map((de) => theDeThi(de, true)).join('');
             }).catch((err) => console.warn('Không tải được đề thi trực tuyến:', err));
         }
 
         firebase.auth().onAuthStateChanged((user) => {
-            if (user) hienDeThiMoi();
+            if (user) hienDeThiMoi(user);
             const khuVucDangNhap = document.getElementById('khu-vuc-dang-nhap');
             const khuVucUser = document.getElementById('khu-vuc-user');
             const nutDangXuatMobile = document.getElementById('nutDangXuatMobile');

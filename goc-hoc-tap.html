@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Góc học tập - DoforMath</title>
+    
+    <!-- Cấu hình Favicon -->
+
+    <!-- Font chữ Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Giao diện sáng / tối: chạy trước CSS để không bị nháy màu -->
+    <script src="assets/js/dfm-giao-dien.js"></script>
+    <!-- CSS Tailwind dựng sẵn cho cả site (sửa class xong chạy: npm run build:css) -->
+    <link rel="stylesheet" href="assets/css/tailwind.css?v=a5530322">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- KaTeX cho Toán học -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    <!-- PWA: cho phép cài DoforMath như ứng dụng -->
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png">
+    <link rel="manifest" href="manifest.webmanifest">
+    <meta name="theme-color" content="#0d9488">
+    <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="DoforMath">
+    <script defer src="pwa.js"></script>
+</head>
+<body class="pl-14 md:pl-0 bg-slate-50 text-slate-800 antialiased font-sans">
+
+    <!-- HEADER / NAVBAR (Sticky) -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Giảm chiều cao header trên mobile từ h-20 xuống h-16 -->
+            <div class="flex justify-between items-center h-16 md:h-20">
+                
+                <div class="flex items-center gap-2 md:gap-4">
+                    <!-- Logo Toán học: Xóa class pb-1 để trả logo về đúng trọng tâm -->
+                    <a href="index.html" class="flex-shrink-0 flex items-center hover:opacity-80 transition-opacity">
+                        <span class="text-xl lg:text-2xl tracking-tight text-gray-900">
+                            $\textcolor{#0d9488}{\textsf{\textbf{Dofor}}{\sum}\textsf{\textbf{ath}}}$
+                        </span>
+                    </a>
+                </div>
+                
+                <!-- Menu ngang (Desktop) -->
+                <nav class="hidden md:flex items-center gap-0.5 lg:gap-1.5">
+                    <!-- Nút đang chọn (Active): Nền màu xanh ngọc nhạt, chữ đậm -->
+                    <a href="index.html" class="text-gray-600 hover:text-primary hover:bg-gray-100 font-medium px-2.5 lg:px-3 xl:px-4 py-2 rounded-full transition-all whitespace-nowrap text-sm lg:text-base">Trang chủ</a>
+                    
+                    <!-- Các nút bình thường: Di chuột vào sẽ hiện nền xám nhạt bo tròn -->
+                    <a href="courses.html" class="text-gray-600 hover:text-primary hover:bg-gray-100 font-medium px-2.5 lg:px-3 xl:px-4 py-2 rounded-full transition-all whitespace-nowrap text-sm lg:text-base"><span class="lg:hidden">Khóa học</span><span class="hidden lg:inline">Khóa học của tôi</span></a>
+                    
+                    <a href="tai-lieu-mien-phi.html" class="text-gray-600 hover:text-primary hover:bg-gray-100 font-medium px-2.5 lg:px-3 xl:px-4 py-2 rounded-full transition-all whitespace-nowrap text-sm lg:text-base">Tài liệu</a>
+                    
+                    <a href="phong-thi.html" class="text-gray-600 hover:text-primary hover:bg-gray-100 font-medium px-2.5 lg:px-3 xl:px-4 py-2 rounded-full transition-all whitespace-nowrap text-sm lg:text-base">Phòng thi</a>
+                    <a href="goc-hoc-tap.html" class="text-primary bg-teal-50 font-semibold px-2.5 lg:px-3 xl:px-4 py-2 rounded-full transition-all whitespace-nowrap text-sm lg:text-base">Góc học tập</a>
+                    <a href="admin.html" data-admin-link style="display: none;" class="text-primary hover:text-teal-700 hover:bg-teal-50 font-medium px-2.5 lg:px-3 xl:px-4 py-2 rounded-full transition-all whitespace-nowrap text-sm lg:text-base"><i class="fa-solid fa-chart-line xl:mr-1.5" title="Quản trị"></i><span class="hidden xl:inline">Quản trị</span></a>
+                </nav>
+
+                <!-- Nút Hành động -->
+                <!-- Bọc toàn bộ vào auth-container, đặt opacity = 0 để tàng hình ban đầu -->
+                <div class="flex items-center gap-1 md:gap-2">
+                    <button type="button" data-doi-giao-dien aria-label="Đổi giao diện sáng / tối" class="w-9 h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center text-gray-500 hover:text-primary hover:bg-gray-100 transition-colors shrink-0"><span class="dark:hidden"><i class="fa-solid fa-moon"></i></span><span class="hidden dark:inline"><i class="fa-solid fa-sun text-amber-300"></i></span></button>
+                <div id="auth-container" class="flex items-center transition-opacity duration-300 ease-in-out" style="opacity: 0;">
+                    
+                    <!-- 1. Khu vực hiển thị khi CHƯA đăng nhập (Ban đầu ẩn) -->
+                    <div id="khu-vuc-dang-nhap" style="display: none;">
+                        <a href="login.html" class="bg-primary hover:bg-teal-800 text-white px-4 py-2 lg:px-6 md:py-2.5 rounded-full text-sm lg:text-base font-medium transition-all shadow-md hover:shadow-lg whitespace-nowrap inline-block">
+                            Đăng nhập
+                        </a>
+                    </div>
+
+                    <!-- 2. Khu vực hiển thị khi ĐÃ đăng nhập (Ban đầu ẩn) -->
+                    <div id="khu-vuc-user" style="display: none;" class="flex items-center gap-2 xl:gap-4">
+                        <a id="ten-user" href="goc-hoc-tap.html" title="Góc học tập của tôi" class="text-xs md:text-sm font-semibold text-teal-700 bg-teal-50 px-2 py-1.5 md:px-3 md:py-1 rounded-full border border-teal-100 max-w-[100px] xl:max-w-[200px] truncate inline-block text-center hover:bg-teal-100 transition-colors"></a>
+                        
+                        <button onclick="dangXuat()" class="hidden md:flex items-center justify-center gap-1.5 text-xs md:text-sm text-gray-500 hover:text-red-500 font-medium transition-colors bg-gray-100 hover:bg-red-50 md:bg-transparent p-2 md:p-0 rounded-full md:rounded-none w-8 h-8 md:w-auto md:h-auto">
+                            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                            <span class="hidden xl:inline">Đăng xuất</span>
+                        </button>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </div>
+
+    </header>
+
+    <!-- SIDEBAR MOBILE: thu gọn chỉ hiện icon, bấm nút hamburger để mở rộng hiện cả tên mục -->
+    <style>
+        #mobileSidebar { width: 3.5rem; transition: width .25s ease, box-shadow .25s ease; }
+        #mobileSidebar.is-open { width: 16rem; max-width: 80%; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, .25); }
+        #mobileOverlay { opacity: 0; pointer-events: none; transition: opacity .25s ease; }
+        #mobileOverlay.is-open { opacity: 1; pointer-events: auto; }
+    </style>
+
+    <div id="mobileOverlay" class="fixed inset-0 bg-gray-900/60 z-[60] md:hidden" aria-hidden="true"></div>
+
+    <aside id="mobileSidebar" class="fixed top-0 left-0 h-full bg-teal-600 text-white z-[70] md:hidden flex flex-col overflow-hidden" aria-label="Menu điều hướng">
+        <div class="flex items-center h-16 px-2 shrink-0 border-b border-white/10 whitespace-nowrap">
+            <button id="btnToggleMenu" type="button" class="w-10 h-10 shrink-0 rounded-xl flex items-center justify-center text-white hover:bg-white/15 transition-colors" aria-label="Mở rộng menu" aria-expanded="false" aria-controls="mobileSidebar">
+                <i class="fa-solid fa-bars text-xl"></i>
+            </button>
+            <span class="pl-3 text-xl tracking-tight text-white">
+                $\textcolor{#ffffff}{\textsf{\textbf{Dofor}}{\sum}\textsf{\textbf{ath}}}$
+            </span>
+        </div>
+        <nav class="flex-1 overflow-y-auto overflow-x-hidden py-2">
+            <a href="index.html" title="Trang chủ" class="flex items-center h-12 whitespace-nowrap transition-colors text-teal-100 hover:bg-white/10 hover:text-white font-medium">
+                <i class="fa-solid fa-house w-14 shrink-0 text-center text-xl"></i>
+                <span class="pr-4">Trang chủ</span>
+            </a>
+            <a href="courses.html" title="Khóa học của tôi" class="flex items-center h-12 whitespace-nowrap transition-colors text-teal-100 hover:bg-white/10 hover:text-white font-medium">
+                <i class="fa-solid fa-graduation-cap w-14 shrink-0 text-center text-xl"></i>
+                <span class="pr-4">Khóa học của tôi</span>
+            </a>
+            <a href="tai-lieu-mien-phi.html" title="Tài liệu miễn phí" class="flex items-center h-12 whitespace-nowrap transition-colors text-teal-100 hover:bg-white/10 hover:text-white font-medium">
+                <i class="fa-solid fa-book-open w-14 shrink-0 text-center text-xl"></i>
+                <span class="pr-4">Tài liệu miễn phí</span>
+            </a>
+            <a href="phong-thi.html" title="Phòng thi" class="flex items-center h-12 whitespace-nowrap transition-colors text-teal-100 hover:bg-white/10 hover:text-white font-medium">
+                <i class="fa-solid fa-stopwatch w-14 shrink-0 text-center text-xl"></i>
+                <span class="pr-4">Phòng thi</span>
+            </a>
+            <a href="goc-hoc-tap.html" title="Góc học tập" aria-current="page" class="flex items-center h-12 whitespace-nowrap transition-colors bg-white/20 text-white font-semibold">
+                <i class="fa-solid fa-user-graduate w-14 shrink-0 text-center text-xl"></i>
+                <span class="pr-4">Góc học tập</span>
+            </a>
+            <a href="admin.html" data-admin-link title="Quản trị" style="display: none;" class="flex items-center h-12 whitespace-nowrap transition-colors text-teal-100 hover:bg-white/10 hover:text-white font-medium">
+                <i class="fa-solid fa-chart-line w-14 shrink-0 text-center text-xl"></i>
+                <span class="pr-4">Quản trị</span>
+            </a>
+        </nav>
+        <!-- Nút đăng xuất (mobile): chỉ hiện khi đã đăng nhập -->
+        <button id="nutDangXuatMobile" type="button" onclick="dangXuat()" title="Đăng xuất" style="display: none;" class="items-center h-12 w-full shrink-0 mb-2 whitespace-nowrap border-t border-white/10 text-teal-100 hover:bg-white/10 hover:text-white font-medium transition-colors">
+            <i class="fa-solid fa-arrow-right-from-bracket w-14 shrink-0 text-center text-xl"></i>
+            <span class="pr-4">Đăng xuất</span>
+        </button>
+    </aside>
+
+    <!-- Script điều khiển sidebar mobile: JS thuần, không phụ thuộc Alpine.js -->
+    <script>
+        (function () {
+            var overlay = document.getElementById('mobileOverlay');
+            var sidebar = document.getElementById('mobileSidebar');
+            var btnToggle = document.getElementById('btnToggleMenu');
+            if (!overlay || !sidebar || !btnToggle) return;
+            var icon = btnToggle.querySelector('i');
+
+            function setOpen(open) {
+                sidebar.classList.toggle('is-open', open);
+                overlay.classList.toggle('is-open', open);
+                icon.classList.toggle('fa-bars', !open);
+                icon.classList.toggle('fa-xmark', open);
+                btnToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+                btnToggle.setAttribute('aria-label', open ? 'Thu gọn menu' : 'Mở rộng menu');
+                document.body.style.overflow = open ? 'hidden' : '';
+            }
+
+            btnToggle.addEventListener('click', function () {
+                setOpen(!sidebar.classList.contains('is-open'));
+            });
+            overlay.addEventListener('click', function () { setOpen(false); });
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') setOpen(false);
+            });
+            // Bấm vào link nào cũng thu gọn sidebar lại; trình duyệt vẫn điều hướng bình thường theo href
+            sidebar.querySelectorAll('a').forEach(function (link) {
+                link.addEventListener('click', function () { setOpen(false); });
+            });
+            // Xoay ngang / phóng to sang giao diện desktop thì tự thu gọn để không kẹt khóa cuộn trang
+            window.matchMedia('(min-width: 768px)').addEventListener('change', function (e) {
+                if (e.matches) setOpen(false);
+            });
+        })();
+    </script>
+
+    <!-- ================= GÓC HỌC TẬP: dữ liệu riêng của từng học sinh ================= -->
+    <section class="relative bg-slate-900 overflow-hidden">
+        <div class="absolute inset-0 opacity-30" style="background: radial-gradient(circle at 15% 20%, rgba(20,184,166,.45), transparent 45%), radial-gradient(circle at 85% 80%, rgba(16,185,129,.3), transparent 40%);"></div>
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-14">
+            <p class="text-teal-300 text-sm font-semibold uppercase tracking-wider"><i class="fa-solid fa-user-graduate mr-1.5"></i>Góc học tập của tôi</p>
+            <h1 id="loi-chao" class="text-3xl md:text-4xl font-extrabold text-white mt-2">Xin chào!</h1>
+            <p class="text-slate-300 mt-2 max-w-2xl">Nơi tổng hợp điểm số và quá trình học của riêng bạn. Xem lại chỗ còn yếu để cải thiện mỗi ngày.</p>
+            <div id="o-tong-quan" class="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-8"></div>
+        </div>
+    </section>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-10">
+        <!-- Đang tải / chưa đăng nhập -->
+        <div id="trang-thai" class="text-center text-slate-500 py-16"><i class="fa-solid fa-circle-notch fa-spin text-2xl text-primary"></i><p class="mt-3">Đang tải dữ liệu của bạn...</p></div>
+
+        <div id="noi-dung" class="hidden grid lg:grid-cols-3 gap-6">
+            <!-- CỘT TRÁI -->
+            <div class="lg:col-span-2 space-y-6 min-w-0">
+                <section class="lg:hidden bg-gradient-to-br from-teal-50 to-emerald-50 rounded-3xl border border-teal-100 p-5 md:p-6">
+                    <h2 class="text-lg font-bold text-slate-900 mb-4"><i class="fa-solid fa-lightbulb text-amber-500 mr-2"></i>Gợi ý cho bạn</h2>
+                    <ul data-goi-y class="space-y-3"></ul>
+                </section>
+                <section class="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 md:p-6">
+                    <div class="flex flex-wrap items-end justify-between gap-2 mb-1">
+                        <h2 class="text-lg font-bold text-slate-900"><i class="fa-solid fa-chart-line text-teal-600 mr-2"></i>Tiến bộ điểm số</h2>
+                        <span id="xu-huong" class="text-sm font-semibold"></span>
+                    </div>
+                    <p class="text-xs text-slate-500 mb-4">Điểm các đề thi trực tuyến đã được công bố, quy về thang 10.</p>
+                    <div id="bieu-do-diem"></div>
+                </section>
+
+                <section class="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 md:p-6">
+                    <h2 class="text-lg font-bold text-slate-900 mb-4"><i class="fa-solid fa-file-signature text-teal-600 mr-2"></i>Đề thi đã làm</h2>
+                    <div id="ds-de-thi" class="space-y-3"></div>
+                </section>
+
+                <section class="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 md:p-6">
+                    <h2 class="text-lg font-bold text-slate-900 mb-1"><i class="fa-solid fa-magnifying-glass text-teal-600 mr-2"></i>Câu cần xem lại</h2>
+                    <p class="text-xs text-slate-500 mb-4">Các câu làm sai, đúng một phần hoặc bỏ trống ở những đề thầy đã công bố chi tiết. Bấm vào câu để mở lại đúng câu đó.</p>
+                    <div id="cau-xem-lai" class="space-y-4"></div>
+                </section>
+            </div>
+
+            <!-- CỘT PHẢI -->
+            <div class="space-y-6 min-w-0">
+                <section class="hidden lg:block bg-gradient-to-br from-teal-50 to-emerald-50 rounded-3xl border border-teal-100 p-5 md:p-6">
+                    <h2 class="text-lg font-bold text-slate-900 mb-4"><i class="fa-solid fa-lightbulb text-amber-500 mr-2"></i>Gợi ý cho bạn</h2>
+                    <ul data-goi-y class="space-y-3"></ul>
+                </section>
+
+                <section class="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 md:p-6">
+                    <h2 class="text-lg font-bold text-slate-900 mb-1"><i class="fa-solid fa-bullseye text-teal-600 mr-2"></i>Mạnh &amp; yếu theo phần</h2>
+                    <p class="text-xs text-slate-500 mb-4">Tỉ lệ làm đúng gộp từ tất cả đề đã có điểm.</p>
+                    <div id="theo-phan" class="space-y-4"></div>
+                </section>
+
+                <section class="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 md:p-6">
+                    <h2 class="text-lg font-bold text-slate-900 mb-4"><i class="fa-solid fa-square-root-variable text-teal-600 mr-2"></i>Kiểm tra công thức</h2>
+                    <div id="kiem-tra-ct" class="space-y-4"></div>
+                </section>
+
+                <section class="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 md:p-6">
+                    <h2 class="text-lg font-bold text-slate-900 mb-1"><i class="fa-solid fa-calendar-days text-teal-600 mr-2"></i>Hoạt động 30 ngày</h2>
+                    <p id="hoat-dong-tom-tat" class="text-xs text-slate-500 mb-4"></p>
+                    <div id="hoat-dong"></div>
+                </section>
+
+                <section class="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 md:p-6">
+                    <h2 class="text-lg font-bold text-slate-900 mb-4"><i class="fa-solid fa-book-open-reader text-teal-600 mr-2"></i>Bài học gần đây</h2>
+                    <ul id="bai-gan-day" class="space-y-2"></ul>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <!-- Chú thích khi rê chuột / chạm vào biểu đồ -->
+    <div id="chu-thich" role="tooltip" class="hidden fixed z-[80] pointer-events-none bg-slate-900 text-white text-xs font-medium rounded-lg px-2.5 py-1.5 shadow-lg whitespace-nowrap"></div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script src="assets/js/dfm-de-thi.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyD-NDo43O3Q_9GVii6pDOM7D6SQ5pxmo5g",
+            authDomain: "doformath-bac70.firebaseapp.com",
+            projectId: "doformath-bac70",
+            storageBucket: "doformath-bac70.firebasestorage.app",
+            messagingSenderId: "329095418163",
+            appId: "1:329095418163:web:226636d40b5c2960cdee46"
+        };
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+
+        function dangXuat() {
+            firebase.auth().signOut().then(() => window.location.reload()).catch((err) => console.error('Lỗi đăng xuất:', err));
+        }
+
+        // ================= GÓC HỌC TẬP =================
+        // Học sinh chỉ đọc được dữ liệu của chính mình (Firestore Rules):
+        //   hoc_sinh/{uid} (hoạt động học), bai_lam (bài nộp đề trực tuyến), bxh_*/{uid} (kiểm tra công thức).
+        // Đáp án đề chỉ đọc được khi thầy đã công bố, nên điểm/chi tiết hiện theo đúng mức thầy cho phép.
+        const D = window.dfmDeThi;
+        const BXH = [
+            { id: 'bxh_luong_giac', ten: 'Công thức lượng giác', url: 'exam/kiem-tra-cong-thuc-luong-giac.html' },
+            { id: 'bxh_tap_hop_he_thuc_luong', ten: 'Tập hợp & hệ thức lượng', url: 'exam/kiem-tra-tap-hop-he-thuc-luong.html' },
+            { id: 'bxh_day_so_thong_ke', ten: 'Dãy số & thống kê', url: 'exam/kiem-tra-cong-thuc-day-so-thong-ke.html' }
+        ];
+        const TEN_KHOA = { 'toan-10': 'Toán 10', 'toan-11': 'Toán 11', 'toan-12': 'Toán 12' };
+        const TEN_PHAN = { mc: 'Phần I · Trắc nghiệm', tf: 'Phần II · Đúng/sai', sa: 'Phần III · Trả lời ngắn' };
+        const MOT_NGAY = 86400000;
+        const $ = (id) => document.getElementById(id);
+        const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        const so = (x, n) => D.dinhDangSo(x, n == null ? 2 : n);
+        const thanhMs = (t) => (!t ? 0 : t.toMillis ? t.toMillis() : typeof t === 'number' ? t : 0);
+        const ngayThang = (ms) => { const d = new Date(ms); return String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + d.getFullYear(); };
+        const khoaNgay = (d) => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+        function thoiLuong(giay) {
+            giay = Math.round(giay || 0);
+            if (giay < 60) return giay ? '< 1 phút' : '0 phút';
+            const g = Math.floor(giay / 3600), p = Math.floor((giay % 3600) / 60);
+            return g ? g + ' giờ' + (p ? ' ' + p + ' phút' : '') : p + ' phút';
+        }
+        // Mức đánh giá luôn đi kèm chữ + biểu tượng (không chỉ dựa vào màu)
+        function mucDo(pt) {
+            if (pt >= 80) return { ten: 'Tốt', icon: 'fa-circle-check', chu: 'text-emerald-700', nen: 'bg-emerald-500' };
+            if (pt >= 50) return { ten: 'Khá', icon: 'fa-circle-half-stroke', chu: 'text-amber-700', nen: 'bg-amber-400' };
+            return { ten: 'Cần cải thiện', icon: 'fa-circle-exclamation', chu: 'text-red-600', nen: 'bg-red-500' };
+        }
+
+        // ---------- Tải dữ liệu ----------
+        async function taiDuLieu(user) {
+            const db = firebase.firestore();
+            const [hs, bl, ...bxh] = await Promise.allSettled([
+                db.collection('hoc_sinh').doc(user.uid).get(),
+                db.collection('bai_lam').where('uid', '==', user.uid).get()
+            ].concat(BXH.map((b) => db.collection(b.id).doc(user.uid).get())));
+            const hocSinh = hs.status === 'fulfilled' && hs.value.exists ? hs.value.data() : null;
+            const baiLam = bl.status === 'fulfilled' ? bl.value.docs.map((d) => Object.assign({ id: d.id }, d.data())) : [];
+            const kiemTra = BXH.map((b, i) => Object.assign({ du: bxh[i].status === 'fulfilled' && bxh[i].value.exists ? bxh[i].value.data() : null }, b));
+
+            // Mỗi bài nộp: lấy đề (để biết mức công bố, cách chia điểm) và đáp án (nếu đã công bố) để chấm
+            const deThi = await Promise.all(baiLam.map(async (b) => {
+                const r = { bai: b, deId: b.deId, tieuDe: b.tieuDe || 'Đề thi', nop: thanhMs(b.nopLuc), de: null, congBo: 'an', kq: null };
+                try {
+                    const s = await db.collection('de_thi').doc(b.deId).get();
+                    if (s.exists) { r.de = s.data(); r.tieuDe = r.de.tieuDe || r.tieuDe; r.congBo = D.congBoCua(r.de); }
+                } catch (e) { /* đề đã bị xóa */ }
+                if (r.de && r.congBo !== 'an') {
+                    try {
+                        const s = await db.collection('dap_an').doc(b.deId).get();
+                        if (s.exists) r.kq = D.chamDiem(r.de.cauHoi || [], s.data().cauHoi || {}, b.traLoi, r.de.thangDiem);
+                    } catch (e) { /* chưa được phép xem */ }
+                }
+                return r;
+            }));
+            deThi.sort((a, b) => a.nop - b.nop);
+            return { hocSinh: hocSinh, deThi: deThi, kiemTra: kiemTra, loiHocSinh: hs.status === 'rejected' };
+        }
+
+        // ---------- Phân tích ----------
+        function phanTich(du) {
+            const coDiem = du.deThi.filter((r) => r.kq);
+            const phan = { mc: { dung: 0, tong: 0 }, tf: { dung: 0, tong: 0 }, sa: { dung: 0, tong: 0 } };
+            let trong = 0, tongCau = 0, tiLeGio = [];
+            coDiem.forEach((r) => {
+                (r.de.cauHoi || []).forEach((q) => {
+                    const c = r.kq.chiTiet[q.id];
+                    if (!c) return;
+                    tongCau++;
+                    if (trangThaiCau(q, c, r.bai.traLoi) === 'trong') trong++;
+                    if (q.loai === 'tf') { phan.tf.tong += c.soY; phan.tf.dung += c.soYDung; }
+                    else { phan[q.loai].tong++; if (c.dung) phan[q.loai].dung++; }
+                });
+                if (r.de.thoiGian) tiLeGio.push(Math.min(1, (r.bai.thoiGianLam || 0) / (r.de.thoiGian * 60)));
+            });
+            const pt = {};
+            Object.keys(phan).forEach((l) => { pt[l] = phan[l].tong ? Math.round(phan[l].dung / phan[l].tong * 100) : null; });
+            const diem10 = coDiem.map((r) => r.kq.thang10);
+            return {
+                coDiem: coDiem, phan: phan, pt: pt,
+                tiLeTrong: tongCau ? trong / tongCau : 0,
+                tiLeGio: tiLeGio.length ? tiLeGio.reduce((a, b) => a + b, 0) / tiLeGio.length : null,
+                diemTB: diem10.length ? diem10.reduce((a, b) => a + b, 0) / diem10.length : null,
+                viPham: du.deThi.reduce((s, r) => s + (r.bai.viPham || 0), 0)
+            };
+        }
+        function trangThaiCau(q, c, traLoi) {
+            const a = (traLoi || {})[q.id];
+            const trong = q.loai === 'tf' ? !(Array.isArray(a) && a.some((v) => v === true || v === false)) : !a;
+            if (!c || trong) return 'trong';
+            if (c.dung) return 'dung';
+            return q.loai === 'tf' && c.soYDung > 0 ? 'mot-phan' : 'sai';
+        }
+        function ngayHoc(hocSinh) {
+            const ngay = (hocSinh && hocSinh.ngay) || {};
+            const homNay = new Date(); homNay.setHours(0, 0, 0, 0);
+            const ds = [];
+            for (let i = 29; i >= 0; i--) {
+                const d = new Date(homNay.getTime() - i * MOT_NGAY);
+                ds.push({ d: d, n: Number(ngay[khoaNgay(d)]) || 0 });
+            }
+            // Chuỗi ngày học liên tiếp (tính tới hôm nay, hoặc hôm qua nếu hôm nay chưa học)
+            let chuoi = 0;
+            for (let i = ds.length - 1; i >= 0; i--) {
+                if (ds[i].n > 0) chuoi++;
+                else if (i === ds.length - 1) continue;
+                else break;
+            }
+            const lanCuoi = Object.keys(ngay).filter((k) => Number(ngay[k]) > 0).sort().pop();
+            return { ds: ds, soNgay: ds.filter((x) => x.n > 0).length, chuoi: chuoi, lanCuoi: lanCuoi };
+        }
+
+        // ---------- Vẽ ----------
+        function oTongQuan(icon, nhan, giaTri, phu) {
+            return '<div class="bg-white/10 backdrop-blur border border-white/10 rounded-2xl p-4">' +
+                '<p class="text-xs text-slate-300 font-medium"><i class="fa-solid ' + icon + ' mr-1.5 text-teal-300"></i>' + nhan + '</p>' +
+                '<p class="text-2xl md:text-3xl font-extrabold text-white mt-1">' + giaTri + '</p>' +
+                (phu ? '<p class="text-xs text-slate-400 mt-0.5">' + phu + '</p>' : '') + '</div>';
+        }
+        function veTongQuan(du, pt, nh) {
+            const hs = du.hocSinh || {};
+            $('o-tong-quan').innerHTML =
+                oTongQuan('fa-star', 'Điểm TB đề thi', pt.diemTB == null ? '—' : so(pt.diemTB, 1), pt.coDiem.length ? 'thang 10 · ' + pt.coDiem.length + ' đề có điểm' : 'chưa có đề được công bố điểm') +
+                oTongQuan('fa-file-signature', 'Đề đã làm', du.deThi.length, du.kiemTra.filter((k) => k.du).length + ' bài kiểm tra công thức') +
+                oTongQuan('fa-clock', 'Thời gian học', esc(thoiLuong(hs.thoiGianHoc)), (hs.soLanMoBai || 0) + ' lượt mở bài') +
+                oTongQuan('fa-fire', 'Chuỗi ngày học', nh.chuoi + ' ngày', nh.soNgay + '/30 ngày gần đây có học');
+        }
+
+        // Biểu đồ đường điểm số (một chuỗi số liệu: không cần chú giải, tên ở tiêu đề)
+        function veBieuDoDiem(pt) {
+            const ds = pt.coDiem;
+            const khung = $('bieu-do-diem');
+            if (!ds.length) {
+                khung.innerHTML = '<div class="text-center text-slate-400 text-sm py-10 bg-slate-50 rounded-2xl"><i class="fa-solid fa-chart-line text-2xl mb-2 block"></i>Chưa có điểm nào được công bố. Làm đề trong <a href="phong-thi.html" class="text-primary font-semibold hover:underline">Phòng thi</a> nhé!</div>';
+                $('xu-huong').textContent = '';
+                return;
+            }
+            const W = 640, H = 220, L = 34, R = 16, T = 16, B = 34;
+            const x = (i) => ds.length === 1 ? (L + W - R) / 2 : L + i * (W - L - R) / (ds.length - 1);
+            const y = (v) => T + (10 - v) / 10 * (H - T - B);
+            const luoi = [0, 5, 10].map((v) => '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + y(v) + '" y2="' + y(v) + '" stroke="currentColor" class="text-slate-200" stroke-width="1"' + (v ? ' stroke-dasharray="3 4"' : '') + '/>' +
+                '<text x="' + (L - 8) + '" y="' + (y(v) + 4) + '" text-anchor="end" font-size="11" fill="currentColor" class="text-slate-400">' + v + '</text>').join('');
+            const duong = ds.map((r, i) => (i ? 'L' : 'M') + x(i).toFixed(1) + ' ' + y(r.kq.thang10).toFixed(1)).join(' ');
+            const vung = duong + ' L' + x(ds.length - 1).toFixed(1) + ' ' + y(0) + ' L' + x(0).toFixed(1) + ' ' + y(0) + ' Z';
+            const diem = ds.map((r, i) => {
+                const tip = esc(r.tieuDe) + ' · ' + so(r.kq.tong) + '/' + so(r.kq.toiDa) + ' (thang 10: ' + so(r.kq.thang10) + ') · ' + ngayThang(r.nop);
+                return '<g data-tip="' + tip + '" tabindex="0" class="cursor-pointer outline-none">' +
+                    '<circle cx="' + x(i) + '" cy="' + y(r.kq.thang10) + '" r="14" fill="transparent"/>' +
+                    '<circle cx="' + x(i) + '" cy="' + y(r.kq.thang10) + '" r="5" fill="currentColor" stroke="currentColor" stroke-width="2" class="text-teal-600 [stroke:white] dark:[stroke:#0f172a]"/></g>';
+            }).join('');
+            const cuoi = ds[ds.length - 1];
+            const nhanCuoi = '<text x="' + Math.min(x(ds.length - 1), W - R - 4) + '" y="' + (y(cuoi.kq.thang10) - 12) + '" text-anchor="' + (ds.length === 1 ? 'middle' : 'end') + '" font-size="12" font-weight="700" fill="currentColor" class="text-teal-700">' + so(cuoi.kq.thang10, 1) + '</text>';
+            const nhanX = '<text x="' + x(0) + '" y="' + (H - 10) + '" text-anchor="' + (ds.length === 1 ? 'middle' : 'start') + '" font-size="11" fill="currentColor" class="text-slate-400">' + ngayThang(ds[0].nop) + '</text>' +
+                (ds.length > 1 ? '<text x="' + x(ds.length - 1) + '" y="' + (H - 10) + '" text-anchor="end" font-size="11" fill="currentColor" class="text-slate-400">' + ngayThang(cuoi.nop) + '</text>' : '');
+            khung.innerHTML = '<svg viewBox="0 0 ' + W + ' ' + H + '" class="w-full h-auto" role="img" aria-label="Điểm các đề thi theo thời gian">' + luoi +
+                '<path d="' + vung + '" fill="currentColor" class="text-teal-500" opacity=".08"/>' +
+                '<path d="' + duong + '" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" class="text-teal-600"/>' +
+                diem + nhanCuoi + nhanX + '</svg>';
+            if (ds.length > 1) {
+                const chenh = cuoi.kq.thang10 - ds[ds.length - 2].kq.thang10;
+                $('xu-huong').innerHTML = Math.abs(chenh) < 0.05 ? '<span class="text-slate-500"><i class="fa-solid fa-equals mr-1"></i>Giữ nguyên so với đề trước</span>'
+                    : chenh > 0 ? '<span class="text-emerald-700"><i class="fa-solid fa-arrow-trend-up mr-1"></i>Tăng ' + so(chenh, 1) + ' điểm so với đề trước</span>'
+                    : '<span class="text-red-600"><i class="fa-solid fa-arrow-trend-down mr-1"></i>Giảm ' + so(-chenh, 1) + ' điểm so với đề trước</span>';
+            }
+        }
+
+        function veDanhSachDe(du) {
+            const ds = du.deThi.slice().reverse();
+            $('ds-de-thi').innerHTML = ds.length ? ds.map((r) => {
+                const k = r.kq;
+                const muc = k ? mucDo(k.thang10 * 10) : null;
+                const phan = k ? ['mc', 'tf', 'sa'].filter((l) => k.phan[l].so).map((l) =>
+                    '<span class="text-xs text-slate-500">' + D.PHAN[l] + ': <b class="text-slate-700">' + so(k.phan[l].diem) + '/' + so(k.phan[l].toiDa) + '</b></span>').join('<span class="text-slate-300">·</span>') : '';
+                return '<a href="exam/lam-bai.html?de=' + encodeURIComponent(r.deId) + '" class="flex items-center gap-4 p-4 rounded-2xl border border-slate-100 hover:border-teal-200 hover:bg-teal-50/40 transition group">' +
+                    '<div class="w-16 h-16 shrink-0 rounded-2xl flex flex-col items-center justify-center ' + (k ? 'bg-teal-50' : 'bg-slate-100') + '">' +
+                    (k ? '<span class="text-xl font-extrabold text-teal-700 leading-none">' + so(k.tong) + '</span><span class="text-[10px] text-slate-500 mt-0.5">/ ' + so(k.toiDa) + '</span>'
+                       : '<i class="fa-solid fa-hourglass-half text-slate-400"></i>') + '</div>' +
+                    '<div class="flex-1 min-w-0"><p class="font-semibold text-slate-900 line-clamp-2 group-hover:text-teal-700">' + esc(r.tieuDe) + '</p>' +
+                    '<p class="text-xs text-slate-500 mt-0.5">Nộp ' + ngayThang(r.nop) + (r.bai.viPham ? ' · <span class="text-red-600">rời bài ' + r.bai.viPham + ' lần</span>' : '') + '</p>' +
+                    '<div class="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-1">' + (k ? phan : '<span class="text-xs text-slate-500">' + (r.de ? 'Thầy chưa công bố điểm' : 'Đề đã bị xóa') + '</span>') + '</div></div>' +
+                    (muc ? '<span class="hidden sm:inline-flex items-center gap-1 text-xs font-semibold ' + muc.chu + '"><i class="fa-solid ' + muc.icon + '"></i>' + muc.ten + '</span>' : '') +
+                    '<i class="fa-solid fa-chevron-right text-slate-300 group-hover:text-teal-600"></i></a>';
+            }).join('') : '<p class="text-sm text-slate-400">Bạn chưa làm đề thi trực tuyến nào. <a href="phong-thi.html" class="text-primary font-semibold hover:underline">Vào Phòng thi</a></p>';
+        }
+
+        const MAU_TT = { sai: 'bg-red-500 text-white', 'mot-phan': 'bg-amber-400 text-white', trong: 'bg-slate-200 text-slate-600' };
+        const TEN_TT = { sai: 'Sai', 'mot-phan': 'Đúng một phần', trong: 'Bỏ trống' };
+        function veCauXemLai(du) {
+            const nhom = du.deThi.slice().reverse().filter((r) => r.kq && (r.congBo === 'chi-tiet' || r.congBo === 'day-du')).map((r) => {
+                const dem = { mc: 0, tf: 0, sa: 0 };
+                const cau = (r.de.cauHoi || []).map((q) => ({ q: q, nhan: D.PHAN[q.loai] + '.' + (++dem[q.loai]), tt: trangThaiCau(q, r.kq.chiTiet[q.id], r.bai.traLoi) }))
+                    .filter((x) => x.tt !== 'dung');
+                return { r: r, cau: cau };
+            });
+            if (!nhom.length) {
+                $('cau-xem-lai').innerHTML = '<p class="text-sm text-slate-400">Chưa có đề nào được thầy công bố chi tiết từng câu.</p>';
+                return;
+            }
+            $('cau-xem-lai').innerHTML = nhom.map((g) =>
+                '<div><div class="flex flex-wrap items-baseline justify-between gap-2 mb-2"><p class="font-semibold text-slate-800 text-sm">' + esc(g.r.tieuDe) + '</p>' +
+                '<span class="text-xs text-slate-500">' + (g.cau.length ? g.cau.length + ' câu cần xem lại' : '<span class="text-emerald-700"><i class="fa-solid fa-circle-check mr-1"></i>Đúng hết, tuyệt vời!</span>') +
+                (g.r.congBo === 'day-du' ? ' · <span class="text-teal-700">có lời giải</span>' : '') + '</span></div>' +
+                '<div class="flex flex-wrap gap-1.5">' + g.cau.map((x) =>
+                    '<a href="exam/lam-bai.html?de=' + encodeURIComponent(g.r.deId) + '#xl-' + encodeURIComponent(x.q.id) + '" title="' + TEN_TT[x.tt] + '" class="text-xs font-bold px-2 py-1.5 rounded-lg hover:scale-105 transition ' + MAU_TT[x.tt] + '">' + x.nhan + '</a>').join('') + '</div></div>'
+            ).join('') + '<div class="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500 pt-1">' +
+                Object.keys(TEN_TT).map((t) => '<span><span class="inline-block w-2.5 h-2.5 rounded-sm align-middle mr-1 ' + MAU_TT[t] + '"></span>' + TEN_TT[t] + '</span>').join('') + '</div>';
+        }
+
+        function veTheoPhan(pt) {
+            const loai = ['mc', 'tf', 'sa'].filter((l) => pt.phan[l].tong);
+            $('theo-phan').innerHTML = loai.length ? loai.map((l) => {
+                const p = pt.pt[l], m = mucDo(p);
+                return '<div><div class="flex items-baseline justify-between gap-2 text-sm"><span class="font-medium text-slate-700">' + TEN_PHAN[l] + '</span>' +
+                    '<span class="font-bold text-slate-900">' + p + '%</span></div>' +
+                    '<div class="h-2 bg-slate-100 rounded-full mt-1.5 overflow-hidden"><div class="h-full rounded-full ' + m.nen + '" style="width:' + Math.max(2, p) + '%"></div></div>' +
+                    '<div class="flex justify-between text-xs mt-1"><span class="text-slate-500">' + pt.phan[l].dung + '/' + pt.phan[l].tong + (l === 'tf' ? ' ý đúng' : ' câu đúng') + '</span>' +
+                    '<span class="font-semibold ' + m.chu + '"><i class="fa-solid ' + m.icon + ' mr-1"></i>' + m.ten + '</span></div></div>';
+            }).join('') : '<p class="text-sm text-slate-400">Cần ít nhất một đề đã được công bố điểm.</p>';
+        }
+
+        function veKiemTraCongThuc(du) {
+            $('kiem-tra-ct').innerHTML = du.kiemTra.map((k) => {
+                const d = k.du;
+                if (!d || !Number.isFinite(d.diem)) {
+                    return '<div class="flex items-center justify-between gap-3"><span class="text-sm font-medium text-slate-700">' + esc(k.ten) + '</span>' +
+                        '<a href="' + k.url + '" class="text-xs font-semibold text-primary hover:underline whitespace-nowrap">Làm bài <i class="fa-solid fa-arrow-right ml-0.5"></i></a></div>';
+                }
+                const p = Math.round(d.diem / (d.tong || 1) * 100), m = mucDo(p);
+                const ls = Array.isArray(d.lichSu) ? d.lichSu : [];
+                return '<div><div class="flex items-baseline justify-between gap-2 text-sm"><span class="font-medium text-slate-700">' + esc(k.ten) + '</span>' +
+                    '<span class="font-bold text-slate-900">' + esc(d.diem) + '/' + esc(d.tong) + '</span></div>' +
+                    '<div class="h-2 bg-slate-100 rounded-full mt-1.5 overflow-hidden"><div class="h-full rounded-full ' + m.nen + '" style="width:' + Math.max(2, p) + '%"></div></div>' +
+                    '<div class="flex justify-between gap-2 text-xs mt-1"><span class="text-slate-500">Tốt nhất · ' + (d.soLan || ls.length || 1) + ' lần làm' +
+                    (ls.length > 1 ? ' · lần gần nhất ' + esc(ls[ls.length - 1].diem) + '/' + esc(ls[ls.length - 1].tong) : '') + '</span>' +
+                    '<a href="' + k.url + '" class="font-semibold text-primary hover:underline whitespace-nowrap">Làm lại</a></div></div>';
+            }).join('');
+        }
+
+        // Cột số lượt học mỗi ngày trong 30 ngày (một chuỗi, cột mảnh bo đầu, khoảng hở giữa các cột)
+        function veHoatDong(du, nh) {
+            const hs = du.hocSinh || {};
+            $('hoat-dong-tom-tat').textContent = du.loiHocSinh ? 'Chưa đọc được dữ liệu học tập.' :
+                (hs.luotVao || 0) + ' lượt vào khóa học · ' + (hs.soLanMoBai || 0) + ' lượt mở bài · ' + thoiLuong(hs.thoiGianHoc);
+            const W = 300, H = 90, B = 16, max = Math.max(1, ...nh.ds.map((x) => x.n));
+            const bw = W / nh.ds.length;
+            const cot = nh.ds.map((x, i) => {
+                const h = x.n ? Math.max(4, (H - B - 4) * x.n / max) : 2;
+                const tip = ngayThang(x.d.getTime()) + ': ' + (x.n ? x.n + ' lượt học' : 'không học');
+                return '<g data-tip="' + tip + '"><rect x="' + (i * bw) + '" y="0" width="' + bw + '" height="' + (H - B) + '" fill="transparent"/>' +
+                    '<rect x="' + (i * bw + 1) + '" y="' + (H - B - h) + '" width="' + (bw - 2) + '" height="' + h + '" rx="2" fill="currentColor" class="' + (x.n ? 'text-teal-500' : 'text-slate-200') + '"/></g>';
+            }).join('');
+            $('hoat-dong').innerHTML = '<svg viewBox="0 0 ' + W + ' ' + H + '" class="w-full h-auto" role="img" aria-label="Số lượt học mỗi ngày trong 30 ngày">' + cot +
+                '<text x="0" y="' + (H - 3) + '" font-size="9" fill="currentColor" class="text-slate-400">' + ngayThang(nh.ds[0].d.getTime()).slice(0, 5) + '</text>' +
+                '<text x="' + W + '" y="' + (H - 3) + '" font-size="9" text-anchor="end" fill="currentColor" class="text-slate-400">Hôm nay</text></svg>';
+        }
+
+        function veBaiGanDay(du) {
+            const bai = Object.values((du.hocSinh && du.hocSinh.bai) || {}).filter((b) => b && b.url && b.ten && TEN_KHOA[b.khoa])
+                .sort((a, b) => thanhMs(b.lanCuoi) - thanhMs(a.lanCuoi)).slice(0, 5);
+            $('bai-gan-day').innerHTML = bai.length ? bai.map((b) =>
+                '<li><a href="courses/' + b.khoa + '.html?bai=' + encodeURIComponent(b.url) + '" class="flex items-center gap-3 p-2.5 -mx-2.5 rounded-xl hover:bg-teal-50/60 transition group">' +
+                '<span class="w-9 h-9 shrink-0 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center"><i class="fa-solid fa-play text-xs"></i></span>' +
+                '<span class="flex-1 min-w-0"><span class="block text-sm font-medium text-slate-800 line-clamp-2 group-hover:text-teal-700">' + esc(b.ten) + '</span>' +
+                '<span class="block text-xs text-slate-500">' + TEN_KHOA[b.khoa] + ' · ' + thoiLuong(b.giay) + ' · ' + (b.luotMo || 1) + ' lượt</span></span></a></li>').join('')
+                : '<li class="text-sm text-slate-400">Chưa mở bài học nào. <a href="courses.html" class="text-primary font-semibold hover:underline">Vào khóa học</a></li>';
+        }
+
+        // Gợi ý tự động dựa trên dữ liệu thật của học sinh
+        function veGoiY(du, pt, nh) {
+            const g = [];
+            const them = (icon, mau, html) => g.push('<li class="flex gap-3 text-sm text-slate-700"><span class="w-8 h-8 shrink-0 rounded-xl bg-white flex items-center justify-center shadow-sm"><i class="fa-solid ' + icon + ' ' + mau + '"></i></span><span class="pt-1">' + html + '</span></li>');
+            const loai = ['mc', 'tf', 'sa'].filter((l) => pt.pt[l] != null);
+            if (loai.length) {
+                const yeu = loai.reduce((a, b) => (pt.pt[b] < pt.pt[a] ? b : a));
+                const manh = loai.reduce((a, b) => (pt.pt[b] > pt.pt[a] ? b : a));
+                const meo = {
+                    mc: 'Luyện thêm câu trắc nghiệm: loại trừ phương án sai trước, thử thay số để kiểm tra lại.',
+                    tf: 'Chấm từng ý độc lập; đúng đủ 4 ý mới được trọn điểm nên hãy ưu tiên chắc chắn từng ý.',
+                    sa: 'Ghi kết quả ra nháp rồi kiểm tra lại phép tính, chú ý làm tròn đúng yêu cầu của đề.'
+                };
+                if (pt.pt[yeu] < 80) them('fa-bullseye', 'text-red-500', '<b>' + TEN_PHAN[yeu] + '</b> là phần cần cải thiện nhất (đúng ' + pt.pt[yeu] + '%). ' + meo[yeu]);
+                if (loai.length > 1 && manh !== yeu && pt.pt[manh] >= 70) them('fa-medal', 'text-amber-500', 'Bạn làm tốt nhất ở <b>' + TEN_PHAN[manh] + '</b> (' + pt.pt[manh] + '%). Giữ phong độ nhé!');
+            }
+            if (pt.tiLeTrong >= 0.1) them('fa-hourglass-half', 'text-amber-600', 'Bạn đang bỏ trống <b>' + Math.round(pt.tiLeTrong * 100) + '%</b> số câu. Câu sai không bị trừ điểm, hãy phân bổ thời gian và đừng để trống câu nào.');
+            if (pt.tiLeGio != null && pt.tiLeGio < 0.5 && pt.diemTB != null && pt.diemTB < 8) them('fa-stopwatch', 'text-teal-600', 'Bạn thường nộp bài khi còn hơn nửa thời gian. Dành thêm thời gian kiểm tra lại sẽ giúp tăng điểm.');
+            if (pt.viPham) them('fa-triangle-exclamation', 'text-red-500', 'Bạn đã rời khỏi bài thi <b>' + pt.viPham + ' lần</b>. Giữ nguyên màn hình làm bài để tránh bị tự động nộp.');
+            const ct = du.kiemTra.filter((k) => k.du && Number.isFinite(k.du.diem)).map((k) => ({ k: k, p: k.du.diem / (k.du.tong || 1) * 100 })).sort((a, b) => a.p - b.p)[0];
+            if (ct && ct.p < 80) them('fa-square-root-variable', 'text-teal-600', 'Ôn lại <b>' + esc(ct.k.ten) + '</b> (đạt ' + Math.round(ct.p) + '%) rồi <a href="' + ct.k.url + '" class="text-primary font-semibold hover:underline">làm lại bài kiểm tra</a>.');
+            const chuaLam = du.kiemTra.filter((k) => !k.du);
+            if (chuaLam.length) them('fa-list-check', 'text-teal-600', 'Bạn chưa thử bài kiểm tra <a href="' + chuaLam[0].url + '" class="text-primary font-semibold hover:underline">' + esc(chuaLam[0].ten) + '</a>.');
+            if (!du.loiHocSinh) {
+                const cachNgay = nh.lanCuoi ? Math.round((new Date().setHours(0, 0, 0, 0) - new Date(nh.lanCuoi + 'T00:00:00').getTime()) / MOT_NGAY) : null;
+                if (cachNgay == null) them('fa-graduation-cap', 'text-teal-600', 'Bắt đầu học bài đầu tiên trong <a href="courses.html" class="text-primary font-semibold hover:underline">Khóa học của tôi</a>.');
+                else if (cachNgay >= 3) them('fa-calendar-xmark', 'text-amber-600', 'Đã <b>' + cachNgay + ' ngày</b> bạn chưa vào học. Học đều mỗi ngày một ít sẽ nhớ lâu hơn.');
+                else if (nh.chuoi >= 3) them('fa-fire', 'text-orange-500', 'Chuỗi <b>' + nh.chuoi + ' ngày</b> học liên tiếp, tiếp tục giữ lửa nhé!');
+            }
+            if (pt.coDiem.length >= 2) {
+                const ds = pt.coDiem, chenh = ds[ds.length - 1].kq.thang10 - ds[ds.length - 2].kq.thang10;
+                if (chenh >= 0.5) them('fa-arrow-trend-up', 'text-emerald-600', 'Điểm đề gần nhất tăng <b>' + so(chenh, 1) + '</b> so với đề trước. Rất tốt!');
+            }
+            if (!g.length) them('fa-rocket', 'text-teal-600', du.deThi.length ? 'Kết quả của bạn rất ổn. Thử sức với đề mới trong <a href="phong-thi.html" class="text-primary font-semibold hover:underline">Phòng thi</a>!' : 'Làm đề đầu tiên trong <a href="phong-thi.html" class="text-primary font-semibold hover:underline">Phòng thi</a> để nhận phân tích điểm mạnh, điểm yếu.');
+            // Chỉ giữ 5 gợi ý quan trọng nhất (đã xếp theo mức ưu tiên)
+            document.querySelectorAll('[data-goi-y]').forEach((ul) => { ul.innerHTML = g.slice(0, 5).join(''); });
+        }
+
+        // Chú thích khi rê chuột / chạm vào điểm hoặc cột
+        (function () {
+            const tip = $('chu-thich');
+            const hien = (el) => {
+                tip.textContent = el.getAttribute('data-tip');
+                tip.classList.remove('hidden');
+                const r = el.getBoundingClientRect(), w = tip.offsetWidth;
+                tip.style.left = Math.max(8, Math.min(window.innerWidth - w - 8, r.left + r.width / 2 - w / 2)) + 'px';
+                tip.style.top = Math.max(8, r.top - tip.offsetHeight - 8) + 'px';
+            };
+            const an = () => tip.classList.add('hidden');
+            document.addEventListener('mouseover', (e) => { const el = e.target.closest && e.target.closest('[data-tip]'); el ? hien(el) : an(); });
+            document.addEventListener('focusin', (e) => { const el = e.target.closest && e.target.closest('[data-tip]'); if (el) hien(el); });
+            document.addEventListener('click', (e) => { const el = e.target.closest && e.target.closest('[data-tip]'); el ? hien(el) : an(); });
+            window.addEventListener('scroll', an, { passive: true });
+        })();
+
+        firebase.auth().onAuthStateChanged(async (user) => {
+            const khuVucDangNhap = $('khu-vuc-dang-nhap'), khuVucUser = $('khu-vuc-user'), nutDangXuatMobile = $('nutDangXuatMobile');
+            if (user) {
+                khuVucDangNhap.style.display = 'none'; khuVucUser.style.display = 'flex'; nutDangXuatMobile.style.display = 'flex';
+                document.querySelectorAll('[data-admin-link]').forEach((a) => { a.style.display = user.email === 'thanhdo@dfm.com' ? '' : 'none'; });
+                $('ten-user').innerText = user.email.split('@')[0];
+            } else {
+                khuVucDangNhap.style.display = 'block'; khuVucUser.style.display = 'none'; nutDangXuatMobile.style.display = 'none';
+            }
+            $('auth-container').style.opacity = '1';
+
+            if (!user) {
+                $('trang-thai').innerHTML = '<div class="max-w-md mx-auto bg-white rounded-3xl border border-slate-200 p-8"><i class="fa-solid fa-lock text-3xl text-teal-600"></i>' +
+                    '<p class="mt-3 font-semibold text-slate-800">Đăng nhập để xem góc học tập của bạn</p>' +
+                    '<a href="login.html" class="inline-block mt-5 bg-primary hover:bg-teal-700 text-white px-6 py-2.5 rounded-full font-semibold">Đăng nhập</a></div>';
+                return;
+            }
+            $('loi-chao').textContent = 'Xin chào, ' + user.email.split('@')[0] + '!';
+            try {
+                const du = await taiDuLieu(user);
+                const pt = phanTich(du), nh = ngayHoc(du.hocSinh);
+                veTongQuan(du, pt, nh);
+                veBieuDoDiem(pt);
+                veDanhSachDe(du);
+                veCauXemLai(du);
+                veTheoPhan(pt);
+                veKiemTraCongThuc(du);
+                veHoatDong(du, nh);
+                veBaiGanDay(du);
+                veGoiY(du, pt, nh);
+                $('trang-thai').classList.add('hidden');
+                $('noi-dung').classList.remove('hidden');
+            } catch (err) {
+                console.error(err);
+                $('trang-thai').innerHTML = '<p class="text-red-600">Không tải được dữ liệu. Kiểm tra mạng rồi tải lại trang.</p>';
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderMathInElement(document.body, { delimiters: [{ left: '$', right: '$', display: false }], throwOnError: false });
+        });
+    </script>
+</body>
+</html>

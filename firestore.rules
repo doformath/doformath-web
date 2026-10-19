@@ -13,9 +13,11 @@ service cloud.firestore {
       allow write: if laAdmin();
     }
 
-    // Theo dõi học tập: học sinh chỉ ghi vào hồ sơ của chính mình; chỉ Admin đọc
+    // Theo dõi học tập: học sinh chỉ ghi vào hồ sơ của chính mình; Admin đọc tất cả,
+    // học sinh đọc được hồ sơ của chính mình (trang Góc học tập)
     match /hoc_sinh/{uid} {
-      allow read, delete: if laAdmin();
+      allow get: if laAdmin() || (request.auth != null && request.auth.uid == uid);
+      allow list, delete: if laAdmin();
       allow create, update: if request.auth != null && request.auth.uid == uid
                             && request.resource.data.email == request.auth.token.email;
       match /hoat_dong/{id} {
@@ -39,17 +41,21 @@ service cloud.firestore {
       allow write: if laAdmin();
     }
 
-    // Đáp án + lời giải: học sinh chỉ đọc được SAU KHI đã nộp bài đề đó
+    // Đáp án + lời giải: học sinh chỉ đọc được khi ĐÃ NỘP bài đề đó VÀ Admin đã công bố điểm/đáp án
+    // (trường congBo của đề: 'an' = chưa công bố, 'diem' = chỉ điểm, 'chi-tiet' = điểm + đúng/sai từng câu,
+    //  'day-du' = điểm + đáp án + lời giải)
     match /dap_an/{deId} {
       allow get: if laAdmin() || (request.auth != null
-                  && exists(/databases/$(database)/documents/bai_lam/$(deId + '__' + request.auth.uid)));
+                  && exists(/databases/$(database)/documents/bai_lam/$(deId + '__' + request.auth.uid))
+                  && get(/databases/$(database)/documents/de_thi/$(deId)).data.get('congBo', 'diem') in ['diem', 'chi-tiet', 'day-du']);
       allow list, write: if laAdmin();
     }
 
     // Bài làm: mỗi học sinh nộp 1 lần cho mỗi đề (mã = <mã đề>__<uid>), chỉ khi đề đang mở; nộp rồi không sửa được
     match /bai_lam/{baiId} {
       allow get: if laAdmin() || (request.auth != null && baiId.split('__')[1] == request.auth.uid);
-      allow list: if laAdmin();
+      // Học sinh liệt kê được bài của chính mình (Phòng thi hiện các đề đã nộp để xem kết quả)
+      allow list: if laAdmin() || (request.auth != null && resource.data.uid == request.auth.uid);
       allow create: if request.auth != null
         && baiId == request.resource.data.deId + '__' + request.auth.uid
         && request.resource.data.uid == request.auth.uid

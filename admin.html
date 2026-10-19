@@ -12,7 +12,7 @@
     <!-- Giao diện sáng / tối: chạy trước CSS để không bị nháy màu -->
     <script src="assets/js/dfm-giao-dien.js"></script>
     <!-- CSS Tailwind dựng sẵn cho cả site (sửa class xong chạy: npm run build:css) -->
-    <link rel="stylesheet" href="assets/css/tailwind.css?v=08097a6e">
+    <link rel="stylesheet" href="assets/css/tailwind.css?v=a5530322">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- KaTeX: vẽ logo DoforMath giống các trang khác -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
@@ -213,18 +213,15 @@
         <section id="tab-kiem-tra" data-panel hidden>
             <div class="flex flex-wrap gap-3 items-center mb-4">
                 <select id="chon-bai-kt" class="py-2.5 px-3 rounded-xl border border-gray-200 bg-white text-sm"></select>
-                <span id="tom-tat-kt" class="text-sm text-gray-500"></span>
+                <span id="tom-tat-kt" class="text-sm text-gray-500 flex flex-wrap items-center gap-x-3 gap-y-1"></span>
             </div>
             <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-x-auto">
                 <table class="bang w-full text-sm min-w-[720px]">
-                    <thead><tr>
-                        <th>#</th><th>Học sinh</th><th class="text-right">Điểm tốt nhất</th><th class="text-right">Thời gian</th>
-                        <th class="text-right">Số lần làm</th><th class="text-right">Vi phạm</th><th>Lần cuối</th>
-                    </tr></thead>
+                    <thead id="dau-kt"></thead>
                     <tbody id="bang-kt"></tbody>
                 </table>
             </div>
-            <p class="text-xs text-gray-400 mt-3">Bấm vào một dòng để xem lịch sử các lần làm bài.</p>
+            <p id="chu-kt" class="text-xs text-gray-400 mt-3"></p>
         </section>
 
         <!-- ========== TAB ĐỀ THI (tải đề từ file TeX) ========== -->
@@ -232,7 +229,6 @@
             <div class="flex flex-wrap gap-3 items-center justify-between mb-4">
                 <div>
                     <h2 class="font-bold text-gray-900">Đề thi trực tuyến</h2>
-                    <p class="text-sm text-gray-500">Dán hoặc tải file .tex (gói ex_test: \choice, \choiceTF, \shortans) lên, hệ thống tự chuyển thành đề thi trên web.</p>
                 </div>
                 <button id="nut-tao-de" type="button" class="bg-primary hover:bg-teal-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold shadow-sm transition-colors">
                     <i class="fa-solid fa-plus mr-1.5"></i>Tạo đề thi
@@ -461,6 +457,7 @@
 
         // ---------- Tải dữ liệu ----------
         async function taiDuLieu() {
+            S.dapAn = {};
             const tenNguon = ['phan_quyen', 'hoc_sinh', 'bai_hoc_them'].concat(BAI_KIEM_TRA.map((b) => b.id), ['de_thi', 'bai_lam']);
             const kq = await Promise.allSettled(tenNguon.map((t) => db.collection(t).get()));
             const loi = [];
@@ -613,6 +610,13 @@
                     esc(r.diem) + '/' + esc(r.tong) + ' · ' + phutGiay(r.thoiGian) + ' · ' + esc(r.soLan || 0) + ' lần</span></li>' : '';
             }).join('');
 
+            const baiDe = (S.baiLam || []).filter((b) => (hs.uid && b.uid === hs.uid) || b.email === hs.email)
+                .sort((a, b) => (thanhDate(b.nopLuc) || 0) - (thanhDate(a.nopLuc) || 0));
+            const ketQuaDe = baiDe.map((b) => {
+                const de = (S.deThi || []).find((d) => d.id === b.deId);
+                return '<li class="flex justify-between gap-3 py-2"><span>' + esc(de ? de.tieuDe : (b.tieuDe || 'Đề đã xóa')) + ' <span class="text-xs text-gray-400">· đề trực tuyến</span></span>' +
+                    '<span class="so text-gray-700 text-right" data-diem-bai="' + esc(b.id) + '">' + (de ? '<i class="fa-solid fa-circle-notch fa-spin text-gray-300"></i>' : '—') + '</span></li>';
+            }).join('');
             const noiDung = moHopThoai(email,
                 '<div class="flex flex-wrap items-center gap-2 mb-5"><span class="inline-flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full ' + tt.lop + '"><i class="fa-solid ' + tt.icon + '"></i>' + tt.nhan + '</span>' +
                 '<span class="text-sm text-gray-500">Lần cuối: ' + ngayGio(hs.lanCuoi) + '</span></div>' +
@@ -633,7 +637,7 @@
                         '<td class="text-right so">' + (b.luotMo || 0) + '</td><td class="text-right so whitespace-nowrap">' + thoiLuong(b.giay) + '</td><td class="text-gray-500 whitespace-nowrap">' + truocDay(thanhDate(b.lanCuoi)) + '</td></tr>').join('') +
                     '</tbody></table></div>' : '<p class="text-sm text-gray-400 mb-6">Chưa mở bài nào.</p>') +
 
-                (ketQua ? '<h3 class="font-bold text-gray-900 mb-2">Kết quả kiểm tra</h3><ul class="divide-y divide-gray-100 text-sm mb-6">' + ketQua + '</ul>' : '') +
+                (ketQua || ketQuaDe ? '<h3 class="font-bold text-gray-900 mb-2">Kết quả kiểm tra</h3><ul class="divide-y divide-gray-100 text-sm mb-6">' + ketQua + ketQuaDe + '</ul>' : '') +
 
                 '<h3 class="font-bold text-gray-900 mb-3">Nhật ký gần nhất</h3><ul id="nhat-ky-hs" class="text-sm space-y-2"><li class="text-gray-400"><i class="fa-solid fa-circle-notch fa-spin mr-1"></i>Đang tải...</li></ul>'
             );
@@ -644,6 +648,15 @@
                 theoNgay.push({ nhan: d.getDate() + '/' + (d.getMonth() + 1), giaTri: (hs.ngay || {})[ngayKey(d)] || 0 });
             }
             veBieuDoCot(noiDung.querySelector('#bieu-do-hs'), theoNgay, 'lượt');
+            baiDe.forEach(async (b) => {
+                const de = (S.deThi || []).find((d) => d.id === b.deId);
+                const o = noiDung.querySelector('[data-diem-bai="' + b.id + '"]');
+                if (!de || !o) return;
+                try {
+                    const kq = DT.chamDiem(de.cauHoi || [], await layDapAn(de.id), b.traLoi, de.thangDiem);
+                    o.textContent = DT.dinhDangSo(kq.tong, 2) + '/' + DT.dinhDangSo(kq.toiDa, 2) + ' · ' + phutGiay((b.thoiGianLam || 0) * 1000) + (b.viPham ? ' · rời bài ' + b.viPham + ' lần' : '');
+                } catch (err) { o.textContent = 'Lỗi tải đáp án'; }
+            });
 
             noiDung.querySelectorAll('[data-quyen]').forEach((nut) => nut.addEventListener('click', async (e) => {
                 e.preventDefault();
@@ -1217,10 +1230,103 @@
         }
 
         // ---------- TAB KIỂM TRA ----------
-        $('chon-bai-kt').innerHTML = BAI_KIEM_TRA.map((b) => '<option value="' + b.id + '">' + esc(b.ten) + '</option>').join('');
+        // Gồm các bài kiểm tra công thức (bảng xếp hạng) và các đề thi trực tuyến (bài nộp ở bai_lam)
         $('chon-bai-kt').addEventListener('change', veKiemTra);
+        function napChonBaiKt() {
+            const chon = $('chon-bai-kt');
+            const cu = chon.value;
+            const dsDe = (S.deThi || []).slice().sort((a, b) => (thanhDate(b.capNhatLuc) || 0) - (thanhDate(a.capNhatLuc) || 0));
+            chon.innerHTML = '<optgroup label="Bài kiểm tra công thức">' + BAI_KIEM_TRA.map((b) => '<option value="' + b.id + '">' + esc(b.ten) + '</option>').join('') + '</optgroup>' +
+                (dsDe.length ? '<optgroup label="Đề thi trực tuyến">' + dsDe.map((de) =>
+                    '<option value="de:' + esc(de.id) + '">' + esc(de.tieuDe) + ' (' + (S.baiLam || []).filter((b) => b.deId === de.id).length + ' bài nộp)</option>').join('') + '</optgroup>' : '');
+            if (cu && [...chon.options].some((o) => o.value === cu)) chon.value = cu;
+        }
+        // Đáp án của đề (chỉ Admin đọc được) — tải một lần rồi dùng lại
+        function layDapAn(deId) {
+            S.dapAn = S.dapAn || {};
+            if (!S.dapAn[deId]) {
+                S.dapAn[deId] = db.collection('dap_an').doc(deId).get()
+                    .then((d) => (d.exists && d.data().cauHoi) || {})
+                    .catch((err) => { delete S.dapAn[deId]; throw err; });
+            }
+            return S.dapAn[deId];
+        }
+        const soVN = (x) => DT.dinhDangSo(x, 2);
+        // Tình trạng từng câu của một bài nộp: dung | mot-phan | sai | trong
+        function trangThaiCauBai(q, kq, traLoi) {
+            const c = kq.chiTiet[q.id], a = (traLoi || {})[q.id];
+            const trong = q.loai === 'tf' ? !(Array.isArray(a) && a.some((v) => v === true || v === false)) : !a;
+            if (!c || trong) return 'trong';
+            if (c.dung) return 'dung';
+            return q.loai === 'tf' && c.soYDung > 0 ? 'mot-phan' : 'sai';
+        }
+        const MAU_TT = { dung: 'bg-emerald-500 text-white', 'mot-phan': 'bg-amber-400 text-white', sai: 'bg-red-500 text-white', trong: 'bg-gray-200 text-gray-500' };
+        const TEN_TT = { dung: 'Đúng', 'mot-phan': 'Đúng một phần', sai: 'Sai', trong: 'Bỏ trống' };
+
+        async function veKetQuaDeKt(deId) {
+            const de = (S.deThi || []).find((d) => d.id === deId);
+            if (!de) return;
+            const toiDa = tongDiemDe(de);
+            $('dau-kt').innerHTML = '<tr><th>#</th><th>Học sinh</th><th class="text-right whitespace-nowrap">Điểm (/' + soVN(toiDa) + ')</th><th class="text-right">Phần I</th><th class="text-right">Phần II</th><th class="text-right">Phần III</th>' +
+                '<th class="text-right">Thời gian</th><th class="text-right">Rời bài</th><th>Nộp lúc</th></tr>';
+            $('chu-kt').textContent = 'Bấm vào một dòng để xem từng câu đúng/sai. Đổi mức công bố, chia điểm hay cho làm lại ở nút “Chi tiết đề”.';
+            const tt = TRANG_THAI_DE[de.trangThai] || TRANG_THAI_DE.nhap;
+            const nutChiTiet = '<span class="inline-flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full ' + tt.lop + '"><i class="fa-solid ' + tt.icon + '"></i>' + tt.ten + '</span>' +
+                '<span class="text-xs text-gray-500"><i class="fa-solid ' + DT.CONG_BO[DT.congBoCua(de)].icon + ' mr-1"></i>' + DT.CONG_BO[DT.congBoCua(de)].ten + '</span>' +
+                '<button type="button" data-kt-chi-tiet-de class="text-sm font-medium text-primary hover:underline"><i class="fa-solid fa-square-poll-vertical mr-1"></i>Chi tiết đề</button>';
+            const bai = (S.baiLam || []).filter((b) => b.deId === deId);
+            if (!bai.length) {
+                $('tom-tat-kt').innerHTML = '<span>Chưa có bài nộp</span>' + nutChiTiet;
+                $('bang-kt').innerHTML = '<tr><td colspan="9" class="text-center text-gray-400 py-10">Chưa có học sinh nào nộp bài đề này.</td></tr>';
+                return;
+            }
+            $('tom-tat-kt').innerHTML = nutChiTiet;
+            $('bang-kt').innerHTML = '<tr><td colspan="9" class="text-center text-gray-400 py-10"><i class="fa-solid fa-circle-notch fa-spin mr-1"></i>Đang chấm điểm...</td></tr>';
+            let dapAn;
+            try { dapAn = await layDapAn(deId); }
+            catch (err) { $('bang-kt').innerHTML = '<tr><td colspan="9" class="text-center text-red-600 py-10">Không tải được đáp án: ' + esc(err.message) + '</td></tr>'; return; }
+            if ($('chon-bai-kt').value !== 'de:' + deId) return;   // đã chọn bài khác trong lúc tải
+
+            const cauHoi = de.cauHoi || [];
+            const ds = bai.map((b) => Object.assign({ kq: DT.chamDiem(cauHoi, dapAn, b.traLoi, de.thangDiem) }, b))
+                .sort((a, b) => b.kq.tong - a.kq.tong || (a.thoiGianLam || 0) - (b.thoiGianLam || 0));
+            const diem = ds.map((b) => b.kq.tong);
+            $('tom-tat-kt').innerHTML = '<span>' + ds.length + ' bài nộp · điểm TB ' + soVN(diem.reduce((x, y) => x + y, 0) / diem.length) +
+                ' · cao nhất ' + soVN(Math.max(...diem)) + ' · thấp nhất ' + soVN(Math.min(...diem)) + '</span>' + nutChiTiet;
+            const dem = { mc: 0, tf: 0, sa: 0 };
+            const nhan = cauHoi.map((q) => DT.PHAN[q.loai] + '.' + (++dem[q.loai]));
+            $('bang-kt').innerHTML = ds.map((b, i) => {
+                const hs = S.theoUid.get(b.uid);
+                const p = b.kq.phan;
+                return '<tr class="co-the-bam" data-mo-ls="' + i + '"><td class="text-gray-400 so">' + (i + 1) + '</td>' +
+                    '<td><div class="font-medium text-gray-900">' + esc(b.email || (hs && hs.email) || b.uid) + '</div>' +
+                    (b.lyDoNop === 'vi-pham' ? '<div class="text-xs text-red-600">Tự nộp do rời bài</div>' : b.lyDoNop === 'het-gio' ? '<div class="text-xs text-amber-700">Tự nộp khi hết giờ</div>' : '') + '</td>' +
+                    '<td class="text-right so font-semibold">' + soVN(b.kq.tong) + '</td>' +
+                    ['mc', 'tf', 'sa'].map((l) => '<td class="text-right so whitespace-nowrap">' + (p[l].so ? soVN(p[l].diem) + ' <span class="text-xs text-gray-400">(' + p[l].dung + '/' + p[l].so + ')</span>' : '—') + '</td>').join('') +
+                    '<td class="text-right so whitespace-nowrap">' + phutGiay((b.thoiGianLam || 0) * 1000) + '</td>' +
+                    '<td class="text-right so">' + (b.viPham ? '<span class="text-red-700 font-medium"><i class="fa-solid fa-triangle-exclamation mr-1"></i>' + esc(b.viPham) + '</span>' : '0') + '</td>' +
+                    '<td class="text-gray-500 whitespace-nowrap">' + ngayGio(thanhDate(b.nopLuc)) + '</td></tr>' +
+                    '<tr data-ls="' + i + '" hidden><td></td><td colspan="8" class="bg-gray-50"><div class="flex flex-wrap gap-1 py-1">' +
+                    cauHoi.map((q, j) => {
+                        const t = trangThaiCauBai(q, b.kq, b.traLoi), c = b.kq.chiTiet[q.id];
+                        return '<span title="' + TEN_TT[t] + ' · ' + soVN(c.diem) + '/' + DT.dinhDangSo(c.toiDa, 3) + ' điểm" class="text-[11px] font-semibold px-1.5 py-1 rounded-md so ' + MAU_TT[t] + '">' + nhan[j] + '</span>';
+                    }).join('') + '</div><div class="text-xs text-gray-500 mt-1">' +
+                    Object.keys(TEN_TT).map((t) => '<span class="inline-block w-2.5 h-2.5 rounded-sm align-middle mr-1 ' + MAU_TT[t] + '"></span>' + TEN_TT[t]).join(' &nbsp; ') + '</div></td></tr>';
+            }).join('');
+        }
+        $('tom-tat-kt').addEventListener('click', (e) => {
+            if (!e.target.closest('[data-kt-chi-tiet-de]')) return;
+            const de = (S.deThi || []).find((d) => 'de:' + d.id === $('chon-bai-kt').value);
+            if (de) xemKetQuaDe(de);
+        });
+
         function veKiemTra() {
+            napChonBaiKt();
             const id = $('chon-bai-kt').value;
+            if (id.startsWith('de:')) { veKetQuaDeKt(id.slice(3)); return; }
+            $('dau-kt').innerHTML = '<tr><th>#</th><th>Học sinh</th><th class="text-right">Điểm tốt nhất</th><th class="text-right">Thời gian</th>' +
+                '<th class="text-right">Số lần làm</th><th class="text-right">Vi phạm</th><th>Lần cuối</th></tr>';
+            $('chu-kt').textContent = 'Bấm vào một dòng để xem lịch sử các lần làm bài.';
             const ds = (S.bxh[id] || []).filter((r) => Number.isFinite(r.diem))
                 .sort((a, b) => b.diem - a.diem || (a.thoiGian || 0) - (b.thoiGian || 0));
             const tb = ds.length ? ds.reduce((s, r) => s + r.diem / (r.tong || 1), 0) / ds.length : 0;
@@ -1257,11 +1363,132 @@
             mo: { ten: 'Đang mở', lop: 'bg-emerald-50 text-emerald-700', icon: 'fa-circle-play' },
             dong: { ten: 'Đã đóng', lop: 'bg-red-50 text-red-700', icon: 'fa-lock' }
         };
+        const gioiHanCua = (de) => (Number.isFinite(de.gioiHanViPham) ? de.gioiHanViPham : 3);
         const linkDe = (id) => new URL('exam/lam-bai.html?de=' + encodeURIComponent(id), location.href).href;
         const tomTatSoCau = (cauHoi) => {
             const d = DT.soCauTheoLoai(cauHoi);
             return [d.mc && d.mc + ' trắc nghiệm', d.tf && d.tf + ' đúng/sai', d.sa && d.sa + ' trả lời ngắn'].filter(Boolean).join(' · ') || 'Chưa có câu hỏi';
         };
+
+        // ----- Chia điểm: tổng điểm từng loại câu (chia đều cho các câu) + % điểm câu đúng/sai -----
+        const TEN_TONG_DIEM = { mc: 'Trắc nghiệm 1 đáp án', tf: 'Đúng/sai', sa: 'Trả lời ngắn' };
+        const docSo = (v) => { const t = String(v == null ? '' : v).trim().replace(',', '.'); return t === '' ? NaN : Number(t); };
+        // Vẽ khung chia điểm vào `khung`; trả về { lay() } → { thangDiem } hoặc { loi }
+        function ganChiaDiem(khung, soCau, thangDiem) {
+            const td = DT.chuanThangDiem(thangDiem, soCau);
+            const loai = ['mc', 'tf', 'sa'].filter((l) => soCau[l]);
+            const oNhap = 'w-24 px-3 py-2 rounded-xl border border-gray-200 text-base text-center so';
+            khung.innerHTML =
+                '<div class="flex items-center justify-between bg-teal-50 border border-teal-100 rounded-xl px-4 py-3 mb-2">' +
+                '<span class="font-semibold text-gray-900">Tổng điểm</span><span data-cd-tong class="text-2xl font-bold text-primary so"></span></div>' +
+                '<div class="space-y-2">' + loai.map((l) =>
+                    '<label class="flex items-center gap-3 border border-gray-100 rounded-xl px-4 py-3 bg-white">' +
+                    '<span class="flex-1 min-w-0"><span class="block font-medium text-gray-900">Tổng điểm câu ' + TEN_TONG_DIEM[l].toLowerCase() + ' <span class="text-gray-400 font-normal">(' + soCau[l] + ' câu)</span></span>' +
+                    '<span data-cd-moi="' + l + '" class="block text-xs text-gray-500 mt-0.5"></span></span>' +
+                    '<input data-cd="' + l + '" inputmode="decimal" class="' + oNhap + '" value="' + esc(DT.dinhDangSo(td.tong[l], 4)) + '"></label>').join('') + '</div>' +
+                '<div class="flex flex-wrap items-center gap-2 mt-2">' +
+                '<button type="button" data-cd-quy10 class="text-xs font-medium px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200"><i class="fa-solid fa-scale-balanced mr-1"></i>Quy về tổng 10 điểm</button>' +
+                '<button type="button" data-cd-thpt class="text-xs font-medium px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200"><i class="fa-solid fa-rotate-left mr-1"></i>Mặc định THPT (0,25 · 1 · 0,5 điểm/câu)</button></div>' +
+                (soCau.tf ? '<h4 class="font-bold text-gray-900 mt-5">Thang điểm câu đúng/sai</h4>' +
+                    '<p class="text-xs text-gray-500 mb-3">% số điểm của một câu đúng/sai mà học sinh nhận được theo số ý trả lời đúng.</p>' +
+                    '<div class="grid sm:grid-cols-2 gap-x-6 gap-y-2">' + [0, 1, 2, 3].map((i) =>
+                        '<label class="flex items-center gap-3"><span class="w-28 shrink-0 text-sm">Đúng ' + (i + 1) + ' ý</span>' +
+                        '<span class="flex items-center"><input data-cd-ds="' + i + '" inputmode="decimal" class="' + oNhap + ' rounded-r-none" value="' + esc(DT.dinhDangSo(td.ds[i], 2)) + '">' +
+                        '<span class="px-3 py-2 border border-l-0 border-gray-200 rounded-r-xl bg-gray-50 text-sm text-gray-500">%</span></span>' +
+                        '<span data-cd-ds-diem="' + i + '" class="text-xs text-gray-500 so"></span></label>').join('') + '</div>' : '') +
+                '<p data-cd-loi class="text-sm text-red-600 mt-2"></p>';
+            const o = (sel) => khung.querySelector(sel);
+            const doc = () => {
+                const t = {}; loai.forEach((l) => { t[l] = docSo(o('[data-cd="' + l + '"]').value); });
+                const ds = soCau.tf ? [0, 1, 2, 3].map((i) => docSo(o('[data-cd-ds="' + i + '"]').value)) : td.ds;
+                return { t: t, ds: ds };
+            };
+            const capNhat = () => {
+                const { t, ds } = doc();
+                const tong = loai.reduce((x, l) => x + (Number.isFinite(t[l]) ? t[l] : 0), 0);
+                o('[data-cd-tong]').textContent = DT.dinhDangSo(tong, 2);
+                loai.forEach((l) => {
+                    o('[data-cd-moi="' + l + '"]').textContent = Number.isFinite(t[l]) ? '= ' + DT.dinhDangSo(t[l] / soCau[l], 3) + ' điểm/câu' : 'Nhập số điểm';
+                });
+                if (soCau.tf) [0, 1, 2, 3].forEach((i) => {
+                    o('[data-cd-ds-diem="' + i + '"]').textContent = Number.isFinite(t.tf) && Number.isFinite(ds[i]) ? '= ' + DT.dinhDangSo(t.tf / soCau.tf * ds[i] / 100, 3) + ' điểm' : '';
+                });
+            };
+            const dat = (gt) => { loai.forEach((l) => { o('[data-cd="' + l + '"]').value = DT.dinhDangSo(gt[l], 4); }); capNhat(); };
+            khung.addEventListener('input', capNhat);
+            o('[data-cd-thpt]').addEventListener('click', () => {
+                const gt = {}; loai.forEach((l) => { gt[l] = DT.DIEM_CAU_THPT[l] * soCau[l]; }); dat(gt);
+                if (soCau.tf) DT.DS_THPT.forEach((x, i) => { o('[data-cd-ds="' + i + '"]').value = x; });
+                capNhat();
+            });
+            o('[data-cd-quy10]').addEventListener('click', () => {
+                const { t } = doc();
+                const tong = loai.reduce((x, l) => x + (Number.isFinite(t[l]) ? t[l] : 0), 0);
+                if (!(tong > 0)) return;
+                const gt = {}; let du = 10;
+                loai.forEach((l) => { gt[l] = DT.lamTron((Number.isFinite(t[l]) ? t[l] : 0) * 10 / tong, 2); du -= gt[l]; });
+                const lon = loai.reduce((a, b) => (gt[b] > gt[a] ? b : a), loai[0]);
+                gt[lon] = DT.lamTron(gt[lon] + du, 2);   // dồn phần lẻ làm tròn vào loại nhiều điểm nhất để tổng đúng 10
+                dat(gt);
+            });
+            capNhat();
+            return {
+                lay() {
+                    const { t, ds } = doc();
+                    const loi = (m) => { o('[data-cd-loi]').textContent = m; return { loi: m }; };
+                    if (loai.some((l) => !Number.isFinite(t[l]) || t[l] < 0)) return loi('Điểm từng loại câu phải là số không âm (vd: 2,5).');
+                    if (!(loai.reduce((x, l) => x + t[l], 0) > 0)) return loi('Tổng điểm phải lớn hơn 0.');
+                    if (ds.some((x) => !Number.isFinite(x) || x < 0 || x > 100)) return loi('Thang điểm câu đúng/sai phải từ 0 đến 100%.');
+                    o('[data-cd-loi]').textContent = '';
+                    const kq = { ds: ds.map((x) => DT.lamTron(x, 2)) };
+                    ['mc', 'tf', 'sa'].forEach((l) => { kq[l] = soCau[l] ? DT.lamTron(t[l], 4) : 0; });
+                    return { thangDiem: kq };
+                }
+            };
+        }
+        function moChiaDiem(de) {
+            const soCau = DT.soCauTheoLoai(de.cauHoi);
+            const soBai = (S.baiLam || []).filter((b) => b.deId === de.id).length;
+            const f = moHopThoai('Chia điểm: ' + de.tieuDe, '');
+            f.innerHTML = '<div data-khung-cd></div>' +
+                (soBai ? '<p class="text-xs text-amber-700 mt-3"><i class="fa-solid fa-circle-info mr-1"></i>Đề đã có ' + soBai + ' bài nộp: điểm của các bài này sẽ được tính lại theo cách chia mới.</p>' : '') +
+                '<div class="flex justify-end gap-2 pt-4 mt-4 border-t border-gray-100"><button type="button" data-dong class="px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-100">Đóng</button>' +
+                '<button type="button" data-cd-luu class="bg-primary hover:bg-teal-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold">Lưu cách chia điểm</button></div>';
+            const cd = ganChiaDiem(f.querySelector('[data-khung-cd]'), soCau, de.thangDiem);
+            f.querySelector('[data-cd-luu]').addEventListener('click', async (e) => {
+                const r = cd.lay();
+                if (r.loi) return;
+                e.currentTarget.disabled = true;
+                try {
+                    await db.collection('de_thi').doc(de.id).update({ thangDiem: r.thangDiem });
+                    de.thangDiem = r.thangDiem;
+                    dongHopThoai(); veDeThi(); veKiemTra();
+                    thongBao('Đã lưu cách chia điểm');
+                } catch (err) { thongBao('Lỗi: ' + err.message); e.currentTarget.disabled = false; }
+            });
+        }
+        const tongDiemDe = (de) => DT.chuanThangDiem(de.thangDiem, DT.soCauTheoLoai(de.cauHoi)).toiDa;
+
+        // Mức công bố cho học sinh: đổi bất kỳ lúc nào, trang kết quả của học sinh cập nhật ngay
+        function thanhCongBo(de) {
+            const cb = DT.congBoCua(de);
+            return '<div class="flex flex-wrap items-center gap-2"><span class="text-xs font-medium text-gray-500"><i class="fa-solid fa-bullhorn mr-1"></i>Công bố cho học sinh:</span>' +
+                '<div class="inline-flex rounded-xl border border-gray-200 p-0.5 bg-gray-50">' +
+                Object.keys(DT.CONG_BO).map((k) => '<button type="button" data-cong-bo="' + k + '" data-de="' + esc(de.id) + '" title="' + esc(DT.CONG_BO[k].moTa) + '" aria-pressed="' + (cb === k) + '" class="px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ' +
+                    (cb === k ? (k === 'an' ? 'bg-gray-700 text-white' : 'bg-primary text-white') + ' shadow-sm' : 'text-gray-600 hover:bg-white') + '"><i class="fa-solid ' + DT.CONG_BO[k].icon + ' mr-1"></i>' + DT.CONG_BO[k].ten + '</button>').join('') +
+                '</div></div>';
+        }
+        async function doiCongBo(id, moi) {
+            const de = (S.deThi || []).find((d) => d.id === id);
+            if (!de || DT.congBoCua(de) === moi || !DT.CONG_BO[moi]) return false;
+            try {
+                await db.collection('de_thi').doc(id).update({ congBo: moi, hienLoiGiai: FV.delete() });
+                de.congBo = moi; delete de.hienLoiGiai;
+                veDeThi(); veKiemTra();
+                thongBao(moi === 'an' ? 'Đã ẩn điểm và đáp án với học sinh' : moi === 'diem' ? 'Đã công bố điểm cho học sinh' : 'Đã công bố điểm, đáp án và lời giải');
+                return true;
+            } catch (err) { thongBao('Lỗi: ' + err.message); return false; }
+        }
 
         function veDeThi() {
             const ds = (S.deThi || []).slice().sort((a, b) => (thanhDate(b.capNhatLuc) || 0) - (thanhDate(a.capNhatLuc) || 0));
@@ -1279,11 +1506,14 @@
                     '<span class="shrink-0 inline-flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full ' + tt.lop + '"><i class="fa-solid ' + tt.icon + '"></i>' + tt.ten + '</span></div>' +
                     '<div class="flex flex-wrap gap-2 text-xs text-gray-500">' +
                     '<span class="bg-gray-50 rounded-full px-2.5 py-1"><i class="fa-solid fa-users mr-1"></i>' + soBai + ' bài nộp</span>' +
-                    '<span class="bg-gray-50 rounded-full px-2.5 py-1"><i class="fa-solid ' + (de.hienLoiGiai ? 'fa-lightbulb' : 'fa-eye-slash') + ' mr-1"></i>' + (de.hienLoiGiai ? 'Hiện lời giải sau khi nộp' : 'Chỉ hiện điểm') + '</span>' +
+                    '<span class="bg-gray-50 rounded-full px-2.5 py-1"><i class="fa-solid fa-star mr-1"></i>Thang ' + DT.dinhDangSo(tongDiemDe(de), 2) + ' điểm</span>' +
+                    '<span class="bg-gray-50 rounded-full px-2.5 py-1"><i class="fa-solid fa-person-walking-arrow-right mr-1"></i>' + (gioiHanCua(de) ? 'Rời bài ' + gioiHanCua(de) + ' lần thì tự nộp' : 'Chỉ ghi lại số lần rời bài') + '</span>' +
                     '<span class="bg-gray-50 rounded-full px-2.5 py-1"><i class="fa-regular fa-clock mr-1"></i>Sửa ' + truocDay(thanhDate(de.capNhatLuc)).toLowerCase() + '</span></div>' +
+                    thanhCongBo(de) +
                     '<div class="flex flex-wrap gap-1 pt-2 border-t border-gray-100">' +
                     '<button type="button" data-de-ket-qua="' + esc(de.id) + '" class="px-3 py-1.5 rounded-lg text-sm hover:bg-gray-100"><i class="fa-solid fa-square-poll-vertical mr-1"></i>Kết quả</button>' +
                     '<button type="button" data-de-sua="' + esc(de.id) + '" class="px-3 py-1.5 rounded-lg text-sm hover:bg-gray-100"><i class="fa-solid fa-pen mr-1"></i>Sửa</button>' +
+                    '<button type="button" data-de-chia-diem="' + esc(de.id) + '" class="px-3 py-1.5 rounded-lg text-sm hover:bg-gray-100"><i class="fa-solid fa-calculator mr-1"></i>Chia điểm</button>' +
                     '<button type="button" data-de-trang-thai="' + esc(de.id) + '" class="px-3 py-1.5 rounded-lg text-sm hover:bg-gray-100"><i class="fa-solid ' + (de.trangThai === 'mo' ? 'fa-lock' : 'fa-lock-open') + ' mr-1"></i>' + (de.trangThai === 'mo' ? 'Đóng đề' : 'Mở đề') + '</button>' +
                     '<button type="button" data-de-link="' + esc(de.id) + '" class="px-3 py-1.5 rounded-lg text-sm hover:bg-gray-100"><i class="fa-solid fa-link mr-1"></i>Sao chép link</button>' +
                     '<a href="' + esc(linkDe(de.id)) + '" target="_blank" rel="noopener" class="px-3 py-1.5 rounded-lg text-sm hover:bg-gray-100"><i class="fa-solid fa-arrow-up-right-from-square mr-1"></i>Mở thử</a>' +
@@ -1294,13 +1524,16 @@
 
         $('nut-tao-de').addEventListener('click', () => moFormDe(null));
         $('ds-de-thi').addEventListener('click', async (e) => {
-            const nut = e.target.closest('button[data-de-ket-qua], button[data-de-sua], button[data-de-trang-thai], button[data-de-link], button[data-de-xoa]');
+            const nutCb = e.target.closest('button[data-cong-bo]');
+            if (nutCb) { doiCongBo(nutCb.getAttribute('data-de'), nutCb.getAttribute('data-cong-bo')); return; }
+            const nut = e.target.closest('button[data-de-ket-qua], button[data-de-sua], button[data-de-chia-diem], button[data-de-trang-thai], button[data-de-link], button[data-de-xoa]');
             if (!nut) return;
-            const id = nut.getAttribute('data-de-ket-qua') || nut.getAttribute('data-de-sua') || nut.getAttribute('data-de-trang-thai') || nut.getAttribute('data-de-link') || nut.getAttribute('data-de-xoa');
+            const id = nut.getAttribute('data-de-ket-qua') || nut.getAttribute('data-de-sua') || nut.getAttribute('data-de-chia-diem') || nut.getAttribute('data-de-trang-thai') || nut.getAttribute('data-de-link') || nut.getAttribute('data-de-xoa');
             const de = (S.deThi || []).find((d) => d.id === id);
             if (!de) return;
             if (nut.hasAttribute('data-de-ket-qua')) xemKetQuaDe(de);
             if (nut.hasAttribute('data-de-sua')) moFormDe(de);
+            if (nut.hasAttribute('data-de-chia-diem')) moChiaDiem(de);
             if (nut.hasAttribute('data-de-link')) {
                 try { await navigator.clipboard.writeText(linkDe(id)); thongBao('Đã sao chép link làm bài'); }
                 catch (err) { prompt('Link làm bài:', linkDe(id)); }
@@ -1432,7 +1665,13 @@
                 '<div><label class="block text-sm font-medium mb-1.5" for="de-trang-thai">Trạng thái</label>' +
                 '<select id="de-trang-thai" class="w-full px-3 py-2.5 rounded-xl border border-gray-200 bg-white text-sm">' +
                 Object.keys(TRANG_THAI_DE).map((k) => '<option value="' + k + '"' + ((de ? de.trangThai : 'nhap') === k ? ' selected' : '') + '>' + TRANG_THAI_DE[k].ten + (k === 'mo' ? ' (học sinh vào làm được)' : '') + '</option>').join('') + '</select></div>' +
-                '<label class="sm:col-span-2 flex items-center gap-2 text-sm"><input id="de-loi-giai" type="checkbox" class="accent-teal-600 w-4 h-4"' + (de && de.hienLoiGiai ? ' checked' : '') + '> Sau khi nộp bài, cho học sinh xem đáp án và lời giải (bỏ chọn: chỉ hiện điểm)</label>' +
+                '<div><label class="block text-sm font-medium mb-1.5" for="de-cong-bo">Công bố cho học sinh</label>' +
+                '<select id="de-cong-bo" class="w-full px-3 py-2.5 rounded-xl border border-gray-200 bg-white text-sm">' +
+                Object.keys(DT.CONG_BO).map((k) => '<option value="' + k + '"' + ((de ? DT.congBoCua(de) : 'an') === k ? ' selected' : '') + '>' + DT.CONG_BO[k].ten + ' — ' + DT.CONG_BO[k].moTa.toLowerCase() + '</option>').join('') + '</select>' +
+                '<p class="text-xs text-gray-500 mt-1">Đổi được bất kỳ lúc nào ngay trên thẻ đề.</p></div>' +
+                '<div><label class="block text-sm font-medium mb-1.5" for="de-vi-pham">Rời bài tối đa (lần)</label>' +
+                '<input id="de-vi-pham" type="number" min="0" max="20" class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-base" value="' + esc(de ? gioiHanCua(de) : 3) + '">' +
+                '<p class="text-xs text-gray-500 mt-1">Chuyển tab, thoát toàn màn hình... đủ số lần này bài tự nộp. Nhập 0: chỉ ghi lại.</p></div>' +
                 '</div>' +
                 '<div class="mt-5"><div class="flex flex-wrap items-center justify-between gap-2 mb-1.5"><span class="text-sm font-medium">Nội dung đề (TeX)</span>' +
                 '<label class="text-sm text-primary font-medium cursor-pointer hover:underline"><i class="fa-solid fa-file-import mr-1"></i>Chọn file .tex<input id="de-file" type="file" accept=".tex,text/x-tex,text/plain" class="sr-only"></label></div>' +
@@ -1448,7 +1687,7 @@
             const hinhCu = new Map();
             if (de && goc && Array.isArray(goc.hinhNguon)) goc.hinhNguon.forEach((ma, i) => { const h = (de.hinh || [])[i]; if (ma && h) hinhCu.set(ma, h); });
 
-            let ban = null;
+            let ban = null, chiaDiem = null, thangDiemForm = de ? de.thangDiem : null;
             const vung = f.querySelector('#de-ket-qua-chuyen');
             const nutLuu = f.querySelector('#de-luu');
 
@@ -1536,9 +1775,16 @@
                     '<p class="text-sm text-gray-500 mt-1">' + (kq.boQua ? 'Bỏ qua ' + kq.boQua + ' câu tự luận (không có \\choice, \\choiceTF hay \\shortans). ' : '') + (kq.hinh.length ? kq.hinh.length + ' hình.' : 'Không có hình.') + '</p>' +
                     (kq.canhBao.length ? '<ul class="mt-2 text-sm text-amber-800 bg-amber-50 rounded-xl px-4 py-2 space-y-1">' + kq.canhBao.map((c) => '<li><i class="fa-solid fa-triangle-exclamation mr-1"></i>' + esc(c) + '</li>').join('') + '</ul>' : '') +
                     '</div>' +
+                    '<h4 class="font-bold text-gray-900 mt-5 mb-1">Chia điểm</h4><p class="text-xs text-gray-500 mb-3">Nhập tổng điểm cho từng loại câu, điểm mỗi câu được chia đều. Đổi lại được bất kỳ lúc nào bằng nút “Chia điểm” trên thẻ đề.</p><div id="de-chia-diem"></div>' +
                     (kq.hinh.length ? '<h4 class="font-bold text-gray-900 mt-5 mb-2">Hình vẽ</h4><p class="text-xs text-gray-500 mb-3">Hình TikZ được vẽ ngay trên trình duyệt (lần đầu mất khoảng 1 phút để tải bộ vẽ). Hình nào không vẽ được thì tải ảnh thay thế.</p><div id="de-ds-hinh" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>' : '') +
                     '<h4 class="font-bold text-gray-900 mt-5 mb-1">Xem trước</h4><div id="de-xem-truoc">' + htmlXemTruoc(kq) + '</div>';
                 DT.veToan(vung.querySelector('#de-xem-truoc'));
+                // Giữ cách chia điểm đang nhập khi bấm chuyển đổi lại (nếu số câu từng loại không đổi)
+                const soCauMoi = DT.soCauTheoLoai(kq.cauHoi);
+                if (chiaDiem && JSON.stringify(soCauMoi) === JSON.stringify(chiaDiem.soCau)) { const r = chiaDiem.lay(); if (r.thangDiem) thangDiemForm = r.thangDiem; }
+                else if (chiaDiem) thangDiemForm = null;
+                chiaDiem = ganChiaDiem(vung.querySelector('#de-chia-diem'), soCauMoi, thangDiemForm);
+                chiaDiem.soCau = soCauMoi;
                 veHinhPanel();
                 for (const h of ban.hinh) if (h.trangThai === 'cho') await veMotHinh(h);
             });
@@ -1550,12 +1796,15 @@
                 if (!tieuDe) { loiEl.textContent = 'Chưa nhập tên đề.'; return; }
                 if (!ban || !ban.kq.cauHoi.length) { loiEl.textContent = 'Chưa có câu hỏi nào: bấm “Chuyển đổi & xem trước” trước.'; return; }
                 if (ban.tex !== f.querySelector('#de-tex').value) { loiEl.textContent = 'Nội dung TeX đã thay đổi sau lần chuyển đổi: bấm “Chuyển đổi & xem trước” lại.'; return; }
+                const cd = chiaDiem ? chiaDiem.lay() : {};
+                if (cd.loi) { loiEl.textContent = 'Chia điểm: ' + cd.loi; return; }
                 const thieu = ban.hinh.filter((h) => h.trangThai === 'loi').length;
                 if (thieu && !confirm('Còn ' + thieu + ' hình chưa có (học sinh sẽ thấy ô “Hình chưa có”). Vẫn lưu?')) return;
                 const deDoc = {
                     tieuDe: tieuDe, moTa: f.querySelector('#de-mo-ta').value.trim(), thoiGian: thoiGian,
-                    trangThai: f.querySelector('#de-trang-thai').value, hienLoiGiai: f.querySelector('#de-loi-giai').checked,
-                    cauHoi: ban.kq.cauHoi, soCau: DT.soCauTheoLoai(ban.kq.cauHoi),
+                    trangThai: f.querySelector('#de-trang-thai').value, congBo: f.querySelector('#de-cong-bo').value,
+                    gioiHanViPham: Math.min(20, Math.max(0, Math.round(Number(f.querySelector('#de-vi-pham').value) || 0))),
+                    cauHoi: ban.kq.cauHoi, soCau: DT.soCauTheoLoai(ban.kq.cauHoi), thangDiem: cd.thangDiem,
                     hinh: ban.hinh.map((h) => ({ svg: h.url ? '' : (h.svg || ''), url: h.url || '', benPhai: !!h.benPhai })),
                     capNhatLuc: FV.serverTimestamp()
                 };
@@ -1564,7 +1813,7 @@
                 nutLuu.disabled = true;
                 try {
                     const ref = de ? db.collection('de_thi').doc(de.id) : db.collection('de_thi').doc();
-                    if (!de) deDoc.taoLuc = FV.serverTimestamp();
+                    if (!de) deDoc.taoLuc = FV.serverTimestamp(); else deDoc.hienLoiGiai = FV.delete();
                     const lo = db.batch();
                     lo.set(ref, deDoc, { merge: !!de });
                     lo.set(db.collection('dap_an').doc(ref.id), { cauHoi: ban.kq.dapAn, texGoc: ban.tex, hinhNguon: ban.hinh.map((h) => h.tikz || '') });
@@ -1593,9 +1842,9 @@
             } catch (err) { f.innerHTML = '<p class="text-red-600">Không tải được kết quả: ' + esc(err.message) + '</p>'; return; }
             if (!ds.length) { f.innerHTML = '<p class="text-gray-500">Chưa có học sinh nào nộp bài.</p>'; return; }
 
-            ds.forEach((b) => { b.kq = DT.chamDiem(de.cauHoi || [], dapAn, b.traLoi); });
-            ds.sort((a, b) => b.kq.thang10 - a.kq.thang10 || (a.thoiGianLam || 0) - (b.thoiGianLam || 0));
-            const diem = ds.map((b) => b.kq.thang10);
+            ds.forEach((b) => { b.kq = DT.chamDiem(de.cauHoi || [], dapAn, b.traLoi, de.thangDiem); });
+            ds.sort((a, b) => b.kq.tong - a.kq.tong || (a.thoiGianLam || 0) - (b.thoiGianLam || 0));
+            const diem = ds.map((b) => b.kq.tong);
             const tb = diem.reduce((s, x) => s + x, 0) / diem.length;
             const so = (x) => (Math.round(x * 100) / 100).toString().replace('.', ',');
             const dem = { mc: 0, tf: 0, sa: 0 };
@@ -1605,6 +1854,7 @@
             }));
 
             f.innerHTML =
+                '<div id="kq-cong-bo" class="mb-4 p-3 rounded-xl bg-teal-50/60 border border-teal-100">' + thanhCongBo(de) + '</div>' +
                 '<div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">' +
                 oSoLieu('Bài nộp', ds.length, '', true) + oSoLieu('Điểm trung bình', so(tb), '', true) +
                 oSoLieu('Cao nhất', so(Math.max(...diem)), '', true) + oSoLieu('Thấp nhất', so(Math.min(...diem)), '', true) + '</div>' +
@@ -1612,18 +1862,23 @@
                 '<div class="flex flex-wrap gap-1.5 mb-6">' + tiLe.map((x) =>
                     '<span class="text-xs font-medium px-2 py-1 rounded-lg ' + (x.pt < 40 ? 'bg-red-50 text-red-700' : x.pt < 70 ? 'bg-amber-50 text-amber-700' : 'bg-emerald-50 text-emerald-700') + '">' + x.nhan + ': ' + x.pt + '%</span>').join('') + '</div>' +
                 '<div class="overflow-x-auto border border-gray-100 rounded-xl"><table class="bang w-full text-sm min-w-[720px]"><thead><tr>' +
-                '<th>#</th><th>Học sinh</th><th class="text-right">Điểm</th><th class="text-right">Phần I</th><th class="text-right">Phần II</th><th class="text-right">Phần III</th><th class="text-right">Thời gian</th><th class="text-right">Rời trang</th><th>Nộp lúc</th><th></th></tr></thead><tbody>' +
+                '<th>#</th><th>Học sinh</th><th class="text-right whitespace-nowrap">Điểm (/' + so(ds[0].kq.toiDa) + ')</th><th class="text-right">Phần I</th><th class="text-right">Phần II</th><th class="text-right">Phần III</th><th class="text-right">Thời gian</th><th class="text-right">Rời trang</th><th>Nộp lúc</th><th></th></tr></thead><tbody>' +
                 ds.map((b, i) => '<tr><td class="text-gray-400 so">' + (i + 1) + '</td><td class="font-medium text-gray-900">' + esc(b.email || b.uid) + '</td>' +
-                    '<td class="text-right so font-bold">' + so(b.kq.thang10) + '</td>' +
+                    '<td class="text-right so font-bold">' + so(b.kq.tong) + '</td>' +
                     '<td class="text-right so">' + b.kq.phan.mc.dung + '/' + b.kq.phan.mc.so + '</td>' +
                     '<td class="text-right so">' + so(b.kq.phan.tf.diem) + '</td>' +
                     '<td class="text-right so">' + b.kq.phan.sa.dung + '/' + b.kq.phan.sa.so + '</td>' +
                     '<td class="text-right so whitespace-nowrap">' + phutGiay((b.thoiGianLam || 0) * 1000) + '</td>' +
                     '<td class="text-right so">' + (b.viPham ? '<span class="text-red-700 font-medium"><i class="fa-solid fa-triangle-exclamation mr-1"></i>' + esc(b.viPham) + '</span>' : '0') + '</td>' +
-                    '<td class="text-gray-500 whitespace-nowrap">' + ngayGio(thanhDate(b.nopLuc)) + '</td>' +
+                    '<td class="text-gray-500 whitespace-nowrap">' + ngayGio(thanhDate(b.nopLuc)) +
+                    (b.lyDoNop === 'vi-pham' ? '<span class="block text-xs text-red-600 font-medium">Tự nộp do rời bài</span>' : b.lyDoNop === 'het-gio' ? '<span class="block text-xs text-amber-700">Tự nộp khi hết giờ</span>' : '') + '</td>' +
                     '<td><button type="button" data-lam-lai="' + esc(b.id) + '" class="text-xs text-gray-500 hover:text-red-600 whitespace-nowrap" title="Xóa bài này để học sinh làm lại"><i class="fa-solid fa-rotate-left mr-1"></i>Cho làm lại</button></td></tr>').join('') +
                 '</tbody></table></div>';
 
+            f.querySelector('#kq-cong-bo').addEventListener('click', async (e) => {
+                const n = e.target.closest('button[data-cong-bo]');
+                if (n && await doiCongBo(de.id, n.getAttribute('data-cong-bo'))) f.querySelector('#kq-cong-bo').innerHTML = thanhCongBo((S.deThi || []).find((d) => d.id === de.id) || de);
+            });
             f.querySelectorAll('[data-lam-lai]').forEach((n) => n.addEventListener('click', async () => {
                 const b = ds.find((x) => x.id === n.getAttribute('data-lam-lai'));
                 if (!confirm('Xóa bài làm của ' + (b.email || b.uid) + ' để học sinh làm lại đề này?')) return;

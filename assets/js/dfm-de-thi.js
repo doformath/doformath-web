@@ -272,7 +272,6 @@ window.dfmDeThi = (function () {
     // ---------- Chấm điểm (thang THPT 2025) ----------
     // Phần I: 0,25 điểm/câu. Phần II: mỗi câu tối đa 1 điểm — đúng 1 ý 0,1; 2 ý 0,25; 3 ý 0,5; 4 ý 1.
     // Phần III: 0,5 điểm/câu. Điểm quy về thang 10 theo tỉ lệ (đề đủ 12 + 4 + 6 câu thì đúng bằng thang 10).
-    const DIEM_DS = [0, 0.1, 0.25, 0.5, 1];
 
     function soChuan(x) {
         if (x === null || x === undefined) return null;
@@ -287,32 +286,58 @@ window.dfmDeThi = (function () {
         return String(traLoi).trim().toLowerCase() === String(dapAn).trim().toLowerCase();
     }
 
-    function chamDiem(cauHoi, dapAn, traLoi) {
+    // ----- Chia điểm (Admin chỉnh cho từng đề) -----
+    // thangDiem = { mc, tf, sa: tổng điểm của mỗi loại câu (chia đều cho các câu cùng loại),
+    //               ds: [% điểm khi đúng 1, 2, 3, 4 ý] của câu đúng/sai }
+    // Đề chưa chia điểm dùng mặc định THPT 2025: 0,25 / 1 / 0,5 điểm mỗi câu; đúng/sai 10-25-50-100%.
+    const DIEM_CAU_THPT = { mc: 0.25, tf: 1, sa: 0.5 };
+    const DS_THPT = [10, 25, 50, 100];
+    const lamTron = function (x, n) { const k = Math.pow(10, n == null ? 2 : n); return Math.round((x || 0) * k) / k; };
+    function chuanThangDiem(td, soCau) {
+        td = td || {};
+        const tong = {}, moiCau = {};
+        ['mc', 'tf', 'sa'].forEach(function (l) {
+            const n = soCau[l] || 0;
+            const v = Number(td[l]);
+            tong[l] = n ? (Number.isFinite(v) && v >= 0 ? v : lamTron(DIEM_CAU_THPT[l] * n, 4)) : 0;
+            moiCau[l] = n ? tong[l] / n : 0;
+        });
+        const ds = Array.isArray(td.ds) && td.ds.length === 4 && td.ds.every(function (x) { return Number.isFinite(Number(x)); })
+            ? td.ds.map(Number) : DS_THPT.slice();
+        return { tong: tong, moiCau: moiCau, ds: ds, toiDa: lamTron(tong.mc + tong.tf + tong.sa, 4) };
+    }
+    // Số kiểu Việt Nam: 0,25 ; tối đa n chữ số thập phân
+    function dinhDangSo(x, n) { return lamTron(x, n == null ? 2 : n).toString().replace('.', ','); }
+
+    function chamDiem(cauHoi, dapAn, traLoi, thangDiem) {
         traLoi = traLoi || {};
-        const kq = { tong: 0, toiDa: 0, chiTiet: {}, phan: { mc: { dung: 0, so: 0 }, tf: { dung: 0, so: 0, diem: 0 }, sa: { dung: 0, so: 0 } } };
+        const td = chuanThangDiem(thangDiem, soCauTheoLoai(cauHoi));
+        const kq = { tong: 0, toiDa: td.toiDa, chiTiet: {}, phan: {} };
+        ['mc', 'tf', 'sa'].forEach(function (l) { kq.phan[l] = { dung: 0, so: 0, diem: 0, toiDa: td.tong[l] }; });
         cauHoi.forEach(function (q) {
             const da = (dapAn[q.id] || {}).dung;
             const tl = traLoi[q.id];
-            let diem = 0, toiDa = 0, dung = false, soYDung = 0;
+            const toiDa = td.moiCau[q.loai] || 0;
+            let diem = 0, dung = false, soYDung = 0, soY = 0;
             if (q.loai === 'mc') {
-                toiDa = 0.25; dung = !!tl && tl === da; diem = dung ? toiDa : 0;
+                dung = !!tl && tl === da; diem = dung ? toiDa : 0;
             } else if (q.loai === 'tf') {
-                toiDa = 1;
-                const n = (da || []).length;
+                soY = (da || []).length;
                 soYDung = (da || []).filter(function (v, i) { return Array.isArray(tl) && tl[i] === v; }).length;
-                diem = n === 4 ? DIEM_DS[soYDung] : (n ? soYDung / n : 0);
-                dung = n > 0 && soYDung === n;
-                kq.phan.tf.diem += diem;
+                diem = soY === 4 ? (soYDung ? toiDa * td.ds[soYDung - 1] / 100 : 0) : (soY ? toiDa * soYDung / soY : 0);
+                dung = soY > 0 && soYDung === soY;
             } else {
-                toiDa = 0.5; dung = tlnDung(tl, da); diem = dung ? toiDa : 0;
+                dung = tlnDung(tl, da); diem = dung ? toiDa : 0;
             }
             kq.phan[q.loai].so++;
+            kq.phan[q.loai].diem += diem;
             if (dung) kq.phan[q.loai].dung++;
-            kq.tong += diem; kq.toiDa += toiDa;
-            kq.chiTiet[q.id] = { diem: diem, toiDa: toiDa, dung: dung, soYDung: soYDung };
+            kq.tong += diem;
+            kq.chiTiet[q.id] = { diem: diem, toiDa: toiDa, dung: dung, soYDung: soYDung, soY: soY };
         });
-        kq.tong = Math.round(kq.tong * 100) / 100;
-        kq.thang10 = kq.toiDa ? Math.round(kq.tong / kq.toiDa * 1000) / 100 : 0;
+        ['mc', 'tf', 'sa'].forEach(function (l) { kq.phan[l].diem = lamTron(kq.phan[l].diem, 4); });
+        kq.tong = lamTron(kq.tong, 2);
+        kq.thang10 = kq.toiDa ? lamTron(kq.tong / kq.toiDa * 10, 2) : 0;
         return kq;
     }
 
@@ -322,7 +347,24 @@ window.dfmDeThi = (function () {
         return d;
     }
 
+    // Mức công bố kết quả cho học sinh (Admin đổi được bất kỳ lúc nào):
+    // 'an' = chưa công bố, 'diem' = chỉ điểm, 'chi-tiet' = điểm + đúng/sai từng câu (không hiện đáp án),
+    // 'day-du' = điểm + đáp án + lời giải.
+    // Đề tạo trước khi có tuỳ chọn này dùng cờ cũ hienLoiGiai.
+    const CONG_BO = {
+        an: { ten: 'Chưa công bố', moTa: 'Học sinh chỉ thấy “đã nộp bài”', icon: 'fa-eye-slash' },
+        diem: { ten: 'Chỉ điểm', moTa: 'Học sinh xem được điểm', icon: 'fa-star-half-stroke' },
+        'chi-tiet': { ten: 'Đúng/sai từng câu', moTa: 'Học sinh xem điểm và biết câu nào đúng, câu nào sai (chưa hiện đáp án)', icon: 'fa-list-check' },
+        'day-du': { ten: 'Điểm + đáp án', moTa: 'Học sinh xem điểm, đáp án và lời giải', icon: 'fa-lightbulb' }
+    };
+    function congBoCua(de) {
+        if (de && CONG_BO[de.congBo]) return de.congBo;
+        return de && de.hienLoiGiai ? 'day-du' : 'diem';
+    }
+
     return {
+        congBoCua: congBoCua, CONG_BO: CONG_BO,
+        chuanThangDiem: chuanThangDiem, dinhDangSo: dinhDangSo, lamTron: lamTron, DIEM_CAU_THPT: DIEM_CAU_THPT, DS_THPT: DS_THPT,
         phanTich: phanTich, texSangHtml: texSangHtml, chamDiem: chamDiem, tlnDung: tlnDung, soChuan: soChuan,
         veToan: veToan, ganHinh: ganHinh, soCauTheoLoai: soCauTheoLoai, MACRO: MACRO,
         TEN_LOAI: { mc: 'Trắc nghiệm', tf: 'Đúng/Sai', sa: 'Trả lời ngắn' },

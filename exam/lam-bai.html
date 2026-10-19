@@ -9,7 +9,7 @@
     <!-- Giao diện sáng / tối: chạy trước CSS để không bị nháy màu -->
     <script src="../assets/js/dfm-giao-dien.js"></script>
     <!-- CSS Tailwind dựng sẵn cho cả site (sửa class xong chạy: npm run build:css) -->
-    <link rel="stylesheet" href="../assets/css/tailwind.css?v=08097a6e">
+    <link rel="stylesheet" href="../assets/css/tailwind.css?v=a5530322">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
@@ -42,9 +42,11 @@
     <!-- HEADER DOFORMATH -->
     <header class="fixed top-0 right-0 left-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200/60 h-14 shadow-sm">
         <div class="flex items-center justify-between h-full px-4 lg:px-6 max-w-7xl mx-auto">
-            <a href="../phong-thi.html" class="flex items-center text-gray-500 hover:text-primary font-medium gap-2 transition">
+            <a x-show="phase !== 'playing'" href="../phong-thi.html" class="flex items-center text-gray-500 hover:text-primary font-medium gap-2 transition">
                 <i class="fa-solid fa-arrow-left"></i> Thoát
             </a>
+            <!-- Đang làm bài thì không có lối thoát nào trên giao diện -->
+            <span x-show="phase === 'playing'" x-cloak class="flex items-center gap-1.5 text-xs font-bold text-red-500"><i class="fa-solid fa-lock"></i> Đang thi</span>
             <a href="../index.html" class="hover:opacity-80 transition-opacity">
                 <span class="text-xl tracking-tight text-slate-900 font-bold">
                     $\textcolor{#0d9488}{\textsf{\textbf{Dofor}}{\sum}\textsf{\textbf{ath}}}$
@@ -102,7 +104,7 @@
                     </div>
                     <div class="flex flex-col items-center py-5 gap-1">
                         <i class="fa-solid fa-trophy text-blue-500 text-xl"></i>
-                        <span class="text-2xl font-extrabold text-slate-800">10</span>
+                        <span class="text-2xl font-extrabold text-slate-800" x-text="dinhDangDiem(thang.toiDa)"></span>
                         <span class="text-xs text-slate-500">Thang điểm</span>
                     </div>
                 </div>
@@ -123,8 +125,13 @@
                     <ul class="mt-4 text-sm text-slate-500 space-y-1.5">
                         <li><i class="fa-solid fa-circle-info text-teal-500 mr-1.5"></i>Mỗi học sinh chỉ được nộp bài <b class="text-slate-700">một lần</b>. Hết giờ bài sẽ tự nộp.</li>
                         <li><i class="fa-solid fa-floppy-disk text-teal-500 mr-1.5"></i>Bài làm được lưu tạm trên máy: lỡ tải lại trang vẫn làm tiếp được, đồng hồ vẫn chạy.</li>
-                        <li><i class="fa-solid fa-eye text-teal-500 mr-1.5"></i>Số lần rời khỏi trang trong lúc làm bài sẽ được ghi lại.</li>
+                        <li><i class="fa-solid fa-expand text-teal-500 mr-1.5"></i>Bài làm ở chế độ toàn màn hình. <b class="text-slate-700">Không được</b> chuyển tab, mở ứng dụng khác, tải lại trang hay thoát toàn màn hình.</li>
+                        <li x-show="gioiHanViPham"><i class="fa-solid fa-triangle-exclamation text-red-500 mr-1.5"></i>Mỗi lần rời bài là một lần vi phạm; vi phạm đủ <b class="text-red-600" x-text="gioiHanViPham"></b> lần bài sẽ <b class="text-red-600">tự động nộp</b>.</li>
+                        <li x-show="!gioiHanViPham"><i class="fa-solid fa-eye text-teal-500 mr-1.5"></i>Số lần rời khỏi bài làm sẽ được ghi lại và gửi cho thầy.</li>
                     </ul>
+                    <div x-show="coBaiDangLam && viPham" class="mt-4 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm font-medium">
+                        <i class="fa-solid fa-triangle-exclamation mr-1"></i>Bạn đã rời khỏi bài làm <b x-text="viPham"></b><span x-show="gioiHanViPham">/<span x-text="gioiHanViPham"></span></span> lần.
+                    </div>
                 </div>
 
                 <div class="px-4 sm:px-8 pb-6 sm:pb-8 flex flex-col gap-3">
@@ -139,13 +146,6 @@
         <!-- MÀN HÌNH 2: GIAO DIỆN THI (PLAYING)        -->
         <!-- ========================================== -->
         <div class="max-w-6xl mx-auto px-3 sm:px-4 py-4 sm:py-8" x-show="phase === 'playing'" x-cloak x-transition>
-
-            <!-- Cảnh báo rời trang -->
-            <div x-show="canhBaoRoiTrang" x-transition class="mb-3 bg-amber-50 border border-amber-200 text-amber-800 rounded-2xl px-4 py-2.5 text-sm flex items-center gap-2">
-                <i class="fa-solid fa-triangle-exclamation"></i>
-                <span>Bạn vừa rời khỏi trang làm bài (<b x-text="viPham"></b> lần). Số lần này sẽ được ghi vào kết quả.</span>
-                <button @click="canhBaoRoiTrang = false" class="ml-auto text-amber-700"><i class="fa-solid fa-xmark"></i></button>
-            </div>
 
             <!-- THANH TOP BAR (ĐỒNG HỒ) -->
             <div class="mb-4 sm:mb-6 space-y-2 relative z-20">
@@ -241,7 +241,7 @@
                                                 <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full"
                                                       :class="{'text-blue-500 bg-blue-50': q.loai === 'mc', 'text-violet-500 bg-violet-50': q.loai === 'tf', 'text-amber-500 bg-amber-50': q.loai === 'sa'}"
                                                       x-text="q.loai === 'mc' ? 'Trắc nghiệm' : q.loai === 'tf' ? 'Đúng/Sai' : 'Điền số'"></span>
-                                                <span class="text-[11px] text-slate-400" x-text="q.loai === 'mc' ? '0,25 điểm' : q.loai === 'tf' ? 'Tối đa 1 điểm' : '0,5 điểm'"></span>
+                                                <span class="text-[11px] text-slate-400" x-text="(q.loai === 'tf' ? 'Tối đa ' : '') + D.dinhDangSo(thang.moiCau[q.loai], 3) + ' điểm'"></span>
                                             </div>
                                             <div class="dfm-noi-dung text-sm font-normal text-slate-800 leading-relaxed max-w-none" x-html="q.noiDung"></div>
                                         </div>
@@ -445,43 +445,86 @@
         <!-- ========================================== -->
         <div x-show="phase === 'result'" x-transition x-cloak class="max-w-3xl mx-auto px-4 py-8">
             <div class="bg-white rounded-3xl p-6 sm:p-10 shadow-sm border border-slate-200 text-center">
-                <i class="fa-solid fa-trophy text-5xl text-amber-400 mb-3"></i>
+                <i class="fa-solid text-5xl mb-3" :class="coDiem ? 'fa-trophy text-amber-400' : 'fa-circle-check text-teal-500'"></i>
                 <h2 class="text-2xl sm:text-3xl font-black text-slate-800 mb-1" x-text="daNopTruoc ? 'Bạn đã làm đề này' : 'Đã nộp bài thành công!'"></h2>
                 <p class="text-slate-500 font-medium mb-6" x-text="quiz.title"></p>
 
-                <div class="bg-teal-50 border border-teal-100 rounded-2xl p-6 text-teal-800">
-                    <p class="text-sm font-bold uppercase tracking-widest text-teal-600 mb-1">Điểm của bạn</p>
-                    <p class="text-5xl font-black"><span x-text="dinhDangDiem(ketQua.thang10)"></span><span class="text-xl text-teal-500"> / 10</span></p>
-                    <p class="text-sm text-teal-700 mt-2" x-show="ketQua.toiDa && ketQua.toiDa !== 10">Điểm thô: <span x-text="dinhDangDiem(ketQua.tong)"></span> / <span x-text="dinhDangDiem(ketQua.toiDa)"></span> (quy về thang 10)</p>
+                <!-- Chưa công bố: chỉ báo đã nộp, trang tự cập nhật khi thầy công bố -->
+                <div x-show="!coDiem" class="bg-slate-50 border border-slate-200 rounded-2xl p-6 text-slate-600">
+                    <i class="fa-solid fa-hourglass-half text-3xl text-teal-500 mb-3"></i>
+                    <p class="font-bold text-slate-800">Thầy chưa công bố điểm</p>
+                    <p class="text-sm mt-1">Khi thầy công bố, điểm sẽ tự hiện ngay trên trang này, không cần tải lại. Bạn cũng có thể xem lại sau trong Phòng thi.</p>
                 </div>
 
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4 text-left">
-                    <div x-show="sectionI.length" class="bg-blue-50 rounded-xl p-3"><p class="text-xs text-blue-600 font-semibold">Phần I</p><p class="font-black text-blue-800"><span x-text="ketQua.phan ? ketQua.phan.mc.dung : 0"></span>/<span x-text="sectionI.length"></span> câu đúng</p></div>
-                    <div x-show="sectionII.length" class="bg-violet-50 rounded-xl p-3"><p class="text-xs text-violet-600 font-semibold">Phần II</p><p class="font-black text-violet-800"><span x-text="ketQua.phan ? dinhDangDiem(ketQua.phan.tf.diem) : 0"></span>/<span x-text="sectionII.length"></span> điểm</p></div>
-                    <div x-show="sectionIII.length" class="bg-amber-50 rounded-xl p-3"><p class="text-xs text-amber-600 font-semibold">Phần III</p><p class="font-black text-amber-800"><span x-text="ketQua.phan ? ketQua.phan.sa.dung : 0"></span>/<span x-text="sectionIII.length"></span> câu đúng</p></div>
+                <div x-show="coDiem">
+                    <div class="bg-teal-50 border border-teal-100 rounded-2xl p-6 text-teal-800" :class="vuaCongBo ? 'ring-4 ring-teal-300/60' : ''">
+                        <p class="text-sm font-bold uppercase tracking-widest text-teal-600 mb-1">Điểm của bạn</p>
+                        <p class="text-5xl font-black"><span x-text="dinhDangDiem(ketQua.tong)"></span><span class="text-xl text-teal-500" x-text="' / ' + dinhDangDiem(ketQua.toiDa)"></span></p>
+                        <p class="text-sm text-teal-700 mt-2" x-show="ketQua.toiDa && Math.abs(ketQua.toiDa - 10) > 0.001">Quy về thang 10: <b x-text="dinhDangDiem(ketQua.thang10)"></b></p>
+                    </div>
+                    <div class="grid grid-cols-3 gap-3 mt-4 text-left">
+                        <template x-for="p in [['mc', 'I', 'blue'], ['tf', 'II', 'violet'], ['sa', 'III', 'amber']]" :key="p[0]">
+                            <div x-show="ketQua.phan && ketQua.phan[p[0]].so" class="rounded-xl p-3" :class="{ blue: 'bg-blue-50', violet: 'bg-violet-50', amber: 'bg-amber-50' }[p[2]]">
+                                <p class="text-xs font-semibold" :class="{ blue: 'text-blue-600', violet: 'text-violet-600', amber: 'text-amber-600' }[p[2]]" x-text="'Phần ' + p[1]"></p>
+                                <p class="font-black" :class="{ blue: 'text-blue-800', violet: 'text-violet-800', amber: 'text-amber-800' }[p[2]]" x-text="ketQua.phan ? dinhDangDiem(ketQua.phan[p[0]].diem) + ' / ' + dinhDangDiem(ketQua.phan[p[0]].toiDa) + ' điểm' : ''"></p>
+                                <p class="text-xs text-slate-500 mt-0.5" x-text="ketQua.phan ? (p[0] === 'tf' ? 'Đúng hết ' : 'Đúng ') + ketQua.phan[p[0]].dung + '/' + ketQua.phan[p[0]].so + ' câu' : ''"></p>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3 mt-3 text-left">
                     <div class="bg-slate-50 rounded-xl p-3"><p class="text-xs text-slate-500 font-semibold">Thời gian làm</p><p class="font-black text-slate-800" x-text="thoiGianLamStr"></p></div>
+                    <div class="rounded-xl p-3" :class="viPham ? 'bg-red-50' : 'bg-emerald-50'"><p class="text-xs font-semibold" :class="viPham ? 'text-red-500' : 'text-emerald-600'">Rời bài</p><p class="font-black" :class="viPham ? 'text-red-600' : 'text-emerald-700'" x-text="viPham ? viPham + ' lần' : 'Không lần nào'"></p></div>
                 </div>
+                <p x-show="lyDoNop === 'vi-pham'" class="mt-3 text-sm font-semibold text-red-600"><i class="fa-solid fa-ban mr-1"></i>Bài đã bị tự động nộp do rời bài quá số lần cho phép.</p>
+                <p x-show="lyDoNop === 'het-gio'" class="mt-3 text-sm font-semibold text-amber-600"><i class="fa-regular fa-clock mr-1"></i>Bài được tự động nộp khi hết giờ.</p>
 
-                <p x-show="!quiz.hienLoiGiai" class="mt-6 text-sm text-slate-500"><i class="fa-solid fa-lock mr-1"></i>Đề này không hiển thị đáp án và lời giải sau khi nộp.</p>
+                <p x-show="coDiem && congBo === 'diem'" class="mt-6 text-sm text-slate-500"><i class="fa-solid fa-lock mr-1"></i>Chi tiết từng câu, đáp án và lời giải sẽ hiện tại đây khi thầy công bố.</p>
 
                 <div class="mt-8 flex flex-wrap justify-center gap-3">
                     <a href="../phong-thi.html" class="px-8 py-3 rounded-full bg-slate-800 text-white font-bold hover:bg-slate-700 transition-colors shadow-md">Trở về Phòng thi</a>
                 </div>
             </div>
 
-            <!-- XEM LẠI TỪNG CÂU (nếu đề cho phép) -->
-            <div x-show="quiz.hienLoiGiai" id="xem-lai" class="mt-8 space-y-4">
-                <h3 class="text-lg font-black text-slate-800">Xem lại bài làm</h3>
+            <!-- XEM LẠI TỪNG CÂU: mức 'chi-tiet' chỉ cho biết câu đúng/sai; mức 'day-du' hiện thêm đáp án + lời giải -->
+            <div x-show="coDiem && (congBo === 'chi-tiet' || congBo === 'day-du')" id="xem-lai" class="mt-8 space-y-4">
+                <div class="flex flex-wrap items-end justify-between gap-2">
+                    <h3 class="text-lg font-black text-slate-800">Xem lại bài làm</h3>
+                    <p x-show="!hienDapAn" class="text-xs text-slate-500"><i class="fa-solid fa-lock mr-1"></i>Thầy chưa công bố đáp án, chỉ cho biết câu nào đúng, câu nào sai.</p>
+                </div>
+
+                <!-- Bảng đúng/sai từng câu -->
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 sm:p-5">
+                    <div class="flex flex-wrap gap-x-4 gap-y-1 text-xs font-semibold">
+                        <template x-for="t in ['dung', 'mot-phan', 'sai', 'trong']" :key="t">
+                            <span x-show="demTrangThai[t]" class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded" :class="TT[t].o"></span><span class="text-slate-600" x-text="TT[t].ten + ': ' + demTrangThai[t]"></span></span>
+                        </template>
+                    </div>
+                    <template x-for="sec in cacPhan" :key="'tt-' + sec">
+                        <div class="mt-4">
+                            <p class="text-xs font-bold text-slate-500 mb-2" x-text="'Phần ' + sec"></p>
+                            <div class="flex flex-wrap gap-1.5">
+                                <template x-for="q in questions.filter((x) => x.phan === sec)" :key="'o-' + q.id">
+                                    <button type="button" @click="scrollToId('xl-' + q.id)" :title="TT[trangThaiCau(q)].ten"
+                                            class="w-11 h-11 rounded-xl flex flex-col items-center justify-center text-xs font-black transition hover:scale-105" :class="TT[trangThaiCau(q)].o">
+                                        <span x-text="q.so"></span><i class="fa-solid text-[9px]" :class="TT[trangThaiCau(q)].icon"></i>
+                                    </button>
+                                </template>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+
                 <template x-for="q in questions" :key="'xl-' + q.id">
-                    <div class="bg-white rounded-2xl border shadow-sm overflow-hidden" :class="(ketQua.chiTiet && ketQua.chiTiet[q.id] && ketQua.chiTiet[q.id].dung) ? 'border-emerald-200' : 'border-red-200'">
+                    <div :id="'xl-' + q.id" class="bg-white rounded-2xl border shadow-sm overflow-hidden scroll-mt-20" :class="TT[trangThaiCau(q)].vien">
                         <div class="flex items-start gap-3 px-5 pt-5 pb-3">
-                            <span class="flex-shrink-0 w-7 h-7 rounded-full text-xs font-extrabold flex items-center justify-center text-white"
-                                  :class="(ketQua.chiTiet && ketQua.chiTiet[q.id] && ketQua.chiTiet[q.id].dung) ? 'bg-emerald-500' : 'bg-red-500'" x-text="q.so"></span>
+                            <span class="flex-shrink-0 w-7 h-7 rounded-full text-xs font-extrabold flex items-center justify-center" :class="TT[trangThaiCau(q)].o" x-text="q.so"></span>
                             <div class="flex-1 min-w-0">
                                 <div class="flex flex-wrap items-center gap-2 mb-2">
                                     <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-500" x-text="'Phần ' + q.phan"></span>
-                                    <span class="text-[11px] font-bold" :class="(ketQua.chiTiet && ketQua.chiTiet[q.id] && ketQua.chiTiet[q.id].diem > 0) ? 'text-emerald-600' : 'text-red-500'"
-                                          x-text="ketQua.chiTiet && ketQua.chiTiet[q.id] ? dinhDangDiem(ketQua.chiTiet[q.id].diem) + ' / ' + dinhDangDiem(ketQua.chiTiet[q.id].toiDa) + ' điểm' : ''"></span>
+                                    <span class="text-[11px] font-bold px-2 py-0.5 rounded-full" :class="TT[trangThaiCau(q)].nhan" x-text="TT[trangThaiCau(q)].ten + (q.loai === 'tf' && ketQua.chiTiet && ketQua.chiTiet[q.id] ? ' (' + ketQua.chiTiet[q.id].soYDung + '/' + ketQua.chiTiet[q.id].soY + ' ý)' : '')"></span>
+                                    <span class="text-[11px] font-bold text-slate-500" x-text="ketQua.chiTiet && ketQua.chiTiet[q.id] ? dinhDangDiem(ketQua.chiTiet[q.id].diem) + ' / ' + D.dinhDangSo(ketQua.chiTiet[q.id].toiDa, 3) + ' điểm' : ''"></span>
                                 </div>
                                 <div class="dfm-noi-dung text-sm text-slate-800" x-html="q.noiDung"></div>
                             </div>
@@ -490,10 +533,8 @@
                             <template x-if="q.loai === 'mc'">
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                     <template x-for="opt in q.luaChon" :key="opt.key">
-                                        <div class="flex items-center gap-3 px-4 py-2.5 rounded-xl border text-sm"
-                                             :class="dungCua(q) === opt.key ? 'border-emerald-400 bg-emerald-50' : (getAnswer(q.id) === opt.key ? 'border-red-300 bg-red-50' : 'border-slate-200')">
-                                            <span class="w-6 h-6 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-extrabold"
-                                                  :class="dungCua(q) === opt.key ? 'bg-emerald-500 text-white' : (getAnswer(q.id) === opt.key ? 'bg-red-500 text-white' : 'bg-slate-100 text-slate-500')" x-text="opt.key"></span>
+                                        <div class="flex items-center gap-3 px-4 py-2.5 rounded-xl border text-sm" :class="lopLuaChon(q, opt.key)[0]">
+                                            <span class="w-6 h-6 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-extrabold" :class="lopLuaChon(q, opt.key)[1]" x-text="opt.key"></span>
                                             <span class="dfm-noi-dung min-w-0" x-html="opt.html"></span>
                                             <i x-show="getAnswer(q.id) === opt.key" class="fa-solid fa-user ml-auto text-xs text-slate-400" title="Bạn chọn"></i>
                                         </div>
@@ -505,20 +546,22 @@
                                     <template x-for="(opt, i) in q.luaChon" :key="opt.key">
                                         <div class="flex items-center gap-2 text-sm py-1 border-b border-slate-100">
                                             <span class="flex-1 min-w-0"><b class="text-slate-500" x-text="opt.key + ')'"></b> <span class="dfm-noi-dung" x-html="opt.html"></span></span>
-                                            <span class="w-20 text-center text-xs font-bold rounded-md py-1" :class="tfGet(q.id, i) === null ? 'text-slate-400' : (tfGet(q.id, i) === (dungCua(q) || [])[i] ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-600')"
+                                            <!-- Chưa công bố đáp án: không tô màu từng ý (tô màu là lộ đáp án) -->
+                                            <span class="w-20 text-center text-xs font-bold rounded-md py-1"
+                                                  :class="tfGet(q.id, i) === null ? 'text-slate-400' : (!hienDapAn ? 'bg-slate-100 text-slate-600' : (tfGet(q.id, i) === (dungCua(q) || [])[i] ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-600'))"
                                                   x-text="tfGet(q.id, i) === null ? 'Bỏ trống' : (tfGet(q.id, i) ? 'Bạn: Đúng' : 'Bạn: Sai')"></span>
-                                            <span class="w-20 text-center text-xs font-bold text-emerald-700" x-text="'Đáp án: ' + ((dungCua(q) || [])[i] ? 'Đ' : 'S')"></span>
+                                            <span x-show="hienDapAn" class="w-20 text-center text-xs font-bold text-emerald-700" x-text="'Đáp án: ' + ((dungCua(q) || [])[i] ? 'Đ' : 'S')"></span>
                                         </div>
                                     </template>
                                 </div>
                             </template>
                             <template x-if="q.loai === 'sa'">
                                 <div class="flex flex-wrap gap-3 text-sm">
-                                    <span class="px-3 py-1.5 rounded-lg" :class="(ketQua.chiTiet && ketQua.chiTiet[q.id] && ketQua.chiTiet[q.id].dung) ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-600'">Bạn trả lời: <b x-text="getAnswer(q.id) || '(bỏ trống)'"></b></span>
-                                    <span class="px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700">Đáp án: <b x-text="dungCua(q)"></b></span>
+                                    <span class="px-3 py-1.5 rounded-lg" :class="{ dung: 'bg-emerald-50 text-emerald-700', sai: 'bg-red-50 text-red-600' }[trangThaiCau(q)] || 'bg-slate-100 text-slate-500'">Bạn trả lời: <b x-text="getAnswer(q.id) || '(bỏ trống)'"></b></span>
+                                    <span x-show="hienDapAn" class="px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700">Đáp án: <b x-text="dungCua(q)"></b></span>
                                 </div>
                             </template>
-                            <details x-show="loiGiaiCua(q)" class="mt-3 bg-slate-50 rounded-xl px-4 py-3">
+                            <details x-show="hienDapAn && loiGiaiCua(q)" class="mt-3 bg-slate-50 rounded-xl px-4 py-3">
                                 <summary class="cursor-pointer text-sm font-bold text-teal-700"><i class="fa-solid fa-lightbulb mr-1"></i>Lời giải</summary>
                                 <div class="dfm-noi-dung text-sm text-slate-700 mt-2" x-html="loiGiaiCua(q)"></div>
                             </details>
@@ -528,6 +571,21 @@
             </div>
         </div>
     </main>
+
+    <!-- HỘP THÔNG BÁO: cảnh báo vi phạm / xác nhận nộp / hết giờ (không dùng confirm/alert của trình duyệt vì chúng làm thoát toàn màn hình) -->
+    <div x-show="hop.hien" x-cloak class="fixed inset-0 z-[100] flex items-center justify-center bg-gray-900/80 backdrop-blur-sm px-4">
+        <div class="bg-white rounded-3xl p-6 md:p-8 max-w-md w-full shadow-2xl text-center">
+            <div class="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-5" :class="hop.mau === 'do' ? 'bg-red-100' : 'bg-teal-100'">
+                <i class="fa-solid text-4xl" :class="[hop.icon, hop.mau === 'do' ? 'text-red-500' : 'text-teal-600']"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-2" x-text="hop.tieuDe"></h3>
+            <p class="text-gray-600 mb-6" x-text="hop.noiDung"></p>
+            <div class="flex flex-col-reverse sm:flex-row gap-2">
+                <button x-show="hop.nutPhu" type="button" @click="dongHop(false)" class="flex-1 py-3 rounded-xl border border-slate-200 text-slate-600 font-bold hover:bg-slate-50 transition-all" x-text="hop.nutPhu"></button>
+                <button type="button" @click="dongHop(true)" class="flex-1 py-3 rounded-xl text-white font-bold shadow-md transition-all" :class="hop.mau === 'do' ? 'bg-red-500 hover:bg-red-600' : 'bg-teal-600 hover:bg-teal-700'" x-text="hop.nut"></button>
+            </div>
+        </div>
+    </div>
 
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -551,16 +609,24 @@
                 phase: 'dang-tai', loi: '',
                 deId: new URLSearchParams(location.search).get('de') || '',
                 user: null,
-                quiz: { title: '', description: '', time_limit: 0, hienLoiGiai: false },
+                quiz: { title: '', description: '', time_limit: 0 },
+                congBo: 'an', gioiHanViPham: 3, thangDiem: null, D: D,
+                TT: {
+                    dung: { ten: 'Đúng', icon: 'fa-check', o: 'bg-emerald-500 text-white', vien: 'border-emerald-200', nhan: 'bg-emerald-50 text-emerald-700' },
+                    'mot-phan': { ten: 'Đúng một phần', icon: 'fa-circle-half-stroke', o: 'bg-amber-400 text-white', vien: 'border-amber-200', nhan: 'bg-amber-50 text-amber-700' },
+                    sai: { ten: 'Sai', icon: 'fa-xmark', o: 'bg-red-500 text-white', vien: 'border-red-200', nhan: 'bg-red-50 text-red-600' },
+                    trong: { ten: 'Bỏ trống', icon: 'fa-minus', o: 'bg-slate-200 text-slate-500', vien: 'border-slate-200', nhan: 'bg-slate-100 text-slate-500' }
+                },
                 questions: [], hinh: [],
                 tenPhan: { mc: 'Trắc nghiệm nhiều phương án lựa chọn', tf: 'Trắc nghiệm đúng sai', sa: 'Trắc nghiệm trả lời ngắn' },
                 activeSection: 'I', openFill: null,
                 clockDisplayMode: 'countdown_timeline', analogClockFace: 'analog',
                 realClockStr: '--:--:--', analogHourDeg: 0, analogMinDeg: 0, analogSecDeg: 0,
                 timeLeft: 0, timer: null,
-                answers: {}, batDau: 0, viPham: 0, canhBaoRoiTrang: false,
-                coBaiDangLam: false, dangNop: false, daNopTruoc: false,
-                dapAn: {}, ketQua: {}, thoiGianLamStr: '',
+                answers: {}, batDau: 0, viPham: 0, mocViPham: 0, lyDoNop: '',
+                coBaiDangLam: false, dangNop: false, loiNop: false, daNopTruoc: false,
+                hop: { hien: false, tieuDe: '', noiDung: '', nut: '', nutPhu: '', mau: 'do', icon: '', khiDong: null },
+                dapAn: {}, daCoDapAn: false, ketQua: {}, thoiGianLamStr: '', vuaCongBo: false, huyNghe: null,
 
                 get sectionI() { return this.questions.filter((q) => q.loai === 'mc'); },
                 get sectionII() { return this.questions.filter((q) => q.loai === 'tf'); },
@@ -583,6 +649,16 @@
                     return tong ? Math.min(100, ((tong - this.timeLeft) / tong) * 100) : 0;
                 },
                 get khoaLuuTam() { return 'dfm-bai-lam:' + this.deId + ':' + (this.user ? this.user.uid : ''); },
+                // Có điểm để hiện: thầy đã công bố VÀ đọc được đáp án
+                get coDiem() { return this.congBo !== 'an' && this.daCoDapAn; },
+                get hienDapAn() { return this.congBo === 'day-du'; },
+                // Cách chia điểm của đề (thầy chỉnh trong trang Quản trị)
+                get thang() { return D.chuanThangDiem(this.thangDiem, D.soCauTheoLoai(this.questions)); },
+                get demTrangThai() {
+                    const d = { dung: 0, 'mot-phan': 0, sai: 0, trong: 0 };
+                    if (this.coDiem) this.questions.forEach((q) => { d[this.trangThaiCau(q)]++; });
+                    return d;
+                },
 
                 init() {
                     this.$nextTick(() => D.veToan(document.querySelector('header')));
@@ -593,28 +669,97 @@
                         this.user = user;
                         this.taiDe();
                     });
-                    // Đếm "rời trang" khi học sinh rời đi rồi QUAY LẠI (chuyển tab, mở ứng dụng khác).
-                    // Không đếm lúc tải lại trang: khi đó trang bị ẩn nhưng không bao giờ hiện lại.
-                    let daRoi = false;
-                    document.addEventListener('visibilitychange', () => {
-                        if (this.phase !== 'playing') return;
-                        if (document.visibilityState === 'hidden') { daRoi = true; return; }
-                        if (daRoi) {
-                            daRoi = false;
-                            this.viPham++;
-                            this.canhBaoRoiTrang = true;
-                            this.luuTam();
-                        }
-                    });
+                    this.chongRoiBai();
                 },
                 baoLoi(msg) { this.loi = msg; this.phase = 'loi'; },
+
+                // ---------- Chống rời bài (giống các trang dò lý thuyết) ----------
+                // Toàn màn hình + bắt chuyển tab / mở ứng dụng khác / tải lại trang / thoát toàn màn hình.
+                chongRoiBai() {
+                    document.addEventListener('visibilitychange', () => {
+                        if (document.hidden) this.ghiViPham('chuyển sang tab hoặc ứng dụng khác');
+                    });
+                    // Điện thoại (nhất là iPhone) không có toàn màn hình nên bắt thêm lúc trang mất tiêu điểm;
+                    // chờ một nhịp để bỏ qua các lần mất tiêu điểm thoáng qua
+                    window.addEventListener('blur', () => {
+                        setTimeout(() => { if (!document.hasFocus()) this.ghiViPham('rời khỏi trang làm bài'); }, 300);
+                    });
+                    // Lúc trang bị đóng/tải lại: số lần vi phạm đã lưu tạm nên khi mở lại vẫn còn
+                    window.addEventListener('pagehide', () => this.ghiViPham('tải lại hoặc rời khỏi trang làm bài'));
+                    ['fullscreenchange', 'webkitfullscreenchange'].forEach((suKien) => {
+                        document.addEventListener(suKien, () => { if (!this.dangToanManHinh()) this.ghiViPham('thoát chế độ toàn màn hình'); });
+                    });
+                    // Trong lúc thi: chặn chuột phải, bôi đen, phím tắt mở mã nguồn / lưu / in
+                    document.addEventListener('contextmenu', (e) => { if (this.phase === 'playing') e.preventDefault(); });
+                    document.addEventListener('selectstart', (e) => {
+                        const el = e.target.nodeType === 1 ? e.target : e.target.parentElement;
+                        if (this.phase === 'playing' && !(el && el.closest('input, textarea, select, [contenteditable]'))) e.preventDefault();
+                    });
+                    document.addEventListener('keydown', (e) => {
+                        if (this.phase !== 'playing') return;
+                        const k = (e.key || '').toUpperCase();
+                        if (k === 'F12' || ((e.ctrlKey || e.metaKey) && e.shiftKey && ['I', 'J', 'C'].includes(k)) || ((e.ctrlKey || e.metaKey) && ['U', 'S', 'P'].includes(k))) {
+                            e.preventDefault(); e.stopPropagation();
+                        }
+                    }, true);
+                    // Mở công cụ nhà phát triển trong lúc thi thì trang bị "đóng băng"
+                    setInterval(() => { if (this.phase === 'playing') (function () { return false; })['constructor']('debugger')['call'](); }, 100);
+                },
+                dangToanManHinh() { return !!(document.fullscreenElement || document.webkitFullscreenElement); },
+                vaoToanManHinh() {
+                    if (this.dangToanManHinh()) return;
+                    const el = document.documentElement;
+                    try {
+                        if (el.requestFullscreen) el.requestFullscreen().catch(() => {});
+                        else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+                    } catch (e) {}
+                },
+                thoatToanManHinh() {
+                    if (!this.dangToanManHinh()) return;
+                    try {
+                        if (document.exitFullscreen) document.exitFullscreen().catch(() => {});
+                        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+                    } catch (e) {}
+                },
+                ghiViPham(lyDo) {
+                    // Rời tab thường kéo theo mất tiêu điểm + thoát toàn màn hình: gộp các sự kiện sát nhau thành một lần
+                    if (this.phase !== 'playing' || this.dangNop || Date.now() - this.mocViPham < 1000) return;
+                    this.mocViPham = Date.now();
+                    this.viPham++;
+                    this.luuTam();
+                    const N = this.gioiHanViPham;
+                    if (N && this.viPham >= N) {
+                        this.moHop({ tieuDe: 'ĐÌNH CHỈ LÀM BÀI', icon: 'fa-ban', nut: 'Xem kết quả',
+                            noiDung: 'Lý do: ' + lyDo + '. Bạn đã rời bài ' + N + ' lần nên bài đã tự động nộp, các câu chưa làm không được điểm.' });
+                        this.nopBai(true, 'vi-pham');
+                        return;
+                    }
+                    this.moHop({ tieuDe: 'CẢNH BÁO VI PHẠM', icon: 'fa-triangle-exclamation', nut: 'Đã hiểu & quay lại làm bài',
+                        noiDung: 'Lý do: ' + lyDo + '. ' + (N
+                            ? 'Cảnh báo lần ' + this.viPham + '/' + N + '. Số lần vi phạm được gửi cho thầy; đủ ' + N + ' lần bài sẽ tự động nộp.'
+                            : 'Đây là lần thứ ' + this.viPham + '. Số lần rời bài được gửi cho thầy cùng bài làm.'),
+                        khiDong: () => this.vaoToanManHinh() });
+                },
+
+                // ---------- Hộp thông báo ----------
+                moHop(o) {
+                    this.hop = Object.assign({ hien: true, tieuDe: '', noiDung: '', nut: 'Đóng', nutPhu: '', mau: 'do', icon: 'fa-triangle-exclamation', khiDong: null }, o);
+                },
+                dongHop(dongY) {
+                    const fn = dongY ? this.hop.khiDong : null;
+                    this.hop.hien = false;
+                    if (fn) fn();
+                },
 
                 async taiDe() {
                     try {
                         const snap = await db.collection('de_thi').doc(this.deId).get();
                         if (!snap.exists) { this.baoLoi('Không tìm thấy đề thi, hoặc đề đã đóng.'); return; }
                         const de = snap.data();
-                        this.quiz = { title: de.tieuDe || 'Đề thi', description: de.moTa || '', time_limit: de.thoiGian || 90, hienLoiGiai: !!de.hienLoiGiai };
+                        this.quiz = { title: de.tieuDe || 'Đề thi', description: de.moTa || '', time_limit: de.thoiGian || 90 };
+                        this.congBo = D.congBoCua(de);
+                        this.thangDiem = de.thangDiem || null;
+                        this.gioiHanViPham = Number.isFinite(de.gioiHanViPham) ? Math.max(0, de.gioiHanViPham) : 3;
                         document.title = this.quiz.title + ' - DoforMath';
                         this.hinh = de.hinh || [];
                         // Đánh số câu theo từng phần như đề THPT
@@ -633,22 +778,36 @@
                         if (bai.exists) {
                             const v = bai.data();
                             this.answers = v.traLoi || {};
+                            this.viPham = v.viPham || 0;
+                            this.lyDoNop = v.lyDoNop || '';
                             this.daNopTruoc = true;
                             this.thoiGianLamStr = this.dinhDangThoiGian(v.thoiGianLam || 0);
                             await this.hienKetQua();
                             return;
                         }
                     } catch (err) { /* chưa có bài làm */ }
-                    // Bài đang làm dở trên máy này
+                    // Bài đang làm dở trên máy này (kể cả khi đã hết giờ: vẫn nộp phần đã làm)
+                    let tuNop = '';
                     try {
                         const tam = JSON.parse(localStorage.getItem(this.khoaLuuTam) || 'null');
-                        if (tam && tam.batDau && Date.now() - tam.batDau < this.quiz.time_limit * 60000 + 60000) {
+                        if (tam && tam.batDau && Date.now() - tam.batDau < 7 * 86400000) {
                             this.answers = tam.traLoi || {}; this.batDau = tam.batDau; this.viPham = tam.viPham || 0;
                             this.coBaiDangLam = true;
+                            if (this.gioiHanViPham && this.viPham >= this.gioiHanViPham) tuNop = 'vi-pham';
+                            else if (Date.now() - tam.batDau >= this.quiz.time_limit * 60000) tuNop = 'het-gio';
                         }
                     } catch (e) {}
                     this.phase = 'intro';
                     this.$nextTick(() => this.veNoiDung(document.getElementById('ds-cau-hoi')));
+                    // Đã rời bài quá số lần / hết giờ lúc trang bị đóng: nộp luôn phần đã làm
+                    if (tuNop) {
+                        this.start(true);
+                        if (tuNop === 'vi-pham') {
+                            this.moHop({ tieuDe: 'ĐÌNH CHỈ LÀM BÀI', icon: 'fa-ban', nut: 'Xem kết quả',
+                                noiDung: 'Bạn đã rời bài ' + this.viPham + ' lần nên bài đã tự động nộp, các câu chưa làm không được điểm.' });
+                            this.nopBai(true, 'vi-pham');
+                        }
+                    }
                 },
 
                 veNoiDung(el) {
@@ -656,11 +815,13 @@
                     D.veToan(el);
                 },
 
-                start() {
+                start(tuDong) {
                     if (!this.batDau) this.batDau = Date.now();
+                    if (!tuDong) this.vaoToanManHinh();   // cần thao tác bấm của học sinh mới vào được toàn màn hình
                     this.phase = 'playing';
                     this.luuTam();
                     this.dongHo();
+                    clearInterval(this.timer);
                     this.timer = setInterval(() => this.dongHo(), 1000);
                     window.scrollTo({ top: 0 });
                 },
@@ -672,7 +833,11 @@
                     this.analogHourDeg = (h % 12) * 30 + m * 0.5 + s * (0.5 / 60);
                     this.analogMinDeg = m * 6 + s * 0.1;
                     this.analogSecDeg = s * 6;
-                    if (this.timeLeft <= 0 && this.phase === 'playing') this.nopBai(true);
+                    if (this.timeLeft <= 0 && this.phase === 'playing' && !this.dangNop && !this.loiNop) {
+                        this.moHop({ tieuDe: 'HẾT GIỜ LÀM BÀI', icon: 'fa-hourglass-end', mau: 'teal', nut: 'Xem kết quả',
+                            noiDung: 'Đã hết ' + this.quiz.time_limit + ' phút nên bài đã tự động nộp, các câu chưa làm không được điểm.' });
+                        this.nopBai(true, 'het-gio');
+                    }
                 },
                 formattedTime() {
                     return String(Math.floor(this.timeLeft / 60)).padStart(2, '0') + ':' + String(this.timeLeft % 60).padStart(2, '0');
@@ -705,10 +870,17 @@
                 },
 
                 // ----- Nộp bài -----
-                async nopBai(tuDong) {
+                async nopBai(tuDong, lyDo, daXacNhan) {
                     if (this.dangNop || this.phase !== 'playing') return;
-                    if (!tuDong && this.answeredCount < this.totalCommands && !confirm('Bạn chưa trả lời hết các lệnh hỏi. Chắc chắn nộp bài?')) return;
-                    this.dangNop = true;
+                    if (!tuDong && !daXacNhan) {
+                        const con = this.totalCommands - this.answeredCount;
+                        this.moHop({ tieuDe: 'Nộp bài?', icon: 'fa-paper-plane', mau: 'teal', nut: 'Nộp bài', nutPhu: 'Làm tiếp',
+                            noiDung: con > 0 ? 'Bạn còn ' + con + '/' + this.totalCommands + ' lệnh hỏi chưa trả lời, các lệnh bỏ trống không được điểm. Chắc chắn nộp bài?'
+                                             : 'Bạn đã trả lời hết các lệnh hỏi. Nộp rồi sẽ không sửa được nữa.',
+                            khiDong: () => this.nopBai(false, '', true) });
+                        return;
+                    }
+                    this.dangNop = true; this.loiNop = false;
                     const traLoi = {};
                     this.questions.forEach((q) => {
                         const a = this.answers[q.id];
@@ -718,33 +890,93 @@
                     const giay = Math.min(this.quiz.time_limit * 60, Math.round((Date.now() - this.batDau) / 1000));
                     try {
                         await db.collection('bai_lam').doc(this.deId + '__' + this.user.uid).set({
-                            deId: this.deId, uid: this.user.uid, email: this.user.email, traLoi: traLoi,
-                            batDau: this.batDau, thoiGianLam: giay, viPham: this.viPham, tuDongNop: !!tuDong,
+                            deId: this.deId, uid: this.user.uid, email: this.user.email, tieuDe: this.quiz.title, traLoi: traLoi,
+                            batDau: this.batDau, thoiGianLam: giay, viPham: this.viPham, tuDongNop: !!tuDong, lyDoNop: lyDo || '',
                             nopLuc: firebase.firestore.FieldValue.serverTimestamp()
                         });
                     } catch (err) {
-                        this.dangNop = false;
-                        alert(err.code === 'permission-denied' ? 'Bài này đã được nộp trước đó.' : 'Chưa nộp được bài, kiểm tra mạng rồi bấm Nộp bài lại. Bài làm vẫn được lưu trên máy.');
+                        this.dangNop = false; this.loiNop = true;
+                        if (err.code === 'permission-denied') {
+                            this.moHop({ tieuDe: 'Không nộp được bài', icon: 'fa-circle-xmark', nut: 'Tải lại trang', khiDong: () => location.reload(),
+                                noiDung: 'Đề đã bị đóng hoặc bài này đã được nộp trước đó. Bài làm vẫn được lưu trên máy này.' });
+                        } else {
+                            this.moHop({ tieuDe: 'Chưa nộp được bài', icon: 'fa-wifi', nut: 'Nộp lại', nutPhu: tuDong ? '' : 'Làm tiếp',
+                                noiDung: 'Kiểm tra kết nối mạng rồi bấm “Nộp lại”. Bài làm vẫn được lưu trên máy này.',
+                                khiDong: () => this.nopBai(tuDong, lyDo, true) });
+                        }
                         return;
                     }
                     clearInterval(this.timer);
                     try { localStorage.removeItem(this.khoaLuuTam); } catch (e) {}
                     this.answers = traLoi;
+                    this.lyDoNop = lyDo || '';
                     this.thoiGianLamStr = this.dinhDangThoiGian(giay);
+                    this.thoatToanManHinh();
                     await this.hienKetQua();
                     this.dangNop = false;
                 },
                 async hienKetQua() {
-                    try {
-                        const da = await db.collection('dap_an').doc(this.deId).get();
-                        this.dapAn = (da.exists && da.data().cauHoi) || {};
-                    } catch (err) { this.dapAn = {}; }
-                    this.ketQua = D.chamDiem(this.questions, this.dapAn, this.answers);
+                    await this.taiDapAn();
                     this.phase = 'result';
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    // Mở từ "Câu cần xem lại" (Góc học tập): cuộn thẳng tới câu đó
+                    const cau = location.hash.startsWith('#xl-') && document.getElementById(location.hash.slice(1));
+                    if (cau && this.coDiem && this.congBo !== 'diem') setTimeout(() => cau.scrollIntoView({ behavior: 'smooth', block: 'start' }), 400);
+                    else window.scrollTo({ top: 0, behavior: 'smooth' });
+                    this.ngheCongBo();
+                },
+                // Đáp án chỉ đọc được khi thầy đã công bố (Firestore Rules cũng chặn đúng như vậy)
+                async taiDapAn() {
+                    this.dapAn = {}; this.daCoDapAn = false;
+                    if (this.congBo !== 'an') {
+                        try {
+                            const da = await db.collection('dap_an').doc(this.deId).get();
+                            this.dapAn = (da.exists && da.data().cauHoi) || {};
+                            this.daCoDapAn = da.exists;
+                        } catch (err) { /* chưa được phép đọc */ }
+                    }
+                    this.ketQua = this.daCoDapAn ? D.chamDiem(this.questions, this.dapAn, this.answers, this.thangDiem) : {};
                     this.$nextTick(() => this.veNoiDung(document.getElementById('xem-lai')));
                 },
+                // Thầy đổi mức công bố lúc nào thì trang kết quả cập nhật ngay lúc đó
+                ngheCongBo() {
+                    if (this.huyNghe) return;
+                    this.huyNghe = db.collection('de_thi').doc(this.deId).onSnapshot(async (snap) => {
+                        if (!snap.exists) return;
+                        const de = snap.data();
+                        // Thầy chia lại điểm: tính lại ngay
+                        if (JSON.stringify(de.thangDiem || null) !== JSON.stringify(this.thangDiem)) {
+                            this.thangDiem = de.thangDiem || null;
+                            if (this.daCoDapAn) this.ketQua = D.chamDiem(this.questions, this.dapAn, this.answers, this.thangDiem);
+                        }
+                        const moi = D.congBoCua(de);
+                        if (moi === this.congBo) return;
+                        const truoc = this.coDiem;
+                        this.congBo = moi;
+                        await this.taiDapAn();
+                        if (!truoc && this.coDiem) {
+                            this.vuaCongBo = true;
+                            setTimeout(() => { this.vuaCongBo = false; }, 4000);
+                        }
+                    }, () => {});
+                },
                 dungCua(q) { return (this.dapAn[q.id] || {}).dung; },
+                // dung | mot-phan (câu đúng/sai đúng được vài ý) | sai | trong (bỏ trống)
+                trangThaiCau(q) {
+                    const c = (this.ketQua.chiTiet || {})[q.id];
+                    const a = this.answers[q.id];
+                    const trong = q.loai === 'tf' ? !(Array.isArray(a) && a.some((v) => v === true || v === false)) : !a;
+                    if (!c || trong) return 'trong';
+                    if (c.dung) return 'dung';
+                    return q.loai === 'tf' && c.soYDung > 0 ? 'mot-phan' : 'sai';
+                },
+                // Lớp màu cho phương án trắc nghiệm: chưa công bố đáp án thì chỉ tô phương án học sinh chọn
+                lopLuaChon(q, key) {
+                    const chon = this.getAnswer(q.id) === key;
+                    if (this.hienDapAn && this.dungCua(q) === key) return ['border-emerald-400 bg-emerald-50', 'bg-emerald-500 text-white'];
+                    if (chon) return this.trangThaiCau(q) === 'dung' ? ['border-emerald-400 bg-emerald-50', 'bg-emerald-500 text-white'] : ['border-red-300 bg-red-50', 'bg-red-500 text-white'];
+                    return ['border-slate-200', 'bg-slate-100 text-slate-500'];
+                },
+                scrollToId(id) { const el = document.getElementById(id); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); },
                 loiGiaiCua(q) { return (this.dapAn[q.id] || {}).loiGiai || ''; },
                 dinhDangDiem(x) { return (Math.round((x || 0) * 100) / 100).toString().replace('.', ','); },
                 dinhDangThoiGian(giay) { const p = Math.floor(giay / 60), s = giay % 60; return p + ' phút ' + String(s).padStart(2, '0') + ' giây'; }
