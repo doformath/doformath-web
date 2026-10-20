@@ -12,7 +12,7 @@
     <!-- Giao diện sáng / tối: chạy trước CSS để không bị nháy màu -->
     <script src="assets/js/dfm-giao-dien.js"></script>
     <!-- CSS Tailwind dựng sẵn cho cả site (sửa class xong chạy: npm run build:css) -->
-    <link rel="stylesheet" href="assets/css/tailwind.css?v=4d1f765f">
+    <link rel="stylesheet" href="assets/css/tailwind.css?v=d68b872c">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- KaTeX: vẽ logo DoforMath giống các trang khác -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
@@ -80,6 +80,7 @@
             <button class="tab-btn px-4 py-2 rounded-full text-sm text-gray-600 hover:bg-gray-100 whitespace-nowrap" role="tab" data-tab="bai-hoc" aria-selected="false"><i class="fa-solid fa-book-open mr-1.5"></i>Bài học</button>
             <button class="tab-btn px-4 py-2 rounded-full text-sm text-gray-600 hover:bg-gray-100 whitespace-nowrap" role="tab" data-tab="kiem-tra" aria-selected="false"><i class="fa-solid fa-clipboard-check mr-1.5"></i>Kiểm tra</button>
             <button class="tab-btn px-4 py-2 rounded-full text-sm text-gray-600 hover:bg-gray-100 whitespace-nowrap" role="tab" data-tab="de-thi" aria-selected="false"><i class="fa-solid fa-file-signature mr-1.5"></i>Đề thi</button>
+            <button class="tab-btn px-4 py-2 rounded-full text-sm text-gray-600 hover:bg-gray-100 whitespace-nowrap" role="tab" data-tab="tai-lieu" aria-selected="false"><i class="fa-solid fa-folder-open mr-1.5"></i>Tài liệu</button>
         </nav>
     </header>
 
@@ -241,6 +242,20 @@
             </div>
             <div id="ds-de-thi" class="grid gap-4 md:grid-cols-2"></div>
         </section>
+
+        <!-- ========== TAB TÀI LIỆU MIỄN PHÍ ========== -->
+        <section id="tab-tai-lieu" data-panel hidden>
+            <div class="flex flex-wrap gap-3 items-start justify-between mb-4">
+                <div>
+                    <h2 class="font-bold text-gray-900">Tài liệu miễn phí</h2>
+                    <p class="text-sm text-gray-500">Hiện ở trang <a href="tai-lieu-mien-phi.html" target="_blank" rel="noopener" class="text-primary hover:underline">Tài liệu miễn phí</a>, ai cũng xem được, không cần đăng nhập. Nội dung HTML lưu trên Firestore, hình lưu trên Cloudinary.</p>
+                </div>
+                <button id="nut-them-tl" type="button" class="bg-primary hover:bg-teal-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold shadow-sm transition-colors">
+                    <i class="fa-solid fa-plus mr-1.5"></i>Thêm tài liệu
+                </button>
+            </div>
+            <div id="ds-tai-lieu" class="space-y-3"></div>
+        </section>
     </main>
 
     <!-- ========== HỘP THOẠI (dùng chung) ========== -->
@@ -266,6 +281,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
     <script src="assets/js/dfm-de-thi.js"></script>
+    <script src="assets/js/dfm-tai-lieu.js"></script>
     <script>
     (function () {
         const firebaseConfig = {
@@ -463,7 +479,7 @@
         // ---------- Tải dữ liệu ----------
         async function taiDuLieu() {
             S.dapAn = {};
-            const tenNguon = ['phan_quyen', 'hoc_sinh', 'bai_hoc_them'].concat(BAI_KIEM_TRA.map((b) => b.id), ['de_thi', 'bai_lam', 'lop', 'dang_ky']);
+            const tenNguon = ['phan_quyen', 'hoc_sinh', 'bai_hoc_them'].concat(BAI_KIEM_TRA.map((b) => b.id), ['de_thi', 'bai_lam', 'lop', 'dang_ky', 'tai_lieu']);
             const kq = await Promise.allSettled(tenNguon.map((t) => db.collection(t).get()));
             const loi = [];
             const lay = (i) => (kq[i].status === 'fulfilled' ? kq[i].value.docs : (loi.push(tenNguon[i]), []));
@@ -514,6 +530,7 @@
             S.baiLam = lay(4 + BAI_KIEM_TRA.length).map((d) => Object.assign({ id: d.id }, d.data()));
             S.lop = lay(5 + BAI_KIEM_TRA.length).map((d) => Object.assign({ id: d.id }, d.data()));
             S.dangKy = lay(6 + BAI_KIEM_TRA.length).map((d) => Object.assign({ uid: d.id }, d.data()));
+            S.taiLieu = lay(7 + BAI_KIEM_TRA.length).map((d) => Object.assign({ id: d.id }, d.data()));
 
             const cb = $('canh-bao');
             cb.hidden = !loi.length;
@@ -531,6 +548,7 @@
             veBaiHoc();
             veKiemTra();
             veDeThi();
+            veTaiLieu();
             tlNapDs();
         }
 
@@ -1214,7 +1232,9 @@
             if (an) {
                 const b = S.baiThem.find((x) => x.id === an.getAttribute('data-an-bai'));
                 try {
-                    await db.collection('bai_hoc_them').doc(b.id).update({ an: !b.an, capNhatLuc: FV.serverTimestamp() });
+                    const capNhat = { an: !b.an, capNhatLuc: FV.serverTimestamp() };
+                    if (b.an) capNhat.congBoLuc = FV.serverTimestamp();   // Hiện bài: học sinh được báo là bài mới
+                    await db.collection('bai_hoc_them').doc(b.id).update(capNhat);
                     b.an = !b.an; veBaiHoc();
                     thongBao(b.an ? 'Đã ẩn bài khỏi khóa học' : 'Bài đã hiện lại trong khóa học');
                 } catch (err) { thongBao('Lỗi: ' + err.message); }
@@ -1346,6 +1366,8 @@
                     thuTu: Number(f.querySelector('#bai-thu-tu').value) || 0, muc: muc,
                     an: f.querySelector('#bai-an').checked, capNhatLuc: FV.serverTimestamp()
                 };
+                // Lúc học sinh bắt đầu thấy bài (thêm mới không ẩn, hoặc bỏ ẩn): trang chủ thông báo bài mới theo mốc này
+                if (!duLieu.an && (!bai || bai.an)) duLieu.congBoLuc = FV.serverTimestamp();
                 const nut = f.querySelector('button[type="submit"]');
                 nut.disabled = true;
                 try {
@@ -1802,8 +1824,12 @@
                 '<div class="grid sm:grid-cols-2 gap-4">' +
                 '<div class="sm:col-span-2"><label class="block text-sm font-medium mb-1.5" for="de-tieu-de">Tên đề</label>' +
                 '<input id="de-tieu-de" class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-base" placeholder="vd: Đề ôn tập chương 1 - Toán 10" value="' + esc(de ? de.tieuDe : '') + '"></div>' +
-                '<div class="sm:col-span-2"><label class="block text-sm font-medium mb-1.5" for="de-mo-ta">Mô tả ngắn</label>' +
+                '<div><label class="block text-sm font-medium mb-1.5" for="de-mo-ta">Mô tả ngắn</label>' +
                 '<input id="de-mo-ta" class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-base" placeholder="vd: Mệnh đề, tập hợp, hệ thức lượng" value="' + esc(de ? de.moTa || '' : '') + '"></div>' +
+                '<div><label class="block text-sm font-medium mb-1.5" for="de-phan-loai">Phân loại</label>' +
+                '<select id="de-phan-loai" class="w-full px-3 py-2.5 rounded-xl border border-gray-200 bg-white text-sm">' +
+                Object.keys(DT.PHAN_LOAI).concat('khac').map((k) => '<option value="' + k + '"' + ((de ? DT.phanLoaiCua(de) || 'khac' : 'khac') === k ? ' selected' : '') + '>' + (DT.PHAN_LOAI[k] || 'Không phân loại') + '</option>').join('') + '</select>' +
+                '<p class="text-xs text-gray-500 mt-1">Dùng cho nút lọc ở Phòng thi.</p></div>' +
                 '<div><label class="block text-sm font-medium mb-1.5" for="de-thoi-gian">Thời gian làm bài (phút)</label>' +
                 '<input id="de-thoi-gian" type="number" min="1" class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-base" value="' + esc(de ? de.thoiGian : 90) + '"></div>' +
                 '<div><label class="block text-sm font-medium mb-1.5" for="de-trang-thai">Trạng thái</label>' +
@@ -1933,6 +1959,14 @@
                 for (const h of ban.hinh) if (h.trangThai === 'cho') await veMotHinh(h);
             });
 
+            const chonPhanLoai = f.querySelector('#de-phan-loai');
+            if (!de) {
+                chonPhanLoai.addEventListener('change', () => { chonPhanLoai.dataset.daChon = '1'; }, { once: true });
+                f.querySelector('#de-tieu-de').addEventListener('input', (e) => {
+                    if (!chonPhanLoai.dataset.daChon) chonPhanLoai.value = DT.doanPhanLoai(e.target.value) || 'khac';
+                });
+            }
+
             nutLuu.addEventListener('click', async () => {
                 const loiEl = f.querySelector('#de-loi');
                 const tieuDe = f.querySelector('#de-tieu-de').value.trim();
@@ -1945,7 +1979,7 @@
                 const thieu = ban.hinh.filter((h) => h.trangThai === 'loi').length;
                 if (thieu && !confirm('Còn ' + thieu + ' hình chưa có (học sinh sẽ thấy ô “Hình chưa có”). Vẫn lưu?')) return;
                 const deDoc = {
-                    tieuDe: tieuDe, moTa: f.querySelector('#de-mo-ta').value.trim(), thoiGian: thoiGian,
+                    tieuDe: tieuDe, moTa: f.querySelector('#de-mo-ta').value.trim(), phanLoai: chonPhanLoai.value, thoiGian: thoiGian,
                     trangThai: f.querySelector('#de-trang-thai').value, congBo: f.querySelector('#de-cong-bo').value,
                     gioiHanViPham: Math.min(20, Math.max(0, Math.round(Number(f.querySelector('#de-vi-pham').value) || 0))),
                     cauHoi: ban.kq.cauHoi, soCau: DT.soCauTheoLoai(ban.kq.cauHoi), thangDiem: cd.thangDiem,
@@ -2080,6 +2114,292 @@
                 try { await db.collection('bai_lam').doc(b.id).delete(); thongBao('Đã xóa bài làm, học sinh có thể làm lại'); await taiDuLieu(); xemKetQuaDe(de); }
                 catch (err) { thongBao('Lỗi: ' + err.message); }
             }));
+        }
+
+        // ---------- TAB TÀI LIỆU MIỄN PHÍ ----------
+        // Tài liệu dạng trang HTML: lấy phần <body>, bỏ script, đưa hình đi kèm lên Cloudinary (thư mục tai-lieu/<mã tài liệu>)
+        // rồi lưu vào Firestore: tai_lieu/{id} (thông tin) + tai_lieu_noi_dung/{id} (HTML). Xem bằng doc-tai-lieu.html?id=...
+        // Tài liệu PDF: cắt thành ảnh trên Cloudinary giống lời giải, xem bằng courses/xem-tai-lieu.html.
+        const GIOI_HAN_HTML = 900 * 1024;   // Firestore nhận tối đa 1 MB mỗi tài liệu
+        const TL = window.dfmTaiLieu;
+
+        function veTaiLieu() {
+            const ds = (S.taiLieu || []).slice().sort((a, b) => (a.thuTu || 0) - (b.thuTu || 0) || (thanhDate(b.taoLuc) || 0) - (thanhDate(a.taoLuc) || 0));
+            if (!ds.length) {
+                $('ds-tai-lieu').innerHTML = '<div class="bg-white rounded-2xl border border-dashed border-gray-200 p-10 text-center text-gray-400">' +
+                    '<i class="fa-solid fa-folder-open text-3xl mb-3 block"></i>Chưa có tài liệu nào. Bấm "Thêm tài liệu" để bắt đầu.</div>';
+                return;
+            }
+            $('ds-tai-lieu').innerHTML = ds.map((tl) => {
+                const dm = TL.DANH_MUC[tl.danhMuc] || TL.DANH_MUC['ly-thuyet'];
+                const phu = [dm.ten, TL.LOP[tl.lop] || 'Chung', tl.loai === 'anh' ? 'PDF · ' + tl.thuMuc : 'Trang HTML', 'Thứ tự ' + (tl.thuTu || 0), TL.ngay(tl.taoLuc)].filter(Boolean);
+                return '<div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 flex flex-wrap items-start justify-between gap-3' + (tl.an ? ' opacity-70' : '') + '">' +
+                    '<div class="min-w-0 flex-1"><div class="font-semibold text-gray-900">' + esc(tl.tieuDe) +
+                    (tl.an ? ' <span class="text-xs font-medium bg-gray-200 text-gray-600 px-2 py-0.5 rounded-full ml-1">Đang ẩn</span>' : '') + '</div>' +
+                    '<div class="text-xs text-gray-400 mt-1 flex flex-wrap gap-x-3 gap-y-1">' + phu.map((x) => '<span>' + esc(x) + '</span>').join('') + '</div>' +
+                    (tl.moTa ? '<p class="text-sm text-gray-500 mt-1.5 line-clamp-2">' + esc(tl.moTa) + '</p>' : '') + '</div>' +
+                    '<div class="flex flex-wrap gap-1 shrink-0">' +
+                    '<a href="' + esc(TL.duongDan(tl)) + '" target="_blank" rel="noopener" class="px-3 py-1.5 rounded-lg text-sm hover:bg-gray-100"><i class="fa-solid fa-arrow-up-right-from-square mr-1"></i>Xem</a>' +
+                    '<button type="button" data-sua-tl="' + esc(tl.id) + '" class="px-3 py-1.5 rounded-lg text-sm hover:bg-gray-100"><i class="fa-solid fa-pen mr-1"></i>Sửa</button>' +
+                    '<button type="button" data-an-tl="' + esc(tl.id) + '" class="px-3 py-1.5 rounded-lg text-sm hover:bg-gray-100"><i class="fa-solid ' + (tl.an ? 'fa-eye' : 'fa-eye-slash') + ' mr-1"></i>' + (tl.an ? 'Hiện' : 'Ẩn') + '</button>' +
+                    '<button type="button" data-xoa-tl="' + esc(tl.id) + '" class="px-3 py-1.5 rounded-lg text-sm text-red-600 hover:bg-red-50"><i class="fa-solid fa-trash mr-1"></i>Xóa</button>' +
+                    '</div></div>';
+            }).join('');
+        }
+
+        $('nut-them-tl').addEventListener('click', () => moFormTaiLieu(null));
+        $('ds-tai-lieu').addEventListener('click', async (e) => {
+            const sua = e.target.closest('[data-sua-tl]'), an = e.target.closest('[data-an-tl]'), xoa = e.target.closest('[data-xoa-tl]');
+            const tim = (nut, thuocTinh) => S.taiLieu.find((x) => x.id === nut.getAttribute(thuocTinh));
+            if (sua) moFormTaiLieu(tim(sua, 'data-sua-tl'));
+            if (an) {
+                const tl = tim(an, 'data-an-tl');
+                try {
+                    await db.collection('tai_lieu').doc(tl.id).update({ an: !tl.an, capNhatLuc: FV.serverTimestamp() });
+                    tl.an = !tl.an; veTaiLieu();
+                    thongBao(tl.an ? 'Đã ẩn tài liệu' : 'Tài liệu đã hiện ở trang Tài liệu miễn phí');
+                } catch (err) { thongBao('Lỗi: ' + err.message); }
+            }
+            if (xoa) {
+                const tl = tim(xoa, 'data-xoa-tl');
+                if (!confirm('Xóa hẳn tài liệu "' + tl.tieuDe + '"? Không thể hoàn tác (có thể chọn Ẩn thay vì Xóa).')) return;
+                try {
+                    const lo = db.batch();
+                    lo.delete(db.collection('tai_lieu').doc(tl.id));
+                    lo.delete(db.collection('tai_lieu_noi_dung').doc(tl.id));
+                    await lo.commit();
+                    S.taiLieu = S.taiLieu.filter((x) => x.id !== tl.id); veTaiLieu();
+                    thongBao('Đã xóa tài liệu');
+                } catch (err) { thongBao('Lỗi: ' + err.message); }
+            }
+        });
+
+        // Đưa một hình lên Cloudinary, trả về link https của hình
+        async function taiHinhLenCloud(blob, tenFile, publicId) {
+            const fd = new FormData();
+            fd.append('file', blob, tenFile);
+            fd.append('upload_preset', $('tl-preset').value.trim());
+            fd.append('public_id', publicId);
+            fd.append('asset_folder', publicId.replace(/\/[^/]*$/, ''));
+            const res = await fetch('https://api.cloudinary.com/v1_1/' + encodeURIComponent($('tl-cloud').value.trim()) + '/image/upload', { method: 'POST', body: fd });
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok || !data.secure_url) throw new Error('Cloudinary báo lỗi khi tải hình ' + tenFile + ': ' + ((data.error && data.error.message) || res.status));
+            return data.secure_url;
+        }
+
+        // Đoạn mô tả tự động: câu đầu đủ dài trong trang, tối đa 180 ký tự (không cắt giữa công thức $...$)
+        function moTaTuDong(goc) {
+            let t = Array.from(goc.querySelectorAll('p, li')).map((x) => x.textContent.replace(/\s+/g, ' ').trim()).find((x) => x.length > 30) || '';
+            if (t.length > 180) {
+                t = t.slice(0, 180).replace(/\s+\S*$/, '');
+                if ((t.match(/\$/g) || []).length % 2) t = t.slice(0, t.lastIndexOf('$')).trim();
+                t += '…';
+            }
+            return t;
+        }
+
+        // Một trang HTML → nội dung tài liệu. layHinh(src) trả về { blob, ten } của hình, hoặc null nếu không tìm thấy.
+        async function chuanBiHtml(chuoiHtml, layHinh, maTl, tienDo) {
+            const ban = new DOMParser().parseFromString(chuoiHtml, 'text/html');
+            const h1 = ban.querySelector('h1');
+            const tieuDe = (h1 ? h1.textContent : ban.title.replace(/\s*-\s*DoforMath\s*$/i, '').replace(/^Lý thuyết:\s*/i, '')).replace(/\s+/g, ' ').trim();
+            const body = TL.lamSach(ban.body);
+            const moTa = moTaTuDong(body);
+            const canhBao = [], daTai = new Map();
+            const phien = Date.now().toString(36);   // tên hình mới mỗi lần tải, để hình đã sửa không bị Cloudinary giữ bản cũ
+            const dsHinh = Array.from(body.querySelectorAll('img[src]')).filter((img) => !/^(https?:|data:)/i.test(img.getAttribute('src')));
+            for (let i = 0; i < dsHinh.length; i++) {
+                const src = dsHinh[i].getAttribute('src');
+                if (!daTai.has(src)) {
+                    tienDo('Đang đưa hình lên Cloudinary (' + (i + 1) + '/' + dsHinh.length + ')…');
+                    const hinh = await layHinh(src);
+                    daTai.set(src, hinh ? await taiHinhLenCloud(hinh.blob, hinh.ten, 'tai-lieu/' + maTl + '/' + (khongDau(hinh.ten.replace(/\.[^.]+$/, '')) || 'hinh') + '-' + phien) : null);
+                }
+                if (daTai.get(src)) dsHinh[i].setAttribute('src', daTai.get(src));
+                else if (!canhBao.includes(src)) canhBao.push(src);
+            }
+            return { html: body.innerHTML.trim(), tieuDe: tieuDe, moTa: moTa, hinhThieu: canhBao };
+        }
+
+        async function luuTaiLieuHtml(ref, kq, thongTin, laMoi) {
+            const kichThuoc = new Blob([kq.html]).size;
+            if (kichThuoc > GIOI_HAN_HTML) throw new Error('nội dung quá lớn (' + Math.round(kichThuoc / 1024) + ' KB), Firestore chỉ nhận khoảng 900 KB mỗi tài liệu');
+            const duLieu = Object.assign({}, thongTin, { loai: 'html', capNhatLuc: FV.serverTimestamp() });
+            if (laMoi) duLieu.taoLuc = FV.serverTimestamp();
+            const lo = db.batch();
+            lo.set(ref, duLieu, { merge: true });
+            lo.set(db.collection('tai_lieu_noi_dung').doc(ref.id), { html: kq.html });
+            await lo.commit();
+        }
+
+        // Thử tải ảnh trang 1 của thư mục PDF trên Cloudinary
+        function coThuMucAnh(ten) {
+            return new Promise((ok) => {
+                const img = new Image();
+                img.onload = () => ok(true);
+                img.onerror = () => ok(false);
+                img.src = 'https://res.cloudinary.com/' + encodeURIComponent($('tl-cloud').value.trim()) + '/image/upload/c_limit,w_40/' + ten + '-1.png';
+            });
+        }
+
+        function moFormTaiLieu(tl) {
+            const sua = !!tl;
+            const thuTuMoi = Math.max(0, ...(S.taiLieu || []).map((x) => x.thuTu || 0)) + 10;
+            const NGUON = {
+                giu: ['fa-solid fa-check', 'Giữ nội dung hiện tại', 'Chỉ sửa thông tin bên dưới'],
+                file: ['fa-regular fa-file-code', 'File HTML (kèm hình)', 'Chọn file HTML và các hình nó dùng'],
+                'duong-dan': ['fa-solid fa-link', 'Trang có sẵn trên web', 'Dán đường dẫn, nhiều trang một lần'],
+                pdf: ['fa-regular fa-file-pdf', 'File PDF', 'Cắt thành ảnh trên Cloudinary']
+            };
+            const dsNguon = !sua ? ['file', 'duong-dan', 'pdf'] : tl.loai === 'anh' ? ['pdf'] : ['giu', 'file', 'duong-dan'];
+            const o = 'w-full px-3 py-2.5 rounded-xl border border-gray-200 text-base';
+            const f = moHopThoai(sua ? 'Sửa tài liệu' : 'Thêm tài liệu miễn phí',
+                '<form id="form-tl" class="space-y-4">' +
+                (dsNguon.length > 1 ? '<div><span class="block text-sm font-medium mb-1.5">Nội dung</span><div class="grid sm:grid-cols-3 gap-2">' +
+                    dsNguon.map((k, i) => '<label class="flex items-start gap-2.5 border border-gray-200 rounded-xl p-3 cursor-pointer hover:border-teal-300 has-[:checked]:border-teal-500 has-[:checked]:bg-teal-50">' +
+                        '<input type="radio" name="tlf-nguon" value="' + k + '" class="mt-1 accent-teal-600"' + (i === 0 ? ' checked' : '') + '>' +
+                        '<span><span class="block text-sm font-semibold text-gray-800"><i class="' + NGUON[k][0] + ' mr-1 text-teal-600"></i>' + NGUON[k][1] + '</span>' +
+                        '<span class="block text-xs text-gray-500">' + NGUON[k][2] + '</span></span></label>').join('') + '</div></div>'
+                    : '<input type="radio" name="tlf-nguon" value="' + dsNguon[0] + '" checked hidden>') +
+                '<div data-khoi="file" class="space-y-1"><input id="tlf-file" type="file" multiple accept=".html,.htm,.svg,.png,.jpg,.jpeg,.webp,.gif" class="block w-full text-sm file:mr-3 file:px-4 file:py-2 file:rounded-lg file:border-0 file:bg-teal-50 file:text-teal-700 file:font-medium">' +
+                    '<p class="text-xs text-gray-400">Chọn cùng lúc file HTML và các file hình mà trang đó dùng (giữ Ctrl/Cmd để chọn nhiều file). Mỗi file HTML thành một tài liệu.</p></div>' +
+                '<div data-khoi="duong-dan" class="space-y-1"><textarea id="tlf-duong-dan" rows="4" class="' + o + ' font-mono text-sm" placeholder="courses/toan-12/chuong-1-ung-dung-dao-ham/bai-1-tinh-don-dieu/ly-thuyet.html"></textarea>' +
+                    '<p class="text-xs text-gray-400">Mỗi dòng một trang trong web này, mỗi trang thành một tài liệu. Hình trong trang được tự đưa lên Cloudinary.</p></div>' +
+                '<div data-khoi="pdf" class="grid sm:grid-cols-2 gap-3">' +
+                    '<label class="block text-sm font-medium">Tên thư mục ảnh trên Cloudinary<input id="tlf-thu-muc" class="mt-1.5 ' + o + ' font-normal" placeholder="vd: 12-Casio-Cuc-tri" value="' + esc(sua ? tl.thuMuc || '' : '') + '"></label>' +
+                    '<label class="block text-sm font-medium">File PDF (bỏ trống nếu thư mục đã có ảnh)<input id="tlf-pdf" type="file" accept=".pdf,application/pdf" class="mt-1.5 block w-full text-sm font-normal file:mr-3 file:px-4 file:py-2 file:rounded-lg file:border-0 file:bg-teal-50 file:text-teal-700 file:font-medium"></label></div>' +
+                '<div><label class="block text-sm font-medium mb-1.5" for="tlf-tieu-de">Tiêu đề</label>' +
+                    '<input id="tlf-tieu-de" class="' + o + '" value="' + esc(sua ? tl.tieuDe : '') + '" placeholder="Để trống: lấy tiêu đề lớn trong trang"></div>' +
+                '<div><label class="block text-sm font-medium mb-1.5" for="tlf-mo-ta">Mô tả ngắn</label>' +
+                    '<textarea id="tlf-mo-ta" rows="2" class="' + o + '" placeholder="Để trống: lấy đoạn đầu của trang">' + esc(sua ? tl.moTa || '' : '') + '</textarea>' +
+                    '<p class="text-xs text-gray-400 mt-1">Khi thêm nhiều trang một lần, tiêu đề và mô tả của từng trang được lấy tự động; thứ tự tăng dần theo thứ tự các dòng.</p></div>' +
+                '<div class="grid sm:grid-cols-3 gap-3">' +
+                    '<label class="block text-sm font-medium">Danh mục<select id="tlf-danh-muc" class="mt-1.5 w-full px-3 py-2.5 rounded-xl border border-gray-200 bg-white text-sm font-normal">' +
+                        Object.keys(TL.DANH_MUC).map((k) => '<option value="' + k + '"' + ((sua ? tl.danhMuc : 'ly-thuyet') === k ? ' selected' : '') + '>' + esc(TL.DANH_MUC[k].ten) + '</option>').join('') + '</select></label>' +
+                    '<label class="block text-sm font-medium">Lớp<select id="tlf-lop" class="mt-1.5 w-full px-3 py-2.5 rounded-xl border border-gray-200 bg-white text-sm font-normal"><option value="">Chung</option>' +
+                        Object.keys(TL.LOP).map((k) => '<option value="' + k + '"' + (sua && tl.lop === k ? ' selected' : '') + '>' + TL.LOP[k] + '</option>').join('') + '</select></label>' +
+                    '<label class="block text-sm font-medium">Thứ tự (số nhỏ hiện trước)<input id="tlf-thu-tu" type="number" class="mt-1.5 ' + o + ' font-normal" value="' + esc(sua ? tl.thuTu || 0 : thuTuMoi) + '"></label></div>' +
+                '<label class="flex items-center gap-2 text-sm"><input id="tlf-an" type="checkbox" class="accent-teal-600 w-4 h-4"' + (sua && tl.an ? ' checked' : '') + '> Tạm ẩn (chưa hiện ở trang Tài liệu miễn phí)</label>' +
+                '<div id="tlf-tien-do" class="text-sm text-gray-500"></div>' +
+                '<div id="tlf-loi" class="text-sm text-red-600"></div>' +
+                '<div class="flex justify-end gap-2 pt-2"><button type="button" data-dong class="px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-100">Hủy</button>' +
+                '<button type="submit" class="bg-primary hover:bg-teal-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold disabled:opacity-50">' + (sua ? 'Lưu thay đổi' : 'Thêm tài liệu') + '</button></div></form>');
+
+            const chonNguon = () => (f.querySelector('input[name="tlf-nguon"]:checked') || {}).value;
+            const hienKhoi = () => f.querySelectorAll('[data-khoi]').forEach((k) => { k.hidden = k.getAttribute('data-khoi') !== chonNguon(); });
+            f.querySelectorAll('input[name="tlf-nguon"]').forEach((r) => r.addEventListener('change', hienKhoi));
+            hienKhoi();
+
+            f.querySelector('#form-tl').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const nguon = chonNguon();
+                const tienDo = (s) => { f.querySelector('#tlf-tien-do').textContent = s; };
+                const loiEl = f.querySelector('#tlf-loi');
+                const nut = f.querySelector('button[type="submit"]');
+                const tieuDeNhap = f.querySelector('#tlf-tieu-de').value.trim(), moTaNhap = f.querySelector('#tlf-mo-ta').value.trim();
+                const chung = {
+                    danhMuc: f.querySelector('#tlf-danh-muc').value, lop: f.querySelector('#tlf-lop').value,
+                    thuTu: Number(f.querySelector('#tlf-thu-tu').value) || 0, an: f.querySelector('#tlf-an').checked
+                };
+                loiEl.textContent = '';
+
+                // Các trang HTML cần đọc: { ten, docHtml(), layHinh(src) }
+                let cacTrang = [];
+                if (nguon === 'file') {
+                    const files = Array.from(f.querySelector('#tlf-file').files);
+                    const theoTen = new Map(files.map((x) => [x.name.toLowerCase(), x]));
+                    const layHinh = async (src) => {
+                        const ten = decodeURIComponent(src.split(/[?#]/)[0].split('/').pop()).toLowerCase();
+                        const x = theoTen.get(ten);
+                        return x ? { blob: x, ten: x.name } : null;
+                    };
+                    cacTrang = files.filter((x) => /\.html?$/i.test(x.name)).map((x) => ({ ten: x.name, docHtml: () => x.text(), layHinh: layHinh }));
+                    if (!cacTrang.length) { loiEl.textContent = 'Chưa chọn file HTML nào.'; return; }
+                }
+                if (nguon === 'duong-dan') {
+                    const dong = f.querySelector('#tlf-duong-dan').value.split('\n').map((x) => x.trim()).filter(Boolean);
+                    for (const d of dong) {
+                        const url = new URL(d.replace(/^\/+/, ''), location.href);
+                        if (url.origin !== location.origin) { loiEl.textContent = 'Chỉ nhận trang trong web này: ' + d; return; }
+                        cacTrang.push({
+                            ten: d,
+                            docHtml: async () => {
+                                const res = await fetch(url, { cache: 'no-store' });
+                                if (!res.ok) throw new Error('không mở được trang (lỗi ' + res.status + ')');
+                                return res.text();
+                            },
+                            layHinh: async (src) => {
+                                const u = new URL(src, url);
+                                const res = await fetch(u).catch(() => null);
+                                return res && res.ok ? { blob: await res.blob(), ten: decodeURIComponent(u.pathname.split('/').pop()) } : null;
+                            }
+                        });
+                    }
+                    if (!cacTrang.length) { loiEl.textContent = 'Chưa nhập đường dẫn trang nào.'; return; }
+                }
+                if (sua && cacTrang.length > 1) { loiEl.textContent = 'Khi sửa, chỉ chọn một trang để thay nội dung.'; return; }
+
+                nut.disabled = true;
+                const hinhThieu = [];
+                let daLuu = 0;
+                try {
+                    if (nguon === 'giu') {
+                        if (!tieuDeNhap) throw new Error('Chưa nhập tiêu đề.');
+                        await db.collection('tai_lieu').doc(tl.id).update(Object.assign({ tieuDe: tieuDeNhap, moTa: moTaNhap, capNhatLuc: FV.serverTimestamp() }, chung));
+                    } else if (nguon === 'pdf') {
+                        const thuMuc = f.querySelector('#tlf-thu-muc').value.trim(), pdfFile = f.querySelector('#tlf-pdf').files[0];
+                        if (!tenHopLe(thuMuc)) throw new Error('Tên thư mục chỉ gồm chữ không dấu, số, dấu - và _.');
+                        if (!tieuDeNhap) throw new Error('Chưa nhập tiêu đề.');
+                        if (pdfFile) {
+                            const pdf = await docPdf(pdfFile);
+                            await taiPdfLenCloud(pdf, thuMuc, tienDo);
+                            pdf.destroy();
+                        } else if (!(await coThuMucAnh(thuMuc))) {
+                            throw new Error('Không thấy ảnh của thư mục "' + thuMuc + '" trên Cloudinary. Hãy chọn file PDF để tải lên.');
+                        }
+                        const ref = sua ? db.collection('tai_lieu').doc(tl.id) : db.collection('tai_lieu').doc();
+                        const duLieu = Object.assign({ loai: 'anh', thuMuc: thuMuc, tieuDe: tieuDeNhap, moTa: moTaNhap, capNhatLuc: FV.serverTimestamp() }, chung);
+                        if (!sua) duLieu.taoLuc = FV.serverTimestamp();
+                        await ref.set(duLieu, { merge: true });
+                    } else {
+                        for (let i = 0; i < cacTrang.length; i++) {
+                            const trang = cacTrang[i];
+                            const dau = cacTrang.length > 1 ? '[' + (i + 1) + '/' + cacTrang.length + '] ' : '';
+                            try {
+                                tienDo(dau + 'Đang đọc ' + trang.ten + '…');
+                                const ref = sua ? db.collection('tai_lieu').doc(tl.id) : db.collection('tai_lieu').doc();
+                                const kq = await chuanBiHtml(await trang.docHtml(), trang.layHinh, ref.id, (s) => tienDo(dau + s));
+                                kq.hinhThieu.forEach((h) => hinhThieu.push(trang.ten + ': ' + h));
+                                const motTrang = cacTrang.length === 1;
+                                const tieuDe = (motTrang && tieuDeNhap) || kq.tieuDe;
+                                if (!tieuDe) throw new Error('không tìm thấy tiêu đề trong trang, hãy nhập tiêu đề');
+                                tienDo(dau + 'Đang lưu ' + tieuDe + '…');
+                                // Thêm nhiều trang một lần: thứ tự tăng dần theo thứ tự các dòng / file đã chọn
+                                await luuTaiLieuHtml(ref, kq, Object.assign({ tieuDe: tieuDe, moTa: (motTrang && moTaNhap) || kq.moTa }, chung, { thuTu: chung.thuTu + i }), !sua);
+                                daLuu++;
+                            } catch (err) {
+                                throw new Error((cacTrang.length > 1 ? 'Đã lưu ' + daLuu + '/' + cacTrang.length + ' tài liệu. ' : '') + 'Lỗi ở ' + trang.ten + ': ' + err.message);
+                            }
+                        }
+                    }
+                } catch (err) {
+                    loiEl.textContent = err.message;
+                    tienDo('');
+                    nut.disabled = false;
+                    if (daLuu) await taiDuLieu();
+                    return;
+                }
+                await taiDuLieu();
+                if (hinhThieu.length) {
+                    // Lưu xong nhưng thiếu hình: giữ hộp thoại để Admin đọc cảnh báo
+                    f.querySelector('#tlf-tien-do').innerHTML = '<div class="bg-amber-50 border border-amber-200 text-amber-800 rounded-xl p-3"><b>Đã lưu, nhưng không tìm thấy các hình sau</b> (chọn kèm file hình rồi sửa tài liệu để thay nội dung):<ul class="list-disc pl-5 mt-1">' +
+                        hinhThieu.map((h) => '<li>' + esc(h) + '</li>').join('') + '</ul></div>';
+                    nut.hidden = true;
+                    return;
+                }
+                dongHopThoai();
+                thongBao(sua ? 'Đã lưu tài liệu' : daLuu > 1 ? 'Đã thêm ' + daLuu + ' tài liệu' : 'Đã thêm tài liệu');
+            });
         }
 
         // ---------- Tab & khởi động ----------

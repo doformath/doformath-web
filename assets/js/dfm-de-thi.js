@@ -373,8 +373,24 @@ window.dfmDeThi = (function () {
         return de && de.hienLoiGiai ? 'day-du' : 'diem';
     }
 
+    // Phân loại đề cho nút lọc ở Phòng thi (Admin chọn khi tạo đề; 'khac' = không thuộc nhóm nào).
+    // Đề tạo trước khi có tuỳ chọn này thì đoán theo tên đề.
+    const PHAN_LOAI = { toan12: 'Toán 12', toan11: 'Toán 11', toan10: 'Toán 10', thpt: 'Thi thử THPT', vact: 'ĐGNL V-ACT' };
+    function doanPhanLoai(tieuDe) {
+        const t = String(tieuDe || '').toLowerCase();
+        if (/v-?act|đgnl|đánh giá năng lực/.test(t)) return 'vact';
+        if (/thpt|tốt nghiệp/.test(t)) return 'thpt';
+        const lop = t.match(/(?:toán|lớp|khối)\s*(1[012])(?!\d)/);
+        return lop ? 'toan' + lop[1] : '';
+    }
+    function phanLoaiCua(de) {
+        if (!de || de.phanLoai === 'khac') return '';
+        return PHAN_LOAI[de.phanLoai] ? de.phanLoai : doanPhanLoai(de.tieuDe);
+    }
+
     return {
         congBoCua: congBoCua, CONG_BO: CONG_BO,
+        PHAN_LOAI: PHAN_LOAI, doanPhanLoai: doanPhanLoai, phanLoaiCua: phanLoaiCua,
         chuanThangDiem: chuanThangDiem, dinhDangSo: dinhDangSo, lamTron: lamTron, DIEM_CAU_THPT: DIEM_CAU_THPT, DS_THPT: DS_THPT,
         phanTich: phanTich, texSangHtml: texSangHtml, chamDiem: chamDiem, tlnDung: tlnDung, soChuan: soChuan,
         veToan: veToan, ganHinh: ganHinh, soCauTheoLoai: soCauTheoLoai, MACRO: MACRO,

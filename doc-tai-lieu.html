@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tài liệu - DoforMath</title>
+
+    <link rel="preconnect" href="https://firestore.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Giao diện sáng / tối: chạy trước CSS để không bị nháy màu -->
+    <script src="assets/js/dfm-giao-dien.js"></script>
+    <!-- CSS Tailwind dựng sẵn cho cả site (sửa class xong chạy: npm run build:css) -->
+    <link rel="stylesheet" href="assets/css/tailwind.css?v=d68b872c">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    <!-- PWA: cho phép cài DoforMath như ứng dụng -->
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png">
+    <link rel="manifest" href="manifest.webmanifest">
+    <meta name="theme-color" content="#0d9488">
+    <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="DoforMath">
+    <script defer src="pwa.js"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 antialiased font-sans min-h-screen">
+
+    <header class="bg-white/95 backdrop-blur border-b border-gray-100 sticky top-0 z-40">
+        <div class="relative max-w-4xl mx-auto px-4 h-14 flex items-center justify-between gap-3">
+            <a href="tai-lieu-mien-phi.html" class="flex items-center gap-2 text-gray-500 hover:text-primary font-medium transition-colors shrink-0">
+                <i class="fa-solid fa-arrow-left"></i><span class="hidden sm:inline">Tài liệu</span>
+            </a>
+            <a href="index.html" class="hover:opacity-80 transition-opacity absolute left-1/2 -translate-x-1/2" aria-label="Trang chủ DoforMath">
+                <span id="logo" class="text-xl tracking-tight text-gray-900">$\textcolor{#0d9488}{\textsf{\textbf{Dofor}}{\sum}\textsf{\textbf{ath}}}$</span>
+            </a>
+            <button type="button" data-doi-giao-dien aria-label="Đổi giao diện sáng / tối" class="w-9 h-9 rounded-full flex items-center justify-center text-gray-500 hover:text-primary hover:bg-gray-100 transition-colors shrink-0"><span class="dark:hidden"><i class="fa-solid fa-moon"></i></span><span class="hidden dark:inline"><i class="fa-solid fa-sun text-amber-300"></i></span></button>
+        </div>
+    </header>
+
+    <div id="trang-thai" class="py-24 text-center text-gray-400">
+        <i class="fa-solid fa-circle-notch fa-spin text-3xl text-primary"></i>
+        <p class="mt-4">Đang tải tài liệu...</p>
+    </div>
+    <div id="an-canh-bao" class="max-w-4xl mx-auto px-4 mt-6" hidden>
+        <div class="bg-amber-50 border border-amber-200 text-amber-800 rounded-2xl p-4 text-sm"><i class="fa-solid fa-eye-slash mr-1.5"></i>Tài liệu này đang ẩn: chỉ quản trị viên xem được.</div>
+    </div>
+    <article id="noi-dung" class="pb-16"></article>
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script src="assets/js/dfm-tai-lieu.js"></script>
+    <script>
+    (function () {
+        const firebaseConfig = {
+            apiKey: "AIzaSyD-NDo43O3Q_9GVii6pDOM7D6SQ5pxmo5g",
+            authDomain: "doformath-bac70.firebaseapp.com",
+            projectId: "doformath-bac70",
+            storageBucket: "doformath-bac70.firebasestorage.app",
+            messagingSenderId: "329095418163",
+            appId: "1:329095418163:web:226636d40b5c2960cdee46"
+        };
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const trangThai = document.getElementById('trang-thai');
+        const noiDung = document.getElementById('noi-dung');
+
+        function baoLoi(chu) {
+            trangThai.innerHTML = '<i class="fa-regular fa-folder-open text-4xl text-gray-300"></i><p class="mt-4 font-medium text-gray-600">' + chu + '</p>' +
+                '<a href="tai-lieu-mien-phi.html" class="inline-block mt-6 bg-primary hover:bg-teal-800 text-white px-5 py-2.5 rounded-full font-medium">Xem các tài liệu khác</a>';
+        }
+
+        function veToan(goc) {
+            if (window.renderMathInElement) {
+                renderMathInElement(goc, {
+                    delimiters: [{ left: '$$', right: '$$', display: true }, { left: '$', right: '$', display: false }],
+                    throwOnError: false
+                });
+            } else {
+                document.addEventListener('DOMContentLoaded', function () { veToan(goc); });
+            }
+        }
+        veToan(document.getElementById('logo'));
+
+        const id = new URLSearchParams(location.search).get('id');
+        if (!id) { baoLoi('Không tìm thấy tài liệu.'); return; }
+
+        // Chờ biết đăng nhập hay chưa (Admin xem được cả tài liệu đang ẩn), rồi mới đọc
+        const huy = firebase.auth().onAuthStateChanged(async function () {
+            huy();
+            try {
+                const [sTl, sNd] = await Promise.all([
+                    db.collection('tai_lieu').doc(id).get(),
+                    db.collection('tai_lieu_noi_dung').doc(id).get()
+                ]);
+                if (!sTl.exists) { baoLoi('Không tìm thấy tài liệu.'); return; }
+                const tl = sTl.data();
+                if (tl.loai === 'anh') { location.replace(dfmTaiLieu.duongDan(Object.assign({ id: id }, tl))); return; }
+                if (!sNd.exists) { baoLoi('Không tìm thấy tài liệu.'); return; }
+                document.title = (tl.tieuDe || 'Tài liệu') + ' - DoforMath';
+
+                // Admin soạn nội dung, nhưng vẫn làm sạch trước khi hiển thị cho chắc
+                const ban = new DOMParser().parseFromString('<!DOCTYPE html><body>' + (sNd.data().html || ''), 'text/html');
+                dfmTaiLieu.lamSach(ban.body);
+                ban.body.querySelectorAll('img').forEach(function (img) { img.loading = 'lazy'; img.decoding = 'async'; });
+                noiDung.replaceChildren(...Array.from(ban.body.childNodes).map(function (n) { return document.adoptNode(n); }));
+                document.getElementById('an-canh-bao').hidden = tl.an !== true;
+                trangThai.hidden = true;
+                dfmTaiLieu.boSungTailwind(noiDung);
+                veToan(noiDung);
+            } catch (err) {
+                console.warn('Không tải được tài liệu:', err);
+                baoLoi(err && err.code === 'permission-denied' ? 'Tài liệu này hiện chưa mở.' : 'Không tải được tài liệu. Kiểm tra mạng rồi thử lại.');
+            }
+        });
+    })();
+    </script>
+    <script>
+    // Chặn chuột phải và bôi đen giống các trang tài liệu khác
+    document.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+    document.onselectstart = function (e) {
+        const el = e.target.nodeType === 1 ? e.target : e.target.parentElement;
+        return !!(el && el.closest('input, textarea, select, [contenteditable]'));
+    };
+    </script>
+</body>
+</html>

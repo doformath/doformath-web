@@ -98,6 +98,19 @@ service cloud.firestore {
       allow write: if laAdmin();
     }
 
+    // ===== Tài liệu miễn phí (thêm ở trang Quản trị, tab Tài liệu) =====
+    // Ai cũng đọc được tài liệu đang hiện, không cần đăng nhập (trang danh sách phải lọc where('an', '==', false));
+    // tài liệu đang ẩn chỉ Admin xem được. Chỉ Admin sửa.
+    match /tai_lieu/{id} {
+      allow read: if laAdmin() || resource.data.an == false;
+      allow write: if laAdmin();
+    }
+    // Nội dung HTML: đọc từng tài liệu một, theo trạng thái ẩn / hiện của tài liệu đó
+    match /tai_lieu_noi_dung/{id} {
+      allow get: if laAdmin() || get(/databases/$(database)/documents/tai_lieu/$(id)).data.an == false;
+      allow list, write: if laAdmin();
+    }
+
     // ===== Đề thi trực tuyến (tải lên từ file TeX ở trang Quản trị) =====
     // Đề: học sinh đã được duyệt đọc đề đang mở, hoặc đề mình đã nộp (để xem lại kết quả); chỉ Admin sửa
     match /de_thi/{deId} {

@@ -15,7 +15,7 @@
     <!-- Giao diện sáng / tối: chạy trước CSS để không bị nháy màu -->
     <script src="../assets/js/dfm-giao-dien.js"></script>
     <!-- CSS Tailwind dựng sẵn cho cả site (sửa class xong chạy: npm run build:css) -->
-    <link rel="stylesheet" href="../assets/css/tailwind.css?v=4d1f765f">
+    <link rel="stylesheet" href="../assets/css/tailwind.css?v=d68b872c">
     <!-- Sidebar mục lục kéo đổi độ rộng (dùng chung toan-10/11/12) -->
     <script src="../assets/js/dfm-sidebar.js"></script>
     
@@ -1226,7 +1226,7 @@
                                 <!-- Bài 1 -->
                                 <div x-data="{ openLesson: false }" class="bg-gradient-to-br from-white to-slate-50 border border-slate-200 rounded-2xl p-4 hover:border-teal-300 hover:shadow-md transition-all shadow-sm group/lesson">
                                     <div @click="openLesson = !openLesson" class="flex justify-between items-center cursor-pointer">
-                                        <h5 class="font-semibold text-slate-800 text-sm group-hover/lesson:text-teal-700 transition-colors pr-2 leading-relaxed">Bài 1. Mẫu số liệu ghép nhóm</h5>
+                                        <h5 class="font-semibold text-slate-800 text-sm group-hover/lesson:text-teal-700 transition-colors pr-2 leading-relaxed">Bài 1. Số trung bình và Mốt</h5>
                                         <i class="fa-solid fa-chevron-down text-slate-400 text-sm transition-transform duration-300 group-hover/lesson:text-teal-500" :class="openLesson ? 'rotate-180 text-teal-500' : ''"></i>
                                     </div>
                                     <ul x-show="openLesson" x-transition class="relative border-l-[3px] border-slate-200 ml-2 mt-4 space-y-5 pb-1">
@@ -1253,7 +1253,7 @@
                                 <!-- Bài 2 -->
                                 <div x-data="{ openLesson: false }" class="bg-gradient-to-br from-white to-slate-50 border border-slate-200 rounded-2xl p-4 hover:border-teal-300 hover:shadow-md transition-all shadow-sm group/lesson">
                                     <div @click="openLesson = !openLesson" class="flex justify-between items-center cursor-pointer">
-                                        <h5 class="font-semibold text-slate-800 text-sm group-hover/lesson:text-teal-700 transition-colors pr-2 leading-relaxed">Bài 2. Các số đặc trưng đo xu thế trung tâm</h5>
+                                        <h5 class="font-semibold text-slate-800 text-sm group-hover/lesson:text-teal-700 transition-colors pr-2 leading-relaxed">Bài 2. Trung vị và tứ phân vị</h5>
                                         <i class="fa-solid fa-chevron-down text-slate-400 text-sm transition-transform duration-300 group-hover/lesson:text-teal-500" :class="openLesson ? 'rotate-180 text-teal-500' : ''"></i>
                                     </div>
                                     <ul x-show="openLesson" x-transition class="relative border-l-[3px] border-slate-200 ml-2 mt-4 space-y-5 pb-1">

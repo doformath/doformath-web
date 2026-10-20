@@ -19,7 +19,7 @@
     <!-- Giao diện sáng / tối: chạy trước CSS để không bị nháy màu -->
     <script src="assets/js/dfm-giao-dien.js"></script>
     <!-- CSS Tailwind dựng sẵn cho cả site (sửa class xong chạy: npm run build:css) -->
-    <link rel="stylesheet" href="assets/css/tailwind.css?v=4d1f765f">
+    <link rel="stylesheet" href="assets/css/tailwind.css?v=d68b872c">
 
     <!-- Font Awesome cho các Icon (tải kiểu media="print" để không chặn render, rồi tự chuyển sang "all") -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
@@ -252,6 +252,25 @@
                         <i class="fa-solid fa-arrow-right text-sm transition-transform group-hover:translate-x-0.5"></i>
                     </span>
                 </a>
+
+                <!-- Thẻ "Bài mới cập nhật": bài thầy vừa đăng (14 ngày gần đây) trong các khóa học sinh được học -->
+                <div id="bai-moi" style="display: none;" role="region" aria-label="Bài mới cập nhật"
+                     class="hoc-tiep mt-4 mx-auto w-full max-w-lg text-left bg-white border border-amber-200 rounded-2xl shadow-lg shadow-amber-100/60 overflow-hidden">
+                    <div class="flex items-center gap-3 px-4 py-3 bg-amber-50 border-b border-amber-100">
+                        <span class="w-9 h-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
+                            <i class="fa-solid fa-bell"></i>
+                        </span>
+                        <span class="flex-1 min-w-0">
+                            <span class="block font-bold text-gray-900 leading-snug">Bài mới cập nhật</span>
+                            <span id="bai-moi-phu" class="block text-sm text-gray-500 truncate"></span>
+                        </span>
+                        <button id="bai-moi-dong" type="button" aria-label="Ẩn thông báo bài mới"
+                                class="w-8 h-8 rounded-full text-gray-400 hover:bg-amber-100 hover:text-gray-700 flex items-center justify-center shrink-0 transition-colors">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                    <ul id="bai-moi-ds" class="divide-y divide-gray-100"></ul>
+                </div>
             </div>
         </div>
     </section>
@@ -627,54 +646,32 @@
         </div>
     </section>
     <!-- FOOTER -->
-    <footer class="bg-gray-900 text-gray-300 py-12 border-t border-gray-800">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div class="col-span-1 md:col-span-2">
-                <div class="mb-4 inline-block hover:opacity-80 transition-opacity cursor-pointer">
-    <span class="text-2xl tracking-tight text-white pb-1">
-        $\textcolor{#0d9488}{\textsf{\textbf{Dofor}}{\sum}\textsf{\textbf{ath}}}$
-    </span>
-</div>
-                <p class="text-sm text-gray-400 max-w-sm mb-6 leading-relaxed">
+    <footer class="bg-gray-900 text-gray-300 py-10 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row md:items-center md:justify-between gap-6 text-center md:text-left">
+            <div>
+                <div class="mb-3 inline-block hover:opacity-80 transition-opacity cursor-pointer">
+                    <span class="text-2xl tracking-tight text-white pb-1">
+                        $\textcolor{#0d9488}{\textsf{\textbf{Dofor}}{\sum}\textsf{\textbf{ath}}}$
+                    </span>
+                </div>
+                <p class="text-sm text-gray-400 max-w-md leading-relaxed mx-auto md:mx-0">
                     Nền tảng học Toán trực tuyến tối ưu, giúp học sinh xây dựng tư duy logic và đạt điểm số cao trong các kỳ thi.
                 </p>
-                <div class="flex space-x-4 mt-6">
-                <!-- Facebook -->
-                <a href="https://www.facebook.com/d.circle7" target="_blank" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
+            </div>
+            <div class="flex justify-center gap-4">
+                <a href="https://www.facebook.com/d.circle7" target="_blank" rel="noopener" aria-label="Facebook" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
                     <i class="fa-brands fa-facebook-f"></i>
                 </a>
-                
-                <!-- TikTok -->
-                <a href="https://tiktok.com/@anhthaymathmath" target="_blank" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
+                <a href="https://tiktok.com/@anhthaymathmath" target="_blank" rel="noopener" aria-label="TikTok" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
                     <i class="fa-brands fa-tiktok"></i>
                 </a>
-                
-                <!-- YouTube -->
-                <a href="https://youtube.com/@doformath" target="_blank" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
+                <a href="https://youtube.com/@doformath" target="_blank" rel="noopener" aria-label="YouTube" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
                     <i class="fa-brands fa-youtube"></i>
                 </a>
-
-            </div>
-            </div>
-            <div>
-                <h4 class="text-white font-semibold mb-4">Liên kết nhanh</h4>
-                <ul class="space-y-2 text-sm">
-                    <li><a href="#" class="hover:text-primary transition-colors">Tất cả khóa học</a></li>
-                    <li><a href="#" class="hover:text-primary transition-colors">Tài liệu miễn phí</a></li>
-                    <li><a href="#" class="hover:text-primary transition-colors">Tin tức & Sự kiện</a></li>
-                </ul>
-            </div>
-            <div>
-                <h4 class="text-white font-semibold mb-4">Hỗ trợ</h4>
-                <ul class="space-y-2 text-sm">
-                    <li><a href="#" class="hover:text-primary transition-colors">Hướng dẫn đăng ký</a></li>
-                    <li><a href="#" class="hover:text-primary transition-colors">Chính sách hoàn học phí</a></li>
-                    <li><a href="#" class="hover:text-primary transition-colors">Liên hệ giáo viên</a></li>
-                </ul>
             </div>
         </div>
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 pt-8 border-t border-gray-800 text-sm text-gray-500 text-center">
-            &copy; 2026 DoforMath Education. All rights reserved. Code by HTML/Tailwind.
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 pt-6 border-t border-gray-800 text-sm text-gray-500 text-center">
+            &copy; 2026 DoforMath Education. All rights reserved.
         </div>
     </footer>
 
@@ -693,6 +690,9 @@
     <!-- Nhúng thư viện Firebase Auth: thêm "defer" để không chặn trình duyệt hiển thị trang trong lúc tải -->
 <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script defer src="assets/js/dfm-tai-khoan.js"></script>
+<script defer src="assets/js/dfm-khoa-hoc.js"></script>
 
 <script>
     // Toàn bộ logic Firebase được gói trong DOMContentLoaded để đảm bảo 2 file SDK
@@ -745,8 +745,75 @@
             the.style.display = '';
         }
 
+        // Thẻ "Bài mới cập nhật": bài thầy vừa đăng trong các khóa học sinh được học.
+        // Nhớ trên máy theo từng tài khoản: xem = mốc bài mới nhất đã báo (bài sau mốc này có nhãn "Mới"),
+        // dong = học sinh đã bấm ẩn thông báo (chỉ hiện lại khi có bài đăng sau đó).
+        const SO_BAI_MOI_TOI_DA = 5;
+        function hienBaiMoi(user) {
+            const the = document.getElementById('bai-moi');
+            if (!the) return;
+            the.style.display = 'none';
+            if (!user || !window.dfmTaiKhoan || !window.dfmKhoaHoc || !dfmKhoaHoc.docBaiMoi || !firebase.firestore) return;
+            const db = firebase.firestore();
+            const khoaNho = 'dfm_baiMoi_' + user.email;
+            let nho = {};
+            try { nho = JSON.parse(localStorage.getItem(khoaNho)) || {}; } catch (e) {}
+            const luuNho = () => { try { localStorage.setItem(khoaNho, JSON.stringify(nho)); } catch (e) {} };
+
+            const quyen = user.email === 'thanhdo@dfm.com'
+                ? Promise.resolve({ 'toan-10': true, 'toan-11': true, 'toan-12': true })
+                : dfmTaiKhoan.docQuyen(db, user);
+            quyen.then((q) => dfmKhoaHoc.docBaiMoi(db, Object.keys(TEN_KHOA).filter((k) => q[k] === true)))
+                .then((ds) => {
+                    if (!ds.length || firebase.auth().currentUser !== user) return;
+                    const moiNhat = ds[0].luc;
+                    if (nho.dong && moiNhat <= nho.dong) return;
+                    const daXem = nho.xem || 0;
+                    const soChuaXem = ds.filter((b) => b.luc > daXem).length;
+
+                    const dsEl = document.getElementById('bai-moi-ds');
+                    dsEl.textContent = '';
+                    ds.slice(0, SO_BAI_MOI_TOI_DA).forEach((b) => {
+                        const li = document.createElement('li');
+                        const a = document.createElement('a');
+                        a.href = 'courses/' + b.khoa + '.html?bai=' + encodeURIComponent(b.href);
+                        a.className = 'group flex items-center gap-3 px-4 py-3 hover:bg-teal-50 transition-colors';
+                        a.innerHTML =
+                            '<span class="text-[11px] font-bold text-primary bg-teal-50 group-hover:bg-white rounded-lg px-2 py-1 shrink-0 whitespace-nowrap"></span>' +
+                            '<span class="min-w-0 flex-1"><span class="block font-semibold text-gray-900 leading-snug line-clamp-2 sm:line-clamp-1"></span>' +
+                            '<span class="block text-sm text-gray-500 truncate"></span></span>' +
+                            '<i class="fa-solid fa-chevron-right text-xs text-gray-300 group-hover:text-primary shrink-0"></i>';
+                        const o = a.querySelectorAll('span');
+                        o[0].textContent = TEN_KHOA[b.khoa];
+                        o[2].textContent = b.ten;
+                        if (b.luc > daXem) {
+                            const nhan = document.createElement('span');
+                            nhan.className = 'ml-2 align-middle text-[10px] font-bold uppercase tracking-wide text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded';
+                            nhan.textContent = 'Mới';
+                            o[2].appendChild(nhan);
+                        }
+                        o[3].textContent = [b.chuong, truocDay(b.luc)].filter(Boolean).join(' · ');
+                        li.appendChild(a);
+                        dsEl.appendChild(li);
+                    });
+                    const conLai = ds.length - SO_BAI_MOI_TOI_DA;
+                    document.getElementById('bai-moi-phu').textContent =
+                        (soChuaXem ? soChuaXem + ' bài bạn chưa xem' : ds.length + ' bài trong 2 tuần qua') +
+                        (conLai > 0 ? ' · còn ' + conLai + ' bài khác trong khóa học' : '');
+                    document.getElementById('bai-moi-dong').onclick = () => {
+                        nho.dong = moiNhat; luuNho();
+                        the.style.display = 'none';
+                    };
+                    the.style.display = '';
+                    // Đã báo xong: lần sau vào trang các bài này không còn nhãn "Mới"
+                    nho.xem = Math.max(daXem, moiNhat); luuNho();
+                })
+                .catch((err) => console.warn('Không tải được bài mới:', err));
+        }
+
         firebase.auth().onAuthStateChanged((user) => {
             hienHocTiep(user);
+            hienBaiMoi(user);
             const khuVucDangNhap = document.getElementById('khu-vuc-dang-nhap');
             const khuVucUser = document.getElementById('khu-vuc-user');
             const nutDangXuatMobile = document.getElementById('nutDangXuatMobile');

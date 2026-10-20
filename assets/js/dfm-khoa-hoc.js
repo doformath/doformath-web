@@ -3,6 +3,7 @@
 // 1. Chèn các bài học thêm từ trang Admin (Firestore: bai_hoc_them) vào đúng chương trong mục lục.
 // 2. Nhớ bài đang học (cho thẻ "Tiếp tục học" ở trang chủ) và mở thẳng bài qua địa chỉ ?bai=...
 // 3. Ghi lại hoạt động học tập (Firestore: hoc_sinh/{uid} và hoc_sinh/{uid}/hoat_dong) để Admin theo dõi.
+// Trang chủ dùng dfmKhoaHoc.docBaiMoi(db, cacKhoa) để thông báo bài mới đăng.
 window.dfmKhoaHoc = (function () {
     const ADMIN_EMAIL = 'thanhdo@dfm.com';
     const GIAY_TOI_DA_MOI_DOAN = 60 * 60;   // Tab để mở quá lâu (quên tắt) chỉ tính tối đa 1 giờ mỗi lần
@@ -76,6 +77,16 @@ window.dfmKhoaHoc = (function () {
         return null;
     }
 
+    // Lúc học sinh bắt đầu thấy bài: lúc Admin hiện bài (congBoLuc), bài cũ chưa có trường này thì lấy lúc tạo
+    function mocCongBo(bai) {
+        const t = bai.congBoLuc || bai.taoLuc;
+        return t && t.toMillis ? t.toMillis() : 0;
+    }
+    function laBaiMoi(bai) {
+        const moc = mocCongBo(bai);
+        return !!moc && Date.now() - moc < NGAY_LA_BAI_MOI * 86400000;
+    }
+
     function el(tag, className, attrs) {
         const e = document.createElement(tag);
         if (className) e.className = className;
@@ -90,8 +101,7 @@ window.dfmKhoaHoc = (function () {
         const dau = el('div', 'flex justify-between items-center cursor-pointer', { 'x-on:click': 'openLesson = !openLesson' });
         const h5 = el('h5', 'font-semibold text-slate-800 text-sm group-hover/lesson:text-teal-700 transition-colors pr-2 leading-relaxed');
         h5.textContent = bai.ten;
-        const taoLuc = bai.taoLuc && bai.taoLuc.toMillis ? bai.taoLuc.toMillis() : 0;
-        if (taoLuc && Date.now() - taoLuc < NGAY_LA_BAI_MOI * 86400000) {
+        if (laBaiMoi(bai)) {
             const moi = el('span', 'ml-2 align-middle text-[10px] font-bold uppercase tracking-wide text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded', { 'data-nhan-moi': '' });
             moi.textContent = 'Mới';
             h5.appendChild(moi);
@@ -176,6 +186,22 @@ window.dfmKhoaHoc = (function () {
             });
         }).catch(function (err) {
             console.warn('Không tải được bài học thêm:', err);
+        });
+    }
+
+    // Bài mới đăng trong 14 ngày gần đây của các khóa học sinh được học (thông báo ở trang chủ), mới nhất trước.
+    // href là đúng link trong mục lục khóa học, để mở thẳng bài bằng ...toan-12.html?bai=<href>
+    function docBaiMoi(db, cacKhoa) {
+        if (!cacKhoa.length) return Promise.resolve([]);
+        return db.collection('bai_hoc_them').where('khoa', 'in', cacKhoa).get().then(function (snap) {
+            return snap.docs.map(function (d) { return Object.assign({ id: d.id }, d.data()); })
+                .filter(function (b) { return !b.an && b.ten && b.chuong && laBaiMoi(b); })
+                .map(function (b) {
+                    const href = (b.muc || []).map(function (m) { return taoHref(m, b.ten); }).find(Boolean);
+                    return { id: b.id, khoa: b.khoa, ten: b.ten, chuong: b.chuong, luc: mocCongBo(b), href: href };
+                })
+                .filter(function (b) { return b.href; })
+                .sort(function (a, b) { return b.luc - a.luc; });
         });
     }
 
@@ -308,6 +334,7 @@ window.dfmKhoaHoc = (function () {
     }
 
     return {
+        docBaiMoi: docBaiMoi,
         // Không bao giờ ném lỗi ra ngoài: lỗi ở đây không được làm hỏng trang học
         batDau: function (db, user, khoa) {
             try {

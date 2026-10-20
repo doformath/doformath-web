@@ -13,7 +13,7 @@
     <!-- Giao diện sáng / tối: chạy trước CSS để không bị nháy màu -->
     <script src="assets/js/dfm-giao-dien.js"></script>
     <!-- CSS Tailwind dựng sẵn cho cả site (sửa class xong chạy: npm run build:css) -->
-    <link rel="stylesheet" href="assets/css/tailwind.css?v=4d1f765f">
+    <link rel="stylesheet" href="assets/css/tailwind.css?v=d68b872c">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -264,6 +264,9 @@
                 </section>
             </div>
         </div>
+
+        <!-- Gợi ý không gấp (liên kết Google cho tài khoản thầy cấp) để cuối trang -->
+        <div id="thong-bao-tk-cuoi" class="space-y-3 mt-6 empty:hidden"></div>
     </main>
 
     <!-- HỘP TÀI KHOẢN & ĐỔI MẬT KHẨU -->
@@ -666,23 +669,24 @@
             return '<p class="text-sm font-medium rounded-xl px-4 py-3 ' + (loai === 'ok' ? 'bg-emerald-50 text-emerald-800' : 'bg-red-50 text-red-700') + '" role="' + (loai === 'ok' ? 'status' : 'alert') + '">' +
                 '<i class="fa-solid ' + (loai === 'ok' ? 'fa-circle-check' : 'fa-circle-exclamation') + ' mr-1"></i>' + esc(msg) + '</p>';
         }
-        // Thanh trạng thái đầu trang: đơn đăng ký, xác minh email, gợi ý liên kết cho tài khoản thầy cấp
+        // Thanh trạng thái: đầu trang (đơn đăng ký, xác minh email), cuối trang (gợi ý liên kết cho tài khoản thầy cấp)
         let DON_DANG_KY = null, CO_KHOA = false;
         function veThongBaoTaiKhoan() {
             const u = firebase.auth().currentUser;
             if (!u) return;
             const the = (mau, icon, html, nut) => '<div class="flex flex-wrap items-center gap-3 rounded-2xl border px-4 py-3 ' + mau + '"><i class="fa-solid ' + icon + '"></i><p class="flex-1 min-w-[200px] text-sm">' + html + '</p>' + (nut || '') + '</div>';
             const nutTk = (chu) => '<button type="button" data-mo-tk class="text-sm font-semibold px-3.5 py-2 rounded-xl bg-white/80 hover:bg-white border border-current/10 whitespace-nowrap">' + chu + '</button>';
-            const ds = [];
+            const ds = [], cuoi = [];
             if (DON_DANG_KY && !CO_KHOA) {
                 if (DON_DANG_KY.trangThai === 'cho') ds.push(the('bg-amber-50 border-amber-200 text-amber-800', 'fa-hourglass-half', 'Đơn đăng ký lớp <b>' + esc(DON_DANG_KY.tenLop || DON_DANG_KY.maLop) + '</b> đang chờ thầy duyệt. Duyệt xong bạn sẽ vào học được trong <b>Khóa học</b>.'));
                 else if (DON_DANG_KY.trangThai === 'tu-choi') ds.push(the('bg-red-50 border-red-200 text-red-700', 'fa-circle-xmark', 'Đơn đăng ký lớp <b>' + esc(DON_DANG_KY.tenLop || DON_DANG_KY.maLop) + '</b> chưa được duyệt. Hãy liên hệ thầy.'));
             }
             if (!TK.laEmailCap(u.email) && TK.coMatKhau(u) && !u.emailVerified) ds.push(the('bg-sky-50 border-sky-200 text-sky-800', 'fa-envelope', 'Hãy mở thư DoforMath gửi tới <b>' + esc(u.email) + '</b> để xác minh email, nhờ vậy khi quên mật khẩu bạn tự lấy lại được.', nutTk('Gửi lại thư')));
-            if (TK.laEmailCap(u.email) && !TK.coGoogle(u)) ds.push(the('bg-teal-50 border-teal-200 text-teal-800', 'fa-shield-halved', 'Tài khoản thầy cấp chưa tự lấy lại được mật khẩu khi quên. Hãy <b>liên kết Google</b> hoặc <b>đổi sang email thật</b> (kết quả học tập giữ nguyên).', nutTk('Liên kết ngay')));
+            if (TK.laEmailCap(u.email) && !TK.coGoogle(u)) cuoi.push(the('bg-teal-50 border-teal-200 text-teal-800', 'fa-shield-halved', 'Tài khoản thầy cấp chưa tự lấy lại được mật khẩu khi quên. Hãy <b>liên kết Google</b> hoặc <b>đổi sang email thật</b> (kết quả học tập giữ nguyên).', nutTk('Liên kết ngay')));
             $('thong-bao-tk').innerHTML = ds.join('');
+            $('thong-bao-tk-cuoi').innerHTML = cuoi.join('');
         }
-        $('thong-bao-tk').addEventListener('click', (e) => { if (e.target.closest('[data-mo-tk]')) $('nut-tai-khoan').click(); });
+        ['thong-bao-tk', 'thong-bao-tk-cuoi'].forEach((id) => $(id).addEventListener('click', (e) => { if (e.target.closest('[data-mo-tk]')) $('nut-tai-khoan').click(); }));
 
         // ---------- Tài khoản & đổi mật khẩu ----------
         // Firebase yêu cầu xác nhận lại mật khẩu hiện tại trước khi đổi; đổi xong, phiên đăng nhập ở máy khác bị thu hồi.

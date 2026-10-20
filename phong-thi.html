@@ -13,7 +13,7 @@
     <!-- Giao diện sáng / tối: chạy trước CSS để không bị nháy màu -->
     <script src="assets/js/dfm-giao-dien.js"></script>
     <!-- CSS Tailwind dựng sẵn cho cả site (sửa class xong chạy: npm run build:css) -->
-    <link rel="stylesheet" href="assets/css/tailwind.css?v=4d1f765f">
+    <link rel="stylesheet" href="assets/css/tailwind.css?v=d68b872c">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -205,22 +205,22 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             
             <!-- Nút Lọc Danh mục -->
-            <div class="flex flex-wrap justify-center gap-3 mb-10 md:mb-14">
-                <button class="bg-teal-600 text-white px-5 py-2 rounded-full font-semibold shadow-md shadow-teal-500/20 border border-teal-600">Tất cả đề thi</button>
-                <button class="bg-white text-slate-600 hover:text-teal-600 border border-slate-200 hover:border-teal-300 px-5 py-2 rounded-full font-medium transition-colors">Thi thử THPT</button>
-                <button class="bg-white text-slate-600 hover:text-teal-600 border border-slate-200 hover:border-teal-300 px-5 py-2 rounded-full font-medium transition-colors">ĐGNL V-ACT</button>
-                <button class="bg-white text-slate-600 hover:text-teal-600 border border-slate-200 hover:border-teal-300 px-5 py-2 rounded-full font-medium transition-colors">Toán 12</button>
-                <button class="bg-white text-slate-600 hover:text-teal-600 border border-slate-200 hover:border-teal-300 px-5 py-2 rounded-full font-medium transition-colors">Toán 11</button>
-                <button class="bg-white text-slate-600 hover:text-teal-600 border border-slate-200 hover:border-teal-300 px-5 py-2 rounded-full font-medium transition-colors">Toán 10</button>
+            <div id="loc-de" class="flex flex-wrap justify-center gap-3 mb-10 md:mb-14">
+                <button type="button" data-loc="" aria-pressed="true" class="bg-teal-600 text-white px-5 py-2 rounded-full font-semibold shadow-md shadow-teal-500/20 border border-teal-600">Tất cả đề thi</button>
+                <button type="button" data-loc="toan12" aria-pressed="false" class="bg-white text-slate-600 hover:text-teal-600 border border-slate-200 hover:border-teal-300 px-5 py-2 rounded-full font-medium transition-colors">Toán 12</button>
+                <button type="button" data-loc="toan11" aria-pressed="false" class="bg-white text-slate-600 hover:text-teal-600 border border-slate-200 hover:border-teal-300 px-5 py-2 rounded-full font-medium transition-colors">Toán 11</button>
+                <button type="button" data-loc="toan10" aria-pressed="false" class="bg-white text-slate-600 hover:text-teal-600 border border-slate-200 hover:border-teal-300 px-5 py-2 rounded-full font-medium transition-colors">Toán 10</button>
+                <button type="button" data-loc="thpt" aria-pressed="false" class="bg-white text-slate-600 hover:text-teal-600 border border-slate-200 hover:border-teal-300 px-5 py-2 rounded-full font-medium transition-colors">Thi thử THPT</button>
+                <button type="button" data-loc="vact" aria-pressed="false" class="bg-white text-slate-600 hover:text-teal-600 border border-slate-200 hover:border-teal-300 px-5 py-2 rounded-full font-medium transition-colors">ĐGNL V-ACT</button>
             </div>
 
             <!-- Lưới Đề thi (Grid 3 cột) -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+            <div id="luoi-de" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                 <!-- Đề thi trực tuyến tải lên từ trang Quản trị (đang mở): chèn vào đây khi học sinh đã đăng nhập -->
                 <div id="de-thi-moi" class="contents"></div>
                 
                 <!-- Đề 1: Thi thử THPT (Nổi bật nhất) -->
-                <a href="exam/de-thi-thu-thpt-1.html" class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 border border-slate-200 group flex flex-col cursor-pointer block relative">
+                <a data-loai="thpt" href="exam/de-thi-thu-thpt-1.html" class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 border border-slate-200 group flex flex-col cursor-pointer block relative">
                     <!-- Nhãn góc -->
                     <div class="absolute top-4 right-4 bg-red-100 text-red-600 font-bold text-xs px-2.5 py-1 rounded-md z-10 border border-red-200 flex items-center gap-1">
                         <i class="fa-solid fa-fire"></i> Hot
@@ -260,7 +260,7 @@
                 </a>
 
                 <!-- Kiểm tra công thức Lượng giác (chỉ cần đăng nhập) -->
-                <a href="exam/kiem-tra-cong-thuc-luong-giac.html" class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 border border-slate-200 group flex flex-col cursor-pointer block relative">
+                <a data-loai="toan11" href="exam/kiem-tra-cong-thuc-luong-giac.html" class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 border border-slate-200 group flex flex-col cursor-pointer block relative">
                     <div class="absolute top-4 right-4 bg-teal-50 text-teal-700 font-bold text-xs px-2.5 py-1 rounded-md z-10 border border-teal-200 flex items-center gap-1">
                         <i class="fa-solid fa-user-lock"></i> Cần đăng nhập
                     </div>
@@ -297,7 +297,7 @@
                 </a>
 
                 <!-- Kiểm tra công thức Cấp số cộng, Cấp số nhân, Thống kê (chỉ cần đăng nhập) -->
-                <a href="exam/kiem-tra-cong-thuc-day-so-thong-ke.html" class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 border border-slate-200 group flex flex-col cursor-pointer block relative">
+                <a data-loai="toan11" href="exam/kiem-tra-cong-thuc-day-so-thong-ke.html" class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 border border-slate-200 group flex flex-col cursor-pointer block relative">
                     <div class="absolute top-4 right-4 bg-teal-50 text-teal-700 font-bold text-xs px-2.5 py-1 rounded-md z-10 border border-teal-200 flex items-center gap-1">
                         <i class="fa-solid fa-user-lock"></i> Cần đăng nhập
                     </div>
@@ -334,7 +334,7 @@
                 </a>
 
                 <!-- Kiểm tra Tập hợp, Hệ thức lượng trong tam giác (cần mã do giáo viên cấp) -->
-                <a href="exam/kiem-tra-tap-hop-he-thuc-luong.html" class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 border border-slate-200 group flex flex-col cursor-pointer block relative">
+                <a data-loai="toan10" href="exam/kiem-tra-tap-hop-he-thuc-luong.html" class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 border border-slate-200 group flex flex-col cursor-pointer block relative">
                     <div class="absolute top-4 right-4 bg-amber-100 text-amber-700 font-bold text-xs px-2.5 py-1 rounded-md z-10 border border-amber-200 flex items-center gap-1">
                         <i class="fa-solid fa-key"></i> Cần mã
                     </div>
@@ -371,7 +371,7 @@
                 </a>
 
                 <!-- Đề 2: ĐGNL V-ACT -->
-                <a href="#" class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 border border-slate-200 group flex flex-col cursor-pointer block relative">
+                <a data-loai="vact" href="#" class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 border border-slate-200 group flex flex-col cursor-pointer block relative">
                     <div class="p-6 md:p-8 flex-1 flex flex-col relative overflow-hidden">
                         <i class="fa-solid fa-brain absolute -bottom-6 -right-6 text-9xl text-slate-50 opacity-50 transform -rotate-12 group-hover:scale-110 transition-transform duration-500"></i>
                         
@@ -404,7 +404,7 @@
                 </a>
 
                 <!-- Đề 3: Toán 12 -->
-                <a href="#" class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 border border-slate-200 group flex flex-col cursor-pointer block relative">
+                <a data-loai="toan12" href="#" class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 border border-slate-200 group flex flex-col cursor-pointer block relative">
                     <div class="p-6 md:p-8 flex-1 flex flex-col relative overflow-hidden">
                         <i class="fa-solid fa-file-contract absolute -bottom-6 -right-6 text-9xl text-slate-50 opacity-50 transform -rotate-12 group-hover:scale-110 transition-transform duration-500"></i>
                         
@@ -437,7 +437,7 @@
                 </a>
 
                 <!-- Đề 4: Toán 11 -->
-                <a href="#" class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 border border-slate-200 group flex flex-col cursor-pointer block relative">
+                <a data-loai="toan11" href="#" class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 border border-slate-200 group flex flex-col cursor-pointer block relative">
                     <div class="p-6 md:p-8 flex-1 flex flex-col relative overflow-hidden">
                         <i class="fa-solid fa-shapes absolute -bottom-6 -right-6 text-9xl text-slate-50 opacity-50 transform -rotate-12 group-hover:scale-110 transition-transform duration-500"></i>
                         
@@ -470,7 +470,7 @@
                 </a>
 
                 <!-- Đề 5: Toán 10 -->
-                <a href="#" class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 border border-slate-200 group flex flex-col cursor-pointer block relative">
+                <a data-loai="toan10" href="#" class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 border border-slate-200 group flex flex-col cursor-pointer block relative">
                     <div class="p-6 md:p-8 flex-1 flex flex-col relative overflow-hidden">
                         <i class="fa-solid fa-square-root-variable absolute -bottom-6 -right-6 text-9xl text-slate-50 opacity-50 transform -rotate-12 group-hover:scale-110 transition-transform duration-500"></i>
                         
@@ -503,6 +503,8 @@
                 </a>
 
             </div>
+
+            <p id="loc-trong" class="hidden text-center text-slate-500 py-12"><i class="fa-regular fa-folder-open text-3xl text-slate-300 block mb-3"></i>Chưa có đề nào trong mục này.</p>
         </div>
     </section>
 
@@ -522,6 +524,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script src="assets/js/dfm-de-thi.js"></script>
     
     <script>
         const firebaseConfig = {
@@ -571,7 +574,7 @@
                 ? (de.daDong ? '<span class="text-sm font-medium text-slate-500"><i class="fa-solid fa-lock mr-1"></i>Đề đã đóng</span>'
                     : '<span class="text-sm font-medium ' + (congBo === 'an' ? 'text-slate-500' : 'text-emerald-600') + '">' + (congBo === 'an' ? '<i class="fa-solid fa-hourglass-half mr-1"></i>Chờ công bố điểm' : '<i class="fa-solid fa-star mr-1"></i>Đã có điểm') + '</span>')
                 : '<span class="text-sm font-medium text-slate-500">' + esc(phan) + '</span>';
-            return '<a href="exam/lam-bai.html?de=' + encodeURIComponent(de.id) + '" class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 border ' + (nop ? 'border-emerald-200' : 'border-teal-200') + ' group flex flex-col cursor-pointer block relative">' +
+            return '<a data-loai="' + DT.phanLoaiCua(de) + '" href="exam/lam-bai.html?de=' + encodeURIComponent(de.id) + '" class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 border ' + (nop ? 'border-emerald-200' : 'border-teal-200') + ' group flex flex-col cursor-pointer block relative">' +
                 nhan +
                 '<div class="p-6 md:p-8 flex-1 flex flex-col relative overflow-hidden">' +
                 '<i class="fa-solid fa-file-signature absolute -bottom-6 -right-6 text-9xl text-slate-50 opacity-50 transform -rotate-12 group-hover:scale-110 transition-transform duration-500"></i>' +
@@ -606,8 +609,39 @@
                         .map((id) => ({ id: id, tieuDe: daNop[id].tieuDe || 'Đề thi đã làm', daDong: true, nopLuc: daNop[id].nopLuc })))
                     .sort((a, b) => millis(b.nopLuc) - millis(a.nopLuc));
                 khung.innerHTML = chuaLam.map((de) => theDeThi(de, false)).join('') + daLam.map((de) => theDeThi(de, true)).join('');
+                locDe(locHienTai);
             }).catch((err) => console.warn('Không tải được đề thi trực tuyến:', err));
         }
+
+        // Lọc đề theo nút danh mục; nhớ lựa chọn trên địa chỉ trang (?loai=toan12) để gửi link hoặc tải lại vẫn giữ
+        const DT = window.dfmDeThi;
+        const NUT_BAT = 'bg-teal-600 text-white px-5 py-2 rounded-full font-semibold shadow-md shadow-teal-500/20 border border-teal-600'.split(' ');
+        const NUT_TAT = 'bg-white text-slate-600 hover:text-teal-600 border border-slate-200 hover:border-teal-300 px-5 py-2 rounded-full font-medium transition-colors'.split(' ');
+        let locHienTai = '';
+        function locDe(loc) {
+            locHienTai = DT.PHAN_LOAI[loc] ? loc : '';
+            document.querySelectorAll('#loc-de [data-loc]').forEach((nut) => {
+                const bat = nut.dataset.loc === locHienTai;
+                nut.classList.remove(...(bat ? NUT_TAT : NUT_BAT));
+                nut.classList.add(...(bat ? NUT_BAT : NUT_TAT));
+                nut.setAttribute('aria-pressed', bat);
+            });
+            let soHien = 0;
+            document.querySelectorAll('#luoi-de [data-loai]').forEach((the) => {
+                const hien = !locHienTai || the.dataset.loai === locHienTai;
+                the.classList.toggle('hidden', !hien);
+                if (hien) soHien++;
+            });
+            document.getElementById('loc-trong').classList.toggle('hidden', soHien > 0);
+            const url = new URL(location.href);
+            if (locHienTai) url.searchParams.set('loai', locHienTai); else url.searchParams.delete('loai');
+            history.replaceState(null, '', url);
+        }
+        document.getElementById('loc-de').addEventListener('click', (e) => {
+            const nut = e.target.closest('[data-loc]');
+            if (nut) locDe(nut.dataset.loc);
+        });
+        locDe(new URLSearchParams(location.search).get('loai') || '');
 
         firebase.auth().onAuthStateChanged((user) => {
             if (user) hienDeThiMoi(user);

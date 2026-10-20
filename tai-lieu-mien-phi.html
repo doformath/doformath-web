@@ -13,7 +13,7 @@
     <!-- Giao diện sáng / tối: chạy trước CSS để không bị nháy màu -->
     <script src="assets/js/dfm-giao-dien.js"></script>
     <!-- CSS Tailwind dựng sẵn cho cả site (sửa class xong chạy: npm run build:css) -->
-    <link rel="stylesheet" href="assets/css/tailwind.css?v=4d1f765f">
+    <link rel="stylesheet" href="assets/css/tailwind.css?v=d68b872c">
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -217,8 +217,34 @@
             </div>
 
             <!-- Lưới bài viết (Grid 3 cột) -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                
+            <!-- Tài liệu thêm ở trang Quản trị (Firestore: tai_lieu) được chèn lên đầu lưới -->
+            <div id="luoi-tai-lieu" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+                <!-- Casio: số đặc trưng của mẫu số liệu ghép nhóm (ảnh trên Cloudinary: 11-Casio-So-dac-trung-MSL-ghep-nhom-1..7) -->
+                <a href="courses/xem-tai-lieu.html?folder=11-Casio-So-dac-trung-MSL-ghep-nhom&title=Kỹ năng Flex-Casio tính các số đặc trưng của mẫu số liệu ghép nhóm" class="bg-white rounded-3xl overflow-hidden shadow-md shadow-slate-200/50 hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 border border-slate-100 group flex flex-col cursor-pointer block">
+                    <div class="relative h-48 bg-slate-100 overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-br from-teal-600 to-slate-800 group-hover:scale-105 transition-transform duration-500 flex items-center justify-center">
+                            <i class="fa-solid fa-calculator text-white/20 text-7xl"></i>
+                        </div>
+                        <span class="absolute top-4 left-4 bg-white/95 backdrop-blur-sm text-slate-800 text-xs font-bold px-3 py-1.5 rounded-md shadow-sm flex items-center gap-1.5">
+                            <div class="w-2 h-2 rounded-full bg-red-500"></div> Thủ thuật Casio
+                        </span>
+                        <span class="absolute top-4 right-4 bg-white/95 backdrop-blur-sm text-teal-700 text-xs font-bold px-3 py-1.5 rounded-md shadow-sm">Toán 11</span>
+                    </div>
+                    <div class="p-6 flex-1 flex flex-col">
+                        <span class="text-sm text-slate-400 font-medium mb-2">20/10/2026 • 7 trang</span>
+                        <h3 class="text-xl font-bold text-slate-800 mb-3 group-hover:text-teal-600 transition-colors leading-snug">
+                            Kỹ năng Flex-Casio tính các số đặc trưng của mẫu số liệu ghép nhóm
+                        </h3>
+                        <p class="text-slate-500 text-sm mb-6 line-clamp-3">
+                            Hướng dẫn bấm máy Flexio Fx799VN, Casio fx-580VN X, fx-880BTG và fx-880BTG PLUS: tính số trung bình, phương sai, độ lệch chuẩn, tứ phân vị, trung vị và mốt; kèm bảng so sánh các máy.
+                        </p>
+                        <div class="mt-auto pt-4 border-t border-slate-100 flex items-center text-teal-600 font-semibold text-sm group-hover:text-teal-700">
+                            Xem tài liệu <i class="fa-solid fa-arrow-right ml-2 transform group-hover:translate-x-1 transition-transform"></i>
+                        </div>
+                    </div>
+                </a>
+
                 <!-- Bài 1: Mẹo Casio -->
                 <a href="#" class="bg-white rounded-3xl overflow-hidden shadow-md shadow-slate-200/50 hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 border border-slate-100 group flex flex-col cursor-pointer block">
                     <div class="relative h-48 bg-slate-100 overflow-hidden">
@@ -342,6 +368,8 @@
         <!-- Nhúng thư viện Firebase Auth: thêm "defer" để không chặn trình duyệt hiển thị trang trong lúc tải -->
 <script  src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script  src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script  src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="assets/js/dfm-tai-lieu.js"></script>
 <script>
         const firebaseConfig = {
             apiKey: "AIzaSyD-NDo43O3Q_9GVii6pDOM7D6SQ5pxmo5g",
@@ -356,7 +384,16 @@
             firebase.initializeApp(firebaseConfig);
         }
         
-        // Đã xóa dòng const db = firebase.firestore(); gây lỗi ở đây
+        // Tài liệu thêm ở trang Quản trị: không cần đăng nhập vẫn đọc được tài liệu đang hiện
+        firebase.firestore().collection('tai_lieu').where('an', '==', false).get().then((snap) => {
+            const luoi = document.getElementById('luoi-tai-lieu');
+            const ds = snap.docs.map((d) => Object.assign({ id: d.id }, d.data()))
+                .sort((a, b) => (a.thuTu || 0) - (b.thuTu || 0) || ((b.taoLuc && b.taoLuc.toMillis()) || 0) - ((a.taoLuc && a.taoLuc.toMillis()) || 0));
+            const cacThe = ds.map(dfmTaiLieu.taoThe);
+            luoi.prepend(...cacThe);
+            const veToan = () => cacThe.forEach((t) => renderMathInElement(t, { delimiters: [{ left: '$', right: '$', display: false }], throwOnError: false }));
+            if (window.renderMathInElement) veToan(); else document.addEventListener('DOMContentLoaded', veToan);
+        }).catch((err) => console.warn('Không tải được danh sách tài liệu:', err));
 
         // HÀM ĐĂNG XUẤT
         function dangXuat() {
