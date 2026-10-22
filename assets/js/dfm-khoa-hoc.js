@@ -297,9 +297,10 @@ window.dfmKhoaHoc = (function () {
         capNhatThanhChuyenBai();
     }
 
-    // Các mục bài học có nội dung, theo đúng thứ tự trong mục lục (gồm cả bài học thêm từ Admin)
+    // Các mục bài học có nội dung (bỏ mục "Sắp có"), theo đúng thứ tự trong mục lục (gồm cả bài học thêm từ Admin)
     function cacMucCoNoiDung() {
-        return Array.from(document.querySelectorAll('#sidebar a[target="lesson-frame"]')).filter(laLinkBai);
+        return Array.from(document.querySelectorAll('#sidebar a[target="lesson-frame"]'))
+            .filter(function (a) { return laLinkBai(a) && !a.hasAttribute('data-dfm-sap-co'); });
     }
 
     // Mục ứng với bài đang mở trong khung: khớp đúng địa chỉ trước, không có thì bỏ qua tham số title
@@ -320,16 +321,73 @@ window.dfmKhoaHoc = (function () {
 
     // Mục chưa có nội dung: làm mờ, gắn nhãn "Sắp có", không bấm được
     function lamMoMucTrong() {
-        document.querySelectorAll('#sidebar a[target="lesson-frame"][href="about:blank"]').forEach(function (a) {
-            if (a.hasAttribute('data-dfm-sap-co')) return;
+        document.querySelectorAll('#sidebar a[target="lesson-frame"][href="about:blank"]').forEach(function (a) { datSapCo(a, true); });
+    }
+    function datSapCo(a, bat) {
+        if (bat === a.hasAttribute('data-dfm-sap-co')) return;
+        if (bat) {
             a.setAttribute('data-dfm-sap-co', '');
             a.setAttribute('aria-disabled', 'true');
             a.setAttribute('tabindex', '-1');
             a.classList.add('opacity-50', 'pointer-events-none');
-            const nhan = el('span', 'ml-auto text-[10px] leading-4 font-bold uppercase tracking-wide text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded');
+            const nhan = el('span', 'ml-auto text-[10px] leading-4 font-bold uppercase tracking-wide text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded', { 'data-nhan-sap-co': '' });
             nhan.textContent = 'Sắp có';
             a.appendChild(nhan);
+        } else {
+            ['data-dfm-sap-co', 'aria-disabled', 'tabindex'].forEach(function (k) { a.removeAttribute(k); });
+            a.classList.remove('opacity-50', 'pointer-events-none');
+            a.querySelectorAll('[data-nhan-sap-co]').forEach(function (n) { n.remove(); });
+        }
+    }
+
+    // Mục tài liệu (xem-tai-lieu.html?folder=...) mà Cloudinary chưa có ảnh trang 1 (thầy chưa tải lên) cũng là
+    // "Sắp có"; tải lên xong thì tự mở. Hỏi Cloudinary bằng HEAD (không tải ảnh) và nhớ kết quả trên máy:
+    // có rồi thì 3 ngày mới hỏi lại, chưa có thì 15 phút. Lỗi mạng: để nguyên, không chặn nhầm mục có thật.
+    const CLOUDINARY = 'https://res.cloudinary.com/vrhp60zs/image/upload/';
+    const KHOA_THU_MUC = 'dfm_thu_muc';
+    const HAN_CO = 3 * 86400000, HAN_CHUA_CO = 15 * 60000;
+    const daHoiThuMuc = {};   // các thư mục đã hỏi trong lần mở trang này
+    function thuMucCua(a) {
+        const href = a.getAttribute('href') || '';
+        if (href.indexOf('xem-tai-lieu.html?') !== 0) return null;
+        return new URLSearchParams(href.split('?')[1]).get('folder');
+    }
+    function kiemTraThuMuc() {
+        let nho = {};
+        try { nho = JSON.parse(localStorage.getItem(KHOA_THU_MUC)) || {}; } catch (e) {}
+        const theoThuMuc = {};
+        document.querySelectorAll('#sidebar a[target="lesson-frame"]').forEach(function (a) {
+            const tm = thuMucCua(a);
+            if (tm) (theoThuMuc[tm] = theoThuMuc[tm] || []).push(a);
         });
+        const apDung = function (tm, co) { theoThuMuc[tm].forEach(function (a) { datSapCo(a, !co); }); capNhatThanhChuyenBai(); };
+        const canHoi = Object.keys(theoThuMuc).filter(function (tm) {
+            const m = nho[tm];
+            if (m) apDung(tm, m.co);   // dùng ngay kết quả đã nhớ
+            return !daHoiThuMuc[tm] && !(m && Date.now() - m.luc < (m.co ? HAN_CO : HAN_CHUA_CO));
+        });
+        if (!canHoi.length || !window.fetch) return;
+        canHoi.forEach(function (tm) { daHoiThuMuc[tm] = true; });
+        let i = 0;
+        function hoiTiep() {
+            if (i >= canHoi.length) return Promise.resolve();
+            const tm = canHoi[i++];
+            // Chờ tối đa 10 giây (mạng chậm), quá thì bỏ qua lần này, lần mở trang sau hỏi lại
+            const huy = window.AbortController ? new AbortController() : null;
+            const hen = huy && setTimeout(function () { huy.abort(); }, 10000);
+            return fetch(CLOUDINARY + encodeURIComponent(tm) + '-1.png', { method: 'HEAD', cache: 'no-store', signal: huy ? huy.signal : undefined }).then(function (r) {
+                if (r.ok || r.status === 404) {
+                    const co = r.ok;
+                    try {
+                        const moi = JSON.parse(localStorage.getItem(KHOA_THU_MUC)) || {};
+                        moi[tm] = { co: co, luc: Date.now() };
+                        localStorage.setItem(KHOA_THU_MUC, JSON.stringify(moi));
+                    } catch (e) {}
+                    apDung(tm, co);
+                }
+            }).catch(function () {}).then(function () { clearTimeout(hen); return hoiTiep(); });
+        }
+        for (let k = 0; k < 6; k++) hoiTiep();   // hỏi song song 6 thư mục một lúc
     }
 
     // Bỏ dấu tiếng Việt để tìm "tiem can" vẫn ra "Tiệm cận"
@@ -472,9 +530,10 @@ window.dfmKhoaHoc = (function () {
     // vd sau khi chèn bài học thêm từ Admin (bài cuối có thể là một bài như vậy)
     let daDungTimBai = false;
     function batDauTimBaiNhanh(khoa) {
-        if (daDungTimBai) return dongBoDangHoc();
+        if (daDungTimBai) { kiemTraThuMuc(); return dongBoDangHoc(); }
         daDungTimBai = true;
         lamMoMucTrong();
+        kiemTraThuMuc();
         taoOTimKiem();
         taoThanhChuyenBai();
 
