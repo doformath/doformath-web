@@ -357,7 +357,7 @@ window.dfmKhoaHoc = (function () {
         ketQua.hidden = true;   // dùng thuộc tính hidden để space-y của mục lục không chừa khoảng trống phía trên
         vungCuon.prepend(ketQua);
 
-        let chiMuc = null;   // tạo khi bắt đầu gõ, lúc đó bài học thêm từ Admin đã có trong mục lục
+        // Tạo lại mỗi lần gõ (vài trăm mục, rất nhanh): luôn gồm cả bài học thêm từ Admin chèn vào sau
         function taoChiMuc() {
             return cacMucCoNoiDung().map(function (a) {
                 const info = thongTinBai(a);
@@ -373,8 +373,7 @@ window.dfmKhoaHoc = (function () {
             ketQua.textContent = '';
             if (!tu.length) return;
 
-            chiMuc = chiMuc || taoChiMuc();
-            const khop = chiMuc
+            const khop = taoChiMuc()
                 .filter(function (m) { return tu.every(function (t) { return m.chuoi.includes(t); }); })
                 // Khớp ngay trong tên bài lên trước
                 .map(function (m, i) { return { m: m, diem: (tu.every(function (t) { return m.tenBai.includes(t); }) ? 0 : 1), i: i }; })
@@ -469,7 +468,12 @@ window.dfmKhoaHoc = (function () {
         };
     }
 
+    // Dựng một lần (gọi được sớm, trước khi Firebase xác nhận); gọi lại thì chỉ đồng bộ mục đang học,
+    // vd sau khi chèn bài học thêm từ Admin (bài cuối có thể là một bài như vậy)
+    let daDungTimBai = false;
     function batDauTimBaiNhanh(khoa) {
+        if (daDungTimBai) return dongBoDangHoc();
+        daDungTimBai = true;
         lamMoMucTrong();
         taoOTimKiem();
         taoThanhChuyenBai();
@@ -481,9 +485,7 @@ window.dfmKhoaHoc = (function () {
         try { daLuu = localStorage.getItem(khoaLuu); } catch (e) {}
         const linkLuu = daLuu && cacMucCoNoiDung().find(function (a) { return a.getAttribute('href') === daLuu; });
         if (iframe && linkLuu && iframe.getAttribute('src') !== daLuu) iframe.src = daLuu;
-        const dangMo = mucDangMo();
-        if (dangMo) hienTrongMucLuc(dangMo);
-        else capNhatThanhChuyenBai();
+        dongBoDangHoc();
 
         document.addEventListener('click', function (e) {
             const link = e.target.closest && e.target.closest('#sidebar a[target="lesson-frame"]');
@@ -491,6 +493,18 @@ window.dfmKhoaHoc = (function () {
             try { localStorage.setItem(khoaLuu, link.getAttribute('href')); } catch (err) {}
             danhDauDangHoc(link);
         });
+    }
+
+    function dongBoDangHoc() {
+        const dangMo = mucDangMo();
+        if (!dangMo) return capNhatThanhChuyenBai();
+        if (!dangMo.hasAttribute('data-dfm-dang-hoc')) hienTrongMucLuc(dangMo);
+    }
+
+    // Chạy sau khi trang tải xong và các trình nghe DOMContentLoaded khác (Alpine, mở lại bài cuối) đã chạy
+    function sauKhiTaiTrang(viec) {
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { setTimeout(viec, 0); });
+        else setTimeout(viec, 0);
     }
 
     // ---------- 3. Theo dõi học tập ----------
@@ -577,13 +591,20 @@ window.dfmKhoaHoc = (function () {
 
     return {
         docBaiMoi: docBaiMoi,
+        // Dựng phần giao diện không cần Firebase (tìm bài, bài trước / tiếp, mục đang học) ngay khi trang mở,
+        // dùng khi đã nhớ quyền khóa học trên máy (dfm-phien.js); batDau gọi lại sau vẫn an toàn
+        batDauGiaoDien: function (khoa) {
+            sauKhiTaiTrang(function () {
+                try { batDauTimBaiNhanh(khoa); } catch (err) { console.warn('Lỗi tìm bài nhanh:', err); }
+            });
+        },
         // Không bao giờ ném lỗi ra ngoài: lỗi ở đây không được làm hỏng trang học
         batDau: function (db, user, khoa) {
             try {
                 if (!db || !user) return;
                 chenBaiHocThem(db, khoa).then(function () {
                     // Đợi trang tải xong (Alpine đã chạy, iframe đã mở bài cuối) rồi mới dựng các phần tìm bài
-                    if (document.readyState === 'loading') return new Promise(function (xong) { document.addEventListener('DOMContentLoaded', xong); });
+                    return new Promise(sauKhiTaiTrang);
                 }).then(function () {
                     try { batDauTimBaiNhanh(khoa); } catch (err) { console.warn('Lỗi tìm bài nhanh:', err); }
                     moBaiTheoDiaChi(khoa);

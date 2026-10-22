@@ -13,7 +13,7 @@
     <!-- Giao diện sáng / tối: chạy trước CSS để không bị nháy màu -->
     <script src="../../../../assets/js/dfm-giao-dien.js"></script>
     <!-- CSS Tailwind dựng sẵn cho cả site (sửa class xong chạy: npm run build:css) -->
-    <link rel="stylesheet" href="../../../../assets/css/tailwind.css?v=4e23c26c">
+    <link rel="stylesheet" href="../../../../assets/css/tailwind.css?v=2e459c2e">
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -322,31 +322,32 @@
             
         </section>
     </main>
-    <footer class="bg-gray-900 text-gray-300 py-10 border-t border-gray-800">
+    <!-- Footer: màu sáng; bản tối do scripts/che-do-toi.mjs tự sinh khi build CSS -->
+    <footer class="bg-white text-gray-600 py-10 border-t border-gray-200">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row md:items-center md:justify-between gap-6 text-center md:text-left">
             <div>
                 <div class="mb-3 inline-block hover:opacity-80 transition-opacity cursor-pointer">
-                    <span class="text-2xl tracking-tight text-white pb-1">
+                    <span class="text-2xl tracking-tight pb-1">
                         $\textcolor{#0d9488}{\textsf{\textbf{Dofor}}{\sum}\textsf{\textbf{ath}}}$
                     </span>
                 </div>
-                <p class="text-sm text-gray-400 max-w-md leading-relaxed mx-auto md:mx-0">
+                <p class="text-sm text-gray-500 max-w-md leading-relaxed mx-auto md:mx-0">
                     Nền tảng học Toán trực tuyến tối ưu, giúp học sinh xây dựng tư duy logic và đạt điểm số cao trong các kỳ thi.
                 </p>
             </div>
             <div class="flex justify-center gap-4">
-                <a href="https://www.facebook.com/d.circle7" target="_blank" rel="noopener" aria-label="Facebook" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
+                <a href="https://www.facebook.com/d.circle7" target="_blank" rel="noopener" aria-label="Facebook" class="w-10 h-10 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
                     <i class="fa-brands fa-facebook-f"></i>
                 </a>
-                <a href="https://tiktok.com/@anhthaymathmath" target="_blank" rel="noopener" aria-label="TikTok" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
+                <a href="https://tiktok.com/@anhthaymathmath" target="_blank" rel="noopener" aria-label="TikTok" class="w-10 h-10 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
                     <i class="fa-brands fa-tiktok"></i>
                 </a>
-                <a href="https://youtube.com/@doformath" target="_blank" rel="noopener" aria-label="YouTube" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
+                <a href="https://youtube.com/@doformath" target="_blank" rel="noopener" aria-label="YouTube" class="w-10 h-10 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
                     <i class="fa-brands fa-youtube"></i>
                 </a>
             </div>
         </div>
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 pt-6 border-t border-gray-800 text-sm text-gray-500 text-center">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 pt-6 border-t border-gray-200 text-sm text-gray-500 text-center">
             &copy; 2026 DoforMath Education. All rights reserved.
         </div>
     </footer>

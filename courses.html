@@ -3,6 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Kết nối sẵn tới máy chủ Firebase (tải SDK, đăng nhập, Firestore) để lần đọc đầu nhanh hơn -->
+    <link rel="preconnect" href="https://www.gstatic.com">
+    <link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://securetoken.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://identitytoolkit.googleapis.com" crossorigin>
     <title>Danh sách Khóa học - DoforMath</title>
     
     <!-- Cấu hình Favicon -->
@@ -13,7 +18,7 @@
     <!-- Giao diện sáng / tối: chạy trước CSS để không bị nháy màu -->
     <script src="assets/js/dfm-giao-dien.js"></script>
     <!-- CSS Tailwind dựng sẵn cho cả site (sửa class xong chạy: npm run build:css) -->
-    <link rel="stylesheet" href="assets/css/tailwind.css?v=4e23c26c">
+    <link rel="stylesheet" href="assets/css/tailwind.css?v=2e459c2e">
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -81,7 +86,7 @@
                     <div id="khu-vuc-user" style="display: none;" class="flex items-center gap-2 xl:gap-4">
                         <a id="ten-user" href="goc-hoc-tap.html" title="Góc học tập của tôi" class="text-xs md:text-sm font-semibold text-teal-700 bg-teal-50 px-2 py-1.5 md:px-3 md:py-1 rounded-full border border-teal-100 max-w-[100px] xl:max-w-[200px] truncate inline-block text-center hover:bg-teal-100 transition-colors"></a>
                         
-                        <button onclick="dangXuat()" class="hidden md:flex items-center justify-center gap-1.5 text-xs md:text-sm text-gray-500 hover:text-red-500 font-medium transition-colors bg-gray-100 hover:bg-red-50 md:bg-transparent p-2 md:p-0 rounded-full md:rounded-none w-8 h-8 md:w-auto md:h-auto shrink-0">
+                        <button onclick="dangXuat()" class="hidden md:flex items-center justify-center gap-1.5 text-xs md:text-sm text-gray-500 hover:text-red-500 font-medium transition-colors p-2 md:p-0 rounded-full md:rounded-none w-8 h-8 md:w-auto md:h-auto shrink-0">
                             <i class="fa-solid fa-arrow-right-from-bracket"></i>
                             <span class="hidden xl:inline">Đăng xuất</span>
                         </button>
@@ -394,6 +399,30 @@
         });
     </script>
     <!-- Nhúng thư viện Firebase -->
+    <!-- Phiên đăng nhập nhớ trên máy: header + các khóa học hiện ngay, Firebase kiểm tra lại ở dưới -->
+    <script src="assets/js/dfm-phien.js"></script>
+    <script>
+        // Hiện các khóa học theo quyền: gọi ngay với quyền đã nhớ trên máy, rồi gọi lại khi Firebase đọc xong
+        let daHienKhoaHoc = false;
+        function hienKhoaHoc(quyen) {
+            daHienKhoaHoc = true;
+            let coKhoa = false;
+            ['toan-10', 'toan-11', 'toan-12'].forEach((k) => {
+                const co = quyen[k] === true;
+                document.getElementById('card-' + k).style.display = co ? 'flex' : 'none';
+                if (co) coKhoa = true;
+            });
+            document.getElementById('loading-state').style.display = 'none';
+            document.getElementById('courses-grid').style.display = coKhoa ? 'grid' : 'none';
+            document.getElementById('empty-state').style.display = coKhoa ? 'none' : 'block';
+        }
+        (function () {
+            const p = window.dfmPhien && dfmPhien.doc();
+            if (!p || !p.quyen) return;
+            document.getElementById('user-greeting').innerText = 'Xin chào, ' + p.email.split('@')[0] + '!';
+            hienKhoaHoc(p.quyen);
+        })();
+    </script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -415,6 +444,7 @@
 
         // HÀM ĐĂNG XUẤT
         function dangXuat() {
+            if (window.dfmPhien) dfmPhien.xoa();
             firebase.auth().signOut().then(() => {
                 window.location.replace("index.html");
             }).catch((error) => {
@@ -436,10 +466,6 @@
             const nutDangXuatMobile = document.getElementById('nutDangXuatMobile');
             const tenUser = document.getElementById('ten-user');
 
-            const card10 = document.getElementById('card-toan-10');
-            const card11 = document.getElementById('card-toan-11');
-            const card12 = document.getElementById('card-toan-12');
-
             loadingState.style.display = 'none';
 
             if (user) {
@@ -454,23 +480,14 @@
                 if (tenUser) tenUser.innerText = tenHienThi;
                 if (greeting) greeting.innerText = "Xin chào, " + tenHienThi + "!";
                 
-                coursesGrid.style.display = 'grid';
+                if (!daHienKhoaHoc) coursesGrid.style.display = 'grid';
 
                 // Quét phân quyền khóa học (kèm chuyển quyền nếu học sinh vừa đổi sang email thật)
                 dfmTaiKhoan.docQuyen(db, user)
-                .then((data) => {
-                    let hasCourse = false;
-
-                    if (data['toan-10'] === true) { card10.style.display = 'flex'; hasCourse = true; }
-                    if (data['toan-11'] === true) { card11.style.display = 'flex'; hasCourse = true; }
-                    if (data['toan-12'] === true) { card12.style.display = 'flex'; hasCourse = true; }
-
-                    if (!hasCourse) {
-                        coursesGrid.style.display = 'none';
-                        emptyState.style.display = 'block';
-                    }
-                }).catch((error) => {
+                .then(hienKhoaHoc)
+                .catch((error) => {
                     console.log("Lỗi tải dữ liệu khóa học:", error);
+                    if (daHienKhoaHoc) return;   // giữ các khóa học đã hiện theo quyền nhớ trên máy
                     coursesGrid.style.display = 'none';
                     emptyState.style.display = 'block';
                 });
@@ -482,6 +499,8 @@
                 if (nutDangXuatMobile) nutDangXuatMobile.style.display = 'none';
                 
                 if (greeting) greeting.innerText = "Không gian học tập";
+                coursesGrid.style.display = 'none';
+                emptyState.style.display = 'none';
                 unauthState.style.display = 'block';
             }
 

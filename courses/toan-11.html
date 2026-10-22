@@ -3,6 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Kết nối sẵn tới máy chủ Firebase (tải SDK, đăng nhập, Firestore) để lần đọc đầu nhanh hơn -->
+    <link rel="preconnect" href="https://www.gstatic.com">
+    <link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://securetoken.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://identitytoolkit.googleapis.com" crossorigin>
     <title>Chinh phục Toán 11 - DoforMath</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -15,7 +20,7 @@
     <!-- Giao diện sáng / tối: chạy trước CSS để không bị nháy màu -->
     <script src="../assets/js/dfm-giao-dien.js"></script>
     <!-- CSS Tailwind dựng sẵn cho cả site (sửa class xong chạy: npm run build:css) -->
-    <link rel="stylesheet" href="../assets/css/tailwind.css?v=4e23c26c">
+    <link rel="stylesheet" href="../assets/css/tailwind.css?v=2e459c2e">
     <!-- Sidebar mục lục kéo đổi độ rộng (dùng chung toan-10/11/12) -->
     <script src="../assets/js/dfm-sidebar.js"></script>
     
@@ -1612,6 +1617,15 @@
         });
     </script>
 
+    <!-- Đã nhớ quyền khóa học trên máy (dfm-phien.js): mở ngay, không chờ Firebase; Firebase vẫn kiểm tra lại ở dưới -->
+    <script src="../assets/js/dfm-phien.js"></script>
+    <script>
+        if (window.dfmPhien && dfmPhien.coQuyen("toan-11")) {
+            document.getElementById('loading-screen').remove();
+            document.getElementById('course-content').classList.remove('hidden');
+        }
+    </script>
+
     <!-- FIREBASE AUTH BẢO MẬT -->
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -1639,16 +1653,20 @@
         const courseContent = document.getElementById('course-content');
         const deniedModal = document.getElementById('access-denied-modal');
 
+        // loadingScreen có thể đã được gỡ từ trước (mở ngay theo quyền đã nhớ)
         function handleAccessDenied() {
-            loadingScreen.remove(); 
+            if (loadingScreen) loadingScreen.remove(); 
             deniedModal.classList.remove('hidden'); 
             if(courseContent) courseContent.remove(); 
         }
 
         function handleAccessGranted() {
-            loadingScreen.remove(); 
+            if (loadingScreen) loadingScreen.remove(); 
             courseContent.classList.remove('hidden'); 
         }
+        // Mở ngay theo quyền đã nhớ: dựng luôn phần tìm bài / bài trước-tiếp, không chờ Firebase
+        // (kiểm tra hàm có sẵn: ngay sau khi cập nhật web, máy có thể còn bản JS cũ trong bộ nhớ đệm)
+        if (window.dfmPhien && dfmPhien.coQuyen(currentCourse) && dfmKhoaHoc.batDauGiaoDien) dfmKhoaHoc.batDauGiaoDien(currentCourse);
 
         firebase.auth().onAuthStateChanged((user) => {
             if (!user) {

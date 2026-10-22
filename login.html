@@ -18,7 +18,7 @@
     <!-- Giao diện sáng / tối: chạy trước CSS để không bị nháy màu -->
     <script src="assets/js/dfm-giao-dien.js"></script>
     <!-- CSS Tailwind dựng sẵn cho cả site (sửa class xong chạy: npm run build:css) -->
-    <link rel="stylesheet" href="assets/css/tailwind.css?v=4e23c26c">
+    <link rel="stylesheet" href="assets/css/tailwind.css?v=2e459c2e">
 
     <!-- Thêm Alpine.js để xử lý Ẩn/Hiện mật khẩu -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -37,6 +37,9 @@
     </script>
 
     <!-- Nhúng thư viện Firebase -->
+    <!-- Mở trang đăng nhập: bỏ phiên + dữ liệu đệm đã nhớ trên máy (người đăng nhập tiếp theo có thể là học sinh khác) -->
+    <script src="assets/js/dfm-phien.js"></script>
+    <script>if (window.dfmPhien) dfmPhien.xoa();</script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>

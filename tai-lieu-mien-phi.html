@@ -3,6 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://www.gstatic.com">
+    <!-- Kết nối sẵn tới máy chủ Firebase (đăng nhập, Firestore) để lần đọc đầu nhanh hơn -->
+    <link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://securetoken.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://identitytoolkit.googleapis.com" crossorigin>
     <title>Tài liệu miễn phí - DoforMath</title>
     
     <!-- Cấu hình Favicon -->
@@ -13,7 +18,7 @@
     <!-- Giao diện sáng / tối: chạy trước CSS để không bị nháy màu -->
     <script src="assets/js/dfm-giao-dien.js"></script>
     <!-- CSS Tailwind dựng sẵn cho cả site (sửa class xong chạy: npm run build:css) -->
-    <link rel="stylesheet" href="assets/css/tailwind.css?v=4e23c26c">
+    <link rel="stylesheet" href="assets/css/tailwind.css?v=2e459c2e">
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -81,7 +86,7 @@
                     <div id="khu-vuc-user" style="display: none;" class="flex items-center gap-2 xl:gap-4">
                         <a id="ten-user" href="goc-hoc-tap.html" title="Góc học tập của tôi" class="text-xs md:text-sm font-semibold text-teal-700 bg-teal-50 px-2 py-1.5 md:px-3 md:py-1 rounded-full border border-teal-100 max-w-[100px] xl:max-w-[200px] truncate inline-block text-center hover:bg-teal-100 transition-colors"></a>
                         
-                        <button onclick="dangXuat()" class="hidden md:flex items-center justify-center gap-1.5 text-xs md:text-sm text-gray-500 hover:text-red-500 font-medium transition-colors bg-gray-100 hover:bg-red-50 md:bg-transparent p-2 md:p-0 rounded-full md:rounded-none w-8 h-8 md:w-auto md:h-auto">
+                        <button onclick="dangXuat()" class="hidden md:flex items-center justify-center gap-1.5 text-xs md:text-sm text-gray-500 hover:text-red-500 font-medium transition-colors p-2 md:p-0 rounded-full md:rounded-none w-8 h-8 md:w-auto md:h-auto">
                             <i class="fa-solid fa-arrow-right-from-bracket"></i>
                             <span class="hidden xl:inline">Đăng xuất</span>
                         </button>
@@ -366,6 +371,8 @@
         });
     </script>
         <!-- Nhúng thư viện Firebase Auth: thêm "defer" để không chặn trình duyệt hiển thị trang trong lúc tải -->
+    <!-- Phiên đăng nhập nhớ trên máy: header hiện ngay, không chờ Firebase (xem assets/js/dfm-phien.js) -->
+    <script src="assets/js/dfm-phien.js"></script>
 <script  src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script  src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script  src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -397,6 +404,7 @@
 
         // HÀM ĐĂNG XUẤT
         function dangXuat() {
+            if (window.dfmPhien) dfmPhien.xoa();
             firebase.auth().signOut().then(() => {
                 // Đăng xuất xong tải lại trang hiện tại (không bị văng về trang chủ)
                 window.location.reload(); 

@@ -3,6 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://www.gstatic.com">
+    <!-- Kết nối sẵn tới máy chủ Firebase (đăng nhập, Firestore) để lần đọc đầu nhanh hơn -->
+    <link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://securetoken.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://identitytoolkit.googleapis.com" crossorigin>
     <title>Góc học tập - DoforMath</title>
     
     <!-- Cấu hình Favicon -->
@@ -13,7 +18,7 @@
     <!-- Giao diện sáng / tối: chạy trước CSS để không bị nháy màu -->
     <script src="assets/js/dfm-giao-dien.js"></script>
     <!-- CSS Tailwind dựng sẵn cho cả site (sửa class xong chạy: npm run build:css) -->
-    <link rel="stylesheet" href="assets/css/tailwind.css?v=4e23c26c">
+    <link rel="stylesheet" href="assets/css/tailwind.css?v=2e459c2e">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -80,7 +85,7 @@
                     <div id="khu-vuc-user" style="display: none;" class="flex items-center gap-2 xl:gap-4">
                         <a id="ten-user" href="goc-hoc-tap.html" title="Góc học tập của tôi" class="text-xs md:text-sm font-semibold text-teal-700 bg-teal-50 px-2 py-1.5 md:px-3 md:py-1 rounded-full border border-teal-100 max-w-[100px] xl:max-w-[200px] truncate inline-block text-center hover:bg-teal-100 transition-colors"></a>
                         
-                        <button onclick="dangXuat()" class="hidden md:flex items-center justify-center gap-1.5 text-xs md:text-sm text-gray-500 hover:text-red-500 font-medium transition-colors bg-gray-100 hover:bg-red-50 md:bg-transparent p-2 md:p-0 rounded-full md:rounded-none w-8 h-8 md:w-auto md:h-auto">
+                        <button onclick="dangXuat()" class="hidden md:flex items-center justify-center gap-1.5 text-xs md:text-sm text-gray-500 hover:text-red-500 font-medium transition-colors p-2 md:p-0 rounded-full md:rounded-none w-8 h-8 md:w-auto md:h-auto">
                             <i class="fa-solid fa-arrow-right-from-bracket"></i>
                             <span class="hidden xl:inline">Đăng xuất</span>
                         </button>
@@ -319,6 +324,40 @@
     <!-- Chú thích khi rê chuột / chạm vào biểu đồ -->
     <div id="chu-thich" role="tooltip" class="hidden fixed z-[80] pointer-events-none bg-slate-900 text-white text-xs font-medium rounded-lg px-2.5 py-1.5 shadow-lg whitespace-nowrap"></div>
 
+    <!-- Phiên đăng nhập nhớ trên máy: header hiện ngay, không chờ Firebase (xem assets/js/dfm-phien.js) -->
+    <script src="assets/js/dfm-phien.js"></script>
+    <script>
+        // ----- Bản đã vẽ lưu trên máy (dfm-phien.js) -----
+        // Lưu HTML của khu nội dung sau mỗi lần vẽ xong; lần sau mở trang hiện ngay bản này (trước cả khi tải Firebase)
+        // rồi vẽ lại khi có dữ liệu mới. Kèm danh sách id của các khung: trang đổi cấu trúc thì bỏ qua bản lưu cũ.
+        const KHUNG_NOI_DUNG = Array.from(document.querySelectorAll('#noi-dung [id]')).map((e) => e.id).join(',');
+        const MAU_NOI_DUNG = document.getElementById('noi-dung').innerHTML;   // khung trống, để gỡ bản lưu khi cần
+        let banDemCua = null;   // uid của bản lưu đang hiện
+        function hienBanDem(uid) {
+            const dem = window.dfmPhien && dfmPhien.docDem('goc-hoc-tap', uid);
+            if (!dem || dem.khung !== KHUNG_NOI_DUNG || !dem.html) return false;
+            document.getElementById('noi-dung').innerHTML = dem.html;
+            document.getElementById('trang-thai').classList.add('hidden');
+            document.getElementById('noi-dung').classList.remove('hidden');
+            banDemCua = uid;
+            return true;
+        }
+        // Firebase báo đã đăng xuất / tài khoản khác: gỡ bản lưu, hiện lại "Đang tải"
+        function boBanDem() {
+            if (!banDemCua) return;
+            document.getElementById('noi-dung').innerHTML = MAU_NOI_DUNG;
+            document.getElementById('noi-dung').classList.add('hidden');
+            document.getElementById('trang-thai').classList.remove('hidden');
+            banDemCua = null;
+        }
+        function luuBanDem(user) {
+            if (window.dfmPhien) dfmPhien.ghiDem('goc-hoc-tap', user.uid, { khung: KHUNG_NOI_DUNG, html: document.getElementById('noi-dung').innerHTML });
+        }
+        (function () {
+            const p = window.dfmPhien && dfmPhien.doc();
+            if (p) hienBanDem(p.uid);
+        })();
+    </script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -336,6 +375,7 @@
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 
         function dangXuat() {
+            if (window.dfmPhien) dfmPhien.xoa();
             firebase.auth().signOut().then(() => window.location.reload()).catch((err) => console.error('Lỗi đăng xuất:', err));
         }
 
@@ -846,6 +886,7 @@
             $('auth-container').style.opacity = '1';
 
             if (!user) {
+                boBanDem();
                 $('trang-thai').innerHTML = '<div class="max-w-md mx-auto bg-white rounded-3xl border border-slate-200 p-8"><i class="fa-solid fa-lock text-3xl text-teal-600"></i>' +
                     '<p class="mt-3 font-semibold text-slate-800">Đăng nhập để xem góc học tập của bạn</p>' +
                     '<a href="login.html" class="inline-block mt-5 bg-primary hover:bg-teal-700 text-white px-6 py-2.5 rounded-full font-semibold">Đăng nhập</a></div>';
@@ -853,6 +894,11 @@
             }
             $('loi-chao').textContent = 'Xin chào, ' + user.email.split('@')[0] + '!';
             $('nut-tai-khoan').classList.remove('hidden'); $('nut-tai-khoan').classList.add('inline-flex');
+            // Hiện ngay bản đã vẽ lần trước (lưu trên máy), đồng thời đọc dữ liệu mới song song với quyền / đơn đăng ký
+            if (banDemCua && banDemCua !== user.uid) boBanDem();
+            const coBanDem = banDemCua === user.uid || hienBanDem(user.uid);
+            const huaDuLieu = taiDuLieu(user);
+            huaDuLieu.catch(() => {});   // lỗi xử lý ở dưới (lúc await), tránh báo lỗi "chưa bắt" trong lúc chờ quyền
             try {
                 const db = firebase.firestore();
                 const [quyen, don] = await Promise.all([TK.docQuyen(db, user).catch(() => ({})), db.collection('dang_ky').doc(user.uid).get().catch(() => null)]);
@@ -862,7 +908,7 @@
             veThongBaoTaiKhoan();
             if (location.hash === '#doi-mat-khau') $('nut-tai-khoan').click();
             try {
-                const du = await taiDuLieu(user);
+                const du = await huaDuLieu;
                 const pt = phanTich(du), nh = ngayHoc(du.hocSinh);
                 veTongQuan(du, pt, nh);
                 veBieuDoDiem(pt);
@@ -875,9 +921,11 @@
                 veGoiY(du, pt, nh);
                 $('trang-thai').classList.add('hidden');
                 $('noi-dung').classList.remove('hidden');
+                luuBanDem(user);
             } catch (err) {
                 console.error(err);
-                $('trang-thai').innerHTML = '<p class="text-red-600">Không tải được dữ liệu. Kiểm tra mạng rồi tải lại trang.</p>';
+                // Đang hiện bản đã lưu lần trước thì giữ nguyên, không thay bằng thông báo lỗi
+                if (!coBanDem) $('trang-thai').innerHTML = '<p class="text-red-600">Không tải được dữ liệu. Kiểm tra mạng rồi tải lại trang.</p>';
             }
         });
 

@@ -81,8 +81,14 @@ window.dfmTaiKhoan = (function () {
         return true;
     }
 
-    // Quyền khóa học của học sinh: { 'toan-12': true, ... } hoặc {} nếu chưa có
+    // Quyền khóa học của học sinh: { 'toan-12': true, ... } hoặc {} nếu chưa có.
+    // Đọc xong thì nhớ trên máy (dfm-phien.js) để lần sau trang mở ngay, không chờ đọc lại.
     async function docQuyen(db, user) {
+        const quyen = await docQuyenFirestore(db, user);
+        if (window.dfmPhien) dfmPhien.luuQuyen(user, quyen);
+        return quyen;
+    }
+    async function docQuyenFirestore(db, user) {
         const s = await db.collection('phan_quyen').doc(user.email).get();
         if (s.exists) return s.data() || {};
         if (await chuyenQuyenNeuCan(db, user).catch(function () { return false; })) {
