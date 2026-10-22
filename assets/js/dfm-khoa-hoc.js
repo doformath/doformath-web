@@ -3,6 +3,8 @@
 // 1. Chèn các bài học thêm từ trang Admin (Firestore: bai_hoc_them) vào đúng chương trong mục lục.
 // 2. Nhớ bài đang học (cho thẻ "Tiếp tục học" ở trang chủ) và mở thẳng bài qua địa chỉ ?bai=...
 // 3. Ghi lại hoạt động học tập (Firestore: hoc_sinh/{uid} và hoc_sinh/{uid}/hoat_dong) để Admin theo dõi.
+// 4. Tìm bài nhanh: ô tìm kiếm (gõ không dấu) ở đầu mục lục, tự mở đúng chương/bài đang học,
+//    thanh "Bài trước / Bài tiếp" trên khung bài học, làm mờ các mục chưa có nội dung (about:blank).
 // Trang chủ dùng dfmKhoaHoc.docBaiMoi(db, cacKhoa) để thông báo bài mới đăng.
 window.dfmKhoaHoc = (function () {
     const ADMIN_EMAIL = 'thanhdo@dfm.com';
@@ -241,14 +243,254 @@ window.dfmKhoaHoc = (function () {
         if (!iframe || !laLinkBai(link)) return;
         iframe.src = bai;
         try { localStorage.setItem('doforMath_lastLesson_' + khoa.replace('-', ''), bai); } catch (e) {}
-        // Mở chương + bài chứa mục này trong mục lục, tô sáng và cuộn tới
+        hienTrongMucLuc(link);
+    }
+
+    // Mở chương + bài chứa mục này trong mục lục, tô sáng và cuộn tới
+    function hienTrongMucLuc(link) {
         try {
             const chuong = link.closest('[x-data*="openChapter"]'), khoiBai = link.closest('[x-data*="openLesson"]');
             if (window.Alpine && chuong) Alpine.$data(chuong).openChapter = true;
             if (window.Alpine && khoiBai) Alpine.$data(khoiBai).openLesson = true;
         } catch (e) {}
-        link.classList.add('text-teal-600', 'font-semibold');
+        danhDauDangHoc(link);
         setTimeout(function () { link.scrollIntoView({ block: 'center', behavior: 'smooth' }); }, 400);
+    }
+
+    // ---------- 4. Tìm bài nhanh ----------
+    let capNhatThanhChuyenBai = function () {};   // gán lại khi đã tạo thanh "Bài trước / Bài tiếp"
+
+    // Mục đang học (chỉ một mục tại một thời điểm): dòng nền teal nhạt bo góc, chữ + icon teal,
+    // chấm tròn tô đặc có quầng sáng. Mỗi cặp [lớp thường, lớp đang học] được đổi qua lại cho nhau
+    // (không chỉ thêm lớp, vì lớp màu đứng sau trong CSS sẽ thắng, vd. bg-white thắng bg-teal-500).
+    // Lề âm bù cho phần đệm để chữ không bị xê dịch khi có nền; dòng <li> thành flow-root để lề âm
+    // không bị gộp với khoảng cách giữa các dòng (nếu gộp, chữ tụt xuống lệch khỏi chấm tròn).
+    const DANG_HOC = {
+        dong: [['', 'flow-root']],
+        link: [['text-slate-600', 'text-teal-700 font-semibold bg-teal-50 rounded-lg -mx-2.5 px-2.5 -my-1.5 py-1.5']],
+        icon: [['text-slate-400', 'text-teal-600']],
+        cham: [['bg-white border-teal-400', 'bg-teal-500 border-teal-500 ring-4 ring-teal-100']]
+    };
+    function doiLop(e, cacCap, batLen) {
+        if (!e) return;
+        cacCap.forEach(function (cap) {
+            e.classList.remove.apply(e.classList, cap[batLen ? 0 : 1].split(' ').filter(Boolean));
+            e.classList.add.apply(e.classList, cap[batLen ? 1 : 0].split(' ').filter(Boolean));
+        });
+    }
+    function toMauDangHoc(a, batLen) {
+        doiLop(a, DANG_HOC.link, batLen);
+        doiLop(a.querySelector('i'), DANG_HOC.icon, batLen);
+        doiLop(a.parentElement, DANG_HOC.dong, batLen);
+        doiLop(a.parentElement && a.parentElement.querySelector(':scope > div'), DANG_HOC.cham, batLen);
+    }
+    function danhDauDangHoc(link) {
+        document.querySelectorAll('[data-dfm-dang-hoc]').forEach(function (a) {
+            a.removeAttribute('data-dfm-dang-hoc');
+            a.removeAttribute('aria-current');
+            toMauDangHoc(a, false);
+        });
+        if (!link) return capNhatThanhChuyenBai();
+        link.setAttribute('data-dfm-dang-hoc', '');
+        link.setAttribute('aria-current', 'page');
+        toMauDangHoc(link, true);
+        capNhatThanhChuyenBai();
+    }
+
+    // Các mục bài học có nội dung, theo đúng thứ tự trong mục lục (gồm cả bài học thêm từ Admin)
+    function cacMucCoNoiDung() {
+        return Array.from(document.querySelectorAll('#sidebar a[target="lesson-frame"]')).filter(laLinkBai);
+    }
+
+    // Mục ứng với bài đang mở trong khung: khớp đúng địa chỉ trước, không có thì bỏ qua tham số title
+    function mucDangMo() {
+        const iframe = document.getElementById('lesson-frame');
+        const src = iframe && iframe.getAttribute('src');
+        if (!src) return null;
+        const ds = cacMucCoNoiDung();
+        return ds.find(function (a) { return a.getAttribute('href') === src; })
+            || ds.find(function (a) { return boTitle(a.getAttribute('href')) === boTitle(src); }) || null;
+    }
+
+    // Mở một mục như học sinh tự bấm (để các phần ghi nhớ / theo dõi vẫn chạy), rồi hiện nó trong mục lục
+    function moMuc(link) {
+        link.click();
+        hienTrongMucLuc(link);
+    }
+
+    // Mục chưa có nội dung: làm mờ, gắn nhãn "Sắp có", không bấm được
+    function lamMoMucTrong() {
+        document.querySelectorAll('#sidebar a[target="lesson-frame"][href="about:blank"]').forEach(function (a) {
+            if (a.hasAttribute('data-dfm-sap-co')) return;
+            a.setAttribute('data-dfm-sap-co', '');
+            a.setAttribute('aria-disabled', 'true');
+            a.setAttribute('tabindex', '-1');
+            a.classList.add('opacity-50', 'pointer-events-none');
+            const nhan = el('span', 'ml-auto text-[10px] leading-4 font-bold uppercase tracking-wide text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded');
+            nhan.textContent = 'Sắp có';
+            a.appendChild(nhan);
+        });
+    }
+
+    // Bỏ dấu tiếng Việt để tìm "tiem can" vẫn ra "Tiệm cận"
+    function khongDau(s) {
+        return String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').toLowerCase();
+    }
+
+    function taoOTimKiem() {
+        const sidebar = document.getElementById('sidebar');
+        const vungCuon = sidebar && sidebar.querySelector('.overflow-y-auto');
+        if (!vungCuon || document.getElementById('dfm-tim-bai')) return;
+
+        // Ô nhập nằm ở phần đầu mục lục (dưới dòng "Lộ trình học tập chi tiết")
+        const khung = el('div', 'relative mt-3');
+        khung.appendChild(el('i', 'fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm pointer-events-none'));
+        const o = el('input', 'w-full pl-9 pr-9 py-2.5 rounded-xl border border-slate-200 bg-white text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-100 transition', {
+            id: 'dfm-tim-bai', type: 'text', enterkeyhint: 'search', placeholder: 'Tìm bài… (vd: tiem can, xac suat)', autocomplete: 'off', 'aria-label': 'Tìm bài học'
+        });
+        const xoa = el('button', 'hidden absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-lg text-slate-400 hover:text-teal-600 hover:bg-teal-50', { type: 'button', 'aria-label': 'Xóa tìm kiếm' });
+        xoa.appendChild(el('i', 'fa-solid fa-xmark'));
+        khung.append(o, xoa);
+        vungCuon.previousElementSibling.appendChild(khung);
+
+        const ketQua = el('div', 'space-y-2', { role: 'listbox', 'aria-label': 'Kết quả tìm bài' });
+        ketQua.hidden = true;   // dùng thuộc tính hidden để space-y của mục lục không chừa khoảng trống phía trên
+        vungCuon.prepend(ketQua);
+
+        let chiMuc = null;   // tạo khi bắt đầu gõ, lúc đó bài học thêm từ Admin đã có trong mục lục
+        function taoChiMuc() {
+            return cacMucCoNoiDung().map(function (a) {
+                const info = thongTinBai(a);
+                return { link: a, info: info, tenBai: khongDau(info.tenBai), chuoi: khongDau(info.ten + ' ' + info.chuong) };
+            });
+        }
+
+        function veKetQua() {
+            const tu = khongDau(o.value).split(/\s+/).filter(Boolean);
+            xoa.classList.toggle('hidden', !o.value);
+            Array.from(vungCuon.children).forEach(function (c) { if (c !== ketQua) c.classList.toggle('hidden', tu.length > 0); });
+            ketQua.hidden = !tu.length;
+            ketQua.textContent = '';
+            if (!tu.length) return;
+
+            chiMuc = chiMuc || taoChiMuc();
+            const khop = chiMuc
+                .filter(function (m) { return tu.every(function (t) { return m.chuoi.includes(t); }); })
+                // Khớp ngay trong tên bài lên trước
+                .map(function (m, i) { return { m: m, diem: (tu.every(function (t) { return m.tenBai.includes(t); }) ? 0 : 1), i: i }; })
+                .sort(function (a, b) { return a.diem - b.diem || a.i - b.i; })
+                .slice(0, 40);
+
+            if (!khop.length) {
+                const rong = el('p', 'text-sm text-slate-500 text-center px-4 py-8');
+                rong.textContent = 'Không tìm thấy bài nào. Thử gõ từ khác nhé!';
+                ketQua.appendChild(rong);
+                return;
+            }
+            khop.forEach(function (k) {
+                const m = k.m;
+                const nut = el('button', 'w-full text-left flex items-start gap-3 p-3 rounded-xl border border-slate-200 bg-white hover:border-teal-300 hover:bg-teal-50 transition-colors', { type: 'button', role: 'option' });
+                const icon = m.link.querySelector('i');
+                const lopIcon = icon ? icon.className.split(/\s+/).filter(function (c) { return /^fa-/.test(c); }).join(' ') : 'fa-regular fa-file-lines';
+                nut.appendChild(el('i', lopIcon + ' text-teal-600 mt-0.5 shrink-0'));
+                const chu = el('div', 'min-w-0');
+                const dong1 = el('div', 'text-sm font-semibold text-slate-800 leading-snug line-clamp-2');
+                dong1.textContent = m.info.ten;
+                const dong2 = el('div', 'text-xs text-slate-500 mt-0.5 truncate');
+                dong2.textContent = m.info.chuong;
+                chu.append(dong1, dong2);
+                nut.appendChild(chu);
+                nut.addEventListener('click', function () { chonKetQua(m.link); });
+                ketQua.appendChild(nut);
+            });
+        }
+
+        function chonKetQua(link) {
+            o.value = '';
+            veKetQua();
+            moMuc(link);
+        }
+
+        o.addEventListener('input', veKetQua);
+        o.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+                const dau = ketQua.querySelector('button');
+                if (dau) { e.preventDefault(); dau.click(); }
+            } else if (e.key === 'Escape') {
+                o.value = '';
+                veKetQua();
+            }
+        });
+        xoa.addEventListener('click', function () { o.value = ''; veKetQua(); o.focus(); });
+    }
+
+    // Thanh "Bài trước / Bài tiếp" ở đầu khung bài học; bấm tên bài ở giữa để mở mục lục
+    function taoThanhChuyenBai() {
+        const iframe = document.getElementById('lesson-frame');
+        if (!iframe || document.getElementById('dfm-chuyen-bai')) return;
+        const CAO = 44;
+        const thanh = el('div', 'absolute top-0 left-0 right-0 z-10 flex items-center gap-2 px-2 bg-white border-b border-slate-200', { id: 'dfm-chuyen-bai' });
+        thanh.style.height = CAO + 'px';
+        const lopNut = 'shrink-0 flex items-center gap-1.5 h-8 px-3 rounded-lg text-sm font-semibold text-slate-600 bg-slate-100 hover:bg-teal-50 hover:text-teal-600 transition-colors disabled:opacity-40 disabled:pointer-events-none';
+        const truoc = el('button', lopNut, { type: 'button', 'aria-label': 'Bài trước' });
+        truoc.innerHTML = '<i class="fa-solid fa-chevron-left text-xs"></i><span class="hidden sm:inline">Bài trước</span>';
+        const tiep = el('button', lopNut, { type: 'button', 'aria-label': 'Bài tiếp' });
+        tiep.innerHTML = '<span class="hidden sm:inline">Bài tiếp</span><i class="fa-solid fa-chevron-right text-xs"></i>';
+        const giua = el('button', 'flex-1 min-w-0 text-center text-sm font-semibold text-slate-700 truncate hover:text-teal-600 transition-colors', { type: 'button', title: 'Mở mục lục' });
+        thanh.append(truoc, giua, tiep);
+        iframe.parentElement.prepend(thanh);
+        iframe.style.top = CAO + 'px';
+        iframe.style.height = 'calc(100% - ' + CAO + 'px)';
+
+        giua.addEventListener('click', function () {
+            const khoi = document.getElementById('course-content');
+            try { if (window.Alpine && khoi) Alpine.$data(khoi).sidebarOpen = true; } catch (e) {}
+            const link = document.querySelector('[data-dfm-dang-hoc]');
+            if (link) hienTrongMucLuc(link);
+        });
+
+        function canhBen(buoc) {
+            const ds = cacMucCoNoiDung();
+            const i = ds.indexOf(document.querySelector('[data-dfm-dang-hoc]'));
+            return i < 0 ? null : ds[i + buoc] || null;
+        }
+        truoc.addEventListener('click', function () { const m = canhBen(-1); if (m) moMuc(m); });
+        tiep.addEventListener('click', function () { const m = canhBen(1); if (m) moMuc(m); });
+
+        capNhatThanhChuyenBai = function () {
+            const link = document.querySelector('[data-dfm-dang-hoc]');
+            const info = link ? thongTinBai(link) : null;
+            giua.textContent = info ? info.ten : 'Mục lục';
+            const t = canhBen(-1), s = canhBen(1);
+            truoc.disabled = !t;
+            tiep.disabled = !s;
+            truoc.title = t ? 'Bài trước: ' + thongTinBai(t).ten : '';
+            tiep.title = s ? 'Bài tiếp: ' + thongTinBai(s).ten : '';
+        };
+    }
+
+    function batDauTimBaiNhanh(khoa) {
+        lamMoMucTrong();
+        taoOTimKiem();
+        taoThanhChuyenBai();
+
+        // Mở lại bài học lần trước (nếu trang chưa tự mở) và bung đúng chương/bài đó trong mục lục
+        const iframe = document.getElementById('lesson-frame');
+        const khoaLuu = 'doforMath_lastLesson_' + khoa.replace('-', '');
+        let daLuu = null;
+        try { daLuu = localStorage.getItem(khoaLuu); } catch (e) {}
+        const linkLuu = daLuu && cacMucCoNoiDung().find(function (a) { return a.getAttribute('href') === daLuu; });
+        if (iframe && linkLuu && iframe.getAttribute('src') !== daLuu) iframe.src = daLuu;
+        const dangMo = mucDangMo();
+        if (dangMo) hienTrongMucLuc(dangMo);
+        else capNhatThanhChuyenBai();
+
+        document.addEventListener('click', function (e) {
+            const link = e.target.closest && e.target.closest('#sidebar a[target="lesson-frame"]');
+            if (!laLinkBai(link)) return;
+            try { localStorage.setItem(khoaLuu, link.getAttribute('href')); } catch (err) {}
+            danhDauDangHoc(link);
+        });
     }
 
     // ---------- 3. Theo dõi học tập ----------
@@ -340,6 +582,10 @@ window.dfmKhoaHoc = (function () {
             try {
                 if (!db || !user) return;
                 chenBaiHocThem(db, khoa).then(function () {
+                    // Đợi trang tải xong (Alpine đã chạy, iframe đã mở bài cuối) rồi mới dựng các phần tìm bài
+                    if (document.readyState === 'loading') return new Promise(function (xong) { document.addEventListener('DOMContentLoaded', xong); });
+                }).then(function () {
+                    try { batDauTimBaiNhanh(khoa); } catch (err) { console.warn('Lỗi tìm bài nhanh:', err); }
                     moBaiTheoDiaChi(khoa);
                     ghiNhoHocTiep(user, khoa);
                     if (user.email !== ADMIN_EMAIL) batDauTheoDoi(db, user, khoa);
