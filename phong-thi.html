@@ -8,6 +8,11 @@
     <link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
     <link rel="preconnect" href="https://securetoken.googleapis.com" crossorigin>
     <link rel="preconnect" href="https://identitytoolkit.googleapis.com" crossorigin>
+    <!-- CSS + font của Font Awesome, KaTeX, Inter nằm ở các CDN khác: mở kết nối sớm -->
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <title>Phòng Thi Ảo - DoforMath</title>
     
     <!-- Cấu hình Favicon -->
@@ -329,10 +334,10 @@
                         </div>
                     </a>
 
-                    <!-- Kiểm tra Tập hợp, Hệ thức lượng trong tam giác (cần mã do giáo viên cấp) -->
+                    <!-- Kiểm tra Tập hợp, Hệ thức lượng trong tam giác (chỉ cần đăng nhập) -->
                     <a data-loai="toan10" href="exam/kiem-tra-tap-hop-he-thuc-luong.html" class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 border border-slate-200 group flex flex-col cursor-pointer block relative">
-                        <div class="absolute top-4 right-4 bg-amber-100 text-amber-700 font-bold text-xs px-2.5 py-1 rounded-md z-10 border border-amber-200 flex items-center gap-1">
-                            <i class="fa-solid fa-key"></i> Cần mã
+                        <div class="absolute top-4 right-4 bg-teal-50 text-teal-700 font-bold text-xs px-2.5 py-1 rounded-md z-10 border border-teal-200 flex items-center gap-1">
+                            <i class="fa-solid fa-user-lock"></i> Cần đăng nhập
                         </div>
 
                         <div class="p-6 md:p-8 flex-1 flex flex-col relative overflow-hidden">
@@ -350,6 +355,43 @@
                                 <div class="bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col">
                                     <span class="text-xs text-slate-400 font-medium mb-1">Thời gian</span>
                                     <span class="text-sm font-bold text-slate-700"><i class="fa-regular fa-clock text-teal-500 mr-1"></i> Tính giờ</span>
+                                </div>
+                                <div class="bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col">
+                                    <span class="text-xs text-slate-400 font-medium mb-1">Số lượng</span>
+                                    <span class="text-sm font-bold text-slate-700"><i class="fa-solid fa-list-ol text-teal-500 mr-1"></i> 10 câu</span>
+                                </div>
+                            </div>
+
+                            <div class="mt-auto pt-4 border-t border-slate-100 flex items-center justify-between relative z-10">
+                                <span class="text-sm font-medium text-slate-500"><i class="fa-solid fa-ranking-star mr-1"></i> Có bảng xếp hạng</span>
+                                <div class="bg-amber-50 text-amber-600 font-semibold px-4 py-2 rounded-full text-sm group-hover:bg-amber-500 group-hover:text-white transition-colors shadow-sm">
+                                    Vào thi <i class="fa-solid fa-play text-xs ml-1"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+
+                    <!-- Kiểm tra Giải tam giác, Bài toán tối ưu (chỉ cần đăng nhập) -->
+                    <a data-loai="toan10" href="exam/kiem-tra-giai-tam-giac-toi-uu.html" class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 border border-slate-200 group flex flex-col cursor-pointer block relative">
+                        <div class="absolute top-4 right-4 bg-teal-50 text-teal-700 font-bold text-xs px-2.5 py-1 rounded-md z-10 border border-teal-200 flex items-center gap-1">
+                            <i class="fa-solid fa-user-lock"></i> Cần đăng nhập
+                        </div>
+
+                        <div class="p-6 md:p-8 flex-1 flex flex-col relative overflow-hidden">
+                            <i class="fa-solid fa-trophy absolute -bottom-6 -right-6 text-9xl text-slate-100 dark:opacity-5 transform -rotate-12 group-hover:scale-110 transition-transform duration-500"></i>
+
+                            <div class="flex items-center gap-2 mb-4 relative z-10">
+                                <span class="bg-slate-100 text-slate-600 font-semibold text-xs px-3 py-1 rounded-full uppercase tracking-wider">Toán 10</span>
+                            </div>
+
+                            <h3 class="text-xl font-bold text-slate-900 mb-4 group-hover:text-amber-600 transition-colors leading-snug relative z-10">
+                                Kiểm tra Giải tam giác, Bài toán tối ưu hệ bất phương trình
+                            </h3>
+
+                            <div class="grid grid-cols-2 gap-3 mb-6 relative z-10">
+                                <div class="bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col">
+                                    <span class="text-xs text-slate-400 font-medium mb-1">Thời gian</span>
+                                    <span class="text-sm font-bold text-slate-700"><i class="fa-regular fa-clock text-teal-500 mr-1"></i> 15 phút</span>
                                 </div>
                                 <div class="bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col">
                                     <span class="text-xs text-slate-400 font-medium mb-1">Số lượng</span>
@@ -430,31 +472,13 @@
             });
         });
     </script>
-<!-- Nhúng thư viện Firebase Auth -->
     <!-- Phiên đăng nhập nhớ trên máy: header hiện ngay, không chờ Firebase (xem assets/js/dfm-phien.js) -->
     <script src="assets/js/dfm-phien.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
     <script src="assets/js/dfm-de-thi.js"></script>
-    <script src="assets/js/dfm-tai-khoan.js"></script>
-    
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyD-NDo43O3Q_9GVii6pDOM7D6SQ5pxmo5g",
-            authDomain: "doformath-bac70.firebaseapp.com",
-            projectId: "doformath-bac70",
-            storageBucket: "doformath-bac70.firebasestorage.app",
-            messagingSenderId: "329095418163",
-            appId: "1:329095418163:web:226636d40b5c2960cdee46"
-        };
-        
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
-        
-        // Đã xóa dòng const db = firebase.firestore(); gây lỗi ở đây
 
+    <!-- Vẽ phòng thi: chạy TRƯỚC khi tải Firebase SDK (vài trăm KB) để dữ liệu đệm trên máy / trang cho khách hiện ngay.
+         Chỉ gọi tới firebase bên trong hàm, lúc đó SDK đã tải xong (khởi động ở thẻ script cuối) -->
+    <script>
         // HÀM ĐĂNG XUẤT
         function dangXuat() {
             if (window.dfmPhien) dfmPhien.xoa();
@@ -530,20 +554,30 @@
         // Đề trực tuyến (tải từ file TeX ở trang Quản trị). Chỉ giữ các trường cần để vẽ thẻ (đề có cả nội dung câu hỏi,
         // không cần), thời điểm đổi sang mili-giây để lưu đệm trên máy: { deThi: [...], daNop: { deId: { tieuDe, nopLuc } } }
         const TRUONG_DE = ['tieuDe', 'moTa', 'phanLoai', 'thoiGian', 'soCau', 'congBo', 'hienLoiGiai'];
+        function chonTruongDe(id, v) {
+            const de = { id: id, capNhatLuc: millis(v.capNhatLuc) };
+            TRUONG_DE.forEach((k) => { if (v[k] !== undefined) de[k] = v[k]; });
+            return de;
+        }
+        // Danh sách đề đang mở: đọc bản tóm tắt phong_thi/de_mo (trang Quản trị ghi, chỉ vài KB) thay vì tải nguyên
+        // các đề (mỗi đề tới vài trăm KB vì có câu hỏi + hình). Chưa có bản tóm tắt / Rules chưa cho đọc thì đọc thẳng de_thi như cũ
+        function taiDeDangMo(db) {
+            const docDayDu = () => db.collection('de_thi').where('trangThai', '==', 'mo').get()
+                .then((snap) => snap.docs.map((d) => chonTruongDe(d.id, d.data())));
+            return db.collection('phong_thi').doc('de_mo').get().then((s) => {
+                const ds = s.exists && s.data().ds;
+                return ds ? Object.keys(ds).map((id) => chonTruongDe(id, ds[id])) : docDayDu();
+            }, docDayDu);
+        }
         function taiDeTrucTuyen(user) {
             const db = firebase.firestore();
             return Promise.all([
-                db.collection('de_thi').where('trangThai', '==', 'mo').get(),
+                taiDeDangMo(db),
                 // Rules chưa cập nhật thì bỏ qua phần này, vẫn hiện đề đang mở
                 db.collection('bai_lam').where('uid', '==', user.uid).get().catch(() => null)
-            ]).then(([snap, bl]) => {
+            ]).then(([deThi, bl]) => {
                 const daNop = {};
                 if (bl) bl.docs.forEach((d) => { const v = d.data(); if (v.deId) daNop[v.deId] = { tieuDe: v.tieuDe || '', nopLuc: millis(v.nopLuc) }; });
-                const deThi = snap.docs.map((d) => {
-                    const v = d.data(), de = { id: d.id, capNhatLuc: millis(v.capNhatLuc) };
-                    TRUONG_DE.forEach((k) => { if (v[k] !== undefined) de[k] = v[k]; });
-                    return de;
-                });
                 return { deThi: deThi, daNop: daNop };
             });
         }
@@ -625,11 +659,21 @@
                 hienLop(iconLop('fa-circle-info') + '<span class="text-sm text-slate-600">Tài khoản chưa được xếp lớp. Nhắn thầy Đô để được thêm vào lớp nhé!</span>');
             }
         }
+        const hienLopAdmin = () => hienLop(iconLop('fa-user-shield') + '<span class="font-semibold text-slate-700">Tài khoản quản trị · xem đề của tất cả các lớp</span>');
         // Dựng lại nút lọc + các khu sau mỗi lần có dữ liệu (dữ liệu đệm trên máy, rồi dữ liệu mới từ Firebase)
         function hienPhongThi() {
             dungNutLoc();
             locDe(locHienTai || new URLSearchParams(location.search).get('loai') || '');
             document.getElementById('khu-de').style.opacity = '1';
+        }
+        // Khách: chỉ có đề luyện tập + lời mời đăng nhập
+        function hienKhach() {
+            const canLam = document.getElementById('khu-can-lam');
+            document.getElementById('pt-moi-dang-nhap').classList.remove('hidden');
+            hienLop(iconLop('fa-door-open') + '<span class="font-semibold text-slate-700">Tất cả đề thi</span>');
+            canLam.dataset.tat = document.getElementById('khu-da-lam').dataset.tat = '1';   // cần đăng nhập mới có
+            canLam.classList.add('hidden');
+            hienPhongThi();
         }
 
         // Dựng phòng thi theo tài khoản. Học sinh: hiện ngay dữ liệu lần trước lưu trên máy (nếu có),
@@ -644,16 +688,19 @@
             if (banDemCua && (!user || user.uid !== banDemCua)) boBanDem();
             try {
                 if (!user) {
-                    document.getElementById('pt-moi-dang-nhap').classList.remove('hidden');
-                    hienLop(iconLop('fa-door-open') + '<span class="font-semibold text-slate-700">Tất cả đề thi</span>');
-                    canLam.dataset.tat = daLam.dataset.tat = '1';   // cần đăng nhập mới có
-                    canLam.classList.add('hidden');
-                } else if (user.email === ADMIN_EMAIL) {
-                    canLam.classList.remove('hidden');
-                    hienLop(iconLop('fa-user-shield') + '<span class="font-semibold text-slate-700">Tài khoản quản trị · xem đề của tất cả các lớp</span>');
-                    veDeTrucTuyen(await taiDeTrucTuyen(user).catch((err) => { console.warn('Không tải được đề thi trực tuyến:', err); return {}; }));
+                    hienKhach();
+                    return;
+                }
+                // Lúc đầu đoán là khách (máy chưa nhớ phiên) nhưng thật ra đã đăng nhập: bỏ giao diện khách
+                document.getElementById('pt-moi-dang-nhap').classList.add('hidden');
+                delete canLam.dataset.tat;
+                delete daLam.dataset.tat;
+                canLam.classList.remove('hidden');
+                if (user.email === ADMIN_EMAIL) {
+                    hienLopAdmin();
+                    const du = await taiDeTrucTuyen(user).catch((err) => { console.warn('Không tải được đề thi trực tuyến:', err); return null; });
+                    if (du) { veDeTrucTuyen(du); if (window.dfmPhien) dfmPhien.ghiDem('phong-thi', user.uid, du); }
                 } else {
-                    canLam.classList.remove('hidden');
                     const dem = banDemCua === user.uid || hienBanDem(window.dfmPhien && dfmPhien.doc(), user.uid);
                     const [quyen, du] = await Promise.all([
                         dfmTaiKhoan.docQuyen(firebase.firestore(), user).catch(() => null),
@@ -677,11 +724,12 @@
         // dungPhongThi vẽ lại khi có dữ liệu mới (hoặc gỡ đi nếu Firebase báo tài khoản khác / đã đăng xuất)
         let banDemCua = null;   // uid của dữ liệu đệm đang hiện
         function hienBanDem(phien, uid) {
-            if (!phien || !phien.quyen || phien.uid !== uid || phien.email === ADMIN_EMAIL) return false;
+            const laAdmin = !!phien && phien.email === ADMIN_EMAIL;
+            if (!phien || phien.uid !== uid || (!laAdmin && !phien.quyen)) return false;
             const dem = dfmPhien.docDem('phong-thi', uid);
             if (!dem) return false;
             document.getElementById('khu-can-lam').classList.remove('hidden');
-            datLop(phien.quyen);
+            if (laAdmin) hienLopAdmin(); else datLop(phien.quyen);
             veDeTrucTuyen(dem);
             hienPhongThi();
             banDemCua = uid;
@@ -694,10 +742,34 @@
             hienLop('');
             banDemCua = null;
         }
+        // Máy chưa nhớ phiên nào thì gần như chắc chắn là khách: hiện luôn trang cho khách, không chờ Firebase
         (function () {
             const p = window.dfmPhien && dfmPhien.doc();
-            if (p) hienBanDem(p, p.uid);
+            if (p) { hienBanDem(p, p.uid); return; }
+            hienKhach();
+            const khuVucDangNhap = document.getElementById('khu-vuc-dang-nhap');
+            if (khuVucDangNhap) khuVucDangNhap.style.display = 'block';
+            document.getElementById('auth-container').style.opacity = '1';
         })();
+    </script>
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script src="assets/js/dfm-tai-khoan.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyD-NDo43O3Q_9GVii6pDOM7D6SQ5pxmo5g",
+            authDomain: "doformath-bac70.firebaseapp.com",
+            projectId: "doformath-bac70",
+            storageBucket: "doformath-bac70.firebasestorage.app",
+            messagingSenderId: "329095418163",
+            appId: "1:329095418163:web:226636d40b5c2960cdee46"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
 
         firebase.auth().onAuthStateChanged((user) => {
             dungPhongThi(user);

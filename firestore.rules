@@ -120,6 +120,13 @@ service cloud.firestore {
       allow write: if laAdmin();
     }
 
+    // Bản tóm tắt các đề đang mở cho trang Phòng thi (de_mo: tiêu đề, thời gian, số câu... không có câu hỏi),
+    // trang Quản trị ghi lại mỗi khi danh sách đề đổi
+    match /phong_thi/{docId} {
+      allow get: if laAdmin() || laHocSinh();
+      allow write: if laAdmin();
+    }
+
     // Đáp án + lời giải: học sinh chỉ đọc được khi ĐÃ NỘP bài đề đó VÀ Admin đã công bố điểm/đáp án
     // (trường congBo của đề: 'an' = chưa công bố, 'diem' = chỉ điểm, 'chi-tiet' = điểm + đúng/sai từng câu,
     //  'day-du' = điểm + đáp án + lời giải)
@@ -152,7 +159,8 @@ service cloud.firestore {
     }
 
     // Bảng xếp hạng các bài kiểm tra công thức: học sinh đã được duyệt chỉ đọc/ghi dòng của mình; Admin xem tất cả
-    function ghiBxhHopLe(uid) {
+    // gioiHan: thời gian làm bài tối đa của bài đó (ms)
+    function ghiBxhHopLe(uid, gioiHan) {
       return request.auth != null && request.auth.uid == uid && laHocSinh()
         && chiSua(['ten', 'soLan', 'lanCuoi', 'lichSu', 'diem', 'tong', 'thoiGian', 'viPham', 'ngay'])
         && request.resource.data.ten is string
@@ -162,25 +170,31 @@ service cloud.firestore {
         && request.resource.data.diem <= 10
         && request.resource.data.thoiGian is number
         && request.resource.data.thoiGian > 0
-        && request.resource.data.thoiGian <= 300000
+        && request.resource.data.thoiGian <= gioiHan
         && (!('lichSu' in request.resource.data) || (request.resource.data.lichSu is list && request.resource.data.lichSu.size() <= 100));
     }
     match /bxh_luong_giac/{uid} {
       allow get: if laAdmin() || (request.auth != null && request.auth.uid == uid);
       allow list: if laAdmin();
-      allow create, update: if ghiBxhHopLe(uid);
+      allow create, update: if ghiBxhHopLe(uid, 300000);
       allow delete: if false;
     }
     match /bxh_day_so_thong_ke/{uid} {
       allow get: if laAdmin() || (request.auth != null && request.auth.uid == uid);
       allow list: if laAdmin();
-      allow create, update: if ghiBxhHopLe(uid);
+      allow create, update: if ghiBxhHopLe(uid, 300000);
       allow delete: if false;
     }
     match /bxh_tap_hop_he_thuc_luong/{uid} {
       allow get: if laAdmin() || (request.auth != null && request.auth.uid == uid);
       allow list: if laAdmin();
-      allow create, update: if ghiBxhHopLe(uid);
+      allow create, update: if ghiBxhHopLe(uid, 300000);
+      allow delete: if false;
+    }
+    match /bxh_giai_tam_giac_toi_uu/{uid} {
+      allow get: if laAdmin() || (request.auth != null && request.auth.uid == uid);
+      allow list: if laAdmin();
+      allow create, update: if ghiBxhHopLe(uid, 900000);
       allow delete: if false;
     }
   }

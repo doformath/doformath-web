@@ -302,7 +302,8 @@
         const BAI_KIEM_TRA = [
             { id: 'bxh_luong_giac', ten: 'Công thức lượng giác' },
             { id: 'bxh_tap_hop_he_thuc_luong', ten: 'Tập hợp & hệ thức lượng' },
-            { id: 'bxh_day_so_thong_ke', ten: 'Dãy số & thống kê' }
+            { id: 'bxh_day_so_thong_ke', ten: 'Dãy số & thống kê' },
+            { id: 'bxh_giai_tam_giac_toi_uu', ten: 'Giải tam giác & tối ưu' }
         ];
         const MOT_NGAY = 86400000;
 
@@ -539,6 +540,38 @@
                     '. Thường là do Firestore Rules chưa cho phép tài khoản Admin đọc các mục này.';
             }
             veTatCa();
+            if (!loi.includes('de_thi')) dongBoPhongThi();
+        }
+
+        // Bản tóm tắt các đề đang mở cho trang Phòng thi (phong_thi/de_mo): chỉ các trường để vẽ thẻ đề, để học sinh
+        // không phải tải nguyên đề (câu hỏi + hình, mỗi đề tới vài trăm KB). Dựng lại từ S.deThi sau mỗi lần danh sách đề
+        // đổi; giống bản trên Firestore thì thôi không ghi
+        const TRUONG_TOM_TAT = ['tieuDe', 'moTa', 'phanLoai', 'thoiGian', 'congBo', 'hienLoiGiai'];
+        let tomTatDaGhi = null;
+        // JSON với khóa xếp theo thứ tự (Firestore trả các trường không theo thứ tự lúc ghi)
+        const chuoiOnDinh = (v) => JSON.stringify(v, (k, x) => x && typeof x === 'object' && !Array.isArray(x)
+            ? Object.keys(x).sort().reduce((o, khoa) => { o[khoa] = x[khoa]; return o; }, {}) : x);
+        async function dongBoPhongThi() {
+            const ds = {};
+            (S.deThi || []).filter((de) => de.trangThai === 'mo').forEach((de) => {
+                const luc = thanhDate(de.capNhatLuc);
+                const t = { capNhatLuc: luc ? luc.getTime() : 0, soCau: de.soCau || DT.soCauTheoLoai(de.cauHoi || []) };
+                TRUONG_TOM_TAT.forEach((k) => { if (de[k] !== undefined) t[k] = de[k]; });
+                ds[de.id] = t;
+            });
+            const ref = db.collection('phong_thi').doc('de_mo');
+            try {
+                if (tomTatDaGhi === null) {
+                    const s = await ref.get();
+                    tomTatDaGhi = chuoiOnDinh(s.exists ? s.data().ds : null);
+                }
+                const moi = chuoiOnDinh(ds);
+                if (moi === tomTatDaGhi) return;
+                await ref.set({ ds: ds });
+                tomTatDaGhi = moi;
+            } catch (err) {
+                console.warn('Không cập nhật được danh sách đề cho Phòng thi (Firestore Rules đã có mục phong_thi chưa?):', err);
+            }
         }
 
         function veTatCa() {
@@ -1650,6 +1683,7 @@
             try {
                 await db.collection('de_thi').doc(id).update({ congBo: moi, hienLoiGiai: FV.delete() });
                 de.congBo = moi; delete de.hienLoiGiai;
+                dongBoPhongThi();
                 veDeThi(); veKiemTra();
                 thongBao(moi === 'an' ? 'Đã ẩn điểm và đáp án với học sinh' : moi === 'diem' ? 'Đã công bố điểm cho học sinh' : 'Đã công bố điểm, đáp án và lời giải');
                 return true;
@@ -1708,7 +1742,8 @@
                 const moi = de.trangThai === 'mo' ? 'dong' : 'mo';
                 try {
                     await db.collection('de_thi').doc(id).update({ trangThai: moi, capNhatLuc: FV.serverTimestamp() });
-                    de.trangThai = moi; veDeThi();
+                    de.trangThai = moi; de.capNhatLuc = Date.now(); veDeThi();
+                    dongBoPhongThi();
                     thongBao(moi === 'mo' ? 'Đề đã mở, học sinh vào làm được' : 'Đã đóng đề');
                 } catch (err) { thongBao('Lỗi: ' + err.message); }
             }
