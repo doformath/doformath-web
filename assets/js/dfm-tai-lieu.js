@@ -2,7 +2,7 @@
 // Firestore:
 //   tai_lieu/{id}          thông tin: tieuDe, moTa, danhMuc, lop, loai ('html' | 'anh'), thuMuc, thuTu, an, taoLuc, capNhatLuc
 //   tai_lieu_noi_dung/{id} { html }: nội dung của tài liệu dạng trang HTML (tách riêng để trang danh sách không phải tải)
-// Tài liệu loại 'anh' là PDF đã cắt thành ảnh trên Cloudinary (<thuMuc>-1, -2, ...), mở bằng courses/xem-tai-lieu.html.
+// Tài liệu loại 'anh' là PDF đã cắt thành ảnh trên Cloudinary (<thuMuc>-1, -2, ...), mở bằng courses/xem-tai-lieu.html. 
 window.dfmTaiLieu = (function () {
     const DANH_MUC = {
         'ly-thuyet': { ten: 'Lý thuyết', icon: 'fa-solid fa-book-open', nen: 'from-teal-500 to-emerald-600', cham: 'bg-teal-500' },

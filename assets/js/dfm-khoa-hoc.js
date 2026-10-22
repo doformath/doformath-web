@@ -5,7 +5,7 @@
 // 3. Ghi lại hoạt động học tập (Firestore: hoc_sinh/{uid} và hoc_sinh/{uid}/hoat_dong) để Admin theo dõi.
 // 4. Tìm bài nhanh: ô tìm kiếm (gõ không dấu) ở đầu mục lục, tự mở đúng chương/bài đang học,
 //    thanh "Bài trước / Bài tiếp" trên khung bài học, làm mờ các mục chưa có nội dung (about:blank).
-// Trang chủ dùng dfmKhoaHoc.docBaiMoi(db, cacKhoa) để thông báo bài mới đăng.
+// Trang chủ dùng dfmKhoaHoc.docBaiMoi(db, cacKhoa) để thông báo bài mới đăng. 
 window.dfmKhoaHoc = (function () {
     const ADMIN_EMAIL = 'thanhdo@dfm.com';
     const GIAY_TOI_DA_MOI_DOAN = 60 * 60;   // Tab để mở quá lâu (quên tắt) chỉ tính tối đa 1 giờ mỗi lần
