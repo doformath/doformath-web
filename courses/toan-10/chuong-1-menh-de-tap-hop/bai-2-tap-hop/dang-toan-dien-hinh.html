@@ -1,0 +1,2182 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài 2. Tập hợp - Dạng toán điển hình - DoforMath</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Giao diện sáng / tối: chạy trước CSS để không bị nháy màu -->
+    <script src="../../../../assets/js/dfm-giao-dien.js"></script>
+    <!-- CSS Tailwind dựng sẵn cho cả site (sửa class xong chạy: npm run build:css) -->
+    <link rel="stylesheet" href="../../../../assets/css/tailwind.css?v=3f38453c">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+    <link rel="icon" type="image/png" sizes="32x32" href="../../../../assets/icons/favicon-32.png">
+    <link rel="manifest" href="../../../../manifest.webmanifest">
+    <meta name="theme-color" content="#0d9488">
+    <link rel="apple-touch-icon" href="../../../../assets/icons/apple-touch-icon.png">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="DoforMath">
+    <script defer src="../../../../pwa.js"></script>
+
+    <style>
+        /* Màu của hình minh họa: A = teal, B = cam, C = xanh trời, kết quả = tím */
+        :root {
+            --ca: #0d9488; --cb: #ea580c; --cc: #0284c7; --ck: #7c3aed; --sai: #e11d48; --dung: #059669;
+            --ca-nhat: rgba(13, 148, 136, .16); --cb-nhat: rgba(234, 88, 12, .16); --cc-nhat: rgba(2, 132, 199, .16); --ck-nhat: rgba(124, 58, 237, .18);
+            --truc: #64748b; --truc-nhat: #cbd5e1; --chu-hinh: #334155; --chu-mo: #94a3b8;
+            --nen-hinh: #f8fafc; --nen-the: #ffffff; --vien-hinh: #e2e8f0;
+        }
+        html.dark {
+            --ca: #2dd4bf; --cb: #fb923c; --cc: #38bdf8; --ck: #a78bfa; --sai: #fb7185; --dung: #34d399;
+            --ca-nhat: rgba(45, 212, 191, .18); --cb-nhat: rgba(251, 146, 60, .18); --cc-nhat: rgba(56, 189, 248, .18); --ck-nhat: rgba(167, 139, 250, .22);
+            --truc: #94a3b8; --truc-nhat: #475569; --chu-hinh: #e2e8f0; --chu-mo: #64748b;
+            --nen-hinh: #0f172a; --nen-the: #1e293b; --vien-hinh: #334155;
+        }
+        html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+        .katex { font-size: 1.06em; }
+        .katex-display { margin: .5rem 0; overflow-x: auto; overflow-y: hidden; padding: .15rem 0; }
+
+        /* Thanh chọn dạng: cuộn ngang trên điện thoại, ẩn thanh cuộn */
+        .thanh-dang { scrollbar-width: none; }
+        .thanh-dang::-webkit-scrollbar { display: none; }
+        .chip-dang[aria-current="true"] { background: #0d9488; border-color: #0d9488; color: #fff; box-shadow: 0 4px 12px rgba(13, 148, 136, .3); }
+
+        /* Câu a), b), c) */
+        ol.cau { counter-reset: cau; list-style: none; padding: 0; margin: .5rem 0 0; display: grid; gap: .4rem; }
+        ol.cau > li { counter-increment: cau; position: relative; padding-left: 1.9rem; }
+        ol.cau > li::before { content: counter(cau, lower-alpha) ")"; position: absolute; left: 0; top: .05rem; font-weight: 700; color: var(--ca); }
+
+        /* Lời giải mở / đóng */
+        details.loi-giai > summary { list-style: none; cursor: pointer; }
+        details.loi-giai > summary::-webkit-details-marker { display: none; }
+        details.loi-giai[open] .mui-ten { transform: rotate(180deg); }
+        details.loi-giai[open] > .noi-dung-giai { animation: hienLen .35s ease; }
+        .noi-dung-giai p + p, .noi-dung-giai p + ol, .noi-dung-giai ol + p { margin-top: .5rem; }
+        @keyframes hienLen { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+
+        /* ===== Khung hình minh họa ===== */
+        .khung { margin-top: 1rem; border: 1px solid var(--vien-hinh); border-radius: 1rem; background: var(--nen-hinh); overflow: hidden; }
+        .khung-dau { display: flex; align-items: center; justify-content: space-between; gap: .5rem; padding: .6rem .85rem; border-bottom: 1px solid var(--vien-hinh); flex-wrap: wrap; }
+        .khung-ten { font-size: .72rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--ca); display: inline-flex; align-items: center; gap: .4rem; }
+        .khung-tabs { display: flex; gap: .35rem; overflow-x: auto; scrollbar-width: none; }
+        .khung-tabs::-webkit-scrollbar { display: none; }
+        .nut-tab, .nut-phep { flex-shrink: 0; min-height: 34px; padding: .3rem .8rem; border-radius: 999px; font-size: .85rem; font-weight: 600; border: 1px solid var(--vien-hinh); background: var(--nen-the); color: var(--chu-hinh); transition: all .2s; }
+        .nut-tab:hover, .nut-phep:hover { border-color: var(--ca); }
+        .nut-tab[aria-pressed="true"] { background: var(--ca); border-color: var(--ca); color: #fff; }
+        html.dark .nut-tab[aria-pressed="true"] { color: #0f172a; }
+        .nut-phep[aria-pressed="true"] { background: var(--ck); border-color: var(--ck); color: #fff; box-shadow: 0 3px 10px var(--ck-nhat); }
+        html.dark .nut-phep[aria-pressed="true"] { color: #0f172a; }
+        .khung-phu { display: flex; flex-wrap: wrap; gap: .4rem; justify-content: center; padding: .65rem .75rem 0; }
+        .khung-phu:empty { display: none; }
+        .khung-san { padding: .5rem .5rem 0; display: flex; justify-content: center; }
+        .khung-san svg { width: 100%; max-width: 560px; height: auto; display: block; overflow: visible; }
+        .khung-chu { min-height: 3.4rem; margin: .25rem .75rem .5rem; padding: .6rem .8rem; border-radius: .75rem; background: var(--nen-the); border: 1px solid var(--vien-hinh); font-size: .92rem; line-height: 1.6; color: var(--chu-hinh); }
+        .khung-chu .so-buoc { display: inline-block; margin-right: .4rem; padding: 0 .45rem; border-radius: .4rem; font-size: .72rem; font-weight: 800; background: var(--ca-nhat); color: var(--ca); vertical-align: 1px; }
+        .khung-chu.doi { animation: hienLen .35s ease; }
+        .khung-nut { display: flex; align-items: center; justify-content: center; gap: .4rem; padding: 0 .75rem .75rem; }
+        .khung-nut button { min-width: 42px; height: 42px; border-radius: .8rem; border: 1px solid var(--vien-hinh); background: var(--nen-the); color: var(--chu-hinh); display: inline-flex; align-items: center; justify-content: center; gap: .4rem; font-weight: 700; font-size: .9rem; transition: all .2s; }
+        .khung-nut button:hover:not(:disabled) { border-color: var(--ca); color: var(--ca); }
+        .khung-nut button:disabled { opacity: .35; }
+        .khung-nut .nut-chinh { background: var(--ca); border-color: var(--ca); color: #fff; padding: 0 1rem; }
+        .khung-nut .nut-chinh:hover:not(:disabled) { color: #fff; filter: brightness(1.08); }
+        html.dark .khung-nut .nut-chinh, html.dark .khung-nut .nut-chinh:hover:not(:disabled) { color: #0f172a; }
+        .khung-nut button { flex-shrink: 0; }
+        .khung-nut .nut-chinh { white-space: nowrap; }
+        @media (max-width: 440px) {
+            .khung-nut .nut-chinh { padding: 0; min-width: 48px; }
+            .khung-nut .nut-chinh span { display: none; }
+        }
+        .cham-buoc { display: flex; flex-wrap: wrap; justify-content: center; min-width: 0; gap: .3rem; padding: 0 .25rem; }
+        .cham-buoc span { width: 8px; height: 8px; border-radius: 99px; background: var(--truc-nhat); transition: all .25s; cursor: pointer; }
+        .cham-buoc span.dang { width: 22px; background: var(--ca); }
+        .cham-buoc span.qua { background: var(--ca); opacity: .45; }
+
+        /* Thanh trượt tham số m */
+        .thanh-m { display: flex; align-items: center; gap: .75rem; width: 100%; max-width: 520px; padding: .25rem .25rem 0; }
+        .thanh-m input[type=range] { flex: 1; height: 34px; accent-color: var(--ck); cursor: pointer; }
+        .gia-tri-m { min-width: 5.5rem; text-align: center; font-weight: 800; color: var(--ck); background: var(--ck-nhat); border-radius: .6rem; padding: .3rem .5rem; font-size: .95rem; }
+        .bang-kt { display: grid; gap: .35rem; width: 100%; max-width: 520px; margin: .5rem auto 0; }
+        .dong-kt { display: flex; align-items: center; gap: .5rem; padding: .4rem .65rem; border-radius: .6rem; border: 1px solid var(--vien-hinh); background: var(--nen-the); font-size: .88rem; color: var(--chu-hinh); cursor: pointer; transition: all .2s; text-align: left; }
+        .dong-kt[aria-pressed="true"] { border-color: var(--ck); box-shadow: 0 0 0 2px var(--ck-nhat); }
+        .dong-kt .dau { margin-left: auto; font-weight: 800; font-size: .8rem; padding: .1rem .5rem; border-radius: 99px; white-space: nowrap; }
+        .dau.co { background: rgba(5, 150, 105, .14); color: var(--dung); }
+        .dau.khong { background: rgba(225, 29, 72, .12); color: var(--sai); }
+        .dau.bo { background: var(--truc-nhat); color: var(--chu-hinh); opacity: .7; }
+
+        /* Bảng điều khiển phòng thí nghiệm */
+        .o-dk { display: grid; grid-template-columns: 1fr; gap: .5rem; width: 100%; max-width: 560px; }
+        @media (min-width: 560px) { .o-dk { grid-template-columns: 1fr 1fr; } }
+        .the-tap { border: 1px solid var(--vien-hinh); background: var(--nen-the); border-radius: .85rem; padding: .5rem .65rem; }
+        .dau-the { display: flex; align-items: center; justify-content: center; gap: .4rem; min-height: 1.9rem; font-size: 1.05rem; }
+        .the-tap .ten-tap { font-weight: 800; font-style: italic; font-family: KaTeX_Main, 'Times New Roman', serif; font-size: 1.15rem; }
+        .hai-dau { display: flex; justify-content: space-between; gap: .5rem; margin-top: .35rem; }
+        .cum-dau-mut { display: flex; align-items: center; gap: .3rem; flex-wrap: nowrap; }
+        .cum-dau-mut button { min-width: 34px; height: 34px; border-radius: .6rem; border: 1px solid var(--vien-hinh); background: var(--nen-the); color: var(--chu-hinh); font-weight: 800; font-family: KaTeX_Main, 'Times New Roman', serif; font-size: 1.05rem; }
+        .cum-dau-mut button:hover { border-color: var(--ca); }
+        .cum-dau-mut .so { min-width: 2.6rem; text-align: center; font-weight: 800; font-family: KaTeX_Main, 'Times New Roman', serif; font-size: 1.05rem; }
+
+        /* ===== Phần tử SVG ===== */
+        .hinh-svg text { font-family: KaTeX_Main, 'Times New Roman', serif; fill: var(--chu-hinh); }
+        .hinh-svg text.ui { font-family: Inter, sans-serif; font-weight: 700; }
+        .hinh-svg * { transition: opacity .45s ease, transform .6s cubic-bezier(.34, 1.3, .64, 1), fill .35s, stroke .35s; }
+        .hinh-svg .an { opacity: 0 !important; }
+        .hinh-svg .no { transform-box: fill-box; transform-origin: center; }
+        .hinh-svg .no.an { transform: scale(.3); }
+        .hinh-svg .ve { stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset .9s cubic-bezier(.65, 0, .35, 1), opacity .4s, stroke .3s; }
+        .hinh-svg .ve.xong { stroke-dashoffset: 0; }
+        .hinh-svg .roi { transition: transform .75s cubic-bezier(.5, 0, .2, 1), opacity .45s; }
+        .hinh-svg .mo { opacity: .22; }
+        .hinh-svg .nhay { animation: nhay 1.2s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+        @keyframes nhay { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.18); } }
+        .hinh-svg .vung { fill-opacity: .42; }
+        .hinh-svg path.duong { stroke: var(--ck) !important; stroke-width: 4px; stroke-dasharray: none; }
+        .hinh-svg .pt circle { fill: var(--nen-the); stroke: var(--truc); stroke-width: 1.5; }
+        .hinh-svg .pt.chon circle { fill: var(--ck); stroke: var(--ck); }
+        .hinh-svg .pt.chon text { fill: #fff; font-weight: 700; }
+        html.dark .hinh-svg .pt.chon text { fill: #0f172a; }
+        .hinh-svg .pt.mo2 { opacity: .3; }
+        .hinh-svg .chip rect { fill: var(--nen-the); stroke: var(--vien-hinh); }
+        .hinh-svg .chip.chon rect { fill: var(--ck-nhat); stroke: var(--ck); }
+        @media (prefers-reduced-motion: reduce) {
+            .hinh-svg *, .hinh-svg .ve { transition: none !important; animation: none !important; }
+        }
+
+        /* Hộp phương pháp / ghi nhớ */
+        .hop-ghi-nho { border-left: 4px solid var(--ca); background: var(--ca-nhat); border-radius: .75rem; padding: .75rem 1rem; }
+        .the-phep { border: 1px solid var(--vien-hinh); background: var(--nen-the); border-radius: 1rem; padding: .85rem; }
+        .the-phep svg { width: 100%; max-width: 150px; height: auto; display: block; margin: 0 auto .5rem; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased font-sans">
+
+    <div class="max-w-4xl mx-auto px-3 sm:px-4 w-full mt-4 sm:mt-8 mb-3">
+        <div class="bg-gradient-to-r from-teal-50 to-emerald-50 border border-teal-100 rounded-2xl p-5 sm:p-8 shadow-sm flex flex-col items-center text-center">
+            <span class="bg-teal-100 text-teal-700 border border-teal-200 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide mb-3 shadow-sm inline-flex items-center gap-1.5">
+                <i class="fa-solid fa-pen-to-square"></i> Dạng toán điển hình
+            </span>
+            <h1 class="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 leading-snug">Bài 2. Tập hợp và các phép toán trên tập hợp</h1>
+            <p class="text-sm text-slate-500 mt-2 max-w-xl">5 dạng toán · 17 ví dụ · hình minh họa động: bấm <i class="fa-solid fa-play text-teal-600 text-xs"></i> để xem từng bước, chọn phép toán để thấy tập hợp thay đổi trên trục số.</p>
+            <div class="w-20 h-1.5 bg-gradient-to-r from-teal-400 to-emerald-400 rounded-full mt-5"></div>
+        </div>
+    </div>
+
+    <!-- Chọn dạng toán (dính trên đầu khi cuộn) -->
+    <nav class="sticky top-0 z-40 bg-slate-50/90 backdrop-blur-md border-b border-slate-200/70">
+        <div class="thanh-dang max-w-4xl mx-auto px-3 sm:px-4 py-2.5 flex gap-2 overflow-x-auto">
+            <a href="#dang-1" class="chip-dang shrink-0 px-3.5 py-2 rounded-full border border-slate-200 bg-white text-slate-600 text-sm font-semibold transition-all hover:border-teal-300">Dạng 1 · Xác định tập hợp</a>
+            <a href="#dang-2" class="chip-dang shrink-0 px-3.5 py-2 rounded-full border border-slate-200 bg-white text-slate-600 text-sm font-semibold transition-all hover:border-teal-300">Dạng 2 · Tập con</a>
+            <a href="#dang-3" class="chip-dang shrink-0 px-3.5 py-2 rounded-full border border-slate-200 bg-white text-slate-600 text-sm font-semibold transition-all hover:border-teal-300">Dạng 3 · Phép toán</a>
+            <a href="#dang-4" class="chip-dang shrink-0 px-3.5 py-2 rounded-full border border-slate-200 bg-white text-slate-600 text-sm font-semibold transition-all hover:border-teal-300">Dạng 4 · Tham số m</a>
+            <a href="#dang-5" class="chip-dang shrink-0 px-3.5 py-2 rounded-full border border-slate-200 bg-white text-slate-600 text-sm font-semibold transition-all hover:border-teal-300">Dạng 5 · Biểu đồ Venn</a>
+        </div>
+    </nav>
+
+    <main class="max-w-4xl mx-auto px-3 sm:px-4 pt-5 pb-16 space-y-10 select-none" oncontextmenu="return false;">
+
+        <!-- ===================== DẠNG 1 ===================== -->
+        <section id="dang-1" class="scroll-mt-20 space-y-5">
+            <div class="rounded-2xl border border-teal-200 bg-white shadow-sm overflow-hidden">
+                <div class="bg-gradient-to-r from-teal-600 to-emerald-600 px-4 sm:px-6 py-3.5 text-white flex items-center gap-3">
+                    <span class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center font-black text-lg shrink-0">1</span>
+                    <div>
+                        <p class="text-[11px] font-bold uppercase tracking-widest text-teal-100">Dạng 1</p>
+                        <h2 class="font-bold text-lg sm:text-xl leading-tight">Xác định tập hợp</h2>
+                    </div>
+                </div>
+                <div class="p-4 sm:p-6 space-y-3 text-[15px] leading-relaxed">
+                    <p>Ta có hai cách để xác định một tập hợp:</p>
+                    <div class="grid sm:grid-cols-2 gap-3">
+                        <div class="the-phep">
+                            <p class="font-bold text-teal-700 flex items-center gap-2"><i class="fa-solid fa-list-ol"></i> Cách 1: Liệt kê</p>
+                            <p class="text-sm mt-1">Viết các phần tử trong dấu $\{\ \}$, cách nhau bởi dấu chấm phẩy, mỗi phần tử chỉ viết <b>một lần</b>.</p>
+                            <p class="text-sm mt-2 text-slate-500">Ví dụ: $\{-2;-1;0;1;2\}$</p>
+                        </div>
+                        <div class="the-phep">
+                            <p class="font-bold text-orange-600 flex items-center gap-2"><i class="fa-solid fa-filter"></i> Cách 2: Nêu tính chất đặc trưng</p>
+                            <p class="text-sm mt-1">Tập $X$ gồm đúng những phần tử có tính chất $P$: $X=\{x \mid x \text{ có tính chất } P\}$.</p>
+                            <p class="text-sm mt-2 text-slate-500">Ví dụ: $\{x\in\mathbb Z \mid |x|<3\}$</p>
+                        </div>
+                    </div>
+                    <div class="hop-ghi-nho text-sm">
+                        <b>Mẹo chuyển từ tính chất sang liệt kê:</b> giải điều kiện (phương trình, bất phương trình) → đặt các giá trị lên <b>trục số</b> → <b>lọc</b> theo tập số đã cho ($\mathbb N,\ \mathbb Z,\ \mathbb Q,\ \mathbb R$) → viết các giá trị còn lại vào dấu ngoặc.
+                    </div>
+                </div>
+            </div>
+
+            <article class="rounded-2xl bg-white border border-slate-200 shadow-sm p-4 sm:p-6">
+                <span class="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wider text-teal-700 bg-teal-50 border border-teal-100 px-2.5 py-1 rounded-full">Ví dụ 1</span>
+                <p class="mt-3 font-medium">Viết mỗi tập hợp sau bằng cách liệt kê các phần tử:</p>
+                <ol class="cau">
+                    <li>$A=\left\{x\in\mathbb R \mid \left(2x-x^2\right)\left(2x^2-3x-2\right)=0\right\}$</li>
+                    <li>$B=\left\{x\in\mathbb Z \mid 2x^3-3x^2-5x=0\right\}$</li>
+                    <li>$C=\left\{x\in\mathbb Z \mid 2x^2-75x-77=0\right\}$</li>
+                </ol>
+                <div data-hinh="d1-vd1"></div>
+                <details class="loi-giai mt-4 rounded-xl border border-emerald-100 bg-emerald-50/50">
+                    <summary class="flex items-center gap-2 px-4 py-3 font-bold text-emerald-700 text-sm"><i class="fa-solid fa-lightbulb"></i> Xem lời giải <i class="fa-solid fa-chevron-down mui-ten ml-auto transition-transform"></i></summary>
+                    <div class="noi-dung-giai px-4 pb-4 text-[15px] leading-relaxed text-slate-700">
+                        <p><b>a)</b> $\left(2x-x^2\right)\left(2x^2-3x-2\right)=0 \Leftrightarrow \left[\begin{aligned}&2x-x^2=0\\&2x^2-3x-2=0\end{aligned}\right. \Leftrightarrow \left[\begin{aligned}&x=0 \vee x=2\\&x=-\tfrac12 \vee x=2\end{aligned}\right.$</p>
+                        <p>Do $x\in\mathbb R$ nên $A=\left\{-\dfrac12;0;2\right\}$.</p>
+                        <p><b>b)</b> $2x^3-3x^2-5x=0 \Leftrightarrow x\left(2x^2-3x-5\right)=0 \Leftrightarrow x=0 \vee x=-1 \vee x=\dfrac52$.</p>
+                        <p>Do $x\in\mathbb Z$ nên loại $\dfrac52$, suy ra $B=\{-1;0\}$.</p>
+                        <p><b>c)</b> $2x^2-75x-77=0 \Leftrightarrow x=-1 \vee x=\dfrac{77}{2}$. Do $x\in\mathbb Z$ nên $C=\{-1\}$.</p>
+                    </div>
+                </details>
+            </article>
+
+            <article class="rounded-2xl bg-white border border-slate-200 shadow-sm p-4 sm:p-6">
+                <span class="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wider text-teal-700 bg-teal-50 border border-teal-100 px-2.5 py-1 rounded-full">Ví dụ 2</span>
+                <p class="mt-3 font-medium">Viết mỗi tập hợp sau bằng cách liệt kê các phần tử:</p>
+                <ol class="cau">
+                    <li>$A=\{n\in\mathbb N^* \mid 3&lt;n^2&lt;30\}$</li>
+                    <li>$B=\{x\in\mathbb Z \mid |x|&lt;3\}$</li>
+                    <li>$C=\{x \mid x=3k \text{ với } k\in\mathbb Z \text{ và } -4&lt;x&lt;12\}$</li>
+                </ol>
+                <div data-hinh="d1-vd2"></div>
+                <details class="loi-giai mt-4 rounded-xl border border-emerald-100 bg-emerald-50/50">
+                    <summary class="flex items-center gap-2 px-4 py-3 font-bold text-emerald-700 text-sm"><i class="fa-solid fa-lightbulb"></i> Xem lời giải <i class="fa-solid fa-chevron-down mui-ten ml-auto transition-transform"></i></summary>
+                    <div class="noi-dung-giai px-4 pb-4 text-[15px] leading-relaxed text-slate-700">
+                        <p><b>a)</b> Với $n\in\mathbb N^*$ và $3&lt;n^2&lt;30$ ta chọn được $n=2;3;4;5$ (vì $1^2=1\le 3$ và $6^2=36\ge 30$). Vậy $A=\{2;3;4;5\}$.</p>
+                        <p><b>b)</b> $|x|&lt;3 \Leftrightarrow -3&lt;x&lt;3$. Do $x\in\mathbb Z$ nên $B=\{-2;-1;0;1;2\}$.</p>
+                        <p><b>c)</b> $-4&lt;3k&lt;12 \Leftrightarrow -\dfrac43&lt;k&lt;4$. Do $k\in\mathbb Z$ nên $k\in\{-1;0;1;2;3\}$, suy ra $x=3k\in\{-3;0;3;6;9\}$. Vậy $C=\{-3;0;3;6;9\}$.</p>
+                    </div>
+                </details>
+            </article>
+
+            <article class="rounded-2xl bg-white border border-slate-200 shadow-sm p-4 sm:p-6">
+                <span class="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wider text-teal-700 bg-teal-50 border border-teal-100 px-2.5 py-1 rounded-full">Ví dụ 3</span>
+                <p class="mt-3 font-medium">Viết mỗi tập hợp sau bằng cách liệt kê các phần tử:</p>
+                <ol class="cau">
+                    <li>Tập hợp các số chính phương.</li>
+                    <li>Tập hợp các ước chung của $36$ và $120$.</li>
+                    <li>Tập hợp các bội chung của $8$ và $15$.</li>
+                </ol>
+                <div data-hinh="d1-vd3"></div>
+                <details class="loi-giai mt-4 rounded-xl border border-emerald-100 bg-emerald-50/50">
+                    <summary class="flex items-center gap-2 px-4 py-3 font-bold text-emerald-700 text-sm"><i class="fa-solid fa-lightbulb"></i> Xem lời giải <i class="fa-solid fa-chevron-down mui-ten ml-auto transition-transform"></i></summary>
+                    <div class="noi-dung-giai px-4 pb-4 text-[15px] leading-relaxed text-slate-700">
+                        <p><b>a)</b> Tập hợp các số chính phương: $\{0;1;4;9;16;25;\dots\}$.</p>
+                        <p><b>b)</b> ƯCLN$(36;120)=12$ nên các ước chung của $36$ và $120$ là các ước của $12$: $\{\pm1;\pm2;\pm3;\pm4;\pm6;\pm12\}$.</p>
+                        <p><b>c)</b> BCNN$(8;15)=120$ nên các bội chung của $8$ và $15$ là các bội của $120$: $\{0;\pm120;\pm240;\pm360;\dots\}$.</p>
+                    </div>
+                </details>
+            </article>
+
+            <article class="rounded-2xl bg-white border border-slate-200 shadow-sm p-4 sm:p-6">
+                <span class="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wider text-teal-700 bg-teal-50 border border-teal-100 px-2.5 py-1 rounded-full">Ví dụ 4</span>
+                <p class="mt-3 font-medium">Viết mỗi tập hợp sau bằng cách nêu tính chất đặc trưng:</p>
+                <ol class="cau">
+                    <li>$A=\{2;3;5;7\}$</li>
+                    <li>$B=\{-3;-2;-1;0;1;2;3\}$</li>
+                    <li>$C=\{-5;0;5;10\}$</li>
+                    <li>$D=\{1;2;3;4;6;9;12;18;36\}$</li>
+                </ol>
+                <div data-hinh="d1-vd4"></div>
+                <details class="loi-giai mt-4 rounded-xl border border-emerald-100 bg-emerald-50/50">
+                    <summary class="flex items-center gap-2 px-4 py-3 font-bold text-emerald-700 text-sm"><i class="fa-solid fa-lightbulb"></i> Xem lời giải <i class="fa-solid fa-chevron-down mui-ten ml-auto transition-transform"></i></summary>
+                    <div class="noi-dung-giai px-4 pb-4 text-[15px] leading-relaxed text-slate-700">
+                        <p><b>a)</b> $A=\{x\in\mathbb N \mid x \text{ là số nguyên tố và } x&lt;10\}$.</p>
+                        <p><b>b)</b> $B=\{x\in\mathbb Z \mid |x|\le 3\}$.</p>
+                        <p><b>c)</b> $C=\{x\in\mathbb Z \mid x \text{ là bội của } 5 \text{ và } -5\le x\le 10\}$.</p>
+                        <p><b>d)</b> $D=\{x\in\mathbb N \mid x \text{ là ước của } 36\}$.</p>
+                    </div>
+                </details>
+            </article>
+        </section>
+
+        <!-- ===================== DẠNG 2 ===================== -->
+        <section id="dang-2" class="scroll-mt-20 space-y-5">
+            <div class="rounded-2xl border border-teal-200 bg-white shadow-sm overflow-hidden">
+                <div class="bg-gradient-to-r from-teal-600 to-emerald-600 px-4 sm:px-6 py-3.5 text-white flex items-center gap-3">
+                    <span class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center font-black text-lg shrink-0">2</span>
+                    <div>
+                        <p class="text-[11px] font-bold uppercase tracking-widest text-teal-100">Dạng 2</p>
+                        <h2 class="font-bold text-lg sm:text-xl leading-tight">Tập hợp con – Hai tập hợp bằng nhau</h2>
+                    </div>
+                </div>
+                <div class="p-4 sm:p-6 grid sm:grid-cols-3 gap-3 text-[15px] leading-relaxed">
+                    <div class="the-phep">
+                        <svg viewBox="0 0 150 96" class="hinh-svg" aria-hidden="true">
+                            <rect x="4" y="4" width="142" height="88" rx="44" style="fill: var(--cb-nhat); stroke: var(--cb)" stroke-width="2"/>
+                            <circle cx="56" cy="48" r="28" style="fill: var(--ca-nhat); stroke: var(--ca)" stroke-width="2"/>
+                            <text x="56" y="54" text-anchor="middle" font-size="18" style="fill: var(--ca)">A</text>
+                            <text x="116" y="54" text-anchor="middle" font-size="18" style="fill: var(--cb)">B</text>
+                        </svg>
+                        <p class="font-bold text-center">$A\subset B$</p>
+                        <p class="text-sm text-center text-slate-500">Mọi phần tử của $A$ đều thuộc $B$.</p>
+                    </div>
+                    <div class="the-phep">
+                        <svg viewBox="0 0 150 96" class="hinh-svg" aria-hidden="true">
+                            <circle cx="75" cy="48" r="40" style="fill: var(--ck-nhat); stroke: var(--ck)" stroke-width="2"/>
+                            <circle cx="75" cy="48" r="40" style="fill: none; stroke: var(--ca)" stroke-width="2" stroke-dasharray="6 6"/>
+                            <text x="75" y="54" text-anchor="middle" font-size="18" style="fill: var(--ck)">A = B</text>
+                        </svg>
+                        <p class="font-bold text-center">$A=B \Leftrightarrow A\subset B$ và $B\subset A$</p>
+                        <p class="text-sm text-center text-slate-500">Hai tập có đúng cùng các phần tử.</p>
+                    </div>
+                    <div class="the-phep">
+                        <svg viewBox="0 0 150 96" class="hinh-svg" aria-hidden="true">
+                            <g style="stroke: var(--ca)" stroke-width="2" fill="none">
+                                <path d="M75 12 L40 44 M75 12 L110 44 M40 44 L22 80 M40 44 L58 80 M110 44 L92 80 M110 44 L128 80"/>
+                            </g>
+                            <g style="fill: var(--ca)"><circle cx="75" cy="12" r="5"/><circle cx="40" cy="44" r="4"/><circle cx="110" cy="44" r="4"/><circle cx="22" cy="82" r="4"/><circle cx="58" cy="82" r="4"/><circle cx="92" cy="82" r="4"/><circle cx="128" cy="82" r="4"/></g>
+                        </svg>
+                        <p class="font-bold text-center">Tập có $n$ phần tử có $2^n$ tập con</p>
+                        <p class="text-sm text-center text-slate-500">Mỗi phần tử: <b>chọn</b> hoặc <b>không chọn</b>.</p>
+                    </div>
+                    <div class="hop-ghi-nho text-sm sm:col-span-3">
+                        <b>Luôn nhớ:</b> $\varnothing\subset A$ và $A\subset A$ với mọi tập $A$. Để chứng minh $A\not\subset B$, chỉ cần chỉ ra <b>một</b> phần tử thuộc $A$ mà không thuộc $B$.
+                    </div>
+                </div>
+            </div>
+
+            <article class="rounded-2xl bg-white border border-slate-200 shadow-sm p-4 sm:p-6">
+                <span class="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wider text-teal-700 bg-teal-50 border border-teal-100 px-2.5 py-1 rounded-full">Ví dụ 1</span>
+                <p class="mt-3 font-medium">Tìm tất cả các tập hợp con của tập:</p>
+                <ol class="cau">
+                    <li>$C=\{\varnothing\}$</li>
+                    <li>$B=\{1;2;3\}$</li>
+                    <li>$A=\{a;b\}$</li>
+                    <li>$D=\{a;b;c;d\}$</li>
+                </ol>
+                <div data-hinh="d2-vd1"></div>
+                <details class="loi-giai mt-4 rounded-xl border border-emerald-100 bg-emerald-50/50">
+                    <summary class="flex items-center gap-2 px-4 py-3 font-bold text-emerald-700 text-sm"><i class="fa-solid fa-lightbulb"></i> Xem lời giải <i class="fa-solid fa-chevron-down mui-ten ml-auto transition-transform"></i></summary>
+                    <div class="noi-dung-giai px-4 pb-4 text-[15px] leading-relaxed text-slate-700">
+                        <p><b>a)</b> $C=\{\varnothing\}$ có $1$ phần tử (phần tử đó là $\varnothing$) nên có $2$ tập con: $\varnothing$ và $\{\varnothing\}$.</p>
+                        <p><b>b)</b> $B$ có $2^3=8$ tập con: $\varnothing,\ \{1\},\ \{2\},\ \{3\},\ \{1;2\},\ \{1;3\},\ \{2;3\},\ \{1;2;3\}$.</p>
+                        <p><b>c)</b> $A$ có $2^2=4$ tập con: $\varnothing,\ \{a\},\ \{b\},\ \{a;b\}$.</p>
+                        <p><b>d)</b> $D$ có $2^4=16$ tập con: $\varnothing$; $\{a\},\{b\},\{c\},\{d\}$; $\{a;b\},\{a;c\},\{a;d\},\{b;c\},\{b;d\},\{c;d\}$; $\{a;b;c\},\{a;b;d\},\{a;c;d\},\{b;c;d\}$ và $D$.</p>
+                    </div>
+                </details>
+            </article>
+
+            <article class="rounded-2xl bg-white border border-slate-200 shadow-sm p-4 sm:p-6">
+                <span class="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wider text-teal-700 bg-teal-50 border border-teal-100 px-2.5 py-1 rounded-full">Ví dụ 2</span>
+                <p class="mt-3 font-medium">Tìm quan hệ bao hàm hay bằng nhau giữa các tập hợp sau đây:</p>
+                <ol class="cau">
+                    <li>$A=\{x\in\mathbb N \mid x&lt;2\}$ và $B=\left\{x\in\mathbb Q \mid \left(x^2-x\right)\left(x^2-2\right)=0\right\}$</li>
+                    <li>$A=\{x\in\mathbb N \mid 1&lt;x&lt;4\}$ và $B=\left\{x\in\mathbb Z \mid x^2-9=0\right\}$</li>
+                </ol>
+                <div data-hinh="d2-vd2"></div>
+                <details class="loi-giai mt-4 rounded-xl border border-emerald-100 bg-emerald-50/50">
+                    <summary class="flex items-center gap-2 px-4 py-3 font-bold text-emerald-700 text-sm"><i class="fa-solid fa-lightbulb"></i> Xem lời giải <i class="fa-solid fa-chevron-down mui-ten ml-auto transition-transform"></i></summary>
+                    <div class="noi-dung-giai px-4 pb-4 text-[15px] leading-relaxed text-slate-700">
+                        <p><b>a)</b> $A=\{x\in\mathbb N \mid x&lt;2\}=\{0;1\}$.</p>
+                        <p>$\left(x^2-x\right)\left(x^2-2\right)=0 \Leftrightarrow x=0 \vee x=1 \vee x=\pm\sqrt2$. Vì $\pm\sqrt2\notin\mathbb Q$ nên $B=\{0;1\}$. Vậy $A=B$.</p>
+                        <p><b>b)</b> $A=\{x\in\mathbb N \mid 1&lt;x&lt;4\}=\{2;3\}$ và $B=\{x\in\mathbb Z \mid x^2-9=0\}=\{-3;3\}$.</p>
+                        <p>Ta thấy $2\in A$ mà $2\notin B$ nên $A\not\subset B$; $-3\in B$ mà $-3\notin A$ nên $B\not\subset A$.</p>
+                    </div>
+                </details>
+            </article>
+
+            <article class="rounded-2xl bg-white border border-slate-200 shadow-sm p-4 sm:p-6">
+                <span class="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wider text-teal-700 bg-teal-50 border border-teal-100 px-2.5 py-1 rounded-full">Ví dụ 3</span>
+                <p class="mt-3 font-medium">Cho tập $X=\{1;2;3;4;5;6;7\}$.</p>
+                <ol class="cau">
+                    <li>Hãy tìm tất cả các tập con của $X$ có chứa các phần tử $1;3;5;7$.</li>
+                    <li>Có bao nhiêu tập con của $X$ chứa đúng $2$ phần tử?</li>
+                </ol>
+                <div data-hinh="d2-vd3"></div>
+                <details class="loi-giai mt-4 rounded-xl border border-emerald-100 bg-emerald-50/50">
+                    <summary class="flex items-center gap-2 px-4 py-3 font-bold text-emerald-700 text-sm"><i class="fa-solid fa-lightbulb"></i> Xem lời giải <i class="fa-solid fa-chevron-down mui-ten ml-auto transition-transform"></i></summary>
+                    <div class="noi-dung-giai px-4 pb-4 text-[15px] leading-relaxed text-slate-700">
+                        <p><b>a)</b> Các tập con cần tìm được lập bằng cách thêm vào $\{1;3;5;7\}$ một số (có thể không có) phần tử của $\{2;4;6\}$, tức là ứng với một tập con của $\{2;4;6\}$. Có $2^3=8$ tập:</p>
+                        <p>$\{1;3;5;7\},\ \{1;3;5;7;2\},\ \{1;3;5;7;4\},\ \{1;3;5;7;6\},\ \{1;3;5;7;2;4\},\ \{1;3;5;7;2;6\},\ \{1;3;5;7;4;6\}$ và $X$.</p>
+                        <p><b>b)</b> Tập cần tìm có dạng $\{a;b\}$ với $a,b\in X$, $a\ne b$. Có $7$ cách chọn $a$, ứng với mỗi cách có $6$ cách chọn $b$: được $7\cdot 6=42$ cặp $(a;b)$.</p>
+                        <p>Nhưng hai cặp $(a;b)$ và $(b;a)$ cho cùng một tập $\{a;b\}$ nên mỗi tập được đếm $2$ lần. Vậy có $\dfrac{42}{2}=21$ tập con chứa đúng hai phần tử.</p>
+                    </div>
+                </details>
+            </article>
+        </section>
+
+        <!-- ===================== DẠNG 3 ===================== -->
+        <section id="dang-3" class="scroll-mt-20 space-y-5">
+            <div class="rounded-2xl border border-teal-200 bg-white shadow-sm overflow-hidden">
+                <div class="bg-gradient-to-r from-teal-600 to-emerald-600 px-4 sm:px-6 py-3.5 text-white flex items-center gap-3">
+                    <span class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center font-black text-lg shrink-0">3</span>
+                    <div>
+                        <p class="text-[11px] font-bold uppercase tracking-widest text-teal-100">Dạng 3</p>
+                        <h2 class="font-bold text-lg sm:text-xl leading-tight">Các phép toán trên tập hợp</h2>
+                    </div>
+                </div>
+                <div class="p-4 sm:p-6 space-y-3 text-[15px] leading-relaxed">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        <div class="the-phep text-center"><div data-bieu-tuong="giao"></div><p class="font-bold">Giao $A\cap B$</p><p class="text-sm text-slate-500">Lấy phần <b>chung</b></p></div>
+                        <div class="the-phep text-center"><div data-bieu-tuong="hop"></div><p class="font-bold">Hợp $A\cup B$</p><p class="text-sm text-slate-500">Lấy <b>hết</b></p></div>
+                        <div class="the-phep text-center"><div data-bieu-tuong="hieu"></div><p class="font-bold">Hiệu $A\setminus B$</p><p class="text-sm text-slate-500">Lấy $A$, <b>bỏ</b> phần thuộc $B$</p></div>
+                        <div class="the-phep text-center"><div data-bieu-tuong="bu"></div><p class="font-bold">Phần bù $C_E A$</p><p class="text-sm text-slate-500">Phần của $E$ <b>ngoài</b> $A$</p></div>
+                    </div>
+                    <div class="hop-ghi-nho text-sm space-y-1">
+                        <p><b>Với khoảng, đoạn, nửa khoảng:</b> vẽ mỗi tập trên một trục số rồi so sánh theo từng cột dọc.</p>
+                        <p>• <b>Đầu mút:</b> ngoặc vuông $[\ ]$ là <b>lấy</b> đầu mút, ngoặc tròn $(\ )$ là <b>không lấy</b>. Với từng đầu mút của kết quả, hãy tự hỏi: “số này có thuộc tập kết quả không?”</p>
+                    </div>
+                </div>
+            </div>
+
+            <article class="rounded-2xl bg-white border border-slate-200 shadow-sm p-4 sm:p-6">
+                <span class="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wider text-teal-700 bg-teal-50 border border-teal-100 px-2.5 py-1 rounded-full">Ví dụ 1</span>
+                <p class="mt-3 font-medium">Cho hai tập hợp $A=\{0;1;2;3;4\}$ và $B=\{2;3;4;5;6\}$.</p>
+                <ol class="cau">
+                    <li>Tìm các tập $A\setminus B,\ B\setminus A,\ A\cup B,\ A\cap B$.</li>
+                    <li>Tìm các tập $(A\setminus B)\cup(B\setminus A),\ (A\setminus B)\cap(B\setminus A)$.</li>
+                </ol>
+                <div data-hinh="d3-vd1"></div>
+                <details class="loi-giai mt-4 rounded-xl border border-emerald-100 bg-emerald-50/50">
+                    <summary class="flex items-center gap-2 px-4 py-3 font-bold text-emerald-700 text-sm"><i class="fa-solid fa-lightbulb"></i> Xem lời giải <i class="fa-solid fa-chevron-down mui-ten ml-auto transition-transform"></i></summary>
+                    <div class="noi-dung-giai px-4 pb-4 text-[15px] leading-relaxed text-slate-700">
+                        <p><b>a)</b> $A\setminus B=\{0;1\}$, $B\setminus A=\{5;6\}$, $A\cup B=\{0;1;2;3;4;5;6\}$, $A\cap B=\{2;3;4\}$.</p>
+                        <p><b>b)</b> $(A\setminus B)\cup(B\setminus A)=\{0;1;5;6\}$, $(A\setminus B)\cap(B\setminus A)=\varnothing$.</p>
+                    </div>
+                </details>
+            </article>
+
+            <article class="rounded-2xl bg-white border border-slate-200 shadow-sm p-4 sm:p-6">
+                <span class="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wider text-teal-700 bg-teal-50 border border-teal-100 px-2.5 py-1 rounded-full">Ví dụ 2</span>
+                <p class="mt-3 font-medium">Tìm $A\cap B,\ A\cup B,\ A\setminus B,\ B\setminus A$ trong các trường hợp sau:</p>
+                <ol class="cau">
+                    <li>$A=(-1;3)$, $B=(0;5]$</li>
+                    <li>$A=(-\infty;0]$, $B=[-1;3]$</li>
+                </ol>
+                <div data-hinh="d3-vd2"></div>
+                <details class="loi-giai mt-4 rounded-xl border border-emerald-100 bg-emerald-50/50">
+                    <summary class="flex items-center gap-2 px-4 py-3 font-bold text-emerald-700 text-sm"><i class="fa-solid fa-lightbulb"></i> Xem lời giải <i class="fa-solid fa-chevron-down mui-ten ml-auto transition-transform"></i></summary>
+                    <div class="noi-dung-giai px-4 pb-4 text-[15px] leading-relaxed text-slate-700">
+                        <p><b>a)</b> $A\cap B=(0;3)$; $A\cup B=(-1;5]$; $A\setminus B=(-1;0]$; $B\setminus A=[3;5]$.</p>
+                        <p><b>b)</b> $A\cap B=[-1;0]$; $A\cup B=(-\infty;3]$; $A\setminus B=(-\infty;-1)$; $B\setminus A=(0;3]$.</p>
+                    </div>
+                </details>
+            </article>
+
+            <article class="rounded-2xl bg-white border border-slate-200 shadow-sm p-4 sm:p-6">
+                <span class="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wider text-teal-700 bg-teal-50 border border-teal-100 px-2.5 py-1 rounded-full">Ví dụ 3</span>
+                <p class="mt-3 font-medium">Cho tập hợp $A$ các ước số tự nhiên của $18$ và tập hợp $B$ các ước số tự nhiên của $30$. Xác định $A,\ B,\ A\cap B,\ A\cup B,\ A\setminus B,\ B\setminus A$.</p>
+                <div data-hinh="d3-vd3"></div>
+                <details class="loi-giai mt-4 rounded-xl border border-emerald-100 bg-emerald-50/50">
+                    <summary class="flex items-center gap-2 px-4 py-3 font-bold text-emerald-700 text-sm"><i class="fa-solid fa-lightbulb"></i> Xem lời giải <i class="fa-solid fa-chevron-down mui-ten ml-auto transition-transform"></i></summary>
+                    <div class="noi-dung-giai px-4 pb-4 text-[15px] leading-relaxed text-slate-700">
+                        <p>Ta có $A=\{1;2;3;6;9;18\}$ và $B=\{1;2;3;5;6;10;15;30\}$.</p>
+                        <p>$A\cap B=\{1;2;3;6\}$; $A\cup B=\{1;2;3;5;6;9;10;15;18;30\}$; $A\setminus B=\{9;18\}$; $B\setminus A=\{5;10;15;30\}$.</p>
+                    </div>
+                </details>
+            </article>
+
+            <article class="rounded-2xl bg-white border border-slate-200 shadow-sm p-4 sm:p-6">
+                <span class="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wider text-teal-700 bg-teal-50 border border-teal-100 px-2.5 py-1 rounded-full">Ví dụ 4</span>
+                <p class="mt-3 font-medium">Cho tập hợp $E=\{1;2;3;4;5;6;7;8;9\}$ và các tập hợp con $A=\{1;2;3;4\}$, $B=\{2;4;6;8\}$. Xác định $C_E A,\ C_E B,\ C_E(A\cup B),\ C_E A\cap C_E B$.</p>
+                <div data-hinh="d3-vd4"></div>
+                <details class="loi-giai mt-4 rounded-xl border border-emerald-100 bg-emerald-50/50">
+                    <summary class="flex items-center gap-2 px-4 py-3 font-bold text-emerald-700 text-sm"><i class="fa-solid fa-lightbulb"></i> Xem lời giải <i class="fa-solid fa-chevron-down mui-ten ml-auto transition-transform"></i></summary>
+                    <div class="noi-dung-giai px-4 pb-4 text-[15px] leading-relaxed text-slate-700">
+                        <p>$C_E A=E\setminus A=\{5;6;7;8;9\}$; $C_E B=E\setminus B=\{1;3;5;7;9\}$.</p>
+                        <p>$A\cup B=\{1;2;3;4;6;8\}$ nên $C_E(A\cup B)=\{5;7;9\}$; $C_E A\cap C_E B=\{5;7;9\}$.</p>
+                        <p class="text-sm text-slate-500"><i class="fa-solid fa-star text-amber-400"></i> Nhận xét: $C_E(A\cup B)=C_E A\cap C_E B$ — phần nằm ngoài cả hai tập.</p>
+                    </div>
+                </details>
+            </article>
+
+            <article class="rounded-2xl bg-gradient-to-br from-violet-50 to-teal-50 border border-violet-100 shadow-sm p-4 sm:p-6">
+                <span class="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wider text-violet-700 bg-white border border-violet-100 px-2.5 py-1 rounded-full"><i class="fa-solid fa-flask"></i> Tự thử</span>
+                <p class="mt-3 font-medium">Tự chọn hai tập $A$, $B$ rồi chọn phép toán để xem kết quả trên trục số.</p>
+                <p class="text-sm text-slate-500 mt-1">Bấm vào dấu ngoặc để đổi giữa “lấy” $[\ ]$ và “không lấy” $(\ )$ đầu mút; bấm $-$ liên tục để ra $-\infty$, bấm $+$ liên tục để ra $+\infty$.</p>
+                <div data-hinh="d3-lab"></div>
+            </article>
+        </section>
+
+        <!-- ===================== DẠNG 4 ===================== -->
+        <section id="dang-4" class="scroll-mt-20 space-y-5">
+            <div class="rounded-2xl border border-teal-200 bg-white shadow-sm overflow-hidden">
+                <div class="bg-gradient-to-r from-teal-600 to-emerald-600 px-4 sm:px-6 py-3.5 text-white flex items-center gap-3">
+                    <span class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center font-black text-lg shrink-0">4</span>
+                    <div>
+                        <p class="text-[11px] font-bold uppercase tracking-widest text-teal-100">Dạng 4</p>
+                        <h2 class="font-bold text-lg sm:text-xl leading-tight">Tìm tham số để thỏa phép toán trên tập hợp</h2>
+                    </div>
+                </div>
+                <div class="p-4 sm:p-6 space-y-3 text-[15px] leading-relaxed">
+                    <div class="grid sm:grid-cols-2 gap-3">
+                        <div class="the-phep"><p class="font-bold text-teal-700">01. Phép giao $A\cap B$</p><p class="text-sm">Gồm các phần tử <b>chung</b> của $A$ và $B$.</p><p class="text-sm mt-1">$x\in A\cap B \Leftrightarrow x\in A$ <b>và</b> $x\in B$.</p></div>
+                        <div class="the-phep"><p class="font-bold text-teal-700">02. Phép hợp $A\cup B$</p><p class="text-sm">Gồm các phần tử chung và riêng của $A$ và $B$.</p><p class="text-sm mt-1">$x\in A\cup B \Leftrightarrow x\in A$ <b>hoặc</b> $x\in B$.</p></div>
+                        <div class="the-phep"><p class="font-bold text-teal-700">03. Phép hiệu $A\setminus B$</p><p class="text-sm">Gồm các phần tử thuộc $A$ và không thuộc $B$.</p><p class="text-sm mt-1">$x\in A\setminus B \Leftrightarrow x\in A$ và $x\notin B$.</p></div>
+                        <div class="the-phep"><p class="font-bold text-teal-700">04. Phần bù $C_A B$</p><p class="text-sm">Khi $B\subset A$ thì $A\setminus B$ gọi là phần bù của $B$ trong $A$.</p><p class="text-sm mt-1">$x\in C_A B \Leftrightarrow x\in A$ và $x\notin B$.</p></div>
+                    </div>
+                    <div class="hop-ghi-nho text-sm space-y-1">
+                        <p><b>Cách làm:</b> đặt các đầu mút chứa $m$ lên trục số, <b>kéo thử</b> $m$ để thấy lúc nào điều kiện đúng, rồi so sánh các đầu mút để lập bất phương trình.</p>
+                        <p>• Nhớ điều kiện để mỗi tập <b>khác rỗng</b> (đầu mút trái nhỏ hơn đầu mút phải) và cẩn thận dấu “$=$” ở đầu mút.</p>
+                    </div>
+                </div>
+            </div>
+
+            <article class="rounded-2xl bg-white border border-slate-200 shadow-sm p-4 sm:p-6">
+                <span class="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wider text-teal-700 bg-teal-50 border border-teal-100 px-2.5 py-1 rounded-full">Ví dụ 1</span>
+                <p class="mt-3 font-medium">Cho hai tập khác rỗng $A=(m-1;4]$ và $B=(-2;2m+2)$, với $m\in\mathbb R$. Xác định $m$ để:</p>
+                <ol class="cau">
+                    <li>$A\cap B\ne\varnothing$</li>
+                    <li>$A\subset B$</li>
+                    <li>$B\subset A$</li>
+                    <li>$(A\cap B)\subset(-1;3)$ <span class="text-xs font-bold text-violet-600 bg-violet-50 border border-violet-100 rounded-full px-2 py-0.5 ml-1">Mở rộng</span></li>
+                </ol>
+                <div data-hinh="d4-vd1"></div>
+                <details class="loi-giai mt-4 rounded-xl border border-emerald-100 bg-emerald-50/50">
+                    <summary class="flex items-center gap-2 px-4 py-3 font-bold text-emerald-700 text-sm"><i class="fa-solid fa-lightbulb"></i> Xem lời giải <i class="fa-solid fa-chevron-down mui-ten ml-auto transition-transform"></i></summary>
+                    <div class="noi-dung-giai px-4 pb-4 text-[15px] leading-relaxed text-slate-700">
+                        <p>$A$, $B$ khác rỗng nên $\begin{cases}m-1&lt;4\\2m+2&gt;-2\end{cases}\Leftrightarrow -2&lt;m&lt;5\quad(*)$.</p>
+                        <p><b>a)</b> $A\cap B\ne\varnothing \Leftrightarrow m-1&lt;2m+2 \Leftrightarrow m&gt;-3$. Đối chiếu $(*)$: $-2&lt;m&lt;5$.</p>
+                        <p><b>b)</b> $A\subset B \Leftrightarrow \begin{cases}m-1\ge -2\\2m+2&gt;4\end{cases}\Leftrightarrow \begin{cases}m\ge -1\\m&gt;1\end{cases}\Leftrightarrow m&gt;1$. Đối chiếu $(*)$: $1&lt;m&lt;5$.</p>
+                        <p><b>c)</b> $B\subset A \Leftrightarrow \begin{cases}m-1\le -2\\2m+2\le 4\end{cases}\Leftrightarrow \begin{cases}m\le -1\\m\le 1\end{cases}\Leftrightarrow m\le -1$. Đối chiếu $(*)$: $-2&lt;m\le -1$.</p>
+                        <p><b>d)</b> Để $A\cap B\subset(-1;3)$ thì đầu mút trái của $A\cap B$ phải là $m-1\ge -1$ (nếu là $-2$ thì không chứa được trong $(-1;3)$) và đầu mút phải phải là $2m+2\le 3$ (nếu là $4$ thì $4\in A\cap B$ nhưng $4\notin(-1;3)$). Khi đó $A\cap B=(m-1;2m+2)\subset(-1;3)\Leftrightarrow\begin{cases}m-1\ge -1\\2m+2\le 3\end{cases}\Leftrightarrow 0\le m\le\dfrac12$, thỏa $(*)$.</p>
+                    </div>
+                </details>
+            </article>
+
+            <article class="rounded-2xl bg-white border border-slate-200 shadow-sm p-4 sm:p-6">
+                <span class="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wider text-teal-700 bg-teal-50 border border-teal-100 px-2.5 py-1 rounded-full">Ví dụ 2</span>
+                <p class="mt-3 font-medium">Cho các tập hợp $A=(-\infty;m)$ và $B=[3m-1;3m+3]$. Tìm $m$ để:</p>
+                <ol class="cau">
+                    <li>$A\subset C_{\mathbb R}B$</li>
+                    <li>$C_{\mathbb R}A\cap B\ne\varnothing$</li>
+                </ol>
+                <div data-hinh="d4-vd2"></div>
+                <details class="loi-giai mt-4 rounded-xl border border-emerald-100 bg-emerald-50/50">
+                    <summary class="flex items-center gap-2 px-4 py-3 font-bold text-emerald-700 text-sm"><i class="fa-solid fa-lightbulb"></i> Xem lời giải <i class="fa-solid fa-chevron-down mui-ten ml-auto transition-transform"></i></summary>
+                    <div class="noi-dung-giai px-4 pb-4 text-[15px] leading-relaxed text-slate-700">
+                        <p><b>a)</b> $C_{\mathbb R}B=(-\infty;3m-1)\cup(3m+3;+\infty)$. Vì $A=(-\infty;m)$ kéo dài về $-\infty$ nên $A\subset C_{\mathbb R}B \Leftrightarrow A\subset(-\infty;3m-1)\Leftrightarrow m\le 3m-1\Leftrightarrow m\ge\dfrac12$.</p>
+                        <p><b>b)</b> $C_{\mathbb R}A=[m;+\infty)$ nên $C_{\mathbb R}A\cap B\ne\varnothing\Leftrightarrow m\le 3m+3\Leftrightarrow m\ge -\dfrac32$.</p>
+                    </div>
+                </details>
+            </article>
+
+            <article class="rounded-2xl bg-white border border-slate-200 shadow-sm p-4 sm:p-6">
+                <span class="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wider text-teal-700 bg-teal-50 border border-teal-100 px-2.5 py-1 rounded-full">Ví dụ 3</span>
+                <p class="mt-3 font-medium">Tìm tất cả các giá trị thực của $m$ để các tập hợp sau là tập hợp rỗng.</p>
+                <ol class="cau">
+                    <li>$A=\{x\in\mathbb R \mid x&lt;m \text{ và } x&gt;2m+1\}$</li>
+                    <li>$B=\{x\in\mathbb R \mid x^2-2x+m=0\}$</li>
+                    <li>$C=\{x\in\mathbb R \mid x&lt;m+3 \text{ và } x&gt;4m+3\}$</li>
+                    <li>$D=\{x\in\mathbb R \mid x^2-2x+m+9=0\}$</li>
+                </ol>
+                <div data-hinh="d4-vd3"></div>
+                <details class="loi-giai mt-4 rounded-xl border border-emerald-100 bg-emerald-50/50">
+                    <summary class="flex items-center gap-2 px-4 py-3 font-bold text-emerald-700 text-sm"><i class="fa-solid fa-lightbulb"></i> Xem lời giải <i class="fa-solid fa-chevron-down mui-ten ml-auto transition-transform"></i></summary>
+                    <div class="noi-dung-giai px-4 pb-4 text-[15px] leading-relaxed text-slate-700">
+                        <p><b>a)</b> $A=(2m+1;m)$. $A$ rỗng $\Leftrightarrow m\le 2m+1\Leftrightarrow m\ge -1$.</p>
+                        <p><b>b)</b> $B$ rỗng $\Leftrightarrow$ phương trình $x^2-2x+m=0$ vô nghiệm $\Leftrightarrow \Delta'=1-m&lt;0\Leftrightarrow m&gt;1$.</p>
+                        <p><b>c)</b> $C=(4m+3;m+3)$. $C$ rỗng $\Leftrightarrow m+3\le 4m+3\Leftrightarrow m\ge 0$.</p>
+                        <p><b>d)</b> $D$ rỗng $\Leftrightarrow$ phương trình $x^2-2x+m+9=0$ vô nghiệm $\Leftrightarrow \Delta'=1-(m+9)=-8-m&lt;0\Leftrightarrow m&gt;-8$.</p>
+                    </div>
+                </details>
+            </article>
+        </section>
+
+        <!-- ===================== DẠNG 5 ===================== -->
+        <section id="dang-5" class="scroll-mt-20 space-y-5">
+            <div class="rounded-2xl border border-teal-200 bg-white shadow-sm overflow-hidden">
+                <div class="bg-gradient-to-r from-teal-600 to-emerald-600 px-4 sm:px-6 py-3.5 text-white flex items-center gap-3">
+                    <span class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center font-black text-lg shrink-0">5</span>
+                    <div>
+                        <p class="text-[11px] font-bold uppercase tracking-widest text-teal-100">Dạng 5</p>
+                        <h2 class="font-bold text-lg sm:text-xl leading-tight">Sử dụng biểu đồ Venn</h2>
+                    </div>
+                </div>
+                <div class="p-4 sm:p-6 text-[15px] leading-relaxed">
+                    <ol class="grid sm:grid-cols-3 gap-3">
+                        <li class="the-phep"><p class="text-2xl font-black text-teal-600">01</p><p class="text-sm">Chuyển bài toán về <b>ngôn ngữ tập hợp</b>.</p></li>
+                        <li class="the-phep"><p class="text-2xl font-black text-teal-600">02</p><p class="text-sm">Dùng <b>biểu đồ Venn</b> để minh họa các tập hợp, đặt ẩn cho từng phần.</p></li>
+                        <li class="the-phep"><p class="text-2xl font-black text-teal-600">03</p><p class="text-sm">Dựa vào biểu đồ lập <b>đẳng thức / hệ phương trình</b> rồi tìm kết quả.</p></li>
+                    </ol>
+                </div>
+            </div>
+
+            <article class="rounded-2xl bg-white border border-slate-200 shadow-sm p-4 sm:p-6">
+                <span class="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wider text-teal-700 bg-teal-50 border border-teal-100 px-2.5 py-1 rounded-full">Ví dụ 1</span>
+                <p class="mt-3 font-medium">Cho $A$ là tập hợp các học sinh lớp $10$ đang học ở trường, $B$ là tập hợp học sinh đang học Tiếng Anh ở trường. Hãy diễn đạt bằng lời các tập hợp sau:</p>
+                <ol class="cau">
+                    <li>$A\cap B$</li>
+                    <li>$A\setminus B$</li>
+                    <li>$A\cup B$</li>
+                    <li>$B\setminus A$</li>
+                </ol>
+                <div data-hinh="d5-vd1"></div>
+                <details class="loi-giai mt-4 rounded-xl border border-emerald-100 bg-emerald-50/50">
+                    <summary class="flex items-center gap-2 px-4 py-3 font-bold text-emerald-700 text-sm"><i class="fa-solid fa-lightbulb"></i> Xem lời giải <i class="fa-solid fa-chevron-down mui-ten ml-auto transition-transform"></i></summary>
+                    <div class="noi-dung-giai px-4 pb-4 text-[15px] leading-relaxed text-slate-700">
+                        <p><b>a)</b> $A\cap B$ là tập hợp các học sinh lớp $10$ học môn Tiếng Anh của trường.</p>
+                        <p><b>b)</b> $A\setminus B$ là tập hợp các học sinh lớp $10$ nhưng không học môn Tiếng Anh của trường.</p>
+                        <p><b>c)</b> $A\cup B$ là tập hợp các học sinh hoặc học lớp $10$, hoặc học môn Tiếng Anh của trường.</p>
+                        <p><b>d)</b> $B\setminus A$ là tập hợp các học sinh học môn Tiếng Anh nhưng không học lớp $10$ của trường.</p>
+                    </div>
+                </details>
+            </article>
+
+            <article class="rounded-2xl bg-white border border-slate-200 shadow-sm p-4 sm:p-6">
+                <span class="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wider text-teal-700 bg-teal-50 border border-teal-100 px-2.5 py-1 rounded-full">Ví dụ 2</span>
+                <p class="mt-3 font-medium">Trong lớp 10A có $45$ học sinh trong đó có $25$ em thích môn Văn, $20$ em thích môn Toán, $18$ em thích môn Sử, $6$ em không thích môn nào, $5$ em thích cả ba môn. Hỏi số em thích chỉ một trong ba môn trên.</p>
+                <div data-hinh="d5-vd2"></div>
+                <details class="loi-giai mt-4 rounded-xl border border-emerald-100 bg-emerald-50/50">
+                    <summary class="flex items-center gap-2 px-4 py-3 font-bold text-emerald-700 text-sm"><i class="fa-solid fa-lightbulb"></i> Xem lời giải <i class="fa-solid fa-chevron-down mui-ten ml-auto transition-transform"></i></summary>
+                    <div class="noi-dung-giai px-4 pb-4 text-[15px] leading-relaxed text-slate-700">
+                        <p>Gọi $a, b, c$ lần lượt là số học sinh chỉ thích môn Văn, Sử, Toán; $x$ là số học sinh chỉ thích Văn và Toán; $y$ là số học sinh chỉ thích Sử và Toán; $z$ là số học sinh chỉ thích Văn và Sử.</p>
+                        <p>Số em thích ít nhất một môn là $45-6=39$. Dựa vào biểu đồ Venn ta có hệ:</p>
+                        <p>$\begin{cases}a+x+z+5=25 &amp; (1)\\ b+y+z+5=18 &amp; (2)\\ c+x+y+5=20 &amp; (3)\\ a+b+c+x+y+z+5=39 &amp; (4)\end{cases}$</p>
+                        <p>Cộng $(1),(2),(3)$: $a+b+c+2(x+y+z)+15=63\quad(5)$.</p>
+                        <p>Từ $(4)$: $x+y+z=34-(a+b+c)$. Thay vào $(5)$: $a+b+c+2\big(34-(a+b+c)\big)+15=63\Leftrightarrow a+b+c=20$.</p>
+                        <p>Vậy có $20$ em thích chỉ một môn trong ba môn trên.</p>
+                    </div>
+                </details>
+            </article>
+
+            <article class="rounded-2xl bg-white border border-slate-200 shadow-sm p-4 sm:p-6">
+                <span class="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wider text-teal-700 bg-teal-50 border border-teal-100 px-2.5 py-1 rounded-full">Ví dụ 3</span>
+                <p class="mt-3 font-medium">Trong lớp 11A có $16$ học sinh giỏi Toán, $15$ học sinh giỏi Lý và $11$ học sinh giỏi Hóa. Biết rằng có $9$ học sinh vừa giỏi Toán và Lý, $6$ học sinh vừa giỏi Lý và Hóa, $8$ học sinh vừa giỏi Hóa và Toán (có thể giỏi thêm môn còn lại) và có đúng $11$ học sinh giỏi đúng hai môn. Hỏi có bao nhiêu học sinh của lớp:</p>
+                <ol class="cau">
+                    <li>Giỏi cả ba môn Toán, Lý, Hóa.</li>
+                    <li>Giỏi đúng một môn Toán, Lý hoặc Hóa.</li>
+                </ol>
+                <div data-hinh="d5-vd3"></div>
+                <details class="loi-giai mt-4 rounded-xl border border-emerald-100 bg-emerald-50/50">
+                    <summary class="flex items-center gap-2 px-4 py-3 font-bold text-emerald-700 text-sm"><i class="fa-solid fa-lightbulb"></i> Xem lời giải <i class="fa-solid fa-chevron-down mui-ten ml-auto transition-transform"></i></summary>
+                    <div class="noi-dung-giai px-4 pb-4 text-[15px] leading-relaxed text-slate-700">
+                        <p>Gọi $T, L, H$ lần lượt là tập hợp học sinh giỏi Toán, Lý, Hóa. Ta có $n(T)=16$, $n(L)=15$, $n(H)=11$, $n(T\cap L)=9$, $n(L\cap H)=6$, $n(H\cap T)=8$.</p>
+                        <p><b>a)</b> Trong tổng $n(T\cap L)+n(L\cap H)+n(H\cap T)=23$, mỗi học sinh giỏi đúng hai môn được đếm $1$ lần, mỗi học sinh giỏi cả ba môn được đếm $3$ lần. Do đó $23=11+3\,n(T\cap L\cap H)\Rightarrow n(T\cap L\cap H)=4$.</p>
+                        <p><b>b)</b> Chỉ giỏi Toán: $16-(9+8-4)=3$; chỉ giỏi Lý: $15-(9+6-4)=4$; chỉ giỏi Hóa: $11-(8+6-4)=1$.</p>
+                        <p>Vậy số học sinh giỏi đúng một môn là $3+4+1=8$.</p>
+                    </div>
+                </details>
+            </article>
+        </section>
+    </main>
+
+    <script>
+    (function () {
+        'use strict';
+        const NS = 'http://www.w3.org/2000/svg';
+        const giamDong = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+        const HINH = {};          // data-hinh="..." → hàm dựng hình
+        let demId = 0;
+
+        // ---------- Tạo phần tử ----------
+        function s(tag, attrs, cha) {
+            const el = document.createElementNS(NS, tag);
+            if (attrs) for (const k in attrs) {
+                const v = attrs[k];
+                if (v == null) continue;
+                if (k === 'text') el.textContent = v;
+                else if (typeof v === 'string' && v.indexOf('var(') === 0) el.style.setProperty(k, v);
+                else el.setAttribute(k, v);
+            }
+            if (cha) cha.appendChild(el);
+            return el;
+        }
+        function h(tag, cls, html, cha) {
+            const el = document.createElement(tag);
+            if (cls) el.className = cls;
+            if (html != null) el.innerHTML = html;
+            if (cha) cha.appendChild(el);
+            return el;
+        }
+        function svgMoi(cha, w, hgt, nhan) {
+            return s('svg', { viewBox: `0 0 ${w} ${hgt}`, class: 'hinh-svg', role: 'img', 'aria-label': nhan || 'Hình minh họa' }, cha);
+        }
+        // Chuỗi có $...$ → HTML đã dựng KaTeX
+        function tx(str) {
+            return String(str).replace(/\$([^$]+)\$/g, function (m, t) {
+                if (!window.katex) return t;
+                return katex.renderToString(t, { throwOnError: false, strict: false });
+            });
+        }
+        function hien(el, on) { (Array.isArray(el) ? el : [el]).forEach(function (e) { if (e) e.classList.toggle('an', !on); }); }
+        function ve(el, on) { (Array.isArray(el) ? el : [el]).forEach(function (e) { if (e) e.classList.toggle('xong', !!on); }); }
+        function gioiHan(v, a, b) { return Math.max(a, Math.min(b, v)); }
+        function nut(cha, cls, html, nhan, bam) {
+            const b = h('button', cls, html, cha);
+            b.type = 'button';
+            if (nhan) { b.title = nhan; b.setAttribute('aria-label', nhan); }
+            if (bam) b.addEventListener('click', bam);
+            return b;
+        }
+
+        // ---------- Viết số ----------
+        function phanSo(a) {
+            for (const q of [2, 3, 4]) { const p = a * q; if (Math.abs(p - Math.round(p)) < 1e-9) return [Math.round(p), q]; }
+            return null;
+        }
+        // Chữ thường cho SVG: −1/2, −0,75, +∞
+        function soChu(v, thapPhan) {
+            if (v === Infinity) return '+∞';
+            if (v === -Infinity) return '−∞';
+            const am = v < 0, a = Math.abs(v);
+            let t;
+            if (Number.isInteger(a)) t = String(a);
+            else if (!thapPhan && phanSo(a)) { const f = phanSo(a); t = f[0] + '/' + f[1]; }
+            else t = String(+a.toFixed(2)).replace('.', ',');
+            return (am ? '−' : '') + t;
+        }
+        // TeX: -\frac12, 0{,}75, +\infty
+        function soTex(v, thapPhan) {
+            if (v === Infinity) return '+\\infty';
+            if (v === -Infinity) return '-\\infty';
+            const am = v < 0, a = Math.abs(v);
+            let t;
+            if (Number.isInteger(a)) t = String(a);
+            else if (!thapPhan && phanSo(a)) { const f = phanSo(a); t = '\\dfrac{' + f[0] + '}{' + f[1] + '}'; }
+            else t = String(+a.toFixed(2)).replace('.', '{,}');
+            return (am ? '-' : '') + t;
+        }
+
+        // ---------- Tập hợp là hợp các khoảng ----------
+        // Khoảng {a, b, ta, tb}: ta / tb = có lấy đầu mút trái / phải
+        function K(a, b, ta, tb) { return { a: a, b: b, ta: !!ta && isFinite(a), tb: !!tb && isFinite(b) }; }
+        function thuoc(S, x) {
+            return S.some(function (k) { return (x > k.a || (x === k.a && k.ta)) && (x < k.b || (x === k.b && k.tb)); });
+        }
+        // Kết hợp hai tập theo luật f(thuộc S, thuộc T): xét từng đầu mút và từng khoảng giữa hai đầu mút liên tiếp
+        function phep(S, T, f) {
+            const p = Array.from(new Set(S.concat(T).flatMap(function (k) { return [k.a, k.b]; }).filter(isFinite))).sort(function (x, y) { return x - y; });
+            const thu = function (x) { return f(thuoc(S, x), thuoc(T, x)); };
+            const day = [];
+            if (!p.length) day.push({ lo: -Infinity, t: 0 });
+            else {
+                day.push({ lo: -Infinity, t: p[0] - 1 });
+                p.forEach(function (v, i) {
+                    day.push({ pt: v });
+                    day.push({ lo: v, t: i + 1 < p.length ? (v + p[i + 1]) / 2 : v + 1 });
+                });
+            }
+            const kq = [];
+            let dang = null;
+            day.forEach(function (e) {
+                if ('pt' in e) {
+                    if (thu(e.pt)) { if (!dang) dang = { a: e.pt, ta: true }; }
+                    else if (dang) { dang.b = e.pt; dang.tb = false; kq.push(dang); dang = null; }
+                } else {
+                    if (thu(e.t)) { if (!dang) dang = { a: e.lo, ta: false }; }
+                    else if (dang) { dang.b = e.lo; dang.tb = true; kq.push(dang); dang = null; }
+                }
+            });
+            if (dang) { dang.b = Infinity; dang.tb = false; kq.push(dang); }
+            return kq;
+        }
+        const GIAO = function (a, b) { return a && b; };
+        const HOP = function (a, b) { return a || b; };
+        const HIEU = function (a, b) { return a && !b; };
+        const HIEU_NGUOC = function (a, b) { return b && !a; };
+        const BU = function (a) { return !a; };
+        function rong(S) { return phep(S, [], HOP).length === 0; }
+        function conTap(S, T) { return phep(S, T, HIEU).length === 0; }
+        function texTap(S, thapPhan) {
+            S = phep(S, [], HOP);
+            if (!S.length) return '\\varnothing';
+            return S.map(function (k) {
+                if (k.a === k.b) return '\\{' + soTex(k.a, thapPhan) + '\\}';
+                return (k.ta ? '[' : '(') + soTex(k.a, thapPhan) + ';\\,' + soTex(k.b, thapPhan) + (k.tb ? ']' : ')');
+            }).join('\\cup ');
+        }
+        function texTapRoiRac(ds) { return ds.length ? '\\{' + ds.join(';') + '\\}' : '\\varnothing'; }
+
+        // ---------- Mẫu gạch chéo ----------
+        function mauGach(svg, mau) {
+            const id = 'gach' + (++demId);
+            const defs = s('defs', null, svg);
+            const p = s('pattern', { id: id, width: 6, height: 6, patternUnits: 'userSpaceOnUse', patternTransform: 'rotate(45)' }, defs);
+            s('path', { d: 'M0 0V6', stroke: mau || 'var(--sai)', 'stroke-width': 2.2 }, p);
+            return 'url(#' + id + ')';
+        }
+
+        // ---------- Trục số ----------
+        function ngoacSvg(cha, x, y, ben, lay, mau) {
+            const d = lay
+                ? (ben === 'trai' ? `M${x + 5} ${y - 10}H${x}V${y + 10}H${x + 5}` : `M${x - 5} ${y - 10}H${x}V${y + 10}H${x - 5}`)
+                : (ben === 'trai' ? `M${x + 5} ${y - 11}Q${x - 4} ${y} ${x + 5} ${y + 11}` : `M${x - 5} ${y - 11}Q${x + 4} ${y} ${x - 5} ${y + 11}`);
+            return s('path', { d: d, fill: 'none', stroke: mau, 'stroke-width': 2.6, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', class: 'no' }, cha);
+        }
+        function trucSo(svg, min, max, o) {
+            o = o || {};
+            const W = svg.viewBox.baseVal.width;
+            const L = o.L != null ? o.L : 10, R = o.R != null ? o.R : W - 10;
+            const x0 = o.x0 != null ? o.x0 : 34, x1 = o.x1 != null ? o.x1 : W - 34;
+            const X = function (v) { return v === -Infinity ? L : v === Infinity ? R - 4 : x0 + (v - min) / (max - min) * (x1 - x0); };
+            return {
+                X: X, min: min, max: max,
+                truc: function (y, op, cha) {
+                    op = op || {};
+                    const g = s('g', null, cha || svg);
+                    s('path', { d: `M${L} ${y}H${R}`, stroke: 'var(--truc)', 'stroke-width': 1.4 }, g);
+                    s('path', { d: `M${R - 7} ${y - 4.5}L${R} ${y}L${R - 7} ${y + 4.5}`, fill: 'none', stroke: 'var(--truc)', 'stroke-width': 1.4, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, g);
+                    if (op.vach !== false) {
+                        const b = op.buoc || 1;
+                        for (let v = Math.ceil(min / b) * b; v <= max + 1e-9; v += b) s('path', { d: `M${X(v)} ${y - 3}V${y + 3}`, stroke: 'var(--truc)', 'stroke-width': 1, opacity: .55 }, g);
+                    }
+                    (op.so || []).forEach(function (v) { s('text', { x: X(v), y: y + 20, 'text-anchor': 'middle', 'font-size': 12, text: soChu(v, op.thapPhan) }, g); });
+                    if (op.ten) s('text', { x: o.xTen != null ? o.xTen : L, y: y - 13, class: 'ui', 'font-size': 11, fill: op.mauTen || 'var(--chu-hinh)', text: op.ten }, g);
+                    return g;
+                },
+                // Vẽ một tập (hợp các khoảng) trên dòng y
+                tap: function (y, S, mau, op, cha) {
+                    op = op || {};
+                    const g = s('g', null, cha || svg);
+                    const thanh = [], ngoac = [], nhan = [];
+                    S.forEach(function (k) {
+                        const xa = X(k.a), xb = X(k.b);
+                        if (k.a === k.b) {
+                            ngoac.push(s('circle', { cx: xa, cy: y, r: 5, fill: mau, class: 'no' }, g));
+                        } else {
+                            thanh.push(s('path', { d: `M${xa} ${y}H${xb}`, stroke: mau, 'stroke-width': op.day || 7, pathLength: 1, class: op.tinh ? '' : 've', opacity: op.mo != null ? op.mo : .85 }, g));
+                            if (isFinite(k.a)) ngoac.push(ngoacSvg(g, xa, y, 'trai', k.ta, mau));
+                            if (isFinite(k.b)) ngoac.push(ngoacSvg(g, xb, y, 'phai', k.tb, mau));
+                        }
+                        if (op.nhan !== false) [k.a, k.b].filter(isFinite).forEach(function (v, i) {
+                            if (i === 1 && k.a === k.b) return;
+                            nhan.push(s('text', { x: X(v), y: y + 20, 'text-anchor': 'middle', 'font-size': 12.5, 'font-weight': 700, fill: mau, text: soChu(v, op.thapPhan), class: op.tinh ? '' : 'no' }, g));
+                        });
+                    });
+                    const kq = { g: g, thanh: thanh, ngoac: ngoac, nhan: nhan };
+                    kq.hien = function (on) { ve(thanh, on); hien(ngoac.concat(nhan), on); };
+                    if (!op.tinh) kq.hien(false);
+                    return kq;
+                },
+                diem: function (y, v, mau, chu, cha) {
+                    const g = s('g', { class: 'no' }, cha || svg);
+                    s('circle', { cx: X(v), cy: y, r: 5.5, fill: mau }, g);
+                    if (chu !== false) s('text', { x: X(v), y: y + 21, 'text-anchor': 'middle', 'font-size': 12.5, 'font-weight': 700, fill: mau, text: chu != null ? chu : soChu(v) }, g);
+                    return g;
+                }
+            };
+        }
+
+        // ---------- Khung minh họa có các bước ----------
+        // o.canh = [{ nhan, tao(san, phu, api) → { buoc: [chuỗi | hàm], den(i) } }]
+        function khung(host, o) {
+            const box = h('div', 'khung', null, host);
+            const dau = h('div', 'khung-dau', `<span class="khung-ten"><i class="fa-solid fa-${o.icon || 'wand-magic-sparkles'}"></i> ${o.ten || 'Hình minh họa'}</span>`, box);
+            let tabs = [];
+            if (o.canh.length > 1) {
+                const t = h('div', 'khung-tabs', null, dau);
+                tabs = o.canh.map(function (c, k) { return nut(t, 'nut-tab', tx(c.nhan), null, function () { daBam = true; dung(); mo(k); }); });
+            }
+            const phu = h('div', 'khung-phu', null, box);
+            const san = h('div', 'khung-san', null, box);
+            const chu = h('div', 'khung-chu', null, box);
+            chu.setAttribute('aria-live', 'polite');
+            const thanhNut = h('div', 'khung-nut', null, box);
+            const bDau = nut(thanhNut, '', '<i class="fa-solid fa-rotate-left"></i>', 'Về bước đầu', function () { daBam = true; dung(); den(0); });
+            const bLui = nut(thanhNut, '', '<i class="fa-solid fa-chevron-left"></i>', 'Bước trước', function () { daBam = true; dung(); den(i - 1); });
+            const cham = h('div', 'cham-buoc', null, thanhNut);
+            const bTien = nut(thanhNut, '', '<i class="fa-solid fa-chevron-right"></i>', 'Bước tiếp', function () { daBam = true; dung(); den(i + 1); });
+            const bChay = nut(thanhNut, 'nut-chinh', '', 'Tự chạy', function () { daBam = true; if (hen) dung(); else chay(); });
+            let ht = null, i = 0, hen = null, daBam = false;
+
+            const api = {
+                den: function (k) { den(k); },
+                cuoi: function () { den(ht.buoc.length - 1); },
+                chay: function (tuBuoc) { dung(); if (tuBuoc != null) den(tuBuoc); chay(); },
+                lamMoi: function () { veCham(); den(Math.min(i, ht.buoc.length - 1)); },
+                dung: function () { dung(); },
+                get buoc() { return i; }
+            };
+            function mo(k) {
+                tabs.forEach(function (b, j) { b.setAttribute('aria-pressed', String(j === k)); });
+                san.innerHTML = ''; phu.innerHTML = '';
+                ht = o.canh[k].tao(san, phu, api);
+                veCham();
+                den(0);
+            }
+            function veCham() {
+                cham.innerHTML = '';
+                ht.buoc.forEach(function (_, j) { h('span', null, null, cham).addEventListener('click', function () { daBam = true; dung(); den(j); }); });
+                thanhNut.style.display = ht.buoc.length > 1 ? '' : 'none';
+            }
+            function capNhatNutChay() {
+                const cuoi = i >= ht.buoc.length - 1;
+                bChay.innerHTML = hen ? '<i class="fa-solid fa-pause"></i><span>Dừng</span>'
+                    : cuoi ? '<i class="fa-solid fa-rotate-right"></i><span>Xem lại</span>' : '<i class="fa-solid fa-play"></i><span>Chạy</span>';
+            }
+            function den(k) {
+                k = gioiHan(k, 0, ht.buoc.length - 1);
+                i = k;
+                ht.den(k);
+                const nd = ht.buoc[k];
+                chu.innerHTML = (ht.buoc.length > 1 ? `<span class="so-buoc">${k + 1}/${ht.buoc.length}</span>` : '') + tx(typeof nd === 'function' ? nd() : nd);
+                chu.classList.remove('doi'); void chu.offsetWidth; chu.classList.add('doi');
+                Array.from(cham.children).forEach(function (d, j) { d.className = j === k ? 'dang' : j < k ? 'qua' : ''; });
+                bDau.disabled = bLui.disabled = k === 0;
+                bTien.disabled = k === ht.buoc.length - 1;
+                capNhatNutChay();
+            }
+            function chay() {
+                if (i >= ht.buoc.length - 1) den(0);
+                hen = setInterval(function () {
+                    if (i >= ht.buoc.length - 1) { dung(); return; }
+                    den(i + 1);
+                    if (i >= ht.buoc.length - 1) dung();
+                }, o.nhip || 2400);
+                capNhatNutChay();
+            }
+            function dung() { clearInterval(hen); hen = null; if (ht) capNhatNutChay(); }
+
+            mo(0);
+            // Lần đầu cuộn tới hình thì tự chạy một lượt (trừ khi học sinh đã bấm hoặc máy tắt hiệu ứng)
+            if (!giamDong && o.tuChay !== false && 'IntersectionObserver' in window) {
+                const io = new IntersectionObserver(function (es) {
+                    if (!es[0].isIntersecting) return;
+                    io.disconnect();
+                    if (!daBam && i === 0 && ht.buoc.length > 1) setTimeout(chay, 500);
+                }, { threshold: .6 });
+                io.observe(san);
+            }
+            return api;
+        }
+
+        // Nút chọn (phép toán, câu...) trong vùng phụ
+        function nhomNut(cha, ds, chon, bam, cls) {
+            const cacNut = ds.map(function (d, j) {
+                return nut(cha, cls || 'nut-phep', tx(d.nhan), null, function () { chonNut(j); bam(d, j); });
+            });
+            function chonNut(j) { cacNut.forEach(function (b, k) { b.setAttribute('aria-pressed', String(k === j)); }); }
+            chonNut(chon);
+            return { chon: chonNut, nut: cacNut };
+        }
+
+        // ---------- Biểu đồ Venn 2 tập ----------
+        // Vùng: a (chỉ A), ab (chung), b (chỉ B), ngoai (trong E, ngoài A và B)
+        function venn2(svg, o) {
+            o = o || {};
+            const W = svg.viewBox.baseVal.width, H = svg.viewBox.baseVal.height;
+            const cy = o.cy || 120, r = o.r || 80, c1 = o.c1 || 140, c2 = o.c2 || 220;
+            const id = ++demId, defs = s('defs', null, svg);
+            const cpA = s('clipPath', { id: 'vA' + id }, defs); s('circle', { cx: c1, cy: cy, r: r }, cpA);
+            function matNa(ten, ds) {
+                const m = s('mask', { id: ten + id, maskUnits: 'userSpaceOnUse', x: 0, y: 0, width: W, height: H }, defs);
+                s('rect', { x: 0, y: 0, width: W, height: H, fill: '#fff' }, m);
+                ds.forEach(function (c) { s('circle', { cx: c, cy: cy, r: r, fill: '#000' }, m); });
+                return 'url(#' + ten + id + ')';
+            }
+            const E = o.E ? s('rect', { x: 6, y: 6, width: W - 12, height: H - 12, rx: 14, fill: 'var(--nen-the)', stroke: 'var(--truc)', 'stroke-width': 1.5 }, svg) : null;
+            s('circle', { cx: c1, cy: cy, r: r, fill: 'var(--ca-nhat)' }, svg);
+            s('circle', { cx: c2, cy: cy, r: r, fill: 'var(--cb-nhat)' }, svg);
+            const mauVung = o.mauVung || 'var(--ck)';
+            const vung = {
+                a: s('circle', { cx: c1, cy: cy, r: r, fill: mauVung, mask: matNa('mB', [c2]), class: 'vung an' }, svg),
+                ab: s('circle', { cx: c2, cy: cy, r: r, fill: mauVung, 'clip-path': 'url(#vA' + id + ')', class: 'vung an' }, svg),
+                b: s('circle', { cx: c2, cy: cy, r: r, fill: mauVung, mask: matNa('mA', [c1]), class: 'vung an' }, svg)
+            };
+            if (o.E) vung.ngoai = s('rect', { x: 6, y: 6, width: W - 12, height: H - 12, rx: 14, fill: mauVung, mask: matNa('mAB', [c1, c2]), class: 'vung an' }, svg);
+            s('circle', { cx: c1, cy: cy, r: r, fill: 'none', stroke: 'var(--ca)', 'stroke-width': 2.2 }, svg);
+            s('circle', { cx: c2, cy: cy, r: r, fill: 'none', stroke: 'var(--cb)', 'stroke-width': 2.2 }, svg);
+            const yTen = cy - r * .78;
+            s('text', { x: c1 - r * .78, y: yTen, 'text-anchor': 'middle', 'font-size': 19, 'font-style': 'italic', 'font-weight': 700, fill: 'var(--ca)', text: o.tenA || 'A' }, svg);
+            s('text', { x: c2 + r * .78, y: yTen, 'text-anchor': 'middle', 'font-size': 19, 'font-style': 'italic', 'font-weight': 700, fill: 'var(--cb)', text: o.tenB || 'B' }, svg);
+            if (o.E) s('text', { x: W - 22, y: 28, 'text-anchor': 'middle', 'font-size': 18, 'font-style': 'italic', 'font-weight': 700, text: o.tenE || 'E' }, svg);
+            // Vị trí đặt n phần tử trong một vùng
+            function viTri(ten, n) {
+                if (ten === 'ngoai') return [[30, 30], [W - 56, 30], [30, H - 30], [W - 30, H - 30], [W / 2, 24], [W / 2, H - 22]].slice(0, n);
+                const cx = ten === 'a' ? c1 - r * .52 : ten === 'b' ? c2 + r * .52 : (c1 + c2) / 2;
+                const cot = n <= 3 ? 1 : 2, hang = Math.ceil(n / cot), kq = [];
+                for (let j = 0; j < n; j++) {
+                    const c = j % cot, hg = Math.floor(j / cot);
+                    const soCot = Math.min(cot, n - hg * cot);
+                    kq.push([cx + (c - (soCot - 1) / 2) * 30, cy + (hg - (hang - 1) / 2) * 32]);
+                }
+                return kq;
+            }
+            function bat(ds) { Object.keys(vung).forEach(function (k) { hien(vung[k], ds.indexOf(k) >= 0); }); }
+            return { vung: vung, viTri: viTri, bat: bat, E: E };
+        }
+        // Phần tử dạng chấm tròn có chữ (đặt trong biểu đồ Venn)
+        // Trả về { g: lớp đặt vị trí (gắn class chon / mo2), n: lớp hiện / ẩn có hiệu ứng phóng }
+        function chamPhanTu(cha, x, y, chu) {
+            const g = s('g', { class: 'pt', transform: `translate(${x} ${y})` }, cha);
+            const n = s('g', { class: 'no an' }, g);
+            s('circle', { r: 13.5 }, n);
+            s('text', { y: 4.5, 'text-anchor': 'middle', 'font-size': chu.length > 2 ? 10.5 : 13, text: chu }, n);
+            return { g: g, n: n };
+        }
+
+        // ---------- Biểu đồ Venn 3 tập ----------
+        // Vùng đánh số theo bit: 1 = chỉ tập 1, 3 = tập 1 và 2, 7 = cả ba...
+        const TAM3 = [[125, 112], [235, 112], [180, 204]], R3 = 84;
+        const DIEM3 = { 1: [90, 94], 2: [270, 94], 4: [180, 252], 3: [180, 80], 5: [136, 168], 6: [224, 168], 7: [180, 140] };
+        function venn3(svg, o) {
+            const W = svg.viewBox.baseVal.width, H = svg.viewBox.baseVal.height;
+            const id = ++demId, defs = s('defs', null, svg);
+            const mau = ['var(--ca)', 'var(--cb)', 'var(--cc)'], nhat = ['var(--ca-nhat)', 'var(--cb-nhat)', 'var(--cc-nhat)'];
+            TAM3.forEach(function (c, i) { s('circle', { cx: c[0], cy: c[1], r: R3 }, s('clipPath', { id: `c3${i}_${id}` }, defs)); });
+            const dsMatNa = {};
+            function matNa(ds) {
+                const k = ds.join('');
+                if (!dsMatNa[k]) {
+                    const m = s('mask', { id: `m3${k}_${id}`, maskUnits: 'userSpaceOnUse', x: 0, y: 0, width: W, height: H }, defs);
+                    s('rect', { x: 0, y: 0, width: W, height: H, fill: '#fff' }, m);
+                    ds.forEach(function (i) { s('circle', { cx: TAM3[i][0], cy: TAM3[i][1], r: R3, fill: '#000' }, m); });
+                    dsMatNa[k] = `url(#m3${k}_${id})`;
+                }
+                return dsMatNa[k];
+            }
+            s('rect', { x: 4, y: 4, width: W - 8, height: H - 8, rx: 14, fill: 'var(--nen-the)', stroke: 'var(--truc)', 'stroke-width': 1.5 }, svg);
+            TAM3.forEach(function (c, i) { s('circle', { cx: c[0], cy: c[1], r: R3, fill: nhat[i] }, svg); });
+            const vung = {};
+            for (let m = 1; m <= 7; m++) {
+                let g = svg;
+                for (let i = 0; i < 3; i++) if (m >> i & 1) g = s('g', { 'clip-path': `url(#c3${i}_${id})` }, g);
+                const ngoai = [0, 1, 2].filter(function (i) { return !(m >> i & 1); });
+                vung[m] = s('rect', { x: 0, y: 0, width: W, height: H, fill: 'var(--ck)', mask: ngoai.length ? matNa(ngoai) : null, class: 'vung an' }, g);
+            }
+            TAM3.forEach(function (c, i) { s('circle', { cx: c[0], cy: c[1], r: R3, fill: 'none', stroke: mau[i], 'stroke-width': 2.2 }, svg); });
+            const viTriTen = [[42, 36], [318, 36], [272, 296]];
+            o.ten.forEach(function (t, i) { s('text', { x: viTriTen[i][0], y: viTriTen[i][1], 'text-anchor': 'middle', 'font-size': 15, class: 'ui', fill: mau[i], text: t }, svg); });
+            function bat(ds) { for (let m = 1; m <= 7; m++) hien(vung[m], ds.indexOf(m) >= 0); }
+            return { vung: vung, bat: bat };
+        }
+
+        // ---------- Mảnh ghép dùng nhiều lần ----------
+        function chip(cha, x, y, chu, w) {
+            w = w || Math.max(28, chu.length * 8 + 12);
+            const g = s('g', { class: 'chip', transform: `translate(${x} ${y})` }, cha);
+            const n = s('g', { class: 'no an' }, g);
+            s('rect', { x: -w / 2, y: -12, width: w, height: 24, rx: 7, 'stroke-width': 1.3 }, n);
+            const t = s('text', { y: 4.5, 'text-anchor': 'middle', 'font-size': 13, text: chu }, n);
+            return { g: g, n: n, t: t };
+        }
+        function dauX(cha, x, y, r) {
+            r = r || 7;
+            return s('path', { d: `M${x - r} ${y - r}L${x + r} ${y + r}M${x + r} ${y - r}L${x - r} ${y + r}`, stroke: 'var(--sai)', 'stroke-width': 2.6, 'stroke-linecap': 'round', class: 'no an' }, cha);
+        }
+        // Cung nhảy từ x1 tới x2 (đỉnh cao `cao` phía trên, hoặc phía dưới nếu cao < 0)
+        function cung(cha, x1, x2, y, cao, mau, rong) {
+            return s('path', { d: `M${x1} ${y}Q${(x1 + x2) / 2} ${y - cao * 2} ${x2} ${y}`, fill: 'none', stroke: mau, 'stroke-width': rong || 2, 'stroke-linecap': 'round', pathLength: 1, class: 've' }, cha);
+        }
+        function chamRoi(cha, x, y, mau, chu) {
+            const g = s('g', { transform: `translate(${x} ${y})` }, cha);
+            const n = s('g', { class: 'roi' }, g);
+            const c = s('circle', { r: 6, fill: mau }, n);
+            const t = s('text', { y: 22, 'text-anchor': 'middle', 'font-size': 12.5, 'font-weight': 700, fill: mau, text: chu }, n);
+            const kq = { g: g, n: n, c: c, t: t };
+            kq.roi = function (on) { n.style.transform = on ? 'translateY(0)' : 'translateY(-64px)'; n.style.opacity = on ? 1 : 0; };
+            kq.roi(false);
+            return kq;
+        }
+        function treTung(ds, buoc) { ds.forEach(function (e, j) { if (e) e.style.transitionDelay = (j * (buoc || .12)) + 's'; }); }
+
+        // ================= DẠNG 1 =================
+        // Ví dụ 1: giải phương trình → đặt nghiệm lên trục số → lọc theo tập số
+        function canhNghiem(cfg) {
+            return function (san) {
+                const svg = svgMoi(san, 360, 170, 'Các nghiệm trên trục số');
+                const t = trucSo(svg, cfg.min, cfg.max);
+                const coSo0 = cfg.cum.some(function (c) { return c.ds.indexOf(0) >= 0; });
+                t.truc(96, { buoc: cfg.buoc || 1, so: coSo0 ? [] : [0] });
+                s('text', { x: 350, y: 26, 'text-anchor': 'end', 'font-size': 15, text: cfg.tap === 'Z' ? 'x ∈ ℤ' : 'x ∈ ℝ', fill: 'var(--ck)', 'font-weight': 700 }, svg);
+                const mau = ['var(--ca)', 'var(--cb)'];
+                const daDat = {};
+                const cum = cfg.cum.map(function (c, ci) {
+                    return c.ds.map(function (v) {
+                        const trung = daDat[v];
+                        daDat[v] = true;
+                        const d = chamRoi(svg, t.X(v), 96, mau[ci], soChu(v));
+                        if (trung) { d.t.textContent = ''; d.trung = true; }
+                        d.v = v;
+                        return d;
+                    });
+                });
+                const tatCa = cum.flat();
+                const giu = function (v) { return cfg.tap !== 'Z' || Number.isInteger(v); };
+                const vong = tatCa.filter(function (d) { return !d.trung; }).map(function (d) {
+                    return giu(d.v) ? s('circle', { cx: t.X(d.v), cy: 96, r: 11, fill: 'none', stroke: 'var(--dung)', 'stroke-width': 2.2, class: 'no an' }, svg)
+                        : dauX(svg, t.X(d.v), 96, 9);
+                });
+                const ketQua = s('text', { x: 180, y: 150, 'text-anchor': 'middle', 'font-size': 17, 'font-weight': 700, fill: 'var(--ck)', class: 'no an', text: cfg.ketQuaChu }, svg);
+                const nC = cfg.cum.length;
+                const buoc = [cfg.moDau].concat(cfg.cum.map(function (c) { return c.chu; }), [cfg.loc, cfg.ketLuan]);
+                return {
+                    buoc: buoc,
+                    den: function (i) {
+                        cum.forEach(function (ds, ci) { ds.forEach(function (d) { d.roi(i >= ci + 1); d.c.classList.toggle('nhay', d.trung === true && i === ci + 1); }); });
+                        hien(vong, i >= nC + 1);
+                        tatCa.forEach(function (d) { d.n.classList.toggle('mo', i >= nC + 1 && !giu(d.v)); });
+                        hien(ketQua, i >= nC + 2);
+                    }
+                };
+            };
+        }
+        HINH['d1-vd1'] = function (host) {
+            khung(host, {
+                canh: [
+                    { nhan: 'a)', tao: canhNghiem({ tap: 'R', min: -2, max: 3.5, cum: [
+                        { ds: [0, 2], chu: 'Phương trình tích: $2x-x^2=0 \\Leftrightarrow x(2-x)=0 \\Leftrightarrow x=0$ hoặc $x=2$.' },
+                        { ds: [-0.5, 2], chu: '$2x^2-3x-2=0 \\Leftrightarrow x=-\\tfrac12$ hoặc $x=2$. Nghiệm $x=2$ bị <b>trùng</b> → chỉ viết <b>một lần</b>.' }],
+                        moDau: 'Tìm các số thực $x$ làm cho tích $\\left(2x-x^2\\right)\\left(2x^2-3x-2\\right)$ bằng $0$: cho <b>từng thừa số</b> bằng $0$.',
+                        loc: 'Lọc theo điều kiện $x\\in\\mathbb R$: cả ba nghiệm đều là số thực → <b>giữ tất cả</b>.',
+                        ketLuan: 'Vậy $A=\\left\\{-\\tfrac12;0;2\\right\\}$.', ketQuaChu: 'A = { −1/2 ; 0 ; 2 }' }) },
+                    { nhan: 'b)', tao: canhNghiem({ tap: 'Z', min: -2, max: 3.5, cum: [
+                        { ds: [0], chu: 'Đặt nhân tử chung: $2x^3-3x^2-5x=x\\left(2x^2-3x-5\\right)=0$. Thừa số $x=0$.' },
+                        { ds: [-1, 2.5], chu: '$2x^2-3x-5=0 \\Leftrightarrow x=-1$ hoặc $x=\\tfrac52$.' }],
+                        moDau: 'Giải phương trình $2x^3-3x^2-5x=0$ rồi chỉ giữ các nghiệm là <b>số nguyên</b>.',
+                        loc: 'Lọc theo $x\\in\\mathbb Z$: $\\tfrac52=2{,}5$ không phải số nguyên → <b>loại</b>.',
+                        ketLuan: 'Vậy $B=\\{-1;0\\}$.', ketQuaChu: 'B = { −1 ; 0 }' }) },
+                    { nhan: 'c)', tao: canhNghiem({ tap: 'Z', min: -4, max: 42, buoc: 5, cum: [
+                        { ds: [-1, 38.5], chu: '$2x^2-75x-77=0$ có $a-b+c=2+75-77=0$ nên $x=-1$ hoặc $x=\\tfrac{77}{2}$.' }],
+                        moDau: 'Giải phương trình bậc hai $2x^2-75x-77=0$, chỉ giữ nghiệm nguyên.',
+                        loc: 'Lọc theo $x\\in\\mathbb Z$: $\\tfrac{77}{2}=38{,}5$ không nguyên → <b>loại</b>.',
+                        ketLuan: 'Vậy $C=\\{-1\\}$.', ketQuaChu: 'C = { −1 }' }) }
+                ]
+            });
+        };
+
+        // Ví dụ 2
+        function canhBinhPhuong(san) {
+            const svg = svgMoi(san, 360, 190, 'Biểu đồ n bình phương');
+            const day = 158, k = 3.4, Y = function (v) { return day - v * k; };
+            s('rect', { x: 20, y: Y(30), width: 330, height: Y(3) - Y(30), fill: 'var(--ca-nhat)' }, svg);
+            [3, 30].forEach(function (v) {
+                s('path', { d: `M20 ${Y(v)}H350`, stroke: 'var(--ca)', 'stroke-width': 1.3, 'stroke-dasharray': '5 4' }, svg);
+                s('text', { x: 16, y: Y(v) + 4, 'text-anchor': 'end', 'font-size': 12, 'font-weight': 700, fill: 'var(--ca)', text: v }, svg);
+            });
+            s('path', { d: `M20 ${day}H350`, stroke: 'var(--truc)', 'stroke-width': 1.4 }, svg);
+            const cot = [];
+            for (let n = 1; n <= 6; n++) {
+                const x = 34 + (n - 1) * 52, v = n * n, dat = v > 3 && v < 30;
+                const r = s('rect', { x: x, y: Y(v), width: 30, height: v * k, rx: 4, fill: dat ? 'var(--ca)' : 'var(--sai)', opacity: .85 }, svg);
+                r.style.transformBox = 'fill-box'; r.style.transformOrigin = 'bottom';
+                const so = s('text', { x: x + 15, y: Y(v) - 6, 'text-anchor': 'middle', 'font-size': 12.5, 'font-weight': 700, text: v, class: 'no an' }, svg);
+                s('text', { x: x + 15, y: day + 18, 'text-anchor': 'middle', 'font-size': 13, text: 'n=' + n }, svg);
+                const dau = dat ? null : dauX(svg, x + 15, Y(v) - 22, 6);
+                cot.push({ r: r, so: so, dau: dau, n: n, v: v, dat: dat });
+            }
+            const chuThich = [
+                'Dải xanh là vùng $3&lt;n^2&lt;30$. Lần lượt thử $n=1,2,3,\\dots$ (vì $n\\in\\mathbb N^*$).'
+            ].concat(cot.map(function (c) {
+                return `$n=${c.n}$: $n^2=${c.v}$ ` + (c.dat ? 'nằm trong dải → <b>nhận</b>.' : (c.v <= 3 ? 'không lớn hơn $3$ → <b>loại</b>.' : 'vượt quá $30$ → <b>loại</b>. Từ đây $n$ càng lớn $n^2$ càng lớn nên dừng.'));
+            }), ['Vậy $A=\\{2;3;4;5\\}$.']);
+            return {
+                buoc: chuThich.map(function (c) { return c.replace(/&lt;/g, '<'); }),
+                den: function (i) {
+                    cot.forEach(function (c, j) {
+                        const on = i >= j + 1;
+                        c.r.style.transform = on ? 'scaleY(1)' : 'scaleY(0)';
+                        hien([c.so, c.dau], on);
+                        c.r.classList.toggle('mo', i === 7 && !c.dat);
+                    });
+                }
+            };
+        }
+        function canhTriTuyetDoi(san) {
+            const svg = svgMoi(san, 360, 150, 'Khoảng cách tới 0 nhỏ hơn 3');
+            const t = trucSo(svg, -5, 5);
+            t.truc(92, { so: [-5, 5] });
+            const o = t.tap(92, [K(-3, 3, false, false)], 'var(--ca)', { mo: .35 });
+            const c1 = cung(svg, t.X(0), t.X(3), 92, 26, 'var(--cb)'), c2 = cung(svg, t.X(0), t.X(-3), 92, 26, 'var(--cb)');
+            const chu = s('text', { x: t.X(0), y: 52, 'text-anchor': 'middle', 'font-size': 12, class: 'ui no an', fill: 'var(--cb)', text: 'khoảng cách < 3' }, svg);
+            const diem = [-2, -1, 0, 1, 2].map(function (v) { return t.diem(92, v, 'var(--ck)'); });
+            treTung(diem);
+            const ketQua = s('text', { x: 180, y: 140, 'text-anchor': 'middle', 'font-size': 16, 'font-weight': 700, fill: 'var(--ck)', class: 'no an', text: 'B = { −2 ; −1 ; 0 ; 1 ; 2 }' }, svg);
+            return {
+                buoc: ['$|x|$ là <b>khoảng cách</b> từ điểm $x$ đến điểm $0$ trên trục số.',
+                    '$|x|&lt;3$: khoảng cách đến $0$ nhỏ hơn $3$ $\\Leftrightarrow -3&lt;x&lt;3$. Hai đầu $\\pm3$ <b>không lấy</b> (ngoặc tròn).'.replace(/&lt;/g, '<'),
+                    'Chọn các <b>số nguyên</b> nằm trong khoảng $(-3;3)$.',
+                    'Vậy $B=\\{-2;-1;0;1;2\\}$.'],
+                den: function (i) {
+                    ve([c1, c2], i >= 1); hien(chu, i >= 1); o.hien(i >= 1);
+                    hien(diem, i >= 2); hien(ketQua, i >= 3);
+                }
+            };
+        }
+        function canhBoi3(san) {
+            const svg = svgMoi(san, 360, 160, 'Các bội của 3');
+            const t = trucSo(svg, -7, 13);
+            t.truc(96, { so: [] });
+            const o = t.tap(96, [K(-4, 12, false, false)], 'var(--ca)', { mo: .3 });
+            const phai = [0, 3, 6, 9].map(function (v) { return v < 9 ? cung(svg, t.X(v), t.X(v + 3), 96, 16, 'var(--cb)') : null; }).filter(Boolean);
+            const raPhai = cung(svg, t.X(9), t.X(12), 96, 16, 'var(--sai)');
+            const trai = cung(svg, t.X(0), t.X(-3), 96, 16, 'var(--cb)');
+            const raTrai = cung(svg, t.X(-3), t.X(-6), 96, 16, 'var(--sai)');
+            treTung(phai.concat([raPhai]), .35);
+            const diem = [-3, 0, 3, 6, 9].map(function (v) { return t.diem(96, v, 'var(--ck)'); });
+            const k = [-1, 0, 1, 2, 3].map(function (kk) { return s('text', { x: t.X(kk * 3), y: 64, 'text-anchor': 'middle', 'font-size': 11, class: 'ui no an', fill: 'var(--cb)', text: 'k=' + kk }, svg); });
+            const x12 = dauX(svg, t.X(12), 96, 7), x6 = dauX(svg, t.X(-6), 96, 7);
+            const nhan12 = s('text', { x: t.X(12), y: 117, 'text-anchor': 'middle', 'font-size': 12, fill: 'var(--sai)', class: 'no an', text: '12' }, svg);
+            const nhan6 = s('text', { x: t.X(-6), y: 117, 'text-anchor': 'middle', 'font-size': 12, fill: 'var(--sai)', class: 'no an', text: '−6' }, svg);
+            const ketQua = s('text', { x: 180, y: 150, 'text-anchor': 'middle', 'font-size': 16, 'font-weight': 700, fill: 'var(--ck)', class: 'no an', text: 'C = { −3 ; 0 ; 3 ; 6 ; 9 }' }, svg);
+            return {
+                buoc: ['Điều kiện $-4<x<12$: phần tô xanh trên trục số (không lấy hai đầu mút).',
+                    '$x=3k$ là các bội của $3$: xuất phát từ $0$, <b>nhảy mỗi bước $3$ đơn vị</b> sang phải: $0\\to3\\to6\\to9$. Bước tới $12$ thì ra ngoài (vì $12\\not<12$).',
+                    'Nhảy sang trái: $0\\to-3$. Bước tới $-6$ thì ra ngoài (vì $-6<-4$).',
+                    'Các giá trị thỏa mãn ứng với $k\\in\\{-1;0;1;2;3\\}$. Vậy $C=\\{-3;0;3;6;9\\}$.'],
+                den: function (i) {
+                    o.hien(true);
+                    ve(phai.concat([raPhai]), i >= 1); hien([x12, nhan12], i >= 1);
+                    ve([trai, raTrai], i >= 2); hien([x6, nhan6], i >= 2);
+                    hien(diem.slice(1), i >= 1); hien(diem[0], i >= 2);
+                    hien(k, i >= 3); hien(ketQua, i >= 3);
+                }
+            };
+        }
+        HINH['d1-vd2'] = function (host) {
+            khung(host, { canh: [{ nhan: 'a)', tao: canhBinhPhuong }, { nhan: 'b)', tao: canhTriTuyetDoi }, { nhan: 'c)', tao: canhBoi3 }], nhip: 2000 });
+        };
+
+        // Ví dụ 3
+        function canhChinhPhuong(san) {
+            const svg = svgMoi(san, 360, 150, 'Các số chính phương');
+            const cx = [28, 66, 112, 172, 250], kc = 11, day = 96, nhom = [];
+            for (let n = 0; n <= 4; n++) {
+                const g = s('g', null, svg), cham = [];
+                if (n === 0) cham.push(s('circle', { cx: cx[0], cy: day - 6, r: 4, fill: 'none', stroke: 'var(--truc)', 'stroke-dasharray': '2 2', class: 'no an' }, g));
+                for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) {
+                    cham.push(s('circle', { cx: cx[n] - (n - 1) * kc / 2 + c * kc, cy: day - (n - 1 - r) * kc - 6, r: 4, fill: 'var(--ca)', class: 'no an' }, g));
+                }
+                treTung(cham, .04);
+                const chu = s('text', { x: cx[n], y: day + 20, 'text-anchor': 'middle', 'font-size': 13.5, class: 'no an', text: n + '² = ' + n * n }, g);
+                nhom.push({ cham: cham, chu: chu });
+            }
+            const ba = s('text', { x: 320, y: day, 'text-anchor': 'middle', 'font-size': 22, class: 'no an', text: '…' }, svg);
+            const ketQua = s('text', { x: 180, y: 140, 'text-anchor': 'middle', 'font-size': 16, 'font-weight': 700, fill: 'var(--ck)', class: 'no an', text: '{ 0 ; 1 ; 4 ; 9 ; 16 ; 25 ; … }' }, svg);
+            return {
+                buoc: ['Số chính phương là <b>bình phương của một số tự nhiên</b>: $0^2=0$.',
+                    '$1^2=1$: một chấm.', '$2^2=4$: xếp được hình vuông $2\\times2$.', '$3^2=9$: hình vuông $3\\times3$.', '$4^2=16$: hình vuông $4\\times4$, và cứ thế tiếp tục…',
+                    'Tập hợp có vô số phần tử nên viết dấu “…”: $\\{0;1;4;9;16;25;\\dots\\}$.'],
+                den: function (i) {
+                    nhom.forEach(function (g, n) { hien(g.cham.concat([g.chu]), i >= n); });
+                    hien(ba, i >= 4); hien(ketQua, i >= 5);
+                }
+            };
+        }
+        function canhUocChung(san) {
+            const svg = svgMoi(san, 360, 212, 'Ước chung của 36 và 120');
+            const u36 = [1, 2, 3, 4, 6, 9, 12, 18, 36], u120 = [1, 2, 3, 4, 5, 6, 8, 10, 12, 15, 20, 24, 30, 40, 60, 120];
+            const chung = u36.filter(function (v) { return u120.indexOf(v) >= 0; });
+            s('text', { x: 10, y: 18, class: 'ui', 'font-size': 11, fill: 'var(--ca)', text: 'Ư(36)' }, svg);
+            s('text', { x: 10, y: 74, class: 'ui', 'font-size': 11, fill: 'var(--cb)', text: 'Ư(120)' }, svg);
+            s('text', { x: 10, y: 160, class: 'ui', 'font-size': 11, fill: 'var(--ck)', text: 'Ước chung' }, svg);
+            const c36 = u36.map(function (v, j) { return chip(svg, 26 + j * 38, 38, String(v), 32); });
+            const c120 = u120.map(function (v, j) { return chip(svg, 26 + (j % 8) * 44, 94 + Math.floor(j / 8) * 30, String(v), 36); });
+            treTung(c36.map(function (c) { return c.n; }), .06); treTung(c120.map(function (c) { return c.n; }), .05);
+            const ck = chung.map(function (v, j) { return chip(svg, 40 + j * 56, 182, String(v), 46); });
+            treTung(ck.map(function (c) { return c.n; }), .12);
+            return {
+                buoc: ['Liệt kê các ước tự nhiên của $36$.', 'Liệt kê các ước tự nhiên của $120$.',
+                    'Tô các số có mặt ở <b>cả hai</b> hàng: $1;2;3;4;6;12$ — chính là các ước của ƯCLN$(36;120)=12$.',
+                    'Gom các ước chung xuống hàng dưới.',
+                    'Ước có thể là số âm: thêm dấu $\\pm$. Vậy tập các ước chung là $\\{\\pm1;\\pm2;\\pm3;\\pm4;\\pm6;\\pm12\\}$.'],
+                den: function (i) {
+                    hien(c36.map(function (c) { return c.n; }), i >= 0);
+                    hien(c120.map(function (c) { return c.n; }), i >= 1);
+                    c36.concat(c120).forEach(function (c) { c.g.classList.toggle('chon', i >= 2 && chung.indexOf(+c.t.textContent) >= 0); });
+                    hien(ck.map(function (c) { return c.n; }), i >= 3);
+                    ck.forEach(function (c, j) { c.t.textContent = (i >= 4 ? '±' : '') + chung[j]; c.g.classList.toggle('chon', i >= 4); });
+                }
+            };
+        }
+        function canhBoiChung(san) {
+            const svg = svgMoi(san, 360, 160, 'Bội chung của 8 và 15');
+            const t = trucSo(svg, 0, 250, { x0: 20, x1: 330 });
+            t.truc(80, { vach: false, so: [0] });
+            const b8 = [], b15 = [];
+            for (let v = 0; v + 8 <= 250; v += 8) b8.push(cung(svg, t.X(v), t.X(v + 8), 80, 9, 'var(--ca)', 1.6));
+            for (let v = 0; v + 15 <= 250; v += 15) b15.push(cung(svg, t.X(v), t.X(v + 15), 80, -11, 'var(--cb)', 1.6));
+            treTung(b8, .045); treTung(b15, .07);
+            s('text', { x: 350, y: 52, 'text-anchor': 'end', class: 'ui', 'font-size': 11, fill: 'var(--ca)', text: 'bước 8' }, svg);
+            s('text', { x: 350, y: 120, 'text-anchor': 'end', class: 'ui', 'font-size': 11, fill: 'var(--cb)', text: 'bước 15' }, svg);
+            const gap = [120, 240].map(function (v) {
+                const g = s('g', { class: 'no an' }, svg);
+                s('circle', { cx: t.X(v), cy: 80, r: 7, fill: 'var(--ck)', class: 'nhay' }, g);
+                s('text', { x: t.X(v), y: 108, 'text-anchor': 'middle', 'font-size': 13, 'font-weight': 700, fill: 'var(--ck)', text: v }, g);
+                return g;
+            });
+            const ketQua = s('text', { x: 180, y: 150, 'text-anchor': 'middle', 'font-size': 15, 'font-weight': 700, fill: 'var(--ck)', class: 'no an', text: '{ 0 ; ±120 ; ±240 ; ±360 ; … }' }, svg);
+            return {
+                buoc: ['Bắt đầu từ $0$ trên trục số.', 'Các bội của $8$: nhảy mỗi bước $8$ đơn vị (cung phía trên).', 'Các bội của $15$: nhảy mỗi bước $15$ đơn vị (cung phía dưới).',
+                    'Hai con đường <b>gặp nhau</b> tại $0;\\ 120;\\ 240;\\dots$ — các bội của BCNN$(8;15)=120$.',
+                    'Bội có thể âm, nên tập các bội chung là $\\{0;\\pm120;\\pm240;\\pm360;\\dots\\}$.'],
+                den: function (i) { ve(b8, i >= 1); ve(b15, i >= 2); hien(gap, i >= 3); hien(ketQua, i >= 4); }
+            };
+        }
+        HINH['d1-vd3'] = function (host) {
+            khung(host, { canh: [{ nhan: 'a)', tao: canhChinhPhuong }, { nhan: 'b)', tao: canhUocChung }, { nhan: 'c)', tao: canhBoiChung }], nhip: 2000 });
+        };
+
+        // Ví dụ 4: từ liệt kê → tìm tính chất chung
+        function canhSang(san) {
+            const svg = svgMoi(san, 360, 120, 'Sàng số nguyên tố');
+            const o = []; for (let v = 0; v <= 9; v++) o.push(chip(svg, 22 + v * 35, 50, String(v), 28));
+            const loai = [[0, 1], [4, 6, 8], [9]];
+            const x = loai.map(function (ds) { return ds.map(function (v) { return dauX(svg, 22 + v * 35, 50, 10); }); });
+            const ketQua = s('text', { x: 180, y: 105, 'text-anchor': 'middle', 'font-size': 15, 'font-weight': 700, fill: 'var(--ck)', class: 'no an', text: 'còn lại: 2 ; 3 ; 5 ; 7 — các số nguyên tố' }, svg);
+            return {
+                buoc: ['Nhận xét: các phần tử của $A$ đều nhỏ hơn $10$. Viết các số tự nhiên từ $0$ đến $9$.',
+                    '$0$ và $1$ không phải số nguyên tố → gạch.', 'Gạch các bội của $2$ lớn hơn $2$: $4;6;8$.', 'Gạch các bội của $3$ lớn hơn $3$: $9$.',
+                    'Còn lại đúng $\\{2;3;5;7\\}$. Vậy $A=\\{x\\in\\mathbb N \\mid x \\text{ là số nguyên tố, } x<10\\}$.'],
+                den: function (i) {
+                    hien(o.map(function (c) { return c.n; }), true);
+                    x.forEach(function (ds, j) { hien(ds, i >= j + 1); });
+                    o.forEach(function (c, v) { c.g.classList.toggle('chon', i >= 4 && [2, 3, 5, 7].indexOf(v) >= 0); c.n.classList.toggle('mo', i >= 4 && [2, 3, 5, 7].indexOf(v) < 0); });
+                    hien(ketQua, i >= 4);
+                }
+            };
+        }
+        function canhDoiXung(san) {
+            const svg = svgMoi(san, 360, 140, 'Các số đối xứng qua 0');
+            const t = trucSo(svg, -5, 5);
+            t.truc(90, { so: [-5, 5] });
+            const diem = [-3, -2, -1, 0, 1, 2, 3].map(function (v) { return t.diem(90, v, 'var(--ck)'); });
+            treTung(diem, .08);
+            const cungs = [1, 2, 3].map(function (v) { return cung(svg, t.X(-v), t.X(v), 90, 10 + v * 8, 'var(--cb)', 1.6); });
+            treTung(cungs, .25);
+            const o = t.tap(90, [K(-3, 3, true, true)], 'var(--ca)', { mo: .3, nhan: false });
+            const chu = s('text', { x: 180, y: 130, 'text-anchor': 'middle', 'font-size': 15, 'font-weight': 700, fill: 'var(--ck)', class: 'no an', text: '|x| ≤ 3' }, svg);
+            return {
+                buoc: ['Biểu diễn các phần tử của $B$ trên trục số: các số nguyên liên tiếp từ $-3$ đến $3$.',
+                    'Chúng <b>đối xứng qua $0$</b>: mỗi số $x$ đi cùng số đối $-x$ → nghĩ tới giá trị tuyệt đối.',
+                    'Đều nằm trong đoạn $[-3;3]$, tức $|x|\\le 3$. Vậy $B=\\{x\\in\\mathbb Z \\mid |x|\\le 3\\}$.'],
+                den: function (i) { hien(diem, true); ve(cungs, i >= 1); o.hien(i >= 2); hien(chu, i >= 2); }
+            };
+        }
+        function canhBoi5(san) {
+            const svg = svgMoi(san, 360, 140, 'Các bội của 5');
+            const t = trucSo(svg, -10, 15);
+            t.truc(90, { buoc: 5, so: [-10, 15] });
+            const diem = [-5, 0, 5, 10].map(function (v) { return t.diem(90, v, 'var(--ck)'); });
+            treTung(diem, .1);
+            const cungs = [-5, 0, 5].map(function (v) { return cung(svg, t.X(v), t.X(v + 5), 90, 20, 'var(--cb)'); });
+            const nhan = s('text', { x: t.X(2.5), y: 58, 'text-anchor': 'middle', class: 'ui no an', 'font-size': 11, fill: 'var(--cb)', text: 'mỗi bước +5' }, svg);
+            treTung(cungs, .3);
+            const o = t.tap(90, [K(-5, 10, true, true)], 'var(--ca)', { mo: .3, nhan: false });
+            return {
+                buoc: ['Biểu diễn $C=\\{-5;0;5;10\\}$ trên trục số.', 'Các số <b>cách đều nhau $5$ đơn vị</b> → đều là bội của $5$.',
+                    'Chúng nằm từ $-5$ đến $10$. Vậy $C=\\{x\\in\\mathbb Z \\mid x \\text{ là bội của } 5,\\ -5\\le x\\le 10\\}$.'],
+                den: function (i) { hien(diem, true); ve(cungs, i >= 1); hien(nhan, i >= 1); o.hien(i >= 2); }
+            };
+        }
+        function canhCapUoc(san) {
+            const svg = svgMoi(san, 360, 150, 'Cặp ước của 36');
+            const ds = [1, 2, 3, 4, 6, 9, 12, 18, 36], X = function (j) { return 24 + j * 39; };
+            const o = ds.map(function (v, j) { return chip(svg, X(j), 100, String(v), 30); });
+            const cap = [[0, 8], [1, 7], [2, 6], [3, 5]];
+            const cungs = cap.map(function (p, j) { return cung(svg, X(p[0]), X(p[1]), 86, 14 + (3 - j) * 9, ['var(--ca)', 'var(--cb)', 'var(--cc)', 'var(--ck)'][j]); });
+            treTung(cungs, .5);
+            const vong = s('path', { d: `M${X(4) - 7} 87 C${X(4) - 16} 62 ${X(4) + 16} 62 ${X(4) + 7} 87`, fill: 'none', stroke: 'var(--dung)', 'stroke-width': 2, pathLength: 1, class: 've' }, svg);
+            vong.style.transitionDelay = '2s';
+            const chu = s('text', { x: 180, y: 140, 'text-anchor': 'middle', 'font-size': 13, class: 'no an', text: '1·36 = 2·18 = 3·12 = 4·9 = 6·6 = 36' }, svg);
+            return {
+                buoc: ['Các phần tử của $D$ xếp theo thứ tự tăng dần.', 'Ghép từ hai đầu vào giữa: tích mỗi cặp đều bằng $36$.',
+                    'Vậy mỗi phần tử là một ước của $36$: $D=\\{x\\in\\mathbb N \\mid x \\text{ là ước của } 36\\}$.'],
+                den: function (i) { hien(o.map(function (c) { return c.n; }), true); ve(cungs.concat([vong]), i >= 1); hien(chu, i >= 1); o.forEach(function (c) { c.g.classList.toggle('chon', i >= 2); }); }
+            };
+        }
+        HINH['d1-vd4'] = function (host) {
+            khung(host, { ten: 'Tìm quy luật', icon: 'magnifying-glass', canh: [{ nhan: 'a)', tao: canhSang }, { nhan: 'b)', tao: canhDoiXung }, { nhan: 'c)', tao: canhBoi5 }, { nhan: 'd)', tao: canhCapUoc }], nhip: 2400 });
+        };
+
+        // ================= DẠNG 2 =================
+        function chuTapCon(ds) { return ds.length ? '{' + ds.join(';') + '}' : '∅'; }
+        function texTapCon(ds) { return ds.length ? '\\{' + ds.map(function (x) { return x === '∅' ? '\\varnothing' : x; }).join(';') + '\\}' : '\\varnothing'; }
+
+        // Ví dụ 1: cây "chọn / không chọn" và lưới các tập con
+        function canhCayTapCon(ten, pt) {
+            return function (san) {
+                const n = pt.length, W = 360, tren = 22, buocCay = 34;
+                const dayCay = tren + n * buocCay;
+                const kichThuoc = []; for (let k = 0; k <= n; k++) kichThuoc.push([]);
+                for (let m = 0; m < 1 << n; m++) {
+                    const ds = pt.filter(function (_, i) { return !(m >> (n - 1 - i) & 1); });
+                    kichThuoc[ds.length].push({ ds: ds, la: m });
+                }
+                const yLuoi = dayCay + 34, cao = yLuoi + (n + 1) * 32 + 4;
+                const svg = svgMoi(san, W, cao, 'Cây chọn phần tử và các tập con');
+                const xNut = function (lv, j) { return 30 + (j + .5) * (W - 44) / (1 << lv); };
+                const canh = {}, tang = [];
+                for (let lv = 1; lv <= n; lv++) {
+                    const ds = [];
+                    for (let j = 0; j < 1 << lv; j++) {
+                        const cha = j >> 1, co = (j & 1) === 0;
+                        const p = s('path', { d: `M${xNut(lv - 1, cha)} ${tren + (lv - 1) * buocCay}L${xNut(lv, j)} ${tren + lv * buocCay}`, stroke: co ? 'var(--ca)' : 'var(--truc)', 'stroke-width': 2, 'stroke-dasharray': co ? null : '4 3', fill: 'none' }, svg);
+                        p.classList.add('an');
+                        const c = s('circle', { cx: xNut(lv, j), cy: tren + lv * buocCay, r: lv === n ? 4.5 : 3.5, fill: co ? 'var(--ca)' : 'var(--truc)', class: 'no an' }, svg);
+                        canh[lv + '-' + j] = p;
+                        ds.push(p, c);
+                    }
+                    treTung(ds, .02);
+                    const nhan = s('text', { x: 4, y: tren + (lv - .45) * buocCay, class: 'ui no an', 'font-size': 11, fill: 'var(--ca)', text: pt[lv - 1] + '?' }, svg);
+                    tang.push(ds.concat([nhan]));
+                }
+                s('circle', { cx: xNut(0, 0), cy: tren, r: 5, fill: 'var(--ck)' }, svg);
+                const chuThich = s('g', { class: 'no an' }, svg);
+                s('text', { x: W - 4, y: 14, 'text-anchor': 'end', class: 'ui', 'font-size': 10.5, fill: 'var(--ca)', text: '— chọn' }, chuThich);
+                s('text', { x: W - 4, y: 28, 'text-anchor': 'end', class: 'ui', 'font-size': 10.5, fill: 'var(--truc)', text: '- - không chọn' }, chuThich);
+                // Lưới tập con theo số phần tử
+                const tatCa = [];
+                kichThuoc.forEach(function (hang, k) {
+                    const w = Math.max(30, (k ? k * 2 + 1 : 1) * 7.6 + 12), kc = Math.min(w + 8, (W - 20) / Math.max(1, hang.length));
+                    hang.forEach(function (o, j) {
+                        const c = chip(svg, W / 2 + (j - (hang.length - 1) / 2) * kc, yLuoi + k * 32, chuTapCon(o.ds), Math.min(w, kc - 4));
+                        c.la = o.la;
+                        c.g.style.cursor = 'pointer';
+                        c.g.addEventListener('click', function () { toDuong(c); });
+                        tatCa.push(c);
+                    });
+                });
+                tatCa.sort(function (a, b) { return a.la - b.la; });
+                treTung(tatCa.map(function (c) { return c.n; }), .06);
+                function toDuong(c) {
+                    Object.keys(canh).forEach(function (k) { canh[k].classList.remove('duong'); });
+                    tatCa.forEach(function (x) { x.g.classList.toggle('chon', x === c); });
+                    if (!c) return;
+                    for (let lv = 1; lv <= n; lv++) canh[lv + '-' + (c.la >> (n - lv))].classList.add('duong');
+                }
+                const so = 1 << n;
+                const buoc = ['Lập tập con bằng cách đi qua <b>từng phần tử</b> của $' + ten + '$ và quyết định: <b>chọn</b> hay <b>không chọn</b>.'];
+                pt.forEach(function (x, i) {
+                    const xt = x === '∅' ? '\\varnothing' : x;
+                    buoc.push('Phần tử $' + xt + '$: mỗi nhánh tách đôi → có $' + (i ? '2^' + (i + 1) + '=' : '') + (1 << (i + 1)) + '$ cách.' + (x === '∅' ? ' (Lưu ý: $\\varnothing$ ở đây là <b>một phần tử</b> của $C$.)' : ''));
+                });
+                buoc.push('Mỗi đường từ gốc xuống lá cho <b>một</b> tập con. $' + ten + '$ có $2^' + n + '=' + so + '$ tập con. <i>Chạm vào một tập con để xem đường đi của nó.</i>');
+                return {
+                    buoc: buoc,
+                    den: function (i) {
+                        tang.forEach(function (ds, lv) { hien(ds, i >= lv + 1); });
+                        hien(chuThich, i >= 1);
+                        hien(tatCa.map(function (c) { return c.n; }), i >= n + 1);
+                        if (i < n + 1) toDuong(null);
+                    }
+                };
+            };
+        }
+        HINH['d2-vd1'] = function (host) {
+            khung(host, { ten: 'Cây chọn phần tử', icon: 'sitemap', nhip: 1900, canh: [
+                { nhan: 'a) $C$', tao: canhCayTapCon('C', ['∅']) },
+                { nhan: 'b) $B$', tao: canhCayTapCon('B', ['1', '2', '3']) },
+                { nhan: 'c) $A$', tao: canhCayTapCon('A', ['a', 'b']) },
+                { nhan: 'd) $D$', tao: canhCayTapCon('D', ['a', 'b', 'c', 'd']) }
+            ] });
+        };
+
+        // Ví dụ 2: so sánh hai tập trên hai trục số
+        function canhSoSanh(cfg) {
+            return function (san) {
+                const svg = svgMoi(san, 360, 196, 'So sánh hai tập hợp');
+                const t = trucSo(svg, cfg.min, cfg.max);
+                const yA = 50, yB = 132;
+                t.truc(yA, { ten: cfg.tenA, mauTen: 'var(--ca)', so: [] });
+                t.truc(yB, { ten: cfg.tenB, mauTen: 'var(--cb)', so: [] });
+                const dA = cfg.A.map(function (v) { return t.diem(yA, v, 'var(--ca)'); });
+                treTung(dA, .15);
+                const dB = cfg.nghiemB.map(function (o) { const d = chamRoi(svg, t.X(o.v), yB, 'var(--cb)', o.chu); d.v = o.v; d.giu = o.giu; return d; });
+                const loai = cfg.nghiemB.filter(function (o) { return !o.giu; }).map(function (o) { return dauX(svg, t.X(o.v), yB, 9); });
+                const noi = [], sai = [];
+                cfg.A.forEach(function (v) {
+                    const coB = cfg.nghiemB.some(function (o) { return o.giu && o.v === v; });
+                    if (coB) noi.push(s('path', { d: `M${t.X(v)} ${yA + 8}V${yB - 8}`, stroke: 'var(--dung)', 'stroke-width': 2.2, 'stroke-dasharray': '4 3', class: 'an' }, svg));
+                    else sai.push(s('circle', { cx: t.X(v), cy: yA, r: 12, fill: 'none', stroke: 'var(--sai)', 'stroke-width': 2.2, class: 'no an' }, svg));
+                });
+                cfg.nghiemB.forEach(function (o) {
+                    if (o.giu && cfg.A.indexOf(o.v) < 0) sai.push(s('circle', { cx: t.X(o.v), cy: yB, r: 12, fill: 'none', stroke: 'var(--sai)', 'stroke-width': 2.2, class: 'no an' }, svg));
+                });
+                const ketLuan = s('text', { x: 180, y: 186, 'text-anchor': 'middle', 'font-size': 16, 'font-weight': 700, fill: 'var(--ck)', class: 'no an', text: cfg.ketLuanChu }, svg);
+                return {
+                    buoc: cfg.buoc,
+                    den: function (i) {
+                        hien(dA, true);
+                        dB.forEach(function (d) { d.roi(i >= 1); d.n.classList.toggle('mo', i >= 2 && !d.giu); });
+                        hien(loai, i >= 2);
+                        hien(noi.concat(sai), i >= 3); hien(ketLuan, i >= 3);
+                    }
+                };
+            };
+        }
+        HINH['d2-vd2'] = function (host) {
+            const r2 = Math.SQRT2;
+            khung(host, { ten: 'So sánh trên trục số', icon: 'scale-balanced', canh: [
+                { nhan: 'a)', tao: canhSoSanh({ min: -2.2, max: 2.8, tenA: 'A', tenB: 'B', A: [0, 1],
+                    nghiemB: [{ v: 0, chu: '0', giu: true }, { v: 1, chu: '1', giu: true }, { v: -r2, chu: '−√2', giu: false }, { v: r2, chu: '√2', giu: false }],
+                    ketLuanChu: 'A = B = { 0 ; 1 }',
+                    buoc: ['$A$: các số tự nhiên nhỏ hơn $2$ → $A=\\{0;1\\}$.',
+                        '$B$: giải $\\left(x^2-x\\right)\\left(x^2-2\\right)=0 \\Leftrightarrow x=0;\\ x=1;\\ x=\\pm\\sqrt2$.',
+                        'Lọc theo $x\\in\\mathbb Q$: $\\pm\\sqrt2$ là số vô tỉ → <b>loại</b>. Còn $B=\\{0;1\\}$.',
+                        'Mỗi phần tử của $A$ đều thuộc $B$ và ngược lại → $A\\subset B$, $B\\subset A$, nên $A=B$.'] }) },
+                { nhan: 'b)', tao: canhSoSanh({ min: -4, max: 4.5, tenA: 'A', tenB: 'B', A: [2, 3],
+                    nghiemB: [{ v: -3, chu: '−3', giu: true }, { v: 3, chu: '3', giu: true }],
+                    ketLuanChu: 'A ⊄ B và B ⊄ A',
+                    buoc: ['$A$: số tự nhiên lớn hơn $1$ và nhỏ hơn $4$ → $A=\\{2;3\\}$.',
+                        '$B$: $x^2-9=0 \\Leftrightarrow x=\\pm3$, đều là số nguyên.',
+                        'Vậy $B=\\{-3;3\\}$.',
+                        'Chỉ có $3$ là chung. $2\\in A$ nhưng $2\\notin B$ nên $A\\not\\subset B$; $-3\\in B$ nhưng $-3\\notin A$ nên $B\\not\\subset A$.'] }) }
+            ] });
+        };
+
+        // Ví dụ 3a: các tập con chứa 1;3;5;7
+        function canhCoDinh(san) {
+            const svg = svgMoi(san, 360, 240, 'Tập con chứa 1, 3, 5, 7');
+            const co = [1, 3, 5, 7], tuDo = [2, 4, 6];
+            let chon = [];
+            const o = {};
+            for (let v = 1; v <= 7; v++) {
+                const c = chip(svg, 24 + (v - 1) * 52, 34, String(v), 38);
+                o[v] = c;
+                if (co.indexOf(v) >= 0) {
+                    c.g.classList.add('chon');
+                    s('text', { x: 0, y: -16, 'text-anchor': 'middle', class: 'ui', 'font-size': 9, fill: 'var(--ck)', text: 'luôn có' }, c.n);
+                } else {
+                    c.g.style.cursor = 'pointer';
+                    c.g.addEventListener('click', function () {
+                        chon = chon.indexOf(v) >= 0 ? chon.filter(function (x) { return x !== v; }) : chon.concat([v]).sort();
+                        c.g.classList.toggle('chon', chon.indexOf(v) >= 0);
+                        toLuoi();
+                    });
+                    s('text', { x: 0, y: -16, 'text-anchor': 'middle', class: 'ui', 'font-size': 9, fill: 'var(--truc)', text: 'chạm' }, c.n);
+                }
+            }
+            const nhom = [];
+            for (let m = 0; m < 8; m++) nhom.push(tuDo.filter(function (_, i) { return m >> i & 1; }));
+            nhom.sort(function (a, b) { return a.length - b.length || a.join().localeCompare(b.join()); });
+            const luoi = nhom.map(function (ds, j) {
+                const c = chip(svg, 92 + (j % 2) * 176, 92 + Math.floor(j / 2) * 38, '{1;3;5;7' + (ds.length ? ';' + ds.join(';') : '') + '}', 164);
+                c.ds = ds;
+                return c;
+            });
+            treTung(luoi.map(function (c) { return c.n; }), .1);
+            function toLuoi() { luoi.forEach(function (c) { c.g.classList.toggle('chon', c.ds.join() === chon.join()); }); }
+            return {
+                buoc: ['Bốn phần tử $1;3;5;7$ <b>bắt buộc</b> phải có (màu tím).',
+                    'Mỗi phần tử $2;4;6$ có thể <b>thêm hoặc không</b> → mỗi cách chọn là một tập con của $\\{2;4;6\\}$.',
+                    'Có $2^3=8$ tập con thỏa mãn. <i>Chạm vào $2$, $4$, $6$ ở hàng trên để thử ghép.</i>'],
+                den: function (i) {
+                    hien(Object.keys(o).map(function (k) { return o[k].n; }), true);
+                    tuDo.forEach(function (v) { o[v].n.classList.toggle('nhay', i === 1); });
+                    hien(luoi.map(function (c) { return c.n; }), i >= 2);
+                    toLuoi();
+                }
+            };
+        }
+        // Ví dụ 3b: 7 điểm, mỗi đoạn nối là một tập 2 phần tử
+        function canhBatTay(san) {
+            const svg = svgMoi(san, 360, 230, 'Đếm các đoạn nối 7 điểm');
+            const cx = 180, cy = 112, r = 88, P = [];
+            for (let k = 0; k < 7; k++) { const g = -Math.PI / 2 + k * 2 * Math.PI / 7; P.push([cx + r * Math.cos(g), cy + r * Math.sin(g)]); }
+            const mau = ['var(--ca)', 'var(--cb)', 'var(--cc)', 'var(--ck)', 'var(--dung)', 'var(--sai)'];
+            const nhom = [];
+            for (let a = 0; a < 6; a++) {
+                const ds = [];
+                for (let b = a + 1; b < 7; b++) ds.push(s('path', { d: `M${P[a][0]} ${P[a][1]}L${P[b][0]} ${P[b][1]}`, stroke: mau[a], 'stroke-width': 1.8, pathLength: 1, class: 've', opacity: .8 }, svg));
+                treTung(ds, .12);
+                nhom.push(ds);
+            }
+            P.forEach(function (p, k) {
+                const g = s('g', null, svg);
+                s('circle', { cx: p[0], cy: p[1], r: 12, fill: 'var(--nen-the)', stroke: 'var(--truc)', 'stroke-width': 1.5 }, g);
+                s('text', { x: p[0], y: p[1] + 4.5, 'text-anchor': 'middle', 'font-size': 13, 'font-weight': 700, text: k + 1 }, g);
+            });
+            const dem = s('text', { x: 350, y: 222, 'text-anchor': 'end', 'font-size': 15, 'font-weight': 700, fill: 'var(--ck)', text: '' }, svg);
+            const cong = [];
+            const buoc = ['Mỗi tập con $\\{a;b\\}$ ứng với <b>một đoạn nối</b> hai điểm $a$, $b$. Ta đếm số đoạn nối giữa $7$ điểm.'];
+            for (let a = 0; a < 6; a++) {
+                cong.push(6 - a);
+                buoc.push('Từ điểm $' + (a + 1) + '$ nối tới các điểm sau nó: thêm $' + (6 - a) + '$ đoạn. Tổng: $' + cong.join('+') + '=' + cong.reduce(function (x, y) { return x + y; }, 0) + '$.');
+            }
+            buoc.push('Cách khác: chọn $a$ có $7$ cách, chọn $b$ có $6$ cách → $42$ cặp, nhưng $(a;b)$ và $(b;a)$ là cùng một tập nên chia $2$: $\\dfrac{7\\cdot6}{2}=21$ tập con.');
+            return {
+                buoc: buoc,
+                den: function (i) {
+                    nhom.forEach(function (ds, a) { ve(ds, i >= a + 1); });
+                    let tong = 0; for (let a = 0; a < Math.min(i, 6); a++) tong += 6 - a;
+                    dem.textContent = i ? tong + ' đoạn' : '';
+                }
+            };
+        }
+        HINH['d2-vd3'] = function (host) {
+            khung(host, { canh: [{ nhan: 'a)', tao: canhCoDinh }, { nhan: 'b)', tao: canhBatTay }], nhip: 2100 });
+        };
+
+        // ================= DẠNG 3 =================
+        // Biểu tượng Venn nhỏ trong hộp lý thuyết
+        function bieuTuong() {
+            const vung = { giao: ['ab'], hop: ['a', 'ab', 'b'], hieu: ['a'] };
+            document.querySelectorAll('[data-bieu-tuong]').forEach(function (el) {
+                const loai = el.getAttribute('data-bieu-tuong');
+                const svg = svgMoi(el, 360, 240, 'Biểu đồ Venn');
+                if (loai === 'bu') {
+                    const id = ++demId, defs = s('defs', null, svg);
+                    const m = s('mask', { id: 'bu' + id, maskUnits: 'userSpaceOnUse', x: 0, y: 0, width: 360, height: 240 }, defs);
+                    s('rect', { x: 0, y: 0, width: 360, height: 240, fill: '#fff' }, m);
+                    s('circle', { cx: 170, cy: 124, r: 80, fill: '#000' }, m);
+                    s('rect', { x: 8, y: 8, width: 344, height: 224, rx: 16, fill: 'var(--ck)', 'fill-opacity': .42, mask: 'url(#bu' + id + ')' }, svg);
+                    s('rect', { x: 8, y: 8, width: 344, height: 224, rx: 16, fill: 'none', stroke: 'var(--truc)', 'stroke-width': 3 }, svg);
+                    s('circle', { cx: 170, cy: 124, r: 80, fill: 'var(--ca-nhat)', stroke: 'var(--ca)', 'stroke-width': 3 }, svg);
+                    s('text', { x: 170, y: 136, 'text-anchor': 'middle', 'font-size': 34, 'font-style': 'italic', fill: 'var(--ca)', text: 'A' }, svg);
+                    s('text', { x: 318, y: 50, 'text-anchor': 'middle', 'font-size': 34, 'font-style': 'italic', text: 'E' }, svg);
+                    return;
+                }
+                const v = venn2(svg, { cy: 120, r: 84 });
+                v.bat(vung[loai]);
+            });
+        }
+
+        // Ví dụ 1, 3, 4: biểu đồ Venn với các phần tử cụ thể
+        function canhVennRoiRac(cfg) {
+            return function (san, phu, api) {
+                const coE = !!cfg.E;
+                const svg = svgMoi(san, 360, 240, 'Biểu đồ Venn');
+                const v = venn2(svg, { E: coE, cy: 120, r: coE ? 74 : 82, c1: coE ? 140 : 138, c2: coE ? 216 : 222, tenA: 'A', tenB: 'B' });
+                const tatCa = (cfg.E || cfg.A.concat(cfg.B)).filter(function (x, i, ds) { return ds.indexOf(x) === i; }).sort(function (a, b) { return a - b; });
+                const vungCua = function (x) { const a = cfg.A.indexOf(x) >= 0, b = cfg.B.indexOf(x) >= 0; return a && b ? 'ab' : a ? 'a' : b ? 'b' : 'ngoai'; };
+                const theoVung = { a: [], ab: [], b: [], ngoai: [] };
+                tatCa.forEach(function (x) { theoVung[vungCua(x)].push(x); });
+                const pt = [];
+                Object.keys(theoVung).forEach(function (k) {
+                    const vt = v.viTri(k, theoVung[k].length);
+                    theoVung[k].forEach(function (x, j) { const c = chamPhanTu(svg, vt[j][0], vt[j][1], String(x)); c.x = x; c.vung = k; pt.push(c); });
+                });
+                const nhomA = pt.filter(function (c) { return c.vung === 'a' || c.vung === 'ab'; });
+                const nhomB = pt.filter(function (c) { return c.vung === 'b'; });
+                const nhomNgoai = pt.filter(function (c) { return c.vung === 'ngoai'; });
+                treTung(nhomA.map(function (c) { return c.n; }), .1); treTung(nhomB.map(function (c) { return c.n; }), .12); treTung(nhomNgoai.map(function (c) { return c.n; }), .12);
+                let op = cfg.phep[0];
+                nhomNut(phu, cfg.phep, 0, function (d) { op = d; api.dung(); api.cuoi(); });
+                const buoc = cfg.gioiThieu.slice();
+                buoc.push(function () {
+                    const ds = pt.filter(function (c) { return op.vung.indexOf(c.vung) >= 0; }).map(function (c) { return c.x; }).sort(function (a, b) { return a - b; });
+                    return op.giai + '<br>' + op.nhan + ' $=' + texTapRoiRac(ds) + '$';
+                });
+                const cuoi = buoc.length - 1;
+                return {
+                    buoc: buoc,
+                    den: function (i) {
+                        hien(nhomA.map(function (c) { return c.n; }), i >= 1);
+                        hien(nhomB.map(function (c) { return c.n; }), i >= 2);
+                        hien(nhomNgoai.map(function (c) { return c.n; }), i >= (coE ? 3 : 2));
+                        nhomA.forEach(function (c) { c.n.classList.toggle('nhay', i === 2 && c.vung === 'ab'); });
+                        v.bat(i === cuoi ? op.vung : []);
+                        pt.forEach(function (c) {
+                            c.g.classList.toggle('chon', i === cuoi && op.vung.indexOf(c.vung) >= 0);
+                            c.g.classList.toggle('mo2', i === cuoi && op.vung.indexOf(c.vung) < 0);
+                        });
+                    }
+                };
+            };
+        }
+        HINH['d3-vd1'] = function (host) {
+            khung(host, { ten: 'Biểu đồ Venn', icon: 'circle-half-stroke', canh: [{ nhan: 'Ví dụ 1', tao: canhVennRoiRac({
+                A: [0, 1, 2, 3, 4], B: [2, 3, 4, 5, 6],
+                gioiThieu: ['Vẽ hai tập $A$, $B$ bằng hai vòng tròn cắt nhau. Phần giao nhau chứa các phần tử <b>chung</b>.',
+                    'Xếp các phần tử của $A$: $0;1$ chỉ thuộc $A$; còn $2;3;4$ cũng thuộc $B$ nên nằm ở <b>phần chung</b>.',
+                    'Xếp thêm các phần tử chỉ thuộc $B$: $5;6$. Các số $2;3;4$ đã có sẵn ở phần chung, <b>không viết lại</b>.'],
+                phep: [
+                    { nhan: '$A\\setminus B$', vung: ['a'], giai: '$A\\setminus B$: lấy phần của $A$, <b>bỏ</b> các phần tử thuộc $B$.' },
+                    { nhan: '$B\\setminus A$', vung: ['b'], giai: '$B\\setminus A$: lấy phần của $B$, <b>bỏ</b> các phần tử thuộc $A$.' },
+                    { nhan: '$A\\cup B$', vung: ['a', 'ab', 'b'], giai: '$A\\cup B$: lấy <b>hết</b> các phần tử của cả hai tập (mỗi số viết một lần).' },
+                    { nhan: '$A\\cap B$', vung: ['ab'], giai: '$A\\cap B$: chỉ lấy phần <b>chung</b>.' },
+                    { nhan: '$(A\\setminus B)\\cup(B\\setminus A)$', vung: ['a', 'b'], giai: 'Gộp hai phần “riêng”: lấy hết, <b>trừ</b> phần chung.' },
+                    { nhan: '$(A\\setminus B)\\cap(B\\setminus A)$', vung: [], giai: 'Hai phần “riêng” không có phần tử nào chung → tập rỗng.' }
+                ] }) }]
+            });
+        };
+        HINH['d3-vd3'] = function (host) {
+            khung(host, { ten: 'Biểu đồ Venn', icon: 'circle-half-stroke', canh: [{ nhan: 'Ví dụ 3', tao: canhVennRoiRac({
+                A: [1, 2, 3, 6, 9, 18], B: [1, 2, 3, 5, 6, 10, 15, 30],
+                gioiThieu: ['$A$ là tập các ước tự nhiên của $18$, $B$ là tập các ước tự nhiên của $30$.',
+                    'Xếp $A=\\{1;2;3;6;9;18\\}$: các số $1;2;3;6$ cũng là ước của $30$ nên vào <b>phần chung</b>.',
+                    'Xếp thêm các ước của $30$ không phải ước của $18$: $5;10;15;30$.'],
+                phep: [
+                    { nhan: '$A\\cap B$', vung: ['ab'], giai: 'Phần chung: các ước chung của $18$ và $30$.' },
+                    { nhan: '$A\\cup B$', vung: ['a', 'ab', 'b'], giai: 'Lấy <b>hết</b> các số trong hai vòng tròn.' },
+                    { nhan: '$A\\setminus B$', vung: ['a'], giai: 'Ước của $18$ nhưng <b>không</b> là ước của $30$.' },
+                    { nhan: '$B\\setminus A$', vung: ['b'], giai: 'Ước của $30$ nhưng <b>không</b> là ước của $18$.' }
+                ] }) }]
+            });
+        };
+        HINH['d3-vd4'] = function (host) {
+            khung(host, { ten: 'Biểu đồ Venn với tập E', icon: 'circle-half-stroke', canh: [{ nhan: 'Ví dụ 4', tao: canhVennRoiRac({
+                E: [1, 2, 3, 4, 5, 6, 7, 8, 9], A: [1, 2, 3, 4], B: [2, 4, 6, 8],
+                gioiThieu: ['Hình chữ nhật là tập $E$; hai vòng tròn $A$, $B$ nằm trong $E$.',
+                    'Xếp các phần tử của $A$: $2;4$ cũng thuộc $B$ nên nằm ở phần chung.',
+                    'Xếp các phần tử chỉ thuộc $B$: $6;8$.',
+                    'Các phần tử còn lại của $E$ là $5;7;9$: nằm <b>ngoài</b> cả hai vòng tròn.'],
+                phep: [
+                    { nhan: '$C_E A$', vung: ['b', 'ngoai'], giai: 'Phần bù của $A$ trong $E$: mọi phần của $E$ nằm <b>ngoài vòng $A$</b>.' },
+                    { nhan: '$C_E B$', vung: ['a', 'ngoai'], giai: 'Phần bù của $B$ trong $E$: mọi phần của $E$ nằm <b>ngoài vòng $B$</b>.' },
+                    { nhan: '$C_E(A\\cup B)$', vung: ['ngoai'], giai: 'Tô $A\\cup B$ (cả hai vòng), phần bù là chỗ còn lại của $E$.' },
+                    { nhan: '$C_E A\\cap C_E B$', vung: ['ngoai'], giai: 'Phần chung của “ngoài $A$” và “ngoài $B$” chính là ngoài cả hai vòng — giống hệt $C_E(A\\cup B)$.' }
+                ] }) }]
+            });
+        };
+
+        // Ví dụ 2 và phần Tự thử: phép toán trên khoảng, đoạn, nửa khoảng
+        const PHEP_KHOANG = [
+            { nhan: '$A\\cap B$', tex: 'A\\cap B', chu: 'A ∩ B', f: GIAO,
+              giai: '<b>Giao → lấy phần chung</b>: chỉ giữ các cột mà <b>cả hai</b> thanh cùng phủ (vùng tím). Phần gạch chéo bị bỏ.' },
+            { nhan: '$A\\cup B$', tex: 'A\\cup B', chu: 'A ∪ B', f: HOP,
+              giai: '<b>Hợp → lấy hết</b>: cột nào có <b>ít nhất một</b> thanh phủ đều được lấy (vùng tím).' },
+            { nhan: '$A\\setminus B$', tex: 'A\\setminus B', chu: 'A \\ B', f: HIEU,
+              giai: '<b>Hiệu $A\\setminus B$ → lấy $A$, cắt bỏ phần thuộc $B$</b>: phần của $A$ nằm dưới thanh $B$ bị gạch bỏ.' },
+            { nhan: '$B\\setminus A$', tex: 'B\\setminus A', chu: 'B \\ A', f: HIEU_NGUOC,
+              giai: '<b>Hiệu $B\\setminus A$ → lấy $B$, cắt bỏ phần thuộc $A$</b>: phần của $B$ nằm dưới thanh $A$ bị gạch bỏ.' }
+        ];
+        function veBaTruc(san, A, B, op) {
+            const svg = svgMoi(san, 360, 236, 'Phép toán trên trục số');
+            const mut = A.concat(B).flatMap(function (k) { return [k.a, k.b]; }).filter(isFinite);
+            let lo = mut.length ? Math.min.apply(null, mut) - 1.5 : -5, hi = mut.length ? Math.max.apply(null, mut) + 1.5 : 5;
+            if (hi - lo < 7) { const them = (7 - (hi - lo)) / 2; lo -= them; hi += them; }
+            const t = trucSo(svg, lo, hi);
+            const yA = 44, yB = 114, yR = 192;
+            const R = phep(A, B, op.f);
+            const co0 = lo < 0 && hi > 0 && mut.every(function (v) { return Math.abs(v) >= .8; });
+            const so0 = function () { return co0 ? [0] : []; };
+            t.truc(yA, { ten: 'A', mauTen: 'var(--ca)', so: so0(A) });
+            t.truc(yB, { ten: 'B', mauTen: 'var(--cb)', so: so0(B) });
+            t.truc(yR, { ten: op.chu, mauTen: 'var(--ck)', so: so0(R) });
+            const dai = s('g', null, svg), gach = s('g', null, svg), duong = s('g', null, svg);
+            const bang = R.map(function (k) {
+                const x1 = t.X(k.a), x2 = t.X(k.b), rong = Math.max(8, x2 - x1);
+                return s('rect', { x: k.a === k.b ? x1 - 4 : x1, y: 24, width: rong, height: yR - 10, rx: 6, fill: 'var(--ck-nhat)', class: 'an' }, dai);
+            });
+            const mauGachDo = mauGach(svg, 'var(--sai)');
+            const boA = op.f === GIAO ? phep(A, B, HIEU) : op.f === HIEU ? phep(A, B, GIAO) : [];
+            const boB = op.f === GIAO ? phep(B, A, HIEU) : op.f === HIEU_NGUOC ? phep(A, B, GIAO) : [];
+            const vetGach = [];
+            [[boA, yA], [boB, yB]].forEach(function (p) {
+                p[0].forEach(function (k) {
+                    const x1 = t.X(k.a), x2 = t.X(k.b);
+                    vetGach.push(s('rect', { x: x1, y: p[1] - 11, width: Math.max(4, x2 - x1), height: 22, fill: mauGachDo, class: 'an' }, gach));
+                });
+            });
+            const mutAB = Array.from(new Set(mut));
+            const ke = mutAB.map(function (v) { return s('path', { d: `M${t.X(v)} 28V${yR + 10}`, stroke: 'var(--truc)', 'stroke-width': 1, 'stroke-dasharray': '3 4', class: 'an' }, duong); });
+            const tA = t.tap(yA, A, 'var(--ca)'), tB = t.tap(yB, B, 'var(--cb)');
+            // Bản sao phần được lấy, "rơi" xuống trục kết quả
+            const roi = [];
+            [[A, yA, 'var(--ca)'], [B, yB, 'var(--cb)']].forEach(function (p) {
+                const g = s('g', { class: 'roi' }, svg);
+                phep(p[0], R, GIAO).forEach(function (k) {
+                    if (k.a === k.b) s('circle', { cx: t.X(k.a), cy: p[1], r: 5, fill: p[2] }, g);
+                    else s('path', { d: `M${t.X(k.a)} ${p[1]}H${t.X(k.b)}`, stroke: p[2], 'stroke-width': 7, opacity: .7 }, g);
+                });
+                g.dichY = yR - p[1];
+                roi.push(g);
+            });
+            const tR = t.tap(yR, R, 'var(--ck)', { day: 8 });
+            tR.thanh.concat(tR.ngoac, tR.nhan).forEach(function (e) { e.style.transitionDelay = '.65s'; });
+            const rongR = R.length ? null : s('text', { x: 180, y: yR + 5, 'text-anchor': 'middle', 'font-size': 20, fill: 'var(--ck)', class: 'no an', text: '∅' }, svg);
+            function giaiDauMut() {
+                const ds = Array.from(new Set(R.flatMap(function (k) { return [k.a, k.b]; }).filter(isFinite)));
+                if (!ds.length) return '';
+                return '<span class="block text-[13px] mt-1 opacity-80">' + ds.map(function (e) {
+                    const x = soTex(e), lay = thuoc(R, e);
+                    return '• $' + x + (thuoc(A, e) ? '\\in' : '\\notin') + ' A,\\ ' + x + (thuoc(B, e) ? '\\in' : '\\notin') + ' B$ → ' + (lay ? '<b>lấy</b> $' + x + '$ (ngoặc vuông)' : '<b>không lấy</b> $' + x + '$ (ngoặc tròn)');
+                }).join('<br>') + '</span>';
+            }
+            return {
+                buoc: [
+                    'Biểu diễn $A=' + texTap(A) + '$ trên trục thứ nhất. Ngoặc vuông: lấy đầu mút; ngoặc tròn: không lấy.',
+                    'Biểu diễn $B=' + texTap(B) + '$ trên trục thứ hai, <b>thẳng cột</b> với trục của $A$.',
+                    op.giai,
+                    function () { return R.length ? 'Kết quả: $' + op.tex + '=' + texTap(R) + '$.' + giaiDauMut() : 'Không có cột nào thỏa mãn: $' + op.tex + '=\\varnothing$.'; }
+                ],
+                den: function (i) {
+                    tA.hien(i >= 0); tB.hien(i >= 1);
+                    hien(ke, i >= 2); hien(bang, i >= 2); hien(vetGach, i >= 2);
+                    roi.forEach(function (g) {
+                        g.style.transform = i >= 3 ? `translateY(${g.dichY}px)` : 'translateY(0)';
+                        g.style.opacity = i === 2 ? 1 : 0;
+                        g.style.transition = i >= 3 ? 'transform .7s cubic-bezier(.5,0,.2,1), opacity .35s .75s' : 'opacity .3s';
+                    });
+                    tR.hien(i >= 3); hien(rongR, i >= 3);
+                }
+            };
+        }
+        function canhPhepKhoang(A, B) {
+            return function (san, phu, api) {
+                let op = PHEP_KHOANG[0];
+                const ht = veBaTruc(san, A, B, op);
+                nhomNut(phu, PHEP_KHOANG, 0, function (d) {
+                    op = d;
+                    san.innerHTML = '';
+                    const moi = veBaTruc(san, A, B, op);
+                    ht.buoc = moi.buoc; ht.den = moi.den;
+                    api.lamMoi(); api.chay(1);
+                });
+                return ht;
+            };
+        }
+        HINH['d3-vd2'] = function (host) {
+            khung(host, { ten: 'Phép toán trên trục số', icon: 'ruler-horizontal', nhip: 2600, canh: [
+                { nhan: 'a)', tao: canhPhepKhoang([K(-1, 3, false, false)], [K(0, 5, false, true)]) },
+                { nhan: 'b)', tao: canhPhepKhoang([K(-Infinity, 0, false, true)], [K(-1, 3, true, true)]) }
+            ] });
+        };
+
+        HINH['d3-lab'] = function (host) {
+            const st = { A: { a: -2, b: 3, ta: true, tb: false }, B: { a: 1, b: Infinity, ta: false, tb: false } };
+            khung(host, { ten: 'Phòng thí nghiệm trục số', icon: 'flask', tuChay: false, nhip: 2200, canh: [{ nhan: 'Tự thử', tao: function (san, phu, api) {
+                let op = PHEP_KHOANG[0], ht = null;
+                const dk = h('div', 'o-dk', null, phu);
+                const nutDk = {};
+                ['A', 'B'].forEach(function (ten) {
+                    const the = h('div', 'the-tap', null, dk);
+                    const dau = h('div', 'dau-the', `<span class="ten-tap" style="color: var(--c${ten.toLowerCase()})">${ten}</span><span>=</span>`, the);
+                    const o = st[ten], n = {};
+                    n.xem = h('span', 'xem-tap', '', dau);
+                    const haiDau = h('div', 'hai-dau', null, the);
+                    const trai = h('div', 'cum-dau-mut', null, haiDau), phai = h('div', 'cum-dau-mut', null, haiDau);
+                    n.ta = nut(trai, '', '', 'Đổi ngoặc trái', function () { if (isFinite(o.a)) { o.ta = !o.ta; doi(); } });
+                    nut(trai, '', '−', 'Giảm đầu mút trái', function () { o.a = o.a === -6 ? -Infinity : o.a === -Infinity ? o.a : o.a - 1; doi(); });
+                    nut(trai, '', '+', 'Tăng đầu mút trái', function () { const m = o.a === -Infinity ? -6 : o.a + 1; if (m < o.b) o.a = m; doi(); });
+                    nut(phai, '', '−', 'Giảm đầu mút phải', function () { const m = o.b === Infinity ? 6 : o.b - 1; if (m > o.a) o.b = m; doi(); });
+                    nut(phai, '', '+', 'Tăng đầu mút phải', function () { o.b = o.b === 6 ? Infinity : o.b === Infinity ? o.b : o.b + 1; doi(); });
+                    n.tb = nut(phai, '', '', 'Đổi ngoặc phải', function () { if (isFinite(o.b)) { o.tb = !o.tb; doi(); } });
+                    nutDk[ten] = n;
+                });
+                const hangPhep = h('div', 'flex flex-wrap gap-2 justify-center w-full pt-1', null, phu);
+                nhomNut(hangPhep, PHEP_KHOANG, 0, function (d) { op = d; doi(true); });
+                function tapCua(o) { return [K(o.a, o.b, o.ta, o.tb)]; }
+                function capNhatNut() {
+                    ['A', 'B'].forEach(function (ten) {
+                        const o = st[ten], n = nutDk[ten];
+                        n.ta.textContent = o.ta && isFinite(o.a) ? '[' : '(';
+                        n.tb.textContent = o.tb && isFinite(o.b) ? ']' : ')';
+                        n.ta.disabled = !isFinite(o.a); n.tb.disabled = !isFinite(o.b);
+                        n.xem.innerHTML = tx('$' + texTap(tapCua(o)) + '$');
+                    });
+                }
+                function veLai(chayLai) {
+                    san.innerHTML = '';
+                    const moi = veBaTruc(san, tapCua(st.A), tapCua(st.B), op);
+                    if (!ht) { ht = moi; return; }
+                    ht.buoc = moi.buoc; ht.den = moi.den;
+                    api.lamMoi();
+                    if (chayLai) api.chay(1); else api.cuoi();
+                }
+                function doi(chayLai) { capNhatNut(); veLai(chayLai); }
+                capNhatNut(); veLai();
+                setTimeout(function () { api.cuoi(); }, 0);
+                return ht;
+            } }]
+            });
+        };
+
+        // ================= DẠNG 4 =================
+        function thanhTruot(cha, m, doi) {
+            const hang = h('div', 'thanh-m', null, cha);
+            h('span', 'font-bold italic', 'm', hang);
+            const o = h('input', null, null, hang);
+            o.type = 'range'; o.min = m.min; o.max = m.max; o.step = m.buoc; o.value = m.dau;
+            o.setAttribute('aria-label', 'Giá trị của m');
+            const gt = h('span', 'gia-tri-m', '', hang);
+            const capNhat = function () { gt.textContent = 'm = ' + soChu(+o.value, true); doi(+o.value); };
+            o.addEventListener('input', capNhat);
+            return { capNhat: capNhat };
+        }
+        function bangKiemTra(cha, dsCau, chon) {
+            const bang = h('div', 'bang-kt', null, cha);
+            let dang = dsCau.length > 1 ? 1 : 0;
+            const dong = dsCau.map(function (c, j) {
+                const b = nut(bang, 'dong-kt', '<span>' + tx(c.nhan) + '</span><span class="dau"></span>', null, function () { dang = j; to(); chon(j); });
+                return b;
+            });
+            function to() { dong.forEach(function (b, j) { b.setAttribute('aria-pressed', String(j === dang)); }); }
+            to();
+            return {
+                get dang() { return dang; },
+                capNhat: function (kq) {
+                    kq.forEach(function (v, j) {
+                        const d = dong[j].querySelector('.dau');
+                        d.className = 'dau ' + (v === null ? 'bo' : v ? 'co' : 'khong');
+                        d.innerHTML = v === null ? 'không xét' : v ? '<i class="fa-solid fa-check"></i> đúng' : '<i class="fa-solid fa-xmark"></i> sai';
+                    });
+                }
+            };
+        }
+        // Trục m ở cuối hình: vùng tím là đáp án của câu đang chọn, tam giác là m hiện tại
+        function trucM(svg, m, y) {
+            const t = trucSo(svg, m.min, m.max);
+            t.truc(y, { ten: 'trục m', mauTen: 'var(--ck)', so: [] });
+            const gDapAn = s('g', null, svg), gDau = s('g', null, svg);
+            return {
+                dapAn: function (S) { gDapAn.innerHTML = ''; t.tap(y, S, 'var(--ck)', { tinh: true, mo: .55, day: 9 }, gDapAn); },
+                dat: function (v, kq) {
+                    gDau.innerHTML = '';
+                    const mau = kq === null ? 'var(--truc)' : kq ? 'var(--dung)' : 'var(--sai)';
+                    const x = t.X(v);
+                    s('path', { d: `M${x} ${y - 7}l-7 -12h14z`, fill: mau }, gDau);
+                    s('text', { x: x, y: y - 24, 'text-anchor': 'middle', 'font-size': 13, 'font-style': 'italic', 'font-weight': 700, fill: mau, text: 'm' }, gDau);
+                }
+            };
+        }
+        function canhThamSo(cfg) {
+            return function (san, phu, api) {
+                const boc = h('div', 'w-full flex flex-col items-center', null, san);
+                let m = cfg.m.dau;
+                const truot = thanhTruot(boc, cfg.m, function (v) { m = v; veLai(); });
+                const soHang = cfg.hang.length, cao = 30 + soHang * 58 + 66;
+                const svg = svgMoi(boc, 360, cao, 'Các tập phụ thuộc m');
+                const t = trucSo(svg, cfg.x.min, cfg.x.max);
+                const yHang = cfg.hang.map(function (_, j) { return 40 + j * 58; });
+                cfg.hang.forEach(function (hg, j) { t.truc(yHang[j], { ten: hg.ten, mauTen: hg.mau, so: [] }); });
+                const gDong = s('g', null, svg);
+                const tm = trucM(svg, cfg.m, cao - 28);
+                const bang = bangKiemTra(boc, cfg.cau, function (j) { tm.dapAn(cfg.cau[j].dapAn); veLai(); });
+                tm.dapAn(cfg.cau[bang.dang].dapAn);
+                function veLai() {
+                    gDong.innerHTML = '';
+                    const tap = cfg.hang.map(function (hg) { return phep(hg.tap(m), [], HOP); });
+                    tap.forEach(function (S, j) {
+                        if (S.length) t.tap(yHang[j], S, cfg.hang[j].mau, { tinh: true, thapPhan: true }, gDong);
+                        else s('text', { x: 180, y: yHang[j] + 5, 'text-anchor': 'middle', 'font-size': 13, class: 'ui', fill: 'var(--sai)', text: '∅  (tập rỗng)' }, gDong);
+                    });
+                    const kq = cfg.cau.map(function (c) { return c.dung(tap); });
+                    bang.capNhat(kq);
+                    tm.dat(m, kq[bang.dang]);
+                    api.den(0);
+                }
+                const ht = {
+                    buoc: [function () {
+                        const c = cfg.cau[bang.dang];
+                        return 'Với $m=' + soTex(m, true) + '$: ' + cfg.moTa(m) + '<span class="block text-[13px] mt-1 opacity-80">Kéo thanh trượt để đổi $m$. Vùng tím trên trục $m$ là đáp án của câu đang chọn: $m\\in ' + texTap(c.dapAn) + '$.</span>';
+                    }],
+                    den: function () {}
+                };
+                setTimeout(truot.capNhat, 0);
+                return ht;
+            };
+        }
+        HINH['d4-vd1'] = function (host) {
+            const A = function (m) { return [K(m - 1, 4, false, true)]; }, B = function (m) { return [K(-2, 2 * m + 2, false, false)]; };
+            const khacRong = function (t) { return t[0].length > 0 && t[1].length > 0; };
+            khung(host, { ten: 'Kéo tham số m', icon: 'sliders', canh: [{ nhan: 'Ví dụ 1', tao: canhThamSo({
+                m: { min: -3, max: 6, buoc: .25, dau: 2 }, x: { min: -5, max: 15 },
+                hang: [
+                    { ten: 'A = (m − 1; 4]', mau: 'var(--ca)', tap: A },
+                    { ten: 'B = (−2; 2m + 2)', mau: 'var(--cb)', tap: B },
+                    { ten: 'A ∩ B', mau: 'var(--ck)', tap: function (m) { return phep(A(m), B(m), GIAO); } },
+                    { ten: '(−1; 3)', mau: 'var(--truc)', tap: function () { return [K(-1, 3, false, false)]; } }
+                ],
+                cau: [
+                    { nhan: '$(*)\\ A\\ne\\varnothing,\\ B\\ne\\varnothing$', dung: khacRong, dapAn: [K(-2, 5, false, false)] },
+                    { nhan: 'a) $A\\cap B\\ne\\varnothing$', dung: function (t) { return khacRong(t) ? t[2].length > 0 : null; }, dapAn: [K(-2, 5, false, false)] },
+                    { nhan: 'b) $A\\subset B$', dung: function (t) { return khacRong(t) ? conTap(t[0], t[1]) : null; }, dapAn: [K(1, 5, false, false)] },
+                    { nhan: 'c) $B\\subset A$', dung: function (t) { return khacRong(t) ? conTap(t[1], t[0]) : null; }, dapAn: [K(-2, -1, false, true)] },
+                    { nhan: 'd) $(A\\cap B)\\subset(-1;3)$', dung: function (t) { return khacRong(t) ? conTap(t[2], t[3]) : null; }, dapAn: [K(0, .5, true, true)] }
+                ],
+                moTa: function (m) { return '$A=' + texTap(A(m), true) + '$, $B=' + texTap(B(m), true) + '$, $A\\cap B=' + texTap(phep(A(m), B(m), GIAO), true) + '$.'; }
+            }) }] });
+        };
+        HINH['d4-vd2'] = function (host) {
+            const A = function (m) { return [K(-Infinity, m, false, false)]; }, B = function (m) { return [K(3 * m - 1, 3 * m + 3, true, true)]; };
+            const buB = function (m) { return phep(B(m), [], BU); }, buA = function (m) { return phep(A(m), [], BU); };
+            const mm = { min: -3, max: 3, buoc: .25, dau: -1 }, xx = { min: -11, max: 13 };
+            khung(host, { ten: 'Kéo tham số m', icon: 'sliders', canh: [
+                { nhan: 'a)', tao: canhThamSo({ m: mm, x: xx,
+                    hang: [{ ten: 'A = (−∞; m)', mau: 'var(--ca)', tap: A }, { ten: 'B = [3m − 1; 3m + 3]', mau: 'var(--cb)', tap: B }, { ten: 'Cℝ B', mau: 'var(--ck)', tap: buB }],
+                    cau: [{ nhan: '$A\\subset C_{\\mathbb R}B$', dung: function (t) { return conTap(t[0], t[2]); }, dapAn: [K(.5, Infinity, true, false)] }],
+                    moTa: function (m) { return '$A=' + texTap(A(m), true) + '$, $C_{\\mathbb R}B=' + texTap(buB(m), true) + '$. Thanh $A$ phải nằm gọn trong phần tím.'; } }) },
+                { nhan: 'b)', tao: canhThamSo({ m: mm, x: xx,
+                    hang: [{ ten: 'Cℝ A = [m; +∞)', mau: 'var(--ca)', tap: buA }, { ten: 'B = [3m − 1; 3m + 3]', mau: 'var(--cb)', tap: B }, { ten: 'Cℝ A ∩ B', mau: 'var(--ck)', tap: function (m) { return phep(buA(m), B(m), GIAO); } }],
+                    cau: [{ nhan: '$C_{\\mathbb R}A\\cap B\\ne\\varnothing$', dung: function (t) { return t[2].length > 0; }, dapAn: [K(-1.5, Infinity, true, false)] }],
+                    moTa: function (m) { return '$C_{\\mathbb R}A=' + texTap(buA(m), true) + '$, $B=' + texTap(B(m), true) + '$: phần chung là $' + texTap(phep(buA(m), B(m), GIAO), true) + '$.'; } }) }
+            ] });
+        };
+
+        // Ví dụ 3b, 3d: parabol y = x² − 2x + c(m)
+        function canhParabol(cfg) {
+            return function (san, phu, api) {
+                const boc = h('div', 'w-full flex flex-col items-center', null, san);
+                let m = cfg.m.dau;
+                const truot = thanhTruot(boc, cfg.m, function (v) { m = v; veLai(); });
+                const svg = svgMoi(boc, 360, 280, 'Đồ thị parabol');
+                const X = function (x) { return 30 + (x + 2.5) / 7 * 310; }, Y = function (y) { return 196 - (y + 6) / 15 * 180; };
+                const id = ++demId;
+                s('rect', { x: 20, y: 12, width: 330, height: 190 }, s('clipPath', { id: 'pb' + id }, s('defs', null, svg)));
+                for (let x = -2; x <= 4; x++) if (x) s('path', { d: `M${X(x)} ${Y(0) - 3}V${Y(0) + 3}`, stroke: 'var(--truc)' }, svg);
+                s('path', { d: `M20 ${Y(0)}H346M339 ${Y(0) - 4}L346 ${Y(0)}L339 ${Y(0) + 4}`, stroke: 'var(--truc)', fill: 'none', 'stroke-width': 1.4 }, svg);
+                s('path', { d: `M${X(0)} 200V14M${X(0) - 4} 21L${X(0)} 14L${X(0) + 4} 21`, stroke: 'var(--truc)', fill: 'none', 'stroke-width': 1.4 }, svg);
+                s('text', { x: 344, y: Y(0) + 16, 'text-anchor': 'end', 'font-size': 13, 'font-style': 'italic', text: 'x' }, svg);
+                s('text', { x: X(0) + 8, y: 22, 'font-size': 13, 'font-style': 'italic', text: 'y' }, svg);
+                s('text', { x: X(0) - 6, y: Y(0) + 15, 'text-anchor': 'end', 'font-size': 12, text: 'O' }, svg);
+                const gDong = s('g', null, svg);
+                const tm = trucM(svg, cfg.m, 252);
+                tm.dapAn(cfg.dapAn);
+                const bang = bangKiemTra(boc, [{ nhan: '$' + cfg.ten + '=\\varnothing$ (phương trình vô nghiệm)' }], function () {});
+                function veLai() {
+                    gDong.innerHTML = '';
+                    const c = cfg.c(m), d = 1 - c;
+                    let p = '';
+                    for (let x = -2.5; x <= 4.5001; x += .05) p += (p ? 'L' : 'M') + X(x).toFixed(1) + ' ' + Y(x * x - 2 * x + c).toFixed(1);
+                    const g = s('g', { 'clip-path': `url(#pb${id})` }, gDong);
+                    s('path', { d: p, fill: 'none', stroke: 'var(--ca)', 'stroke-width': 2.6 }, g);
+                    s('circle', { cx: X(1), cy: Y(c - 1), r: 4, fill: 'var(--ca)' }, g);
+                    const nghiem = d > 1e-9 ? [1 - Math.sqrt(d), 1 + Math.sqrt(d)] : Math.abs(d) <= 1e-9 ? [1] : [];
+                    nghiem.forEach(function (x) { s('circle', { cx: X(x), cy: Y(0), r: 6, fill: 'var(--ck)', class: 'nhay' }, gDong); });
+                    s('text', { x: 346, y: 34, 'text-anchor': 'end', 'font-size': 14, class: 'ui', fill: d < 0 ? 'var(--dung)' : 'var(--sai)', text: "Δ' = " + soChu(d, true) }, gDong);
+                    bang.capNhat([d < 0]);
+                    tm.dat(m, d < 0);
+                    api.den(0);
+                }
+                const ht = {
+                    buoc: [function () {
+                        const c = cfg.c(m), d = 1 - c, dt = soTex(d, true);
+                        const tapTex = d < 0 ? '\\varnothing' : d === 0 ? '\\{1\\}' : '\\{1-\\sqrt{' + dt + '};\\ 1+\\sqrt{' + dt + '}\\}';
+                        return 'Với $m=' + soTex(m, true) + '$: $\\Delta\'=1-' + (cfg.cTex === 'm' ? 'm' : '(' + cfg.cTex + ')') + '=1-(' + soTex(c, true) + ')=' + dt + '$. ' +
+                            (d < 0 ? 'Parabol nằm <b>trên hẳn</b> trục $Ox$ → phương trình vô nghiệm' : d === 0 ? 'Parabol <b>chạm</b> trục $Ox$ → có một nghiệm' : 'Parabol <b>cắt</b> trục $Ox$ tại hai điểm → có hai nghiệm') +
+                            ', $' + cfg.ten + '=' + tapTex + '$.<span class="block text-[13px] mt-1 opacity-80">Tập rỗng khi $\\Delta\'<0$: $m\\in ' + texTap(cfg.dapAn) + '$.</span>';
+                    }],
+                    den: function () {}
+                };
+                setTimeout(truot.capNhat, 0);
+                return ht;
+            };
+        }
+        HINH['d4-vd3'] = function (host) {
+            const nuaTrai = function (b) { return [K(-Infinity, b, false, false)]; }, nuaPhai = function (a) { return [K(a, Infinity, false, false)]; };
+            khung(host, { ten: 'Kéo tham số m', icon: 'sliders', canh: [
+                { nhan: 'a)', tao: canhThamSo({ m: { min: -4, max: 3, buoc: .25, dau: -3 }, x: { min: -8, max: 8 },
+                    hang: [{ ten: 'x < m', mau: 'var(--ca)', tap: function (m) { return nuaTrai(m); } }, { ten: 'x > 2m + 1', mau: 'var(--cb)', tap: function (m) { return nuaPhai(2 * m + 1); } },
+                        { ten: 'A (phần chung)', mau: 'var(--ck)', tap: function (m) { return phep(nuaTrai(m), nuaPhai(2 * m + 1), GIAO); } }],
+                    cau: [{ nhan: '$A=\\varnothing$', dung: function (t) { return t[2].length === 0; }, dapAn: [K(-1, Infinity, true, false)] }],
+                    moTa: function (m) { return '$A=' + texTap(phep(nuaTrai(m), nuaPhai(2 * m + 1), GIAO), true) + '$. $A$ rỗng khi hai tia <b>không chồng lên nhau</b>: $m\\le 2m+1$.'; } }) },
+                { nhan: 'b)', tao: canhParabol({ ten: 'B', m: { min: -4, max: 5, buoc: .25, dau: -2 }, c: function (m) { return m; }, cTex: 'm', dapAn: [K(1, Infinity, false, false)] }) },
+                { nhan: 'c)', tao: canhThamSo({ m: { min: -2, max: 2, buoc: .25, dau: -1 }, x: { min: -6, max: 12 },
+                    hang: [{ ten: 'x < m + 3', mau: 'var(--ca)', tap: function (m) { return nuaTrai(m + 3); } }, { ten: 'x > 4m + 3', mau: 'var(--cb)', tap: function (m) { return nuaPhai(4 * m + 3); } },
+                        { ten: 'C (phần chung)', mau: 'var(--ck)', tap: function (m) { return phep(nuaTrai(m + 3), nuaPhai(4 * m + 3), GIAO); } }],
+                    cau: [{ nhan: '$C=\\varnothing$', dung: function (t) { return t[2].length === 0; }, dapAn: [K(0, Infinity, true, false)] }],
+                    moTa: function (m) { return '$C=' + texTap(phep(nuaTrai(m + 3), nuaPhai(4 * m + 3), GIAO), true) + '$. $C$ rỗng khi $m+3\\le 4m+3$.'; } }) },
+                { nhan: 'd)', tao: canhParabol({ ten: 'D', m: { min: -12, max: -4, buoc: .25, dau: -10 }, c: function (m) { return m + 9; }, cTex: 'm+9', dapAn: [K(-8, Infinity, false, false)] }) }
+            ] });
+        };
+
+        // ================= DẠNG 5 =================
+        HINH['d5-vd1'] = function (host) {
+            khung(host, { ten: 'Biểu đồ Venn', icon: 'users', canh: [{ nhan: 'Ví dụ 1', tao: function (san, phu, api) {
+                const svg = svgMoi(san, 360, 240, 'Học sinh lớp 10 và học sinh học Tiếng Anh');
+                const v = venn2(svg, { E: true, cy: 124, r: 76, c1: 142, c2: 218, tenA: 'A', tenB: 'B', tenE: ' ' });
+                s('text', { x: 18, y: 26, class: 'ui', 'font-size': 11, fill: 'var(--truc)', text: 'Học sinh của trường' }, svg);
+                s('text', { x: 92, y: 216, 'text-anchor': 'middle', class: 'ui', 'font-size': 11, fill: 'var(--ca)', text: 'A: lớp 10' }, svg);
+                s('text', { x: 268, y: 216, 'text-anchor': 'middle', class: 'ui', 'font-size': 11, fill: 'var(--cb)', text: 'B: học Tiếng Anh' }, svg);
+                // style đặt trước fill: setAttribute('style') sẽ ghi đè màu đã gán qua style
+                const nguoi = function (x, y, mau) { s('text', { style: 'font-family: "Font Awesome 6 Free"; font-weight: 900', x: x, y: y, 'text-anchor': 'middle', 'font-size': 17, fill: mau, text: String.fromCharCode(0xf007) }, svg); };
+                [[96, 116], [112, 146], [84, 150]].forEach(function (p) { nguoi(p[0], p[1], 'var(--ca)'); });
+                [[172, 118], [190, 148]].forEach(function (p) { nguoi(p[0], p[1], 'var(--ck)'); });
+                [[262, 116], [250, 150], [280, 148]].forEach(function (p) { nguoi(p[0], p[1], 'var(--cb)'); });
+                [[330, 70], [32, 196], [326, 196]].forEach(function (p) { nguoi(p[0], p[1], 'var(--truc)'); });
+                const ds = [
+                    { nhan: 'a) $A\\cap B$', vung: ['ab'], chu: '$A\\cap B$: học sinh <b>vừa</b> học lớp $10$ <b>vừa</b> học Tiếng Anh → <b>các học sinh lớp $10$ học môn Tiếng Anh</b> của trường.' },
+                    { nhan: 'b) $A\\setminus B$', vung: ['a'], chu: '$A\\setminus B$: thuộc $A$ nhưng không thuộc $B$ → <b>các học sinh lớp $10$ nhưng không học Tiếng Anh</b>.' },
+                    { nhan: 'c) $A\\cup B$', vung: ['a', 'ab', 'b'], chu: '$A\\cup B$: thuộc ít nhất một tập → <b>các học sinh hoặc học lớp $10$, hoặc học Tiếng Anh</b>.' },
+                    { nhan: 'd) $B\\setminus A$', vung: ['b'], chu: '$B\\setminus A$: thuộc $B$ nhưng không thuộc $A$ → <b>các học sinh học Tiếng Anh nhưng không học lớp $10$</b>.' }
+                ];
+                let op = ds[0];
+                nhomNut(phu, ds, 0, function (d) { op = d; api.den(0); });
+                return { buoc: [function () { return op.chu; }], den: function () { v.bat(op.vung); } };
+            } }] });
+        };
+
+        // Nhãn trong từng vùng của biểu đồ Venn 3 tập
+        function nhanVung(svg, m, chu, mau, co) {
+            return s('text', { x: DIEM3[m][0], y: DIEM3[m][1] + 6, 'text-anchor': 'middle', 'font-size': co || 17, 'font-weight': 700, 'font-style': 'italic', fill: mau || 'var(--chu-hinh)', text: chu, class: 'no an' }, svg);
+        }
+        function nhanDem(svg, m, chu) {
+            const g = s('g', { class: 'no an' }, svg);
+            s('rect', { x: DIEM3[m][0] - 15, y: DIEM3[m][1] + 10, width: 30, height: 17, rx: 8.5, fill: 'var(--ck)' }, g);
+            s('text', { x: DIEM3[m][0], y: DIEM3[m][1] + 22.5, 'text-anchor': 'middle', 'font-size': 11.5, class: 'ui', fill: '#fff', text: chu }, g);
+            return g;
+        }
+        HINH['d5-vd2'] = function (host) {
+            khung(host, { ten: 'Biểu đồ Venn 3 tập', icon: 'circle-nodes', nhip: 3000, canh: [{ nhan: 'Ví dụ 2', tao: function (san) {
+                const svg = svgMoi(san, 360, 312, 'Biểu đồ Venn Văn, Sử, Toán');
+                const v = venn3(svg, { ten: ['Văn (25)', 'Sử (18)', 'Toán (20)'] });
+                const an = { 1: 'a', 2: 'b', 4: 'c', 3: 'z', 5: 'x', 6: 'y', 7: '5' };
+                const nhan = {}; Object.keys(an).forEach(function (m) { nhan[m] = nhanVung(svg, +m, an[m], m === '7' ? 'var(--ck)' : null); });
+                const ngoai = s('text', { x: 62, y: 296, 'text-anchor': 'middle', 'font-size': 13, class: 'ui no an', text: '6 em ngoài' }, svg);
+                const dem = {}; [1, 2, 4].forEach(function (m) { dem[m] = nhanDem(svg, m, '×1'); }); [3, 5, 6].forEach(function (m) { dem[m] = nhanDem(svg, m, '×2'); }); dem[7] = nhanDem(svg, 7, '×3');
+                const vungBuoc = [[], [1, 3, 5, 7], [2, 3, 6, 7], [4, 5, 6, 7], [1, 2, 3, 4, 5, 6, 7], [1, 2, 3, 4, 5, 6, 7], [1, 2, 4]];
+                return {
+                    buoc: ['Vẽ ba vòng tròn Văn, Sử, Toán và <b>đặt ẩn cho từng phần</b>: $a, b, c$ là số em chỉ thích một môn; $x, y, z$ là số em chỉ thích hai môn; phần giữa là $5$ em thích cả ba.',
+                        'Vòng <b>Văn</b> gồm các phần $a, x, z, 5$: $\\ a+x+z+5=25\\quad(1)$',
+                        'Vòng <b>Sử</b> gồm các phần $b, y, z, 5$: $\\ b+y+z+5=18\\quad(2)$',
+                        'Vòng <b>Toán</b> gồm các phần $c, x, y, 5$: $\\ c+x+y+5=20\\quad(3)$',
+                        'Số em thích ít nhất một môn là $45-6=39$, đó là <b>tất cả các phần</b> trong ba vòng: $a+b+c+x+y+z+5=39\\quad(4)$',
+                        'Cộng $(1),(2),(3)$: phần một môn được đếm <b>1 lần</b>, phần hai môn <b>2 lần</b>, phần giữa <b>3 lần</b>: $a+b+c+2(x+y+z)+15=63\\quad(5)$',
+                        'Từ $(4)$: $x+y+z=34-(a+b+c)$. Thay vào $(5)$: $a+b+c+68-2(a+b+c)+15=63\\Rightarrow a+b+c=20$. Có <b>$20$ em</b> thích chỉ một môn.'],
+                    den: function (i) {
+                        v.bat(vungBuoc[i]);
+                        Object.keys(nhan).forEach(function (m) { hien(nhan[m], true); });
+                        hien(ngoai, i === 0 || i >= 4);
+                        Object.keys(dem).forEach(function (m) { hien(dem[m], i === 5); });
+                    }
+                };
+            } }] });
+        };
+        HINH['d5-vd3'] = function (host) {
+            khung(host, { ten: 'Biểu đồ Venn 3 tập', icon: 'circle-nodes', nhip: 3000, canh: [{ nhan: 'Ví dụ 3', tao: function (san) {
+                const svg = svgMoi(san, 360, 312, 'Biểu đồ Venn Toán, Lý, Hóa');
+                const v = venn3(svg, { ten: ['Toán (16)', 'Lý (15)', 'Hóa (11)'] });
+                const giaTri = { 7: '4', 3: '5', 6: '2', 5: '4', 1: '3', 2: '4', 4: '1' };
+                const nhan = {}; Object.keys(giaTri).forEach(function (m) { nhan[m] = nhanVung(svg, +m, giaTri[m], m === '7' ? 'var(--ck)' : null, 19); });
+                const hoi = s('text', { x: DIEM3[7][0], y: DIEM3[7][1] + 6, 'text-anchor': 'middle', 'font-size': 19, 'font-weight': 700, fill: 'var(--ck)', text: '?', class: 'no an' }, svg);
+                const dem = {}; [3, 5, 6].forEach(function (m) { dem[m] = nhanDem(svg, m, '×1'); }); dem[7] = nhanDem(svg, 7, '×3');
+                const vungBuoc = [[], [3, 5, 6, 7], [7], [3, 5, 6], [1, 2, 4], [1, 2, 4]];
+                return {
+                    buoc: ['Gọi $T, L, H$ là tập học sinh giỏi Toán, Lý, Hóa. Phần giữa (giỏi cả ba môn) chưa biết.',
+                        'Tổng $n(T\\cap L)+n(L\\cap H)+n(H\\cap T)=9+6+8=23$: mỗi em giỏi <b>đúng hai</b> môn được đếm <b>1 lần</b>, mỗi em giỏi <b>cả ba</b> môn bị đếm <b>3 lần</b>.',
+                        'Do đó $23=11+3\\,n(T\\cap L\\cap H)\\Rightarrow n(T\\cap L\\cap H)=4$. <b>Câu a): $4$ học sinh.</b>',
+                        'Điền các phần “đúng hai môn”: Toán–Lý $9-4=5$; Lý–Hóa $6-4=2$; Hóa–Toán $8-4=4$. Kiểm tra: $5+2+4=11$ ✓.',
+                        'Chỉ giỏi Toán: $16-(5+4+4)=3$; chỉ giỏi Lý: $15-(5+2+4)=4$; chỉ giỏi Hóa: $11-(4+2+4)=1$.',
+                        '<b>Câu b):</b> số học sinh giỏi đúng một môn là $3+4+1=8$.'],
+                    den: function (i) {
+                        v.bat(vungBuoc[i]);
+                        hien(hoi, i >= 0 && i <= 1);
+                        hien(nhan[7], i >= 2);
+                        [3, 5, 6].forEach(function (m) { hien(nhan[m], i >= 3); });
+                        [1, 2, 4].forEach(function (m) { hien(nhan[m], i >= 4); });
+                        Object.keys(dem).forEach(function (m) { hien(dem[m], i === 1); });
+                    }
+                };
+            } }] });
+        };
+
+        // ---------- Thanh chọn dạng: tô mục đang xem ----------
+        function dieuHuong() {
+            const chips = Array.from(document.querySelectorAll('.chip-dang'));
+            const thanh = document.querySelector('.thanh-dang');
+            const muc = chips.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+            let dang = -1, cho = false;
+            chips.forEach(function (a, j) {
+                a.addEventListener('click', function (e) { e.preventDefault(); muc[j].scrollIntoView({ behavior: giamDong ? 'auto' : 'smooth', block: 'start' }); });
+            });
+            function to() {
+                cho = false;
+                let j = 0;
+                muc.forEach(function (el, k) { if (el && el.getBoundingClientRect().top <= 140) j = k; });
+                if (j === dang) return;
+                dang = j;
+                chips.forEach(function (c, k) { c.setAttribute('aria-current', String(k === j)); });
+                if (thanh) thanh.scrollTo({ left: Math.max(0, chips[j].offsetLeft - 12), behavior: 'smooth' });
+            }
+            window.addEventListener('scroll', function () { if (!cho) { cho = true; requestAnimationFrame(to); } }, { passive: true });
+            to();
+        }
+
+        function batDau() {
+            if (window.renderMathInElement) {
+                renderMathInElement(document.body, { delimiters: [{ left: '$$', right: '$$', display: true }, { left: '$', right: '$', display: false }], throwOnError: false, strict: false });
+            }
+            try { bieuTuong(); } catch (e) { console.error(e); }
+            Object.keys(HINH).forEach(function (k) {
+                const el = document.querySelector('[data-hinh="' + k + '"]');
+                if (!el) return;
+                try { HINH[k](el); } catch (e) { console.error('Lỗi dựng hình ' + k, e); }
+            });
+            dieuHuong();
+        }
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', batDau);
+        else batDau();
+    })();
+    </script>
+</body>
+</html>

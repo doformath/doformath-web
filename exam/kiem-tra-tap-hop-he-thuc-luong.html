@@ -13,7 +13,7 @@
     <!-- Giao diện sáng / tối: chạy trước CSS để không bị nháy màu -->
     <script src="../assets/js/dfm-giao-dien.js"></script>
     <!-- CSS Tailwind dựng sẵn cho cả site (sửa class xong chạy: npm run build:css) -->
-    <link rel="stylesheet" href="../assets/css/tailwind.css?v=2e459c2e">
+    <link rel="stylesheet" href="../assets/css/tailwind.css?v=3f38453c">
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -69,8 +69,6 @@
                 </ul>
                 <div class="w-full max-w-sm">
                     <input id="oTen" type="text" maxlength="30" placeholder="Nhập họ và tên của bạn" class="w-full px-4 py-3 rounded-xl border-2 border-teal-100 focus:border-teal-400 focus:outline-none text-center font-medium">
-                    <input id="oMa" type="text" maxlength="12" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Mã kiểm tra do thầy cấp" class="mt-3 w-full px-4 py-3 rounded-xl border-2 border-teal-100 focus:border-teal-400 focus:outline-none text-center font-bold tracking-widest uppercase placeholder:font-medium placeholder:tracking-normal placeholder:normal-case">
-                    <p id="loiMa" class="hidden text-sm font-semibold text-red-500 mt-2"></p>
                     <p id="ghiChuDangNhap" class="text-sm text-gray-500 mt-2"></p>
                     <button id="nutBatDau" type="button" disabled class="mt-4 w-full bg-primary hover:bg-teal-800 text-white font-bold py-3 rounded-xl shadow-md hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-primary">
                         <i class="fa-solid fa-play mr-2"></i>Bắt đầu
@@ -78,20 +76,6 @@
                 </div>
             </div>
 
-            <p class="text-center mt-3"><button id="gvMo" type="button" class="text-xs text-gray-400 hover:text-gray-600 underline">Dành cho giáo viên</button></p>
-            <div id="khuGiaoVien" class="hidden mt-3 bg-white p-6 rounded-2xl shadow-sm border border-amber-200">
-                <h2 class="font-bold text-gray-800 mb-4"><i class="fa-solid fa-key text-amber-500 mr-2"></i>Tạo mã kiểm tra</h2>
-                <div class="flex flex-wrap items-center gap-3">
-                    <label class="text-sm text-gray-600">Mã có hiệu lực trong
-                        <input id="gvSoPhut" type="number" min="1" max="600" value="5" class="w-20 mx-1 px-2 py-1.5 rounded-lg border border-gray-200 text-center font-semibold"> phút
-                    </label>
-                    <button id="gvTaoMa" type="button" class="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold shadow-sm">Tạo mã mới</button>
-                </div>
-                <div id="gvKetQua" class="hidden mt-4 px-4 py-3 rounded-xl bg-emerald-50 border border-emerald-200 text-center">
-                    <p id="gvMa" class="font-mono font-extrabold text-3xl tracking-widest text-gray-900 select-all"></p>
-                    <p id="gvHan" class="text-sm text-gray-600 mt-1"></p>
-                </div>
-            </div>
         </section>
 
         <!-- ================= MÀN HÌNH LÀM BÀI ================= -->
@@ -167,21 +151,6 @@
             <p id="vpNoiDung" class="text-gray-600 mb-6"></p>
             <button id="vpNut" type="button" class="w-full py-3 rounded-xl bg-red-500 hover:bg-red-600 text-white font-bold shadow-md transition-all"></button>
         </div>
-    </div>
-
-    <div id="hopGiaoVien" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-gray-900/80 backdrop-blur-sm px-4">
-        <form id="gvForm" class="bg-white rounded-3xl p-6 md:p-8 max-w-sm w-full shadow-2xl text-center" autocomplete="off">
-            <div class="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center mx-auto mb-4">
-                <i class="fa-solid fa-key text-2xl text-amber-500"></i>
-            </div>
-            <h3 class="text-xl font-bold text-gray-900 mb-4">Mật khẩu giáo viên</h3>
-            <input id="gvMatKhau" type="password" autocomplete="new-password" class="w-full px-4 py-3 rounded-xl border-2 border-amber-100 focus:border-amber-400 focus:outline-none text-center font-medium">
-            <p id="gvLoi" class="hidden text-sm font-semibold text-red-500 mt-2">Sai mật khẩu.</p>
-            <div class="flex gap-3 mt-5">
-                <button id="gvHuy" type="button" class="flex-1 py-3 rounded-xl border border-gray-200 text-gray-600 font-bold hover:bg-gray-50">Hủy</button>
-                <button type="submit" class="flex-1 py-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold shadow-md">Mở</button>
-            </div>
-        </form>
     </div>
 
     <!-- Firebase: đăng nhập + lưu bảng xếp hạng -->
@@ -692,11 +661,6 @@
             const user = firebase.auth().currentUser;
             return !!(user && user.email && user.email.toLowerCase() === EMAIL_GIAO_VIEN);
         }
-        // Mã kiểm tra = hạn dùng (4 ký tự) + chữ ký (4 ký tự), tự kiểm tra ngay trên trang, không cần máy chủ
-        const KHOA_MA = '69XMmLnaElloGinboJo-0yYl';
-        const BAM_MAT_KHAU_GV = 656711425877204;
-        const CHU_MA = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // bỏ các ký tự dễ nhầm (O/0, I/1)
-        const MOC_MA = Date.UTC(2026, 0, 1), VONG_MA = 1 << 20, HAN_TOI_DA = 600;
         const $ = function (id) { return document.getElementById(id); };
         const tex = function (s) { return katex.renderToString(s, { throwOnError: false }); };
 
@@ -937,21 +901,6 @@
             chot(kq);
         });
 
-        // ---------- Chống dò mã / mật khẩu: sai quá số lần cho phép thì khóa tạm ----------
-        const SAI_TOI_DA = 5, KHOA_SAI_MS = 60 * 1000;
-        function docSai(khoa) {
-            try { return JSON.parse(localStorage.getItem(khoa)) || { lan: 0, den: 0 }; } catch (e) { return { lan: 0, den: 0 }; }
-        }
-        // Trả về số giây còn bị khóa (0 = không khóa)
-        function conKhoa(khoa) { return Math.max(0, Math.ceil((docSai(khoa).den - Date.now()) / 1000)); }
-        function ghiSai(khoa) {
-            const d = docSai(khoa);
-            d.lan++;
-            if (d.lan >= SAI_TOI_DA) { d.lan = 0; d.den = Date.now() + KHOA_SAI_MS; }
-            try { localStorage.setItem(khoa, JSON.stringify(d)); } catch (e) {}
-        }
-        function xoaSai(khoa) { try { localStorage.removeItem(khoa); } catch (e) {} }
-
         function batDau() {
             // Chỉ học sinh đã đăng nhập mới được làm bài
             if (!firebase.auth().currentUser || dangLam) return;
@@ -961,75 +910,11 @@
                 $('oTen').classList.add('border-red-400');
                 return;
             }
-            const khoaMa = conKhoa('dfm_sai_ma');
-            if (khoaMa) {
-                baoLoiMa('Nhập sai mã quá nhiều lần. Thử lại sau ' + khoaMa + ' giây.');
-                return;
-            }
-            const ma = $('oMa').value.trim().toUpperCase();
-            if (!maConHan(ma)) {
-                ghiSai('dfm_sai_ma');
-                baoLoiMa('Mã không đúng hoặc đã hết hiệu lực.');
-                return;
-            }
-            xoaSai('dfm_sai_ma');
-            if (maDaDung().indexOf(ma) !== -1) {
-                baoLoiMa('Em đã dùng mã này rồi. Mỗi mã chỉ làm được một lần.');
-                return;
-            }
-            // Ghi nhận ngay khi bắt đầu để tải lại trang cũng không làm lại được
-            dsMaDaDung = maDaDung().concat(ma).slice(-30);
-            try { localStorage.setItem('dfm_ma_da_dung_thhtl', JSON.stringify(dsMaDaDung)); } catch (e) {}
             try { localStorage.setItem('dfm_ten', ten); } catch (e) {}
-            $('oMa').value = '';
-            $('loiMa').classList.add('hidden');
             vaoToanManHinh();
             vaoBai();
         }
 
-        // ---------- Mã kiểm tra ----------
-        function bam(s) {
-            let h1 = 0xdeadbeef, h2 = 0x41c6ce57;
-            for (let i = 0; i < s.length; i++) {
-                const c = s.charCodeAt(i);
-                h1 = Math.imul(h1 ^ c, 2654435761);
-                h2 = Math.imul(h2 ^ c, 1597334677);
-            }
-            h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
-            h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
-            return 4294967296 * (2097151 & h2) + (h1 >>> 0);
-        }
-        function soThanhChu(n) {
-            let kq = '';
-            for (let i = 0; i < 4; i++) { kq += CHU_MA[n % 32]; n = Math.floor(n / 32); }
-            return kq;
-        }
-        function phutHienTai() { return Math.floor((Date.now() - MOC_MA) / 60000); }
-        function taoMa(phutHetHan) { return soThanhChu(phutHetHan % VONG_MA) + soThanhChu(bam(KHOA_MA + ':' + phutHetHan) % VONG_MA); }
-        function maConHan(ma) {
-            if (ma.length !== 8) return false;
-            let t = 0;
-            for (let i = 3; i >= 0; i--) {
-                const k = CHU_MA.indexOf(ma[i]);
-                if (k < 0) return false;
-                t = t * 32 + k;
-            }
-            const nay = phutHienTai();
-            let het = nay - nay % VONG_MA + t;
-            if (het <= nay) het += VONG_MA;
-            return het - nay <= HAN_TOI_DA && taoMa(het) === ma;
-        }
-        let dsMaDaDung = null;
-        function maDaDung() {
-            if (!dsMaDaDung) {
-                try { dsMaDaDung = JSON.parse(localStorage.getItem('dfm_ma_da_dung_thhtl')) || []; } catch (e) { dsMaDaDung = []; }
-            }
-            return dsMaDaDung;
-        }
-        function baoLoiMa(html) {
-            $('loiMa').innerHTML = html;
-            $('loiMa').classList.remove('hidden');
-        }
         function vaoBai() {
             de = taoDe(SO_CAU);
             viTri = 0;
@@ -1045,8 +930,6 @@
         $('nutBatDau').addEventListener('click', batDau);
         $('oTen').addEventListener('keydown', function (e) { if (e.key === 'Enter') batDau(); });
         $('oTen').addEventListener('input', function () { $('oTen').classList.remove('border-red-400'); });
-        $('oMa').addEventListener('keydown', function (e) { if (e.key === 'Enter') batDau(); });
-        $('oMa').addEventListener('input', function () { $('oMa').classList.remove('border-red-400'); $('loiMa').classList.add('hidden'); });
         $('nutLamLai').addEventListener('click', function () { hienManHinh('manHinhBatDau'); });
 
         // ---------- Kết quả + bảng xếp hạng ----------
@@ -1255,46 +1138,6 @@
             hop.appendChild(khung);
         }
 
-        // ---------- Giáo viên: tạo mã kiểm tra ----------
-        $('gvMo').addEventListener('click', function () {
-            $('gvMatKhau').value = '';
-            $('gvLoi').classList.add('hidden');
-            $('hopGiaoVien').classList.remove('hidden');
-            $('gvMatKhau').focus();
-        });
-        $('gvHuy').addEventListener('click', function () { $('hopGiaoVien').classList.add('hidden'); });
-        $('gvMatKhau').addEventListener('input', function () { $('gvLoi').classList.add('hidden'); });
-        $('gvForm').addEventListener('submit', function (e) {
-            e.preventDefault();
-            const khoaGv = conKhoa('dfm_sai_gv');
-            if (khoaGv) {
-                $('gvMatKhau').value = '';
-                $('gvLoi').textContent = 'Nhập sai quá nhiều lần. Thử lại sau ' + khoaGv + ' giây.';
-                $('gvLoi').classList.remove('hidden');
-                return;
-            }
-            const dung = bam(KHOA_MA + '|' + $('gvMatKhau').value) === BAM_MAT_KHAU_GV;
-            $('gvMatKhau').value = '';
-            if (!dung) {
-                ghiSai('dfm_sai_gv');
-                $('gvLoi').textContent = 'Sai mật khẩu.';
-                $('gvLoi').classList.remove('hidden');
-                $('gvMatKhau').focus();
-                return;
-            }
-            xoaSai('dfm_sai_gv');
-            $('hopGiaoVien').classList.add('hidden');
-            $('khuGiaoVien').classList.remove('hidden');
-            $('gvMo').classList.add('hidden');
-        });
-        $('gvTaoMa').addEventListener('click', function () {
-            const phut = Math.min(HAN_TOI_DA, Math.max(1, parseInt($('gvSoPhut').value, 10) || 5));
-            const het = phutHienTai() + phut;
-            $('gvMa').textContent = taoMa(het);
-            $('gvHan').textContent = 'Nhập được đến ' + new Date(MOC_MA + het * 60000).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) + ' (' + phut + ' phút).';
-            $('gvKetQua').classList.remove('hidden');
-        });
-
         // ---------- Khởi động ----------
         try { $('oTen').value = localStorage.getItem('dfm_ten') || ''; } catch (e) {}
 
@@ -1303,7 +1146,6 @@
             $('ten-user').classList.toggle('hidden', !user);
             $('nutBatDau').disabled = !user;
             $('oTen').disabled = !user;
-            $('oMa').disabled = !user;
             if (user) {
                 $('ten-user').textContent = user.email.split('@')[0];
                 $('ghiChuDangNhap').textContent = 'Kết quả sẽ được gửi cho thầy.';
