@@ -13,7 +13,7 @@
     <!-- Giao diện sáng / tối: chạy trước CSS để không bị nháy màu -->
     <script src="assets/js/dfm-giao-dien.js"></script>
     <!-- CSS Tailwind dựng sẵn cho cả site (sửa class xong chạy: npm run build:css) -->
-    <link rel="stylesheet" href="assets/css/tailwind.css?v=efc628f6">
+    <link rel="stylesheet" href="assets/css/tailwind.css?v=4e23c26c">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -200,308 +200,213 @@
         </div>
     </section>
 
-    <!-- DANH SÁCH ĐỀ THI -->
+    <!-- DANH SÁCH ĐỀ THI: chia 3 khu Cần làm / Luyện tập / Đã làm, chỉ hiện đề của lớp học sinh (theo quyền khóa học) -->
     <section class="py-12 md:py-16 relative z-20">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            
-            <!-- Nút Lọc Danh mục -->
-            <div id="loc-de" class="flex flex-wrap justify-center gap-3 mb-10 md:mb-14">
-                <button type="button" data-loc="" aria-pressed="true" class="bg-teal-600 text-white px-5 py-2 rounded-full font-semibold shadow-md shadow-teal-500/20 border border-teal-600">Tất cả đề thi</button>
-                <button type="button" data-loc="toan12" aria-pressed="false" class="bg-white text-slate-600 hover:text-teal-600 border border-slate-200 hover:border-teal-300 px-5 py-2 rounded-full font-medium transition-colors">Toán 12</button>
-                <button type="button" data-loc="toan11" aria-pressed="false" class="bg-white text-slate-600 hover:text-teal-600 border border-slate-200 hover:border-teal-300 px-5 py-2 rounded-full font-medium transition-colors">Toán 11</button>
-                <button type="button" data-loc="toan10" aria-pressed="false" class="bg-white text-slate-600 hover:text-teal-600 border border-slate-200 hover:border-teal-300 px-5 py-2 rounded-full font-medium transition-colors">Toán 10</button>
-                <button type="button" data-loc="thpt" aria-pressed="false" class="bg-white text-slate-600 hover:text-teal-600 border border-slate-200 hover:border-teal-300 px-5 py-2 rounded-full font-medium transition-colors">Thi thử THPT</button>
-                <button type="button" data-loc="vact" aria-pressed="false" class="bg-white text-slate-600 hover:text-teal-600 border border-slate-200 hover:border-teal-300 px-5 py-2 rounded-full font-medium transition-colors">ĐGNL V-ACT</button>
+        <!-- Ẩn tới khi biết tài khoản thuộc lớp nào, tránh nháy đề của lớp khác -->
+        <div id="khu-de" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 transition-opacity duration-300" style="opacity: 0;">
+
+            <!-- Lớp của học sinh + nút lọc (chỉ các loại đề của lớp mình) -->
+            <div class="flex flex-col md:flex-row md:items-center gap-4 mb-10 md:mb-12">
+                <div id="pt-lop" class="flex items-center gap-3 min-w-0"></div>
+                <div id="loc-de" class="flex flex-wrap gap-2 md:ml-auto"></div>
             </div>
 
-            <!-- Lưới Đề thi (Grid 3 cột) -->
-            <div id="luoi-de" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-                <!-- Đề thi trực tuyến tải lên từ trang Quản trị (đang mở): chèn vào đây khi học sinh đã đăng nhập -->
-                <div id="de-thi-moi" class="contents"></div>
-                
-                <!-- Đề 1: Thi thử THPT (Nổi bật nhất) -->
-                <a data-loai="thpt" href="exam/de-thi-thu-thpt-1.html" class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 border border-slate-200 group flex flex-col cursor-pointer block relative">
-                    <!-- Nhãn góc -->
-                    <div class="absolute top-4 right-4 bg-red-100 text-red-600 font-bold text-xs px-2.5 py-1 rounded-md z-10 border border-red-200 flex items-center gap-1">
-                        <i class="fa-solid fa-fire"></i> Hot
+            <!-- Chưa đăng nhập -->
+            <div id="pt-moi-dang-nhap" class="hidden mb-12 bg-white border border-teal-200 rounded-3xl p-6 md:p-8 flex flex-col md:flex-row md:items-center gap-5">
+                <div class="w-14 h-14 rounded-2xl bg-teal-50 text-teal-600 border border-teal-100 flex items-center justify-center shrink-0"><i class="fa-solid fa-user-lock text-2xl"></i></div>
+                <div class="flex-1">
+                    <h2 class="text-lg md:text-xl font-bold text-slate-900">Đăng nhập để vào phòng thi của lớp bạn</h2>
+                    <p class="text-sm text-slate-500 mt-1">Sau khi đăng nhập, bạn sẽ thấy các đề thầy đang mở cho lớp mình và kết quả các bài đã làm.</p>
+                </div>
+                <a href="login.html" class="bg-primary hover:bg-teal-800 text-white px-6 py-2.5 rounded-full font-semibold transition-colors shadow-md text-center whitespace-nowrap">Đăng nhập</a>
+            </div>
+
+            <!-- 1. CẦN LÀM: đề trực tuyến đang mở, chưa nộp -->
+            <div id="khu-can-lam" data-khu class="hidden mb-14">
+                <div class="flex items-center gap-3 mb-5">
+                    <div class="w-10 h-10 rounded-xl bg-teal-50 text-teal-600 border border-teal-100 flex items-center justify-center shrink-0"><i class="fa-solid fa-bolt"></i></div>
+                    <div>
+                        <h2 class="text-xl md:text-2xl font-extrabold text-slate-900">Cần làm</h2>
+                        <p class="text-sm text-slate-500">Đề thầy đang mở cho lớp bạn</p>
                     </div>
-                    
-                    <div class="p-6 md:p-8 flex-1 flex flex-col relative overflow-hidden">
-                        <!-- Icon chìm trang trí -->
-                        <i class="fa-solid fa-graduation-cap absolute -bottom-6 -right-6 text-9xl text-slate-50 opacity-50 transform -rotate-12 group-hover:scale-110 transition-transform duration-500"></i>
-                        
-                        <div class="flex items-center gap-2 mb-4 relative z-10">
-                            <span class="bg-slate-100 text-slate-600 font-semibold text-xs px-3 py-1 rounded-full uppercase tracking-wider">THPT Quốc gia</span>
-                        </div>
-                        
-                        <h3 class="text-xl font-bold text-slate-900 mb-4 group-hover:text-red-600 transition-colors leading-snug relative z-10">
-                            Đề thi thử Tốt nghiệp THPT 2027 - Lần 1
-                        </h3>
-                        
-                        <!-- Thông số bài thi -->
-                        <div class="grid grid-cols-2 gap-3 mb-6 relative z-10">
-                            <div class="bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col">
-                                <span class="text-xs text-slate-400 font-medium mb-1">Thời gian</span>
-                                <span class="text-sm font-bold text-slate-700"><i class="fa-regular fa-clock text-teal-500 mr-1"></i> 90 phút</span>
-                            </div>
-                            <div class="bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col">
-                                <span class="text-xs text-slate-400 font-medium mb-1">Số lượng</span>
-                                <span class="text-sm font-bold text-slate-700"><i class="fa-solid fa-list-ol text-teal-500 mr-1"></i> 50 câu</span>
-                            </div>
-                        </div>
-                        
-                        <div class="mt-auto pt-4 border-t border-slate-100 flex items-center justify-between relative z-10">
-                            <span class="text-sm font-medium text-slate-500"><i class="fa-regular fa-user mr-1"></i> 1,250 lượt thi</span>
-                            <div class="bg-red-50 text-red-600 font-semibold px-4 py-2 rounded-full text-sm group-hover:bg-red-600 group-hover:text-white transition-colors shadow-sm">
-                                Bắt đầu <i class="fa-solid fa-play text-xs ml-1"></i>
-                            </div>
-                        </div>
+                    <span data-dem class="ml-auto bg-teal-600 text-white text-sm font-bold min-w-[2rem] h-8 px-2.5 rounded-full flex items-center justify-center"></span>
+                </div>
+                <div data-luoi class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"></div>
+                <div data-trong class="hidden bg-white border border-dashed border-slate-300 rounded-3xl p-8 text-center">
+                    <i class="fa-solid fa-mug-hot text-3xl text-slate-300 mb-3"></i>
+                    <p class="font-semibold text-slate-700">Chưa có đề nào cần làm</p>
+                    <p class="text-sm text-slate-500 mt-1">Khi thầy mở đề mới cho lớp bạn, đề sẽ hiện ở đây.</p>
+                </div>
+            </div>
+
+            <!-- 2. LUYỆN TẬP: đề luyện có sẵn, làm lúc nào cũng được -->
+            <div id="khu-luyen-tap" data-khu class="mb-14">
+                <div class="flex items-center gap-3 mb-5">
+                    <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 border border-amber-100 flex items-center justify-center shrink-0"><i class="fa-solid fa-dumbbell"></i></div>
+                    <div>
+                        <h2 class="text-xl md:text-2xl font-extrabold text-slate-900">Luyện tập</h2>
+                        <p class="text-sm text-slate-500">Làm lúc nào cũng được, có bảng xếp hạng</p>
                     </div>
-                </a>
+                </div>
+                <div data-luoi class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
 
-                <!-- Kiểm tra công thức Lượng giác (chỉ cần đăng nhập) -->
-                <a data-loai="toan11" href="exam/kiem-tra-cong-thuc-luong-giac.html" class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 border border-slate-200 group flex flex-col cursor-pointer block relative">
-                    <div class="absolute top-4 right-4 bg-teal-50 text-teal-700 font-bold text-xs px-2.5 py-1 rounded-md z-10 border border-teal-200 flex items-center gap-1">
-                        <i class="fa-solid fa-user-lock"></i> Cần đăng nhập
+                    <!-- Kiểm tra công thức Lượng giác (chỉ cần đăng nhập) -->
+                    <a data-loai="toan11" href="exam/kiem-tra-cong-thuc-luong-giac.html" class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 border border-slate-200 group flex flex-col cursor-pointer block relative">
+                        <div class="absolute top-4 right-4 bg-teal-50 text-teal-700 font-bold text-xs px-2.5 py-1 rounded-md z-10 border border-teal-200 flex items-center gap-1">
+                            <i class="fa-solid fa-user-lock"></i> Cần đăng nhập
+                        </div>
+
+                        <div class="p-6 md:p-8 flex-1 flex flex-col relative overflow-hidden">
+                            <i class="fa-solid fa-trophy absolute -bottom-6 -right-6 text-9xl text-slate-50 opacity-50 dark:opacity-5 transform -rotate-12 group-hover:scale-110 transition-transform duration-500"></i>
+
+                            <div class="flex items-center gap-2 mb-4 relative z-10">
+                                <span class="bg-slate-100 text-slate-600 font-semibold text-xs px-3 py-1 rounded-full uppercase tracking-wider">Toán 11</span>
+                            </div>
+
+                            <h3 class="text-xl font-bold text-slate-900 mb-4 group-hover:text-amber-600 transition-colors leading-snug relative z-10">
+                                Kiểm tra công thức Lượng giác
+                            </h3>
+
+                            <div class="grid grid-cols-2 gap-3 mb-6 relative z-10">
+                                <div class="bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col">
+                                    <span class="text-xs text-slate-400 font-medium mb-1">Thời gian</span>
+                                    <span class="text-sm font-bold text-slate-700"><i class="fa-regular fa-clock text-teal-500 mr-1"></i> Tính giờ</span>
+                                </div>
+                                <div class="bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col">
+                                    <span class="text-xs text-slate-400 font-medium mb-1">Số lượng</span>
+                                    <span class="text-sm font-bold text-slate-700"><i class="fa-solid fa-list-ol text-teal-500 mr-1"></i> 10 câu</span>
+                                </div>
+                            </div>
+
+                            <div class="mt-auto pt-4 border-t border-slate-100 flex items-center justify-between relative z-10">
+                                <span class="text-sm font-medium text-slate-500"><i class="fa-solid fa-ranking-star mr-1"></i> Có bảng xếp hạng</span>
+                                <div class="bg-amber-50 text-amber-600 font-semibold px-4 py-2 rounded-full text-sm group-hover:bg-amber-500 group-hover:text-white transition-colors shadow-sm">
+                                    Vào thi <i class="fa-solid fa-play text-xs ml-1"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+
+                    <!-- Kiểm tra công thức Cấp số cộng, Cấp số nhân, Thống kê (chỉ cần đăng nhập) -->
+                    <a data-loai="toan11" href="exam/kiem-tra-cong-thuc-day-so-thong-ke.html" class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 border border-slate-200 group flex flex-col cursor-pointer block relative">
+                        <div class="absolute top-4 right-4 bg-teal-50 text-teal-700 font-bold text-xs px-2.5 py-1 rounded-md z-10 border border-teal-200 flex items-center gap-1">
+                            <i class="fa-solid fa-user-lock"></i> Cần đăng nhập
+                        </div>
+
+                        <div class="p-6 md:p-8 flex-1 flex flex-col relative overflow-hidden">
+                            <i class="fa-solid fa-trophy absolute -bottom-6 -right-6 text-9xl text-slate-50 opacity-50 dark:opacity-5 transform -rotate-12 group-hover:scale-110 transition-transform duration-500"></i>
+
+                            <div class="flex items-center gap-2 mb-4 relative z-10">
+                                <span class="bg-slate-100 text-slate-600 font-semibold text-xs px-3 py-1 rounded-full uppercase tracking-wider">Toán 11</span>
+                            </div>
+
+                            <h3 class="text-xl font-bold text-slate-900 mb-4 group-hover:text-amber-600 transition-colors leading-snug relative z-10">
+                                Kiểm tra công thức Cấp số cộng, Cấp số nhân, Thống kê
+                            </h3>
+
+                            <div class="grid grid-cols-2 gap-3 mb-6 relative z-10">
+                                <div class="bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col">
+                                    <span class="text-xs text-slate-400 font-medium mb-1">Thời gian</span>
+                                    <span class="text-sm font-bold text-slate-700"><i class="fa-regular fa-clock text-teal-500 mr-1"></i> Tính giờ</span>
+                                </div>
+                                <div class="bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col">
+                                    <span class="text-xs text-slate-400 font-medium mb-1">Số lượng</span>
+                                    <span class="text-sm font-bold text-slate-700"><i class="fa-solid fa-list-ol text-teal-500 mr-1"></i> 10 câu</span>
+                                </div>
+                            </div>
+
+                            <div class="mt-auto pt-4 border-t border-slate-100 flex items-center justify-between relative z-10">
+                                <span class="text-sm font-medium text-slate-500"><i class="fa-solid fa-ranking-star mr-1"></i> Có bảng xếp hạng</span>
+                                <div class="bg-amber-50 text-amber-600 font-semibold px-4 py-2 rounded-full text-sm group-hover:bg-amber-500 group-hover:text-white transition-colors shadow-sm">
+                                    Vào thi <i class="fa-solid fa-play text-xs ml-1"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+
+                    <!-- Kiểm tra Tập hợp, Hệ thức lượng trong tam giác (cần mã do giáo viên cấp) -->
+                    <a data-loai="toan10" href="exam/kiem-tra-tap-hop-he-thuc-luong.html" class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 border border-slate-200 group flex flex-col cursor-pointer block relative">
+                        <div class="absolute top-4 right-4 bg-amber-100 text-amber-700 font-bold text-xs px-2.5 py-1 rounded-md z-10 border border-amber-200 flex items-center gap-1">
+                            <i class="fa-solid fa-key"></i> Cần mã
+                        </div>
+
+                        <div class="p-6 md:p-8 flex-1 flex flex-col relative overflow-hidden">
+                            <i class="fa-solid fa-trophy absolute -bottom-6 -right-6 text-9xl text-slate-50 opacity-50 dark:opacity-5 transform -rotate-12 group-hover:scale-110 transition-transform duration-500"></i>
+
+                            <div class="flex items-center gap-2 mb-4 relative z-10">
+                                <span class="bg-slate-100 text-slate-600 font-semibold text-xs px-3 py-1 rounded-full uppercase tracking-wider">Toán 10</span>
+                            </div>
+
+                            <h3 class="text-xl font-bold text-slate-900 mb-4 group-hover:text-amber-600 transition-colors leading-snug relative z-10">
+                                Kiểm tra Tập hợp, Hệ thức lượng trong tam giác
+                            </h3>
+
+                            <div class="grid grid-cols-2 gap-3 mb-6 relative z-10">
+                                <div class="bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col">
+                                    <span class="text-xs text-slate-400 font-medium mb-1">Thời gian</span>
+                                    <span class="text-sm font-bold text-slate-700"><i class="fa-regular fa-clock text-teal-500 mr-1"></i> Tính giờ</span>
+                                </div>
+                                <div class="bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col">
+                                    <span class="text-xs text-slate-400 font-medium mb-1">Số lượng</span>
+                                    <span class="text-sm font-bold text-slate-700"><i class="fa-solid fa-list-ol text-teal-500 mr-1"></i> 10 câu</span>
+                                </div>
+                            </div>
+
+                            <div class="mt-auto pt-4 border-t border-slate-100 flex items-center justify-between relative z-10">
+                                <span class="text-sm font-medium text-slate-500"><i class="fa-solid fa-ranking-star mr-1"></i> Có bảng xếp hạng</span>
+                                <div class="bg-amber-50 text-amber-600 font-semibold px-4 py-2 rounded-full text-sm group-hover:bg-amber-500 group-hover:text-white transition-colors shadow-sm">
+                                    Vào thi <i class="fa-solid fa-play text-xs ml-1"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+
+                    <!-- Đề thi thử THPT (đề mẫu 5 câu) -->
+                    <a data-loai="thpt" href="exam/de-thi-thu-thpt-1.html" class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 border border-slate-200 group flex flex-col cursor-pointer block relative">
+                        <div class="p-6 md:p-8 flex-1 flex flex-col relative overflow-hidden">
+                            <i class="fa-solid fa-graduation-cap absolute -bottom-6 -right-6 text-9xl text-slate-50 opacity-50 dark:opacity-5 transform -rotate-12 group-hover:scale-110 transition-transform duration-500"></i>
+
+                            <div class="flex items-center gap-2 mb-4 relative z-10">
+                                <span class="bg-slate-100 text-slate-600 font-semibold text-xs px-3 py-1 rounded-full uppercase tracking-wider">Thi thử THPT</span>
+                            </div>
+
+                            <h3 class="text-xl font-bold text-slate-900 mb-4 group-hover:text-red-600 transition-colors leading-snug relative z-10">
+                                Đề thi thử Tốt nghiệp THPT 2027 - Lần 1
+                            </h3>
+
+                            <div class="grid grid-cols-2 gap-3 mb-6 relative z-10">
+                                <div class="bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col">
+                                    <span class="text-xs text-slate-400 font-medium mb-1">Thời gian</span>
+                                    <span class="text-sm font-bold text-slate-700"><i class="fa-regular fa-clock text-teal-500 mr-1"></i> Tính giờ</span>
+                                </div>
+                                <div class="bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col">
+                                    <span class="text-xs text-slate-400 font-medium mb-1">Số lượng</span>
+                                    <span class="text-sm font-bold text-slate-700"><i class="fa-solid fa-list-ol text-teal-500 mr-1"></i> 5 câu</span>
+                                </div>
+                            </div>
+
+                            <div class="mt-auto pt-4 border-t border-slate-100 flex items-center justify-between relative z-10">
+                                <span class="text-sm font-medium text-slate-500">Phần I · Phần II · Phần III</span>
+                                <div class="bg-red-50 text-red-600 font-semibold px-4 py-2 rounded-full text-sm group-hover:bg-red-600 group-hover:text-white transition-colors shadow-sm whitespace-nowrap">
+                                    Bắt đầu <i class="fa-solid fa-play text-xs ml-1"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+
+                </div>
+            </div>
+
+            <!-- 3. ĐÃ LÀM: bài đã nộp (kể cả đề đã đóng), bấm vào để xem kết quả khi thầy công bố -->
+            <div id="khu-da-lam" data-khu class="hidden">
+                <div class="flex items-center gap-3 mb-5">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center shrink-0"><i class="fa-solid fa-clipboard-check"></i></div>
+                    <div>
+                        <h2 class="text-xl md:text-2xl font-extrabold text-slate-900">Đã làm</h2>
+                        <p class="text-sm text-slate-500">Bấm vào để xem điểm khi thầy công bố</p>
                     </div>
-
-                    <div class="p-6 md:p-8 flex-1 flex flex-col relative overflow-hidden">
-                        <i class="fa-solid fa-trophy absolute -bottom-6 -right-6 text-9xl text-slate-50 opacity-50 transform -rotate-12 group-hover:scale-110 transition-transform duration-500"></i>
-
-                        <div class="flex items-center gap-2 mb-4 relative z-10">
-                            <span class="bg-slate-100 text-slate-600 font-semibold text-xs px-3 py-1 rounded-full uppercase tracking-wider">Toán 11</span>
-                        </div>
-
-                        <h3 class="text-xl font-bold text-slate-900 mb-4 group-hover:text-amber-600 transition-colors leading-snug relative z-10">
-                            Kiểm tra công thức Lượng giác
-                        </h3>
-
-                        <div class="grid grid-cols-2 gap-3 mb-6 relative z-10">
-                            <div class="bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col">
-                                <span class="text-xs text-slate-400 font-medium mb-1">Thời gian</span>
-                                <span class="text-sm font-bold text-slate-700"><i class="fa-regular fa-clock text-teal-500 mr-1"></i> Tính giờ</span>
-                            </div>
-                            <div class="bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col">
-                                <span class="text-xs text-slate-400 font-medium mb-1">Số lượng</span>
-                                <span class="text-sm font-bold text-slate-700"><i class="fa-solid fa-list-ol text-teal-500 mr-1"></i> 10 câu</span>
-                            </div>
-                        </div>
-
-                        <div class="mt-auto pt-4 border-t border-slate-100 flex items-center justify-between relative z-10">
-                            <span class="text-sm font-medium text-slate-500"><i class="fa-solid fa-ranking-star mr-1"></i> Có bảng xếp hạng</span>
-                            <div class="bg-amber-50 text-amber-600 font-semibold px-4 py-2 rounded-full text-sm group-hover:bg-amber-500 group-hover:text-white transition-colors shadow-sm">
-                                Vào thi <i class="fa-solid fa-play text-xs ml-1"></i>
-                            </div>
-                        </div>
-                    </div>
-                </a>
-
-                <!-- Kiểm tra công thức Cấp số cộng, Cấp số nhân, Thống kê (chỉ cần đăng nhập) -->
-                <a data-loai="toan11" href="exam/kiem-tra-cong-thuc-day-so-thong-ke.html" class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 border border-slate-200 group flex flex-col cursor-pointer block relative">
-                    <div class="absolute top-4 right-4 bg-teal-50 text-teal-700 font-bold text-xs px-2.5 py-1 rounded-md z-10 border border-teal-200 flex items-center gap-1">
-                        <i class="fa-solid fa-user-lock"></i> Cần đăng nhập
-                    </div>
-
-                    <div class="p-6 md:p-8 flex-1 flex flex-col relative overflow-hidden">
-                        <i class="fa-solid fa-trophy absolute -bottom-6 -right-6 text-9xl text-slate-50 opacity-50 transform -rotate-12 group-hover:scale-110 transition-transform duration-500"></i>
-
-                        <div class="flex items-center gap-2 mb-4 relative z-10">
-                            <span class="bg-slate-100 text-slate-600 font-semibold text-xs px-3 py-1 rounded-full uppercase tracking-wider">Toán 11</span>
-                        </div>
-
-                        <h3 class="text-xl font-bold text-slate-900 mb-4 group-hover:text-amber-600 transition-colors leading-snug relative z-10">
-                            Kiểm tra công thức Cấp số cộng, Cấp số nhân, Thống kê
-                        </h3>
-
-                        <div class="grid grid-cols-2 gap-3 mb-6 relative z-10">
-                            <div class="bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col">
-                                <span class="text-xs text-slate-400 font-medium mb-1">Thời gian</span>
-                                <span class="text-sm font-bold text-slate-700"><i class="fa-regular fa-clock text-teal-500 mr-1"></i> Tính giờ</span>
-                            </div>
-                            <div class="bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col">
-                                <span class="text-xs text-slate-400 font-medium mb-1">Số lượng</span>
-                                <span class="text-sm font-bold text-slate-700"><i class="fa-solid fa-list-ol text-teal-500 mr-1"></i> 10 câu</span>
-                            </div>
-                        </div>
-
-                        <div class="mt-auto pt-4 border-t border-slate-100 flex items-center justify-between relative z-10">
-                            <span class="text-sm font-medium text-slate-500"><i class="fa-solid fa-ranking-star mr-1"></i> Có bảng xếp hạng</span>
-                            <div class="bg-amber-50 text-amber-600 font-semibold px-4 py-2 rounded-full text-sm group-hover:bg-amber-500 group-hover:text-white transition-colors shadow-sm">
-                                Vào thi <i class="fa-solid fa-play text-xs ml-1"></i>
-                            </div>
-                        </div>
-                    </div>
-                </a>
-
-                <!-- Kiểm tra Tập hợp, Hệ thức lượng trong tam giác (cần mã do giáo viên cấp) -->
-                <a data-loai="toan10" href="exam/kiem-tra-tap-hop-he-thuc-luong.html" class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 border border-slate-200 group flex flex-col cursor-pointer block relative">
-                    <div class="absolute top-4 right-4 bg-amber-100 text-amber-700 font-bold text-xs px-2.5 py-1 rounded-md z-10 border border-amber-200 flex items-center gap-1">
-                        <i class="fa-solid fa-key"></i> Cần mã
-                    </div>
-
-                    <div class="p-6 md:p-8 flex-1 flex flex-col relative overflow-hidden">
-                        <i class="fa-solid fa-trophy absolute -bottom-6 -right-6 text-9xl text-slate-50 opacity-50 transform -rotate-12 group-hover:scale-110 transition-transform duration-500"></i>
-
-                        <div class="flex items-center gap-2 mb-4 relative z-10">
-                            <span class="bg-slate-100 text-slate-600 font-semibold text-xs px-3 py-1 rounded-full uppercase tracking-wider">Toán 10</span>
-                        </div>
-
-                        <h3 class="text-xl font-bold text-slate-900 mb-4 group-hover:text-amber-600 transition-colors leading-snug relative z-10">
-                            Kiểm tra Tập hợp, Hệ thức lượng trong tam giác
-                        </h3>
-
-                        <div class="grid grid-cols-2 gap-3 mb-6 relative z-10">
-                            <div class="bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col">
-                                <span class="text-xs text-slate-400 font-medium mb-1">Thời gian</span>
-                                <span class="text-sm font-bold text-slate-700"><i class="fa-regular fa-clock text-teal-500 mr-1"></i> Tính giờ</span>
-                            </div>
-                            <div class="bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col">
-                                <span class="text-xs text-slate-400 font-medium mb-1">Số lượng</span>
-                                <span class="text-sm font-bold text-slate-700"><i class="fa-solid fa-list-ol text-teal-500 mr-1"></i> 10 câu</span>
-                            </div>
-                        </div>
-
-                        <div class="mt-auto pt-4 border-t border-slate-100 flex items-center justify-between relative z-10">
-                            <span class="text-sm font-medium text-slate-500"><i class="fa-solid fa-ranking-star mr-1"></i> Có bảng xếp hạng</span>
-                            <div class="bg-amber-50 text-amber-600 font-semibold px-4 py-2 rounded-full text-sm group-hover:bg-amber-500 group-hover:text-white transition-colors shadow-sm">
-                                Vào thi <i class="fa-solid fa-play text-xs ml-1"></i>
-                            </div>
-                        </div>
-                    </div>
-                </a>
-
-                <!-- Đề 2: ĐGNL V-ACT -->
-                <a data-loai="vact" href="#" class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 border border-slate-200 group flex flex-col cursor-pointer block relative">
-                    <div class="p-6 md:p-8 flex-1 flex flex-col relative overflow-hidden">
-                        <i class="fa-solid fa-brain absolute -bottom-6 -right-6 text-9xl text-slate-50 opacity-50 transform -rotate-12 group-hover:scale-110 transition-transform duration-500"></i>
-                        
-                        <div class="flex items-center gap-2 mb-4 relative z-10">
-                            <span class="bg-blue-50 text-blue-600 font-semibold text-xs px-3 py-1 rounded-full uppercase tracking-wider border border-blue-100">ĐGNL V-ACT</span>
-                        </div>
-                        
-                        <h3 class="text-xl font-bold text-slate-900 mb-4 group-hover:text-blue-600 transition-colors leading-snug relative z-10">
-                            Đề thi thử Đánh giá năng lực V-ACT 2027 (Phần Toán)
-                        </h3>
-                        
-                        <div class="grid grid-cols-2 gap-3 mb-6 relative z-10">
-                            <div class="bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col">
-                                <span class="text-xs text-slate-400 font-medium mb-1">Thời gian</span>
-                                <span class="text-sm font-bold text-slate-700"><i class="fa-regular fa-clock text-blue-500 mr-1"></i> 60 phút</span>
-                            </div>
-                            <div class="bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col">
-                                <span class="text-xs text-slate-400 font-medium mb-1">Số lượng</span>
-                                <span class="text-sm font-bold text-slate-700"><i class="fa-solid fa-list-ol text-blue-500 mr-1"></i> 40 câu</span>
-                            </div>
-                        </div>
-                        
-                        <div class="mt-auto pt-4 border-t border-slate-100 flex items-center justify-between relative z-10">
-                            <span class="text-sm font-medium text-slate-500"><i class="fa-regular fa-user mr-1"></i> 890 lượt thi</span>
-                            <div class="bg-blue-50 text-blue-600 font-semibold px-4 py-2 rounded-full text-sm group-hover:bg-blue-600 group-hover:text-white transition-colors shadow-sm">
-                                Bắt đầu <i class="fa-solid fa-play text-xs ml-1"></i>
-                            </div>
-                        </div>
-                    </div>
-                </a>
-
-                <!-- Đề 3: Toán 12 -->
-                <a data-loai="toan12" href="#" class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 border border-slate-200 group flex flex-col cursor-pointer block relative">
-                    <div class="p-6 md:p-8 flex-1 flex flex-col relative overflow-hidden">
-                        <i class="fa-solid fa-file-contract absolute -bottom-6 -right-6 text-9xl text-slate-50 opacity-50 transform -rotate-12 group-hover:scale-110 transition-transform duration-500"></i>
-                        
-                        <div class="flex items-center gap-2 mb-4 relative z-10">
-                            <span class="bg-purple-50 text-purple-600 font-semibold text-xs px-3 py-1 rounded-full uppercase tracking-wider border border-purple-100">Toán 12</span>
-                        </div>
-                        
-                        <h3 class="text-xl font-bold text-slate-900 mb-4 group-hover:text-purple-600 transition-colors leading-snug relative z-10">
-                            Đề kiểm tra Giữa Học kỳ 1 - Môn Toán 12
-                        </h3>
-                        
-                        <div class="grid grid-cols-2 gap-3 mb-6 relative z-10">
-                            <div class="bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col">
-                                <span class="text-xs text-slate-400 font-medium mb-1">Thời gian</span>
-                                <span class="text-sm font-bold text-slate-700"><i class="fa-regular fa-clock text-purple-500 mr-1"></i> 90 phút</span>
-                            </div>
-                            <div class="bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col">
-                                <span class="text-xs text-slate-400 font-medium mb-1">Số lượng</span>
-                                <span class="text-sm font-bold text-slate-700"><i class="fa-solid fa-list-ol text-purple-500 mr-1"></i> 50 câu</span>
-                            </div>
-                        </div>
-                        
-                        <div class="mt-auto pt-4 border-t border-slate-100 flex items-center justify-between relative z-10">
-                            <span class="text-sm font-medium text-slate-500"><i class="fa-regular fa-user mr-1"></i> 450 lượt thi</span>
-                            <div class="bg-purple-50 text-purple-600 font-semibold px-4 py-2 rounded-full text-sm group-hover:bg-purple-600 group-hover:text-white transition-colors shadow-sm">
-                                Bắt đầu <i class="fa-solid fa-play text-xs ml-1"></i>
-                            </div>
-                        </div>
-                    </div>
-                </a>
-
-                <!-- Đề 4: Toán 11 -->
-                <a data-loai="toan11" href="#" class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 border border-slate-200 group flex flex-col cursor-pointer block relative">
-                    <div class="p-6 md:p-8 flex-1 flex flex-col relative overflow-hidden">
-                        <i class="fa-solid fa-shapes absolute -bottom-6 -right-6 text-9xl text-slate-50 opacity-50 transform -rotate-12 group-hover:scale-110 transition-transform duration-500"></i>
-                        
-                        <div class="flex items-center gap-2 mb-4 relative z-10">
-                            <span class="bg-emerald-50 text-emerald-600 font-semibold text-xs px-3 py-1 rounded-full uppercase tracking-wider border border-emerald-100">Toán 11</span>
-                        </div>
-                        
-                        <h3 class="text-xl font-bold text-slate-900 mb-4 group-hover:text-emerald-600 transition-colors leading-snug relative z-10">
-                            Đề kiểm tra 1 tiết: Lượng giác & Tổ hợp xác suất
-                        </h3>
-                        
-                        <div class="grid grid-cols-2 gap-3 mb-6 relative z-10">
-                            <div class="bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col">
-                                <span class="text-xs text-slate-400 font-medium mb-1">Thời gian</span>
-                                <span class="text-sm font-bold text-slate-700"><i class="fa-regular fa-clock text-emerald-500 mr-1"></i> 45 phút</span>
-                            </div>
-                            <div class="bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col">
-                                <span class="text-xs text-slate-400 font-medium mb-1">Số lượng</span>
-                                <span class="text-sm font-bold text-slate-700"><i class="fa-solid fa-list-ol text-emerald-500 mr-1"></i> 25 câu</span>
-                            </div>
-                        </div>
-                        
-                        <div class="mt-auto pt-4 border-t border-slate-100 flex items-center justify-between relative z-10">
-                            <span class="text-sm font-medium text-slate-500"><i class="fa-regular fa-user mr-1"></i> 320 lượt thi</span>
-                            <div class="bg-emerald-50 text-emerald-600 font-semibold px-4 py-2 rounded-full text-sm group-hover:bg-emerald-600 group-hover:text-white transition-colors shadow-sm">
-                                Bắt đầu <i class="fa-solid fa-play text-xs ml-1"></i>
-                            </div>
-                        </div>
-                    </div>
-                </a>
-
-                <!-- Đề 5: Toán 10 -->
-                <a data-loai="toan10" href="#" class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 border border-slate-200 group flex flex-col cursor-pointer block relative">
-                    <div class="p-6 md:p-8 flex-1 flex flex-col relative overflow-hidden">
-                        <i class="fa-solid fa-square-root-variable absolute -bottom-6 -right-6 text-9xl text-slate-50 opacity-50 transform -rotate-12 group-hover:scale-110 transition-transform duration-500"></i>
-                        
-                        <div class="flex items-center gap-2 mb-4 relative z-10">
-                            <span class="bg-teal-50 text-teal-600 font-semibold text-xs px-3 py-1 rounded-full uppercase tracking-wider border border-teal-100">Toán 10</span>
-                        </div>
-                        
-                        <h3 class="text-xl font-bold text-slate-900 mb-4 group-hover:text-teal-600 transition-colors leading-snug relative z-10">
-                            Đề kiểm tra Giữa Học kỳ 1 - Môn Toán 10
-                        </h3>
-                        
-                        <div class="grid grid-cols-2 gap-3 mb-6 relative z-10">
-                            <div class="bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col">
-                                <span class="text-xs text-slate-400 font-medium mb-1">Thời gian</span>
-                                <span class="text-sm font-bold text-slate-700"><i class="fa-regular fa-clock text-teal-500 mr-1"></i> 90 phút</span>
-                            </div>
-                            <div class="bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col">
-                                <span class="text-xs text-slate-400 font-medium mb-1">Số lượng</span>
-                                <span class="text-sm font-bold text-slate-700"><i class="fa-solid fa-list-ol text-teal-500 mr-1"></i> 50 câu</span>
-                            </div>
-                        </div>
-                        
-                        <div class="mt-auto pt-4 border-t border-slate-100 flex items-center justify-between relative z-10">
-                            <span class="text-sm font-medium text-slate-500"><i class="fa-regular fa-user mr-1"></i> 510 lượt thi</span>
-                            <div class="bg-teal-50 text-teal-600 font-semibold px-4 py-2 rounded-full text-sm group-hover:bg-teal-600 group-hover:text-white transition-colors shadow-sm">
-                                Bắt đầu <i class="fa-solid fa-play text-xs ml-1"></i>
-                            </div>
-                        </div>
-                    </div>
-                </a>
-
+                </div>
+                <div data-luoi class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
             </div>
 
             <p id="loc-trong" class="hidden text-center text-slate-500 py-12"><i class="fa-regular fa-folder-open text-3xl text-slate-300 block mb-3"></i>Chưa có đề nào trong mục này.</p>
@@ -525,6 +430,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
     <script src="assets/js/dfm-de-thi.js"></script>
+    <script src="assets/js/dfm-tai-khoan.js"></script>
     
     <script>
         const firebaseConfig = {
@@ -553,47 +459,70 @@
         }
 
         // KIỂM TRA TRẠNG THÁI ĐĂNG NHẬP VÀ XỬ LÝ FOUC
-        // Đề thi trực tuyến (tải từ file TeX ở trang Quản trị) đang mở: hiện ở đầu danh sách
+        const DT = window.dfmDeThi;
+        const ADMIN_EMAIL = 'thanhdo@dfm.com';
         function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
-        // Kèm các đề học sinh đã nộp (kể cả đề đã đóng) để quay lại xem điểm khi thầy công bố
-        function theDeThi(de, nop) {
+        const millis = (t) => (t && t.toMillis && t.toMillis()) || 0;
+
+        // ----- Lớp của học sinh -----
+        // Lấy theo quyền khóa học thầy cấp (phan_quyen): học Toán 12 thì thấy đề Toán 12 + Thi thử THPT + ĐGNL V-ACT.
+        // Đề "Không phân loại" ai cũng thấy. Khách, Admin, tài khoản chưa xếp lớp: loaiDuocXem = null (thấy tất cả).
+        const LOAI_THEO_KHOA = { 'toan-12': ['toan12', 'thpt', 'vact'], 'toan-11': ['toan11'], 'toan-10': ['toan10'] };
+        let loaiDuocXem = null;
+        function duocXem(loai) { return !loaiDuocXem || !loai || loaiDuocXem.has(loai); }
+
+        function hienLop(html) { document.getElementById('pt-lop').innerHTML = html; }
+        const nhanLop = (ten) => '<span class="bg-teal-50 text-teal-700 border border-teal-200 font-bold text-sm px-3 py-1 rounded-full whitespace-nowrap">' + esc(ten) + '</span>';
+        const iconLop = (icon) => '<div class="w-10 h-10 rounded-xl bg-white border border-slate-200 text-teal-600 flex items-center justify-center shrink-0 shadow-sm"><i class="fa-solid ' + icon + '"></i></div>';
+
+        // ----- Thẻ đề -----
+        // Đề đang mở, chưa làm: thẻ lớn ở khu "Cần làm"
+        function theCanLam(de) {
             const so = de.soCau || {};
             const tong = (so.mc || 0) + (so.tf || 0) + (so.sa || 0);
             const phan = [so.mc && 'Phần I', so.tf && 'Phần II', so.sa && 'Phần III'].filter(Boolean).join(' · ');
-            const congBo = de.congBo || (de.hienLoiGiai ? 'day-du' : 'diem');
-            const nhan = nop
-                ? '<div class="absolute top-4 right-4 bg-emerald-100 text-emerald-700 font-bold text-xs px-2.5 py-1 rounded-md z-10 border border-emerald-200 flex items-center gap-1"><i class="fa-solid fa-check"></i> Đã nộp</div>'
-                : '<div class="absolute top-4 right-4 bg-teal-100 text-teal-700 font-bold text-xs px-2.5 py-1 rounded-md z-10 border border-teal-200 flex items-center gap-1"><i class="fa-solid fa-bolt"></i> Mới</div>';
-            const thongTin = de.daDong
-                ? '<div class="bg-slate-50 border border-slate-100 rounded-xl p-3 mb-6 relative z-10 text-sm text-slate-600"><i class="fa-solid fa-circle-check text-emerald-500 mr-1"></i> Bạn đã nộp bài · điểm hiện khi thầy công bố</div>'
-                : '<div class="grid grid-cols-2 gap-3 mb-6 relative z-10">' +
-                  '<div class="bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col"><span class="text-xs text-slate-400 font-medium mb-1">Thời gian</span><span class="text-sm font-bold text-slate-700"><i class="fa-regular fa-clock text-teal-500 mr-1"></i> ' + esc(de.thoiGian) + ' phút</span></div>' +
-                  '<div class="bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col"><span class="text-xs text-slate-400 font-medium mb-1">Số lượng</span><span class="text-sm font-bold text-slate-700"><i class="fa-solid fa-list-ol text-teal-500 mr-1"></i> ' + tong + ' câu</span></div>' +
-                  '</div>';
-            const trai = nop
-                ? (de.daDong ? '<span class="text-sm font-medium text-slate-500"><i class="fa-solid fa-lock mr-1"></i>Đề đã đóng</span>'
-                    : '<span class="text-sm font-medium ' + (congBo === 'an' ? 'text-slate-500' : 'text-emerald-600') + '">' + (congBo === 'an' ? '<i class="fa-solid fa-hourglass-half mr-1"></i>Chờ công bố điểm' : '<i class="fa-solid fa-star mr-1"></i>Đã có điểm') + '</span>')
-                : '<span class="text-sm font-medium text-slate-500">' + esc(phan) + '</span>';
-            return '<a data-loai="' + DT.phanLoaiCua(de) + '" href="exam/lam-bai.html?de=' + encodeURIComponent(de.id) + '" class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 border ' + (nop ? 'border-emerald-200' : 'border-teal-200') + ' group flex flex-col cursor-pointer block relative">' +
-                nhan +
+            const loai = DT.phanLoaiCua(de);
+            return '<a data-loai="' + loai + '" href="exam/lam-bai.html?de=' + encodeURIComponent(de.id) + '" class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 border border-teal-200 group flex flex-col cursor-pointer block relative">' +
+                '<div class="absolute top-4 right-4 bg-teal-100 text-teal-700 font-bold text-xs px-2.5 py-1 rounded-md z-10 border border-teal-200 flex items-center gap-1"><i class="fa-solid fa-bolt"></i> Mới</div>' +
                 '<div class="p-6 md:p-8 flex-1 flex flex-col relative overflow-hidden">' +
-                '<i class="fa-solid fa-file-signature absolute -bottom-6 -right-6 text-9xl text-slate-50 opacity-50 transform -rotate-12 group-hover:scale-110 transition-transform duration-500"></i>' +
-                '<div class="flex items-center gap-2 mb-4 relative z-10"><span class="bg-teal-50 text-teal-700 font-semibold text-xs px-3 py-1 rounded-full uppercase tracking-wider">Đề trực tuyến</span></div>' +
+                '<i class="fa-solid fa-file-signature absolute -bottom-6 -right-6 text-9xl text-slate-50 opacity-50 dark:opacity-5 transform -rotate-12 group-hover:scale-110 transition-transform duration-500"></i>' +
+                '<div class="flex items-center gap-2 mb-4 relative z-10"><span class="bg-teal-50 text-teal-700 font-semibold text-xs px-3 py-1 rounded-full uppercase tracking-wider">' + esc(DT.PHAN_LOAI[loai] || 'Đề trực tuyến') + '</span></div>' +
                 '<h3 class="text-xl font-bold text-slate-900 mb-2 group-hover:text-teal-600 transition-colors leading-snug relative z-10">' + esc(de.tieuDe) + '</h3>' +
                 (de.moTa ? '<p class="text-sm text-slate-500 mb-4 relative z-10">' + esc(de.moTa) + '</p>' : '<div class="mb-2"></div>') +
-                thongTin +
-                '<div class="mt-auto pt-4 border-t border-slate-100 flex items-center justify-between gap-2 relative z-10">' + trai +
-                '<div class="bg-teal-50 text-teal-600 font-semibold px-4 py-2 rounded-full text-sm group-hover:bg-teal-600 group-hover:text-white transition-colors shadow-sm whitespace-nowrap">' +
-                (nop ? 'Xem kết quả <i class="fa-solid fa-chevron-right text-xs ml-1"></i>' : 'Bắt đầu <i class="fa-solid fa-play text-xs ml-1"></i>') + '</div>' +
+                '<div class="grid grid-cols-2 gap-3 mb-6 relative z-10">' +
+                '<div class="bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col"><span class="text-xs text-slate-400 font-medium mb-1">Thời gian</span><span class="text-sm font-bold text-slate-700"><i class="fa-regular fa-clock text-teal-500 mr-1"></i> ' + esc(de.thoiGian) + ' phút</span></div>' +
+                '<div class="bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col"><span class="text-xs text-slate-400 font-medium mb-1">Số lượng</span><span class="text-sm font-bold text-slate-700"><i class="fa-solid fa-list-ol text-teal-500 mr-1"></i> ' + tong + ' câu</span></div>' +
+                '</div>' +
+                '<div class="mt-auto pt-4 border-t border-slate-100 flex items-center justify-between gap-2 relative z-10">' +
+                '<span class="text-sm font-medium text-slate-500">' + esc(phan) + '</span>' +
+                '<div class="bg-teal-50 text-teal-600 font-semibold px-4 py-2 rounded-full text-sm group-hover:bg-teal-600 group-hover:text-white transition-colors shadow-sm whitespace-nowrap">Bắt đầu <i class="fa-solid fa-play text-xs ml-1"></i></div>' +
                 '</div></div></a>';
         }
-        function hienDeThiMoi(user) {
-            const khung = document.getElementById('de-thi-moi');
-            if (!khung || khung.dataset.daTai) return;
-            khung.dataset.daTai = '1';
+        // Bài đã nộp: một dòng gọn ở khu "Đã làm"
+        function dongDaLam(de) {
+            const congBo = DT.congBoCua(de);
+            const trangThai = de.daDong
+                ? '<span class="text-slate-500"><i class="fa-solid fa-lock mr-1"></i>Đề đã đóng</span>'
+                : congBo === 'an'
+                    ? '<span class="text-slate-500"><i class="fa-solid fa-hourglass-half mr-1"></i>Chờ công bố điểm</span>'
+                    : '<span class="text-emerald-600 font-semibold"><i class="fa-solid fa-star mr-1"></i>Đã có điểm</span>';
+            const ngay = de.nopLuc && de.nopLuc.toDate ? 'Nộp ' + de.nopLuc.toDate().toLocaleDateString('vi-VN') + ' · ' : '';
+            return '<a data-loai="' + (de.daDong ? '' : DT.phanLoaiCua(de)) + '" href="exam/lam-bai.html?de=' + encodeURIComponent(de.id) + '" class="flex items-center gap-4 p-4 bg-white rounded-2xl border border-slate-200 hover:border-teal-300 hover:shadow-md transition-all group">' +
+                '<div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0"><i class="fa-solid fa-check"></i></div>' +
+                '<div class="min-w-0 flex-1">' +
+                '<div class="font-semibold text-slate-800 truncate group-hover:text-teal-700 transition-colors">' + esc(de.tieuDe) + '</div>' +
+                '<div class="text-xs text-slate-500 mt-0.5">' + esc(ngay) + trangThai + '</div>' +
+                '</div>' +
+                '<span class="text-sm font-semibold text-teal-600 whitespace-nowrap hidden sm:inline">Xem kết quả <i class="fa-solid fa-chevron-right text-xs ml-1"></i></span>' +
+                '<span class="sm:hidden text-slate-400"><i class="fa-solid fa-chevron-right"></i></span>' +   // bọc span: Font Awesome ghi đè display của thẻ <i>
+                '</a>';
+        }
+
+        // Đề trực tuyến (tải từ file TeX ở trang Quản trị): đề đang mở của lớp mình chưa làm → "Cần làm";
+        // các đề đã nộp (kể cả đề đã đóng) → "Đã làm" để quay lại xem điểm khi thầy công bố
+        function taiDeTrucTuyen(user) {
             const db = firebase.firestore();
-            const millis = (t) => (t && t.toMillis && t.toMillis()) || 0;
-            Promise.all([
+            return Promise.all([
                 db.collection('de_thi').where('trangThai', '==', 'mo').get(),
                 // Rules chưa cập nhật thì bỏ qua phần này, vẫn hiện đề đang mở
                 db.collection('bai_lam').where('uid', '==', user.uid).get().catch(() => null)
@@ -602,37 +531,56 @@
                 if (bl) bl.docs.forEach((d) => { const v = d.data(); if (v.deId) daNop[v.deId] = v; });
                 const dangMo = snap.docs.map((d) => Object.assign({ id: d.id }, d.data()))
                     .sort((a, b) => millis(b.capNhatLuc) - millis(a.capNhatLuc));
-                // Đề đang mở chưa làm lên trước, rồi tới đề đã nộp (mới nộp lên trước)
-                const chuaLam = dangMo.filter((de) => !daNop[de.id]);
+                const chuaLam = dangMo.filter((de) => !daNop[de.id] && duocXem(DT.phanLoaiCua(de)));
+                // Bài đã nộp là của chính học sinh nên luôn hiện, không lọc theo lớp
                 const daLam = dangMo.filter((de) => daNop[de.id]).map((de) => Object.assign(de, { nopLuc: daNop[de.id].nopLuc }))
                     .concat(Object.keys(daNop).filter((id) => !dangMo.some((de) => de.id === id))
                         .map((id) => ({ id: id, tieuDe: daNop[id].tieuDe || 'Đề thi đã làm', daDong: true, nopLuc: daNop[id].nopLuc })))
                     .sort((a, b) => millis(b.nopLuc) - millis(a.nopLuc));
-                khung.innerHTML = chuaLam.map((de) => theDeThi(de, false)).join('') + daLam.map((de) => theDeThi(de, true)).join('');
-                locDe(locHienTai);
+                document.querySelector('#khu-can-lam [data-luoi]').innerHTML = chuaLam.map(theCanLam).join('');
+                document.querySelector('#khu-da-lam [data-luoi]').innerHTML = daLam.map(dongDaLam).join('');
             }).catch((err) => console.warn('Không tải được đề thi trực tuyến:', err));
         }
 
-        // Lọc đề theo nút danh mục; nhớ lựa chọn trên địa chỉ trang (?loai=toan12) để gửi link hoặc tải lại vẫn giữ
-        const DT = window.dfmDeThi;
-        const NUT_BAT = 'bg-teal-600 text-white px-5 py-2 rounded-full font-semibold shadow-md shadow-teal-500/20 border border-teal-600'.split(' ');
-        const NUT_TAT = 'bg-white text-slate-600 hover:text-teal-600 border border-slate-200 hover:border-teal-300 px-5 py-2 rounded-full font-medium transition-colors'.split(' ');
+        // ----- Lọc theo loại đề -----
+        // Nút lọc chỉ gồm các loại đề đang có trong phòng thi của học sinh; nhớ lựa chọn trên địa chỉ (?loai=toan12)
+        const NUT_BAT = 'bg-teal-600 text-white border-teal-600 shadow-md shadow-teal-500/20 font-semibold'.split(' ');
+        const NUT_TAT = 'bg-white text-slate-600 hover:text-teal-600 border-slate-200 hover:border-teal-300 font-medium'.split(' ');
         let locHienTai = '';
+        function dungNutLoc() {
+            const coDe = new Set(Array.from(document.querySelectorAll('#khu-de [data-loai]')).map((the) => the.dataset.loai).filter(Boolean));
+            const cacLoai = Object.keys(DT.PHAN_LOAI).filter((l) => coDe.has(l));
+            const khung = document.getElementById('loc-de');
+            khung.innerHTML = cacLoai.length < 2 ? '' : ['', ...cacLoai].map((l) =>
+                '<button type="button" data-loc="' + l + '" aria-pressed="false" class="px-4 py-2 rounded-full border text-sm transition-colors">' + esc(l ? DT.PHAN_LOAI[l] : 'Tất cả') + '</button>').join('');
+            return cacLoai;
+        }
         function locDe(loc) {
-            locHienTai = DT.PHAN_LOAI[loc] ? loc : '';
-            document.querySelectorAll('#loc-de [data-loc]').forEach((nut) => {
-                const bat = nut.dataset.loc === locHienTai;
-                nut.classList.remove(...(bat ? NUT_TAT : NUT_BAT));
-                nut.classList.add(...(bat ? NUT_BAT : NUT_TAT));
-                nut.setAttribute('aria-pressed', bat);
+            const nut = document.querySelector('#loc-de [data-loc="' + loc + '"]');
+            locHienTai = loc && nut ? loc : '';
+            document.querySelectorAll('#loc-de [data-loc]').forEach((n) => {
+                const bat = n.dataset.loc === locHienTai;
+                n.classList.remove(...(bat ? NUT_TAT : NUT_BAT));
+                n.classList.add(...(bat ? NUT_BAT : NUT_TAT));
+                n.setAttribute('aria-pressed', bat);
             });
-            let soHien = 0;
-            document.querySelectorAll('#luoi-de [data-loai]').forEach((the) => {
-                const hien = !locHienTai || the.dataset.loai === locHienTai;
-                the.classList.toggle('hidden', !hien);
-                if (hien) soHien++;
+            document.querySelectorAll('#khu-de [data-loai]').forEach((the) => {
+                the.classList.toggle('hidden', !!locHienTai && the.dataset.loai !== locHienTai);
             });
-            document.getElementById('loc-trong').classList.toggle('hidden', soHien > 0);
+            // Khu "Cần làm" luôn hiện (kèm lời nhắn khi trống); khu khác trống thì ẩn cả khu
+            let tongHien = 0;
+            document.querySelectorAll('#khu-de [data-khu]').forEach((khu) => {
+                if (khu.dataset.tat) return;
+                const so = khu.querySelectorAll('[data-luoi] > [data-loai]:not(.hidden)').length;
+                tongHien += so;
+                const dem = khu.querySelector('[data-dem]');
+                if (dem) dem.textContent = so;
+                if (dem) dem.classList.toggle('hidden', !so);
+                const trong = khu.querySelector('[data-trong]');
+                if (trong) trong.classList.toggle('hidden', so > 0);
+                else khu.classList.toggle('hidden', !so);
+            });
+            document.getElementById('loc-trong').classList.toggle('hidden', tongHien > 0 || !document.getElementById('khu-can-lam').dataset.tat);
             const url = new URL(location.href);
             if (locHienTai) url.searchParams.set('loai', locHienTai); else url.searchParams.delete('loai');
             history.replaceState(null, '', url);
@@ -641,10 +589,50 @@
             const nut = e.target.closest('[data-loc]');
             if (nut) locDe(nut.dataset.loc);
         });
-        locDe(new URLSearchParams(location.search).get('loai') || '');
+
+        // Dựng phòng thi theo tài khoản: bỏ đề lớp khác, dựng nút lọc, hiện các khu
+        let daDung = false;
+        async function dungPhongThi(user) {
+            if (daDung) return;
+            daDung = true;
+            const canLam = document.getElementById('khu-can-lam');
+            const daLam = document.getElementById('khu-da-lam');
+            try {
+                if (!user) {
+                    document.getElementById('pt-moi-dang-nhap').classList.remove('hidden');
+                    hienLop(iconLop('fa-door-open') + '<span class="font-semibold text-slate-700">Tất cả đề thi</span>');
+                    canLam.dataset.tat = daLam.dataset.tat = '1';   // cần đăng nhập mới có
+                    canLam.classList.add('hidden');
+                } else if (user.email === ADMIN_EMAIL) {
+                    canLam.classList.remove('hidden');
+                    hienLop(iconLop('fa-user-shield') + '<span class="font-semibold text-slate-700">Tài khoản quản trị · xem đề của tất cả các lớp</span>');
+                } else {
+                    canLam.classList.remove('hidden');
+                    const quyen = await dfmTaiKhoan.docQuyen(firebase.firestore(), user).catch(() => ({}));
+                    const cacKhoa = Object.keys(LOAI_THEO_KHOA).filter((k) => quyen[k] === true);
+                    if (cacKhoa.length) {
+                        loaiDuocXem = new Set(cacKhoa.flatMap((k) => LOAI_THEO_KHOA[k]));
+                        hienLop(iconLop('fa-users') + '<span class="text-slate-500 font-medium whitespace-nowrap">Phòng thi lớp</span>' +
+                            '<div class="flex flex-wrap gap-2">' + cacKhoa.map((k) => nhanLop(DT.PHAN_LOAI[k.replace('-', '')])).join('') + '</div>');
+                    } else {
+                        hienLop(iconLop('fa-circle-info') + '<span class="text-sm text-slate-600">Tài khoản chưa được xếp lớp. Nhắn thầy Đô để được thêm vào lớp nhé!</span>');
+                    }
+                }
+                // Đề luyện tập của lớp khác: bỏ hẳn khỏi trang
+                document.querySelectorAll('#khu-luyen-tap [data-loai]').forEach((the) => { if (!duocXem(the.dataset.loai)) the.remove(); });
+                if (user) await taiDeTrucTuyen(user);
+                dungNutLoc();
+                locDe(new URLSearchParams(location.search).get('loai') || '');
+            } catch (err) {
+                console.warn('Lỗi dựng phòng thi:', err);
+            } finally {
+                document.getElementById('khu-de').style.opacity = '1';
+            }
+        }
+
 
         firebase.auth().onAuthStateChanged((user) => {
-            if (user) hienDeThiMoi(user);
+            dungPhongThi(user);
             const khuVucDangNhap = document.getElementById('khu-vuc-dang-nhap');
             const khuVucUser = document.getElementById('khu-vuc-user');
             const nutDangXuatMobile = document.getElementById('nutDangXuatMobile');
