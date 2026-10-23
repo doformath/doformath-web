@@ -18,7 +18,7 @@
     <!-- Giao diện sáng / tối: chạy trước CSS để không bị nháy màu -->
     <script src="assets/js/dfm-giao-dien.js"></script>
     <!-- CSS Tailwind dựng sẵn cho cả site (sửa class xong chạy: npm run build:css) -->
-    <link rel="stylesheet" href="assets/css/tailwind.css?v=3f38453c">
+    <link rel="stylesheet" href="assets/css/tailwind.css?v=026215a3">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -192,14 +192,25 @@
         <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-14">
             <div class="flex flex-wrap items-start justify-between gap-4">
                 <div>
-                    <p class="text-teal-300 text-sm font-semibold uppercase tracking-wider"><i class="fa-solid fa-user-graduate mr-1.5"></i>Góc học tập của tôi</p>
+                    <p id="nhan-goc" class="text-teal-300 text-sm font-semibold uppercase tracking-wider"><i class="fa-solid fa-user-graduate mr-1.5"></i>Góc học tập của tôi</p>
                     <h1 id="loi-chao" class="text-3xl md:text-4xl font-extrabold text-white mt-2">Xin chào!</h1>
                 </div>
                 <button id="nut-tai-khoan" type="button" class="hidden items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/15 text-white text-sm font-semibold px-4 py-2.5 rounded-full transition-colors">
                     <i class="fa-solid fa-shield-halved text-teal-300"></i>Tài khoản &amp; mật khẩu
                 </button>
             </div>
-            <p class="text-slate-300 mt-2 max-w-2xl">Nơi tổng hợp điểm số và quá trình học của riêng bạn. Xem lại chỗ còn yếu để cải thiện mỗi ngày.</p>
+            <p id="mo-ta-goc" class="text-slate-300 mt-2 max-w-2xl">Nơi tổng hợp điểm số và quá trình học của riêng bạn. Xem lại chỗ còn yếu để cải thiện mỗi ngày.</p>
+            <!-- Chế độ giáo viên (tài khoản Admin): chọn học sinh để xem góc học tập của học sinh đó -->
+            <label id="chon-hoc-sinh" class="hidden mt-5 max-w-xl">
+                <span class="sr-only">Chọn học sinh</span>
+                <span class="relative block">
+                    <i class="fa-solid fa-user-graduate absolute left-4 top-1/2 -translate-y-1/2 text-teal-300 pointer-events-none"></i>
+                    <select id="ds-hoc-sinh" class="w-full appearance-none pl-11 pr-10 py-3 rounded-2xl bg-white/10 hover:bg-white/15 border border-white/15 text-white text-base font-medium focus:ring-4 focus:ring-teal-500/30 outline-none cursor-pointer" style="color-scheme: dark;">
+                        <option value="">Đang tải danh sách học sinh...</option>
+                    </select>
+                    <i class="fa-solid fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 text-sm pointer-events-none"></i>
+                </span>
+            </label>
             <div id="o-tong-quan" class="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-8"></div>
         </div>
     </section>
@@ -355,7 +366,8 @@
         }
         (function () {
             const p = window.dfmPhien && dfmPhien.doc();
-            if (p) hienBanDem(p.uid);
+            // Tài khoản giáo viên xem học sinh khác nhau mỗi lần, không dùng bản lưu
+            if (p && p.email !== 'thanhdo@dfm.com') hienBanDem(p.uid);
         })();
     </script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -383,6 +395,10 @@
         // Học sinh chỉ đọc được dữ liệu của chính mình (Firestore Rules):
         //   hoc_sinh/{uid} (hoạt động học), bai_lam (bài nộp đề trực tuyến), bxh_*/{uid} (kiểm tra công thức).
         // Đáp án đề chỉ đọc được khi thầy đã công bố, nên điểm/chi tiết hiện theo đúng mức thầy cho phép.
+        // Tài khoản giáo viên (Admin) đọc được dữ liệu của mọi học sinh: chọn học sinh ở đầu trang để xem
+        // góc học tập của em đó, hiện đúng như học sinh thấy (vẫn theo mức công bố của từng đề).
+        const ADMIN_EMAIL = 'thanhdo@dfm.com';
+        let XEM_HO = false;   // đang xem góc học tập của học sinh khác (chế độ giáo viên)
         const D = window.dfmDeThi;
         const BXH = [
             { id: 'bxh_luong_giac', ten: 'Công thức lượng giác', url: 'exam/kiem-tra-cong-thuc-luong-giac.html' },
@@ -412,12 +428,12 @@
         }
 
         // ---------- Tải dữ liệu ----------
-        async function taiDuLieu(user) {
+        async function taiDuLieu(uid) {
             const db = firebase.firestore();
             const [hs, bl, ...bxh] = await Promise.allSettled([
-                db.collection('hoc_sinh').doc(user.uid).get(),
-                db.collection('bai_lam').where('uid', '==', user.uid).get()
-            ].concat(BXH.map((b) => db.collection(b.id).doc(user.uid).get())));
+                db.collection('hoc_sinh').doc(uid).get(),
+                db.collection('bai_lam').where('uid', '==', uid).get()
+            ].concat(BXH.map((b) => db.collection(b.id).doc(uid).get())));
             const hocSinh = hs.status === 'fulfilled' && hs.value.exists ? hs.value.data() : null;
             const baiLam = bl.status === 'fulfilled' ? bl.value.docs.map((d) => Object.assign({ id: d.id }, d.data())) : [];
             const kiemTra = BXH.map((b, i) => Object.assign({ du: bxh[i].status === 'fulfilled' && bxh[i].value.exists ? bxh[i].value.data() : null }, b));
@@ -555,7 +571,9 @@
                 const muc = k ? mucDo(k.thang10 * 10) : null;
                 const phan = k ? ['mc', 'tf', 'sa'].filter((l) => k.phan[l].so).map((l) =>
                     '<span class="text-xs text-slate-500">' + D.PHAN[l] + ': <b class="text-slate-700">' + so(k.phan[l].diem) + '/' + so(k.phan[l].toiDa) + '</b></span>').join('<span class="text-slate-300">·</span>') : '';
-                return '<a href="exam/lam-bai.html?de=' + encodeURIComponent(r.deId) + '" class="flex items-center gap-4 p-4 rounded-2xl border border-slate-100 hover:border-teal-200 hover:bg-teal-50/40 transition group">' +
+                // Trang làm bài mở bài của người đang đăng nhập, nên giáo viên xem hộ thì không gắn link
+                return (XEM_HO ? '<div class="flex items-center gap-4 p-4 rounded-2xl border border-slate-100">'
+                    : '<a href="exam/lam-bai.html?de=' + encodeURIComponent(r.deId) + '" class="flex items-center gap-4 p-4 rounded-2xl border border-slate-100 hover:border-teal-200 hover:bg-teal-50/40 transition group">') +
                     '<div class="w-16 h-16 shrink-0 rounded-2xl flex flex-col items-center justify-center ' + (k ? 'bg-teal-50' : 'bg-slate-100') + '">' +
                     (k ? '<span class="text-xl font-extrabold text-teal-700 leading-none">' + so(k.tong) + '</span><span class="text-[10px] text-slate-500 mt-0.5">/ ' + so(k.toiDa) + '</span>'
                        : '<i class="fa-solid fa-hourglass-half text-slate-400"></i>') + '</div>' +
@@ -563,8 +581,9 @@
                     '<p class="text-xs text-slate-500 mt-0.5">Nộp ' + ngayThang(r.nop) + (r.bai.viPham ? ' · <span class="text-red-600">rời bài ' + r.bai.viPham + ' lần</span>' : '') + '</p>' +
                     '<div class="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-1">' + (k ? phan : '<span class="text-xs text-slate-500">' + (r.de ? 'Thầy chưa công bố điểm' : 'Đề đã bị xóa') + '</span>') + '</div></div>' +
                     (muc ? '<span class="hidden sm:inline-flex items-center gap-1 text-xs font-semibold ' + muc.chu + '"><i class="fa-solid ' + muc.icon + '"></i>' + muc.ten + '</span>' : '') +
-                    '<i class="fa-solid fa-chevron-right text-slate-300 group-hover:text-teal-600"></i></a>';
-            }).join('') : '<p class="text-sm text-slate-400">Bạn chưa làm đề thi trực tuyến nào. <a href="phong-thi.html" class="text-primary font-semibold hover:underline">Vào Phòng thi</a></p>';
+                    (XEM_HO ? '</div>' : '<i class="fa-solid fa-chevron-right text-slate-300 group-hover:text-teal-600"></i></a>');
+            }).join('') : XEM_HO ? '<p class="text-sm text-slate-400">Học sinh chưa làm đề thi trực tuyến nào.</p>'
+                : '<p class="text-sm text-slate-400">Bạn chưa làm đề thi trực tuyến nào. <a href="phong-thi.html" class="text-primary font-semibold hover:underline">Vào Phòng thi</a></p>';
         }
 
         const MAU_TT = { sai: 'bg-red-500 text-white', 'mot-phan': 'bg-amber-400 text-white', trong: 'bg-slate-200 text-slate-600' };
@@ -584,8 +603,9 @@
                 '<div><div class="flex flex-wrap items-baseline justify-between gap-2 mb-2"><p class="font-semibold text-slate-800 text-sm">' + esc(g.r.tieuDe) + '</p>' +
                 '<span class="text-xs text-slate-500">' + (g.cau.length ? g.cau.length + ' câu cần xem lại' : '<span class="text-emerald-700"><i class="fa-solid fa-circle-check mr-1"></i>Đúng hết, tuyệt vời!</span>') +
                 (g.r.congBo === 'day-du' ? ' · <span class="text-teal-700">có lời giải</span>' : '') + '</span></div>' +
-                '<div class="flex flex-wrap gap-1.5">' + g.cau.map((x) =>
-                    '<a href="exam/lam-bai.html?de=' + encodeURIComponent(g.r.deId) + '#xl-' + encodeURIComponent(x.q.id) + '" title="' + TEN_TT[x.tt] + '" class="text-xs font-bold px-2 py-1.5 rounded-lg hover:scale-105 transition ' + MAU_TT[x.tt] + '">' + x.nhan + '</a>').join('') + '</div></div>'
+                '<div class="flex flex-wrap gap-1.5">' + g.cau.map((x) => XEM_HO
+                    ? '<span title="' + TEN_TT[x.tt] + '" class="text-xs font-bold px-2 py-1.5 rounded-lg ' + MAU_TT[x.tt] + '">' + x.nhan + '</span>'
+                    : '<a href="exam/lam-bai.html?de=' + encodeURIComponent(g.r.deId) + '#xl-' + encodeURIComponent(x.q.id) + '" title="' + TEN_TT[x.tt] + '" class="text-xs font-bold px-2 py-1.5 rounded-lg hover:scale-105 transition ' + MAU_TT[x.tt] + '">' + x.nhan + '</a>').join('') + '</div></div>'
             ).join('') + '<div class="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500 pt-1">' +
                 Object.keys(TEN_TT).map((t) => '<span><span class="inline-block w-2.5 h-2.5 rounded-sm align-middle mr-1 ' + MAU_TT[t] + '"></span>' + TEN_TT[t] + '</span>').join('') + '</div>';
         }
@@ -874,6 +894,83 @@
             });
         })();
 
+        function veTatCa(du) {
+            const pt = phanTich(du), nh = ngayHoc(du.hocSinh);
+            veTongQuan(du, pt, nh);
+            veBieuDoDiem(pt);
+            veDanhSachDe(du);
+            veCauXemLai(du);
+            veTheoPhan(pt);
+            veKiemTraCongThuc(du);
+            veHoatDong(du, nh);
+            veBaiGanDay(du);
+            veGoiY(du, pt, nh);
+            $('trang-thai').classList.add('hidden');
+            $('noi-dung').classList.remove('hidden');
+        }
+
+        // ---------- Chế độ giáo viên ----------
+        // Danh sách học sinh gộp từ hồ sơ học tập, bài làm đề thi và đơn đăng ký (đơn có tên học sinh)
+        const DS_HS = new Map();   // uid -> { uid, email, ten }
+        let lanXem = 0;
+        function tenHocSinh(hs) { return hs.ten || hs.email.split('@')[0]; }
+        async function moCheDoGiaoVien() {
+            XEM_HO = true;
+            $('nhan-goc').innerHTML = '<i class="fa-solid fa-chalkboard-user mr-1.5"></i>Góc học tập · chế độ giáo viên';
+            $('mo-ta-goc').textContent = 'Chọn học sinh để xem điểm số và quá trình học của em đó, đúng như học sinh thấy.';
+            $('loi-chao').textContent = 'Góc học tập học sinh';
+            $('chon-hoc-sinh').classList.remove('hidden'); $('chon-hoc-sinh').classList.add('block');
+            $('trang-thai').classList.remove('hidden');
+            const db = firebase.firestore();
+            const [hs, bl, dk, pq] = await Promise.allSettled(['hoc_sinh', 'bai_lam', 'dang_ky', 'phan_quyen'].map((c) => db.collection(c).get()));
+            const them = (uid, email, ten) => {
+                email = String(email || '').toLowerCase();
+                if (!uid || !email || email === ADMIN_EMAIL) return;
+                const o = DS_HS.get(uid) || { uid: uid, email: email };
+                if (ten && !o.ten) o.ten = String(ten);
+                DS_HS.set(uid, o);
+            };
+            if (hs.status === 'fulfilled') hs.value.docs.forEach((d) => them(d.id, d.data().email));
+            if (bl.status === 'fulfilled') bl.value.docs.forEach((d) => them(d.data().uid, d.data().email));
+            if (dk.status === 'fulfilled') dk.value.docs.forEach((d) => { if (DS_HS.has(d.id) || d.data().trangThai === 'duyet') them(d.id, d.data().email, d.data().ten); });
+            const ds = Array.from(DS_HS.values()).sort((a, b) => tenHocSinh(a).localeCompare(tenHocSinh(b), 'vi'));
+            // Chia nhóm theo khóa học đang được cấp (phan_quyen/{email}); em học nhiều khóa thì có mặt ở mỗi nhóm
+            const quyen = new Map();
+            if (pq.status === 'fulfilled') pq.value.docs.forEach((d) => quyen.set(d.id.toLowerCase(), d.data()));
+            const khoaCua = (h) => Object.keys(TEN_KHOA).filter((k) => (quyen.get(h.email) || {})[k] === true);
+            const nhom = Object.keys(TEN_KHOA).map((k) => ({ ten: TEN_KHOA[k], ds: ds.filter((h) => khoaCua(h).includes(k)) }))
+                .concat([{ ten: 'Chưa có khóa học', ds: ds.filter((h) => !khoaCua(h).length) }])
+                .filter((g) => g.ds.length);
+            const chon = new URLSearchParams(location.search).get('hs') || '';
+            $('ds-hoc-sinh').innerHTML = '<option value="">' + (ds.length ? '— Chọn học sinh (' + ds.length + ' em) —' : 'Chưa có học sinh nào có dữ liệu') + '</option>' +
+                nhom.map((g) => '<optgroup label="' + esc(g.ten + ' (' + g.ds.length + ' em)') + '">' +
+                    g.ds.map((h) => '<option value="' + esc(h.uid) + '">' + esc(h.ten ? h.ten + ' · ' + h.email : h.email) + '</option>').join('') + '</optgroup>').join('');
+            if (chon && DS_HS.has(chon)) { $('ds-hoc-sinh').value = chon; xemHocSinh(chon); }
+            else $('trang-thai').innerHTML = '<div class="max-w-md mx-auto bg-white rounded-3xl border border-slate-200 p-8"><i class="fa-solid fa-chalkboard-user text-3xl text-teal-600"></i>' +
+                '<p class="mt-3 font-semibold text-slate-800">' + (hs.status === 'rejected' && bl.status === 'rejected' ? 'Không tải được danh sách học sinh. Kiểm tra mạng rồi tải lại trang.' : 'Chọn một học sinh ở đầu trang để xem góc học tập của em đó') + '</p></div>';
+        }
+        $('ds-hoc-sinh').addEventListener('change', (e) => {
+            const uid = e.target.value;
+            history.replaceState(null, '', uid ? '?hs=' + encodeURIComponent(uid) : location.pathname);
+            if (uid) xemHocSinh(uid);
+        });
+        async function xemHocSinh(uid) {
+            const lan = ++lanXem;
+            const hs = DS_HS.get(uid);
+            $('loi-chao').textContent = hs ? tenHocSinh(hs) : 'Học sinh';
+            $('o-tong-quan').innerHTML = '';
+            $('noi-dung').classList.add('hidden');
+            $('trang-thai').classList.remove('hidden');
+            $('trang-thai').innerHTML = '<i class="fa-solid fa-circle-notch fa-spin text-2xl text-primary"></i><p class="mt-3">Đang tải dữ liệu của học sinh...</p>';
+            try {
+                const du = await taiDuLieu(uid);
+                if (lan === lanXem) veTatCa(du);
+            } catch (err) {
+                console.error(err);
+                if (lan === lanXem) $('trang-thai').innerHTML = '<p class="text-red-600">Không tải được dữ liệu của học sinh này. Kiểm tra mạng rồi thử lại.</p>';
+            }
+        }
+
         firebase.auth().onAuthStateChanged(async (user) => {
             const khuVucDangNhap = $('khu-vuc-dang-nhap'), khuVucUser = $('khu-vuc-user'), nutDangXuatMobile = $('nutDangXuatMobile');
             if (user) {
@@ -892,12 +989,18 @@
                     '<a href="login.html" class="inline-block mt-5 bg-primary hover:bg-teal-700 text-white px-6 py-2.5 rounded-full font-semibold">Đăng nhập</a></div>';
                 return;
             }
-            $('loi-chao').textContent = 'Xin chào, ' + user.email.split('@')[0] + '!';
             $('nut-tai-khoan').classList.remove('hidden'); $('nut-tai-khoan').classList.add('inline-flex');
+            if (user.email === ADMIN_EMAIL) {
+                boBanDem();
+                if (location.hash === '#doi-mat-khau') $('nut-tai-khoan').click();
+                if (!XEM_HO) moCheDoGiaoVien();
+                return;
+            }
+            $('loi-chao').textContent = 'Xin chào, ' + user.email.split('@')[0] + '!';
             // Hiện ngay bản đã vẽ lần trước (lưu trên máy), đồng thời đọc dữ liệu mới song song với quyền / đơn đăng ký
             if (banDemCua && banDemCua !== user.uid) boBanDem();
             const coBanDem = banDemCua === user.uid || hienBanDem(user.uid);
-            const huaDuLieu = taiDuLieu(user);
+            const huaDuLieu = taiDuLieu(user.uid);
             huaDuLieu.catch(() => {});   // lỗi xử lý ở dưới (lúc await), tránh báo lỗi "chưa bắt" trong lúc chờ quyền
             try {
                 const db = firebase.firestore();
@@ -908,19 +1011,7 @@
             veThongBaoTaiKhoan();
             if (location.hash === '#doi-mat-khau') $('nut-tai-khoan').click();
             try {
-                const du = await huaDuLieu;
-                const pt = phanTich(du), nh = ngayHoc(du.hocSinh);
-                veTongQuan(du, pt, nh);
-                veBieuDoDiem(pt);
-                veDanhSachDe(du);
-                veCauXemLai(du);
-                veTheoPhan(pt);
-                veKiemTraCongThuc(du);
-                veHoatDong(du, nh);
-                veBaiGanDay(du);
-                veGoiY(du, pt, nh);
-                $('trang-thai').classList.add('hidden');
-                $('noi-dung').classList.remove('hidden');
+                veTatCa(await huaDuLieu);
                 luuBanDem(user);
             } catch (err) {
                 console.error(err);

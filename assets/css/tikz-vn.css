@@ -1,0 +1,9 @@
+/* Chữ tiếng Việt có dấu trong hình TikZ (SVG) của đề thi.
+   Latin Modern (GUST Font License), rút gọn còn bảng chữ tiếng Việt, cùng kiểu chữ Computer Modern của TeX. */
+@font-face { font-family: lmvn-roman; src: url('../fonts/tikz-vn/lmvn-roman.woff2') format('woff2'); }
+@font-face { font-family: lmvn-bold; src: url('../fonts/tikz-vn/lmvn-bold.woff2') format('woff2'); }
+@font-face { font-family: lmvn-italic; src: url('../fonts/tikz-vn/lmvn-italic.woff2') format('woff2'); }
+@font-face { font-family: lmvn-bolditalic; src: url('../fonts/tikz-vn/lmvn-bolditalic.woff2') format('woff2'); }
+@font-face { font-family: lmvn-sans; src: url('../fonts/tikz-vn/lmvn-sans.woff2') format('woff2'); }
+@font-face { font-family: lmvn-sansbold; src: url('../fonts/tikz-vn/lmvn-sansbold.woff2') format('woff2'); }
+@font-face { font-family: lmvn-mono; src: url('../fonts/tikz-vn/lmvn-mono.woff2') format('woff2'); }

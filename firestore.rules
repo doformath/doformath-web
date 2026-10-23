@@ -150,9 +150,16 @@ service cloud.firestore {
         && request.resource.data.traLoi is map && request.resource.data.traLoi.size() <= 200
         && request.resource.data.tieuDe is string && request.resource.data.tieuDe.size() <= 200
         && get(/databases/$(database)/documents/de_thi/$(request.resource.data.deId)).data.trangThai == 'mo';
-      // Học sinh không sửa được bài đã nộp; Admin chỉ được ghi điểm tự luận chấm tay
+      // Admin làm bài thay học sinh (làm trên giấy, máy lỗi...): tạo bài cho đúng học sinh đó, đánh dấu nhapTay
+      allow create: if laAdmin()
+        && request.resource.data.keys().hasOnly(['deId', 'uid', 'email', 'tieuDe', 'traLoi', 'batDau', 'thoiGianLam', 'viPham', 'tuDongNop', 'lyDoNop', 'nopLuc', 'nhapTay'])
+        && baiId == request.resource.data.deId + '__' + request.resource.data.uid
+        && request.resource.data.traLoi is map && request.resource.data.traLoi.size() <= 200
+        && exists(/databases/$(database)/documents/de_thi/$(request.resource.data.deId));
+      // Học sinh không sửa được bài đã nộp; Admin chỉ được ghi điểm tự luận chấm tay và sửa đáp án (làm bài thay)
       allow update: if laAdmin()
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['diemTuLuan', 'chamTuLuanLuc'])
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['diemTuLuan', 'chamTuLuanLuc', 'traLoi', 'nhapTay', 'suaLuc'])
+        && (request.resource.data.traLoi is map && request.resource.data.traLoi.size() <= 200)
         && (!('diemTuLuan' in request.resource.data)
             || (request.resource.data.diemTuLuan is number && request.resource.data.diemTuLuan >= 0 && request.resource.data.diemTuLuan <= 10));
       allow delete: if laAdmin();
